@@ -1,0 +1,69 @@
+help-messages:
+  - "{LONG_LINE}"
+  - "&7&lMine&c&lJunkie &78- &7&lHelpful Information"
+  - "&eUse `/cell create` to create a new cell."
+  - "{LONG_LINE}"
+
+global-region:
+  # If players can open enderchests in the global region
+  allow-open-enderchest: true
+
+vanilla-mechanics:
+  # If fall damage is disabled
+  disable-fall-damage: true
+  # If suffocation damage is disabled
+  disable-suffocation-damage: true
+  # If drowning damage is disabled
+  disable-drowning-damage: true
+  # If item damage is disabled
+  disable-item-damage: true
+  # If anvil mechanics are disabled
+  disable-anvil-mechanics: true
+  # If farming mechanics are disabled
+  disable-farming-mechanics: true
+  # If brewing mechanics are disabled
+  disable-brewing-mechanics: true
+
+# The auto-smelt configuration section
+auto-smelt:
+  # The block-to-reward list
+  block-list:
+    - "GOLD_ORE,GOLD_INGOT"
+    - "IRON_ORE,IRON_INGOT"
+    - "STONE,STONE"
+
+# The drops-to-inv configuration section
+drops-to-inv:
+  ignored-block-list:
+    - "SKULL_ITEM"
+    - "SKULL"
+
+# The fortune configuration section
+fortune:
+  min-drops: 1
+  max-drops: 700
+  multiplier: 0.1
+  modifier: 2
+  random-drop-amount: true
+  block-list:
+    - "DIAMOND_ORE"
+    - "EMERALD_ORE"
+    - "GOLD_ORE"
+    - "IRON_ORE"
+    - "LAPIS_ORE"
+    - "REDSTONE_ORE"
+    - "QUARTZ_ORE"
+    - "COAL_ORE"
+    - "DIAMOND_BLOCK"
+    - "EMERALD_BLOCK"
+    - "GOLD_BLOCK"
+    - "IRON_BLOCK"
+    - "LAPIS_BLOCK"
+    - "REDSTONE_BLOCK"
+    - "QUARTZ_BLOCK"
+    - "COAL_BLOCK"
+    - "STONE"
+    - "COBBLESTONE"
+    - "ENDER_STONE"
+    - "BEDROCK"
+    - "OBSIDIAN"

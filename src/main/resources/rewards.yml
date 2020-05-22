@@ -1,0 +1,68 @@
+# The rewards chat prefix
+chat-prefix: "&7[&c&lRewards&7] "
+
+# Rewards that are given when an event occurs
+event-rewards:
+  money-per-block-break: 0.0
+  tokens-per-block-break: 1
+
+# MineCrates are crates that give rewards and are randomly spawned as a player mines
+mine-crates:
+  # The cooldown time before a player can find another MineCrate
+  cooldown: 10000
+  # If only the owner can open a MineCrate
+  only-owner-can-open: true
+  # The lines of text to display above the MineCrate
+  hologram-lines:
+    - "&4&k/&r &c{ownerName}'s &lMineCrate &4&k\\"
+    - "&7(Break to get rewards!)"
+  # The MineCrate reward-sets definitions
+  reward-sets:
+    default:
+      chance: 30.0
+      max-rewards: 2
+      items:
+        - name: "&c&l⏣&6&l1,000 Tokens"
+          chance: 30.0
+          commands:
+            - "tokens give {playerName} 1000"
+        - name: "&c&l⏣&6&l2,000 Tokens"
+          chance: 20.0
+          commands:
+            - "tokens give {playerName} 2000"
+        - name: "&c&l⏣&6&l2,500 Tokens"
+          chance: 13.0
+          commands:
+            - "tokens give {playerName} 2500"
+        - name: "&c&l⏣&6&l2,650 Tokens"
+          chance: 10.0
+          commands:
+            - "tokens give {playerName} 2650"
+        - name: "&c&l⏣&6&l2,800 Tokens"
+          chance: 8.0
+          commands:
+            - "tokens give {playerName} 2800"
+        - name: "&c&l⏣&6&l3,000 Tokens"
+          chance: 6.0
+          commands:
+            - "tokens give {playerName} 3000"
+        - name: "&e&l1x &a&lCommon Key"
+          chance: 4.0
+          commands:
+            - "crate givekey to {playerName} Common 1"
+        - name: "&e&l1x &c&lLegendary Key"
+          chance: 4.0
+          commands:
+            - "crate givekey to {playerName} Legendary 1"
+      worlds:
+        - "PrisonWorld"
+
+# The Delivery Man provides incentives to reach goals for rewards
+delivery-man:
+  menu-title: "&c&lThe Delivery Man"
+  npc:
+    hologram-lines:
+      - "&c&lThe Delivery Man"
+      - "&7(Click to claim free rewards!)"
+    texture-value: "eyJ0aW1lc3RhbXAiOjE1NzQxMDkyOTg1OTQsInByb2ZpbGVJZCI6IjkxOGEwMjk1NTlkZDRjZTZiMTZmN2E1ZDUzZWZiNDEyIiwicHJvZmlsZU5hbWUiOiJCZWV2ZWxvcGVyIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8zMDRhZmU5ZmM1Njk0MDAwNWE0OTFhMWUwNmRkOGJhOTVkMWQ4ODQzYWQ1ZjY4NGJjYzY2MjA3NWIwY2FkYjM4In19fQ=="
+    texture-signature: "UCAq+xEM4j7uVneaLgFaaRCTRU05Qh7Z5eRJJrr3ggv1Xa9QlhQeYg8BYtsYPN4jODQgdnkyhYr0SYkASlMPiuNnNSc97P27hdecIOQcIFZTOgarZHkJaWWv3eZ9nV4EPGp+l8CctimlZeE73dPfxCWSKl18po0Ga8bvQRFZoi/POISBn9hR9UQKmZnOc77xOfEbiJAL+5wOCoDc7XrxeLGeL+79SxhkMj0LpPvktZpmtOJ4JNzKOrHJVy76QAuJRHGAQ8mcuowiZ+L7yDFTpJ2WQutMYC9zOkVPEH44vBvr6+ZcHAwUMWqEU5wObHYp6ZqAll/zABbu1ibggFV8H+V7sascaS/Mj1O+ujzypAeUKAYxiECTB7POLvUdQRSDStEPzctydVNMV7XzQRgmkbuVFfsW2lIEKU2q36nLxfVdfcAqgA0JYZvcac8YHWxbZ85C9lKf8Qxb/4jR+AJARykeztvRMzAE06WAcC9mNRht88WJu2U2axLw9JYByx66ou2nCWZS39/ENOidygVQAb2FpuC43DqXI9WXeBCKfI8rk4GMjVTGYs8g5SZVITmXwuwwiyfujqHLPvSpSZtEt/JpgSf3VTXu/lzPfOImRQF2ZgxsQP88O0BEa8Lu5a8wKia912qhTj+Xpzo7kVd4c8AMG3ftprw/0MqWIwYvjGU="

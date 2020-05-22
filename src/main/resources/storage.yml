@@ -1,0 +1,4 @@
+# All you need to do is specify what MongoDB database you'd like to store PrisonAIO data in.
+# This allows you to run multiple PrisonAIO instances on a single MongoDB server.
+# To configure your MongoDB credentials, edit the `/plugins/Cubed/config.json` file.
+mongo-database: "PrisonAIO"

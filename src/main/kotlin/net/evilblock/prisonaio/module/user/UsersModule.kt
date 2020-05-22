@@ -1,0 +1,132 @@
+package net.evilblock.prisonaio.module.user
+
+import net.evilblock.cubed.command.data.parameter.ParameterType
+import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
+import net.evilblock.prisonaio.module.user.bank.command.BankNoteGiveCommand
+import net.evilblock.prisonaio.module.user.command.WithdrawCommand
+import net.evilblock.prisonaio.module.user.bank.listener.BankNoteAdminListeners
+import net.evilblock.prisonaio.module.user.bank.listener.BankNoteDupeListeners
+import net.evilblock.prisonaio.module.user.bank.listener.BankNoteListeners
+import net.evilblock.prisonaio.module.user.command.*
+import net.evilblock.prisonaio.module.user.command.admin.*
+import net.evilblock.prisonaio.module.user.command.parameter.UserParameterType
+import net.evilblock.prisonaio.module.user.listener.DropPickaxeListeners
+import net.evilblock.prisonaio.module.user.listener.UserCacheListeners
+import net.evilblock.prisonaio.module.user.listener.UserStatisticsListeners
+import net.evilblock.prisonaio.module.user.perk.Perk
+import net.evilblock.prisonaio.module.user.task.PlayTimeSyncTask
+import org.bukkit.ChatColor
+import org.bukkit.event.Listener
+
+object UsersModule : PluginModule() {
+
+    private lateinit var permissionSalesMultipliers: Map<String, Double>
+
+    override fun getName(): String {
+        return "Users"
+    }
+
+    override fun getConfigFileName(): String {
+        return "users"
+    }
+
+    override fun onEnable() {
+        permissionSalesMultipliers = readPermissionSalesMultipliers()
+
+        UserHandler.initialLoad()
+        BankNoteHandler.initialLoad()
+
+        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), PlayTimeSyncTask, 20L * 30, 2L * 30)
+    }
+
+    override fun onDisable() {
+        for (user in UserHandler.getUsers()) {
+            user.statistics.syncPlayTime()
+        }
+
+        UserHandler.saveData()
+        BankNoteHandler.saveData()
+    }
+
+    override fun onReload() {
+        permissionSalesMultipliers = readPermissionSalesMultipliers()
+    }
+
+    override fun onAutoSave() {
+        UserHandler.saveData()
+        BankNoteHandler.saveData()
+    }
+
+    override fun getListeners(): List<Listener> {
+        return listOf(
+            DropPickaxeListeners,
+            UserCacheListeners,
+            UserStatisticsListeners,
+            BankNoteAdminListeners,
+            BankNoteDupeListeners,
+            BankNoteListeners
+        )
+    }
+
+    override fun getCommands(): List<Class<*>> {
+        return listOf(
+            AutoSellCommand.javaClass,
+            AutoSmeltCommand.javaClass,
+            DropCommand.javaClass,
+            PingCommand.javaClass,
+            PrestigeCommand.javaClass,
+            ProfileCommand.javaClass,
+            RankupAllCommand.javaClass,
+            RankupCommand.javaClass,
+            RankupsCommand.javaClass,
+            SalesMultiplierCommand.javaClass,
+            SettingsCommand.javaClass,
+            TokensCommand.javaClass,
+            TokensHelpCommand.javaClass,
+            TokensWithdrawCommand.javaClass,
+            WithdrawCommand.javaClass,
+            GrantPerkCommand.javaClass,
+            PerkGrantsCommand.javaClass,
+            TokensGiveCommand.javaClass,
+            TokensResetCommand.javaClass,
+            TokensSetCommand.javaClass,
+            TokensTakeCommand.javaClass,
+            BankNoteGiveCommand.javaClass,
+            UserSetRankCommand.javaClass,
+            UserSetPrestigeCommand.javaClass
+        )
+    }
+
+    override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
+        return mapOf(
+            User::class.java to UserParameterType,
+            Perk::class.java to Perk.PerkParameterType
+        )
+    }
+
+    fun getMaxPrestige(): Int {
+        return config.getInt("prestige.max-prestige", 50)
+    }
+
+    fun getMaxPrestigeTag(): String {
+        return ChatColor.translateAlternateColorCodes('&', config.getString("prestige.max-prestige-tag"))
+    }
+
+    fun isAutoSmeltPerkEnabledByDefault(): Boolean {
+        return config.getBoolean("perks.auto-smelt.default-enabled")
+    }
+
+    fun getPermissionSalesMultipliers(): Map<String, Double> {
+        return permissionSalesMultipliers
+    }
+
+    private fun readPermissionSalesMultipliers(): Map<String, Double> {
+        val section = config.getConfigurationSection("perks.sales-boost.permission-multipliers")
+        return section.getKeys(false).map {
+            println("getting multi for perm $it: ${section.getDouble(it)}")
+            it to section.getDouble(it)
+        }.sortedByDescending { it.second }.toMap()
+    }
+
+}

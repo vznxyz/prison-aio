@@ -1,0 +1,11 @@
+main: net.evilblock.prisonaio.PrisonAIO
+name: PrisonAIO
+description: "All-in-one Prison"
+author: joeleoli
+version: "1.0"
+depend:
+  - Vault
+  - Cubed
+  - WorldGuard
+softdepend:
+  - DeluxeTags

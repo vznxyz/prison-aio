@@ -1,0 +1,18 @@
+# Configuration structure breakdown
+#
+# ranks:
+#   A:              <- the id of the rank
+#     commands:     <- the list of commands that are executed by console when a player purchases this rank
+#       - ""
+#     permissions:  <- the list of permissions that are assigned to the player if their rank is >= this rank
+#
+ranks:
+  A:
+    commands:
+      - "broadcast this command is executed when a player purchases rank a"
+    permissions:
+      - "some.test.permission"
+# For every rank the user has, these default permissions are applied. Supports the `rankId` placeholder.
+default-permissions:
+  - "prisonaio.shops.{rankId}"
+  - "essentials.warp.{rankId}"

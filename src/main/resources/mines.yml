@@ -1,0 +1,6 @@
+# NOTICE:
+# This configuration file is dedicated to mines only. For mining mechanics settings such as
+# auto-smelt, drops-to-inv, fortune, and mining rewards, see `mechanics.yml`.
+
+# The radius around each region that determines if the player is considered nearby
+nearby-radius: 5

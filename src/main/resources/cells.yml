@@ -1,0 +1,28 @@
+grid:
+  # The name of the world that hosts the grid
+  world-name: "CellsWorld"
+  # The amount of columns in the grid
+  columns: 200
+  # The gutter width (in blocks) of the grid
+  gutter-width: 300
+cell:
+  # The name of the schematic file in the `/plugins/WorldEdit/schematics/` directory
+  schematic-file: "CellBuild.schematic"
+  # The maximum amount of members per cell
+  max-members: 6
+  # The maximum characters a cell's name can contain
+  max-name-length: 32
+  # Jerry The Prison Guard settings
+  jerry:
+    hologram-lines:
+      - "&e&lJerry The Prison Guard"
+      - "&7News, Settings & Achievements"
+    change-log:
+      - ""
+      - "&7Posted 4/5/2020"
+      - "&7Cells have been added to the game!"
+      - ""
+      - "&7Configure this changelog in"
+      - "&7the cells.yml file."
+    texture-value: "eyJ0aW1lc3RhbXAiOjE1NzQ4NjI0ODY5NjEsInByb2ZpbGVJZCI6IjgyYzYwNmM1YzY1MjRiNzk4YjkxYTEyZDNhNjE2OTc3IiwicHJvZmlsZU5hbWUiOiJOb3ROb3RvcmlvdXNOZW1vIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9hODc1NzM5MWRmOGVkNGNmOGU0MzNlZmQ5NWZkM2JmOGI2ZGQ1Y2FiNzk5OTc5MGRjY2ZmMjk2ZjM5Nzg2MjgwIn19fQ=="
+    texture-signature: "lFyyHwSgbYxZ9AZ77iGUx91Xm35bjFp6VgyXMphDgHnqi6plwCKu7qzSm/+OMby9y+1RsSET97vQ4CGLN1Yk76ek8wxv/F7ayEYqxMytpxq6rLDPyUWavdeEPlQfpSS0DTNzNHDClBZJLEqXIt5zeWZFc6RWORJjzI6VAqiKPYM+uPbZkeUMtvKn/S9DdweWOtoHa/TdhE0wwDntVYCQM2fnB1VAZmEwFXrNJ5JYsW+cmSyqWGRtP2riKgy60c2V+gHtQKRV2cujwz24v8jijQe8bA8Mevd0txjbL2tJ0rYmZ3ZlH80UB9UswCQZ4+HK6ekXIH98eXi5UF5L+W3AW+09PHsZc1bvKAFa+QpcxV3PisnZLyVBzo2Nic7co6E2GGcSIfUxlE7wUFPShmhyjvpH09p9kv67CMcVXbStlvdd+WdDDisEqWdxWDXxomJj0rFZqPiGINY6yFVdaOCrDvJ9VGiS4phzMai5iiTQGR8UhokIRgo7Gba12CvzoMuy4kDKBqpHo7xwD/pCnDETAtpbtz/L5oaONkPDHrX1YHiO7JZqbAxEwEQ1/eUKfB6TLkjO1YFflVR9Mwoo6fM3Yl/WIDqSezhnHP7PDNMNLnxw9vnDVPuUOmN8R1rAw0tV1gtHEL/GsflX3DRAS/wqLAIPcr3GteXoR9hBbBjSWDQ="

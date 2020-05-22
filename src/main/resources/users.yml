@@ -1,0 +1,21 @@
+prestige:
+  max-prestige: 50
+  max-prestige-tag: "&6&lMaster"
+perks:
+  auto-smelt:
+    # If true, all players will have access to the auto-smelt perk
+    default-enabled: true
+  sales-boost:
+    # Give a group of players a sales multiplier using permissions
+    permission-multipliers:
+      sales-multi-kingpin: 3.0
+      sales-multi-druglord: 2.0
+      sales-multi-narco: 2.0
+      sales-multi-boss: 1.8
+      sales-multi-hitman: 1.7
+      sales-multi-spy: 1.6
+      sales-multi-assassin: 1.5
+      sales-multi-gangster: 1.4
+      sales-multi-thug: 1.3
+      sales-multi-thief: 1.2
+      sales-multi-civilian: 1.1

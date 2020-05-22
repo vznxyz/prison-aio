@@ -1,0 +1,10 @@
+# The chat prefix that is prepended to crates messages
+chat-prefix: "&7[&c&lCrates&7] "
+
+default-hologram-lines:
+  - "&7&oCrate line 1"
+  - "&7&oCrate line 2"
+  - "&7&oCrate line 3"
+
+# If the preview menu will show the chances of winning each reward
+show-chances-preview: true
