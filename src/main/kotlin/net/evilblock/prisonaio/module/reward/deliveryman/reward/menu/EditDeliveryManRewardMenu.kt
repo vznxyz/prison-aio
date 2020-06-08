@@ -114,15 +114,14 @@ class EditDeliveryManRewardMenu(private val reward: DeliveryManReward) : Menu() 
         }
 
         override fun getDescription(player: Player): List<String> {
-            return listOf(
-                "",
-                "${ChatColor.GRAY}The text that appears in the",
-                "${ChatColor.GRAY}`rewards` section of the button",
-                "${ChatColor.GRAY}representing this reward in the",
-                "${ChatColor.GRAY}Delivery Man menu.",
-                "",
-                "${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit rewards text"
-            )
+            val description = arrayListOf<String>()
+
+            description.add("")
+            description.addAll(TextSplitter.split(length = 40, text = "The text that appears in the `rewards` section of the button representing this reward in the Delivery Man menu.", linePrefix = "${ChatColor.GRAY}"))
+            description.add("")
+            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit rewards text")
+
+            return description
         }
 
         override fun getMaterial(player: Player): Material {
@@ -142,17 +141,18 @@ class EditDeliveryManRewardMenu(private val reward: DeliveryManReward) : Menu() 
         }
 
         override fun getDescription(player: Player): List<String> {
-            return listOf(
-                "",
-                "${ChatColor.GRAY}The commands that get executed",
-                "${ChatColor.GRAY}when a player claims this reward.",
-                "",
-                "${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit commands"
-            )
+            val description = arrayListOf<String>()
+
+            description.add("")
+            description.addAll(TextSplitter.split(length = 40, text = "The commands that are executed when a player claims this reward.", linePrefix = "${ChatColor.GRAY}"))
+            description.add("")
+            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit commands")
+
+            return description
         }
 
         override fun getMaterial(player: Player): Material {
-            return Material.COMMAND_REPEATING
+            return Material.COMMAND
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {

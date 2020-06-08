@@ -5,7 +5,6 @@ import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.crate.command.*
 import net.evilblock.prisonaio.module.crate.command.parameter.CrateParameterType
 import net.evilblock.prisonaio.module.crate.key.CrateKeyHandler
-import net.evilblock.prisonaio.module.crate.key.listener.CrateKeyAdminListeners
 import net.evilblock.prisonaio.module.crate.key.listener.CrateKeyDupeListeners
 import net.evilblock.prisonaio.module.crate.listener.CrateMechanicsListeners
 import net.evilblock.prisonaio.module.crate.listener.CrateSetupListeners
@@ -32,7 +31,7 @@ object CratesModule : PluginModule() {
         CrateRollHandler.initialLoad()
         PlacedCrateHandler.initialLoad()
 
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), CrateRollTicker(), 1L, 1L)
+        CrateRollTicker().start()
     }
 
     override fun onDisable() {
@@ -67,7 +66,7 @@ object CratesModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
-            CrateKeyAdminListeners,
+//            CrateKeyAdminListeners,
             CrateKeyDupeListeners,
             CrateMechanicsListeners,
             CrateRollInterruptListeners,

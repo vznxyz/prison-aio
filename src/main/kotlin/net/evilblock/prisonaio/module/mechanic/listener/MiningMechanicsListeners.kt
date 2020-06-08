@@ -1,6 +1,7 @@
 package net.evilblock.prisonaio.module.mechanic.listener
 
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.mechanic.region.Regions
@@ -42,39 +43,34 @@ object MiningMechanicsListeners : Listener {
             return
         }
 
-        // add drops if block is not on drops-to-inv ignored block list
+        // add drops to inventory if the block is on the drops-to-inv ignore list
         if (MechanicsModule.getDropsToInvIgnoredBlocks().contains(event.block.type)) {
             return
         }
 
+        // we never want items to drop naturally
+        event.isDropItems = false
+
         val user = UserHandler.getUser(event.player.uniqueId)
-
-        // get drops based on tool and block
         val drops = getBlockDrops(itemInHand, user, event.player, event.block)
-
-        // if auto-sell is enabled, sell our drops instead of adding them to inventory
-        if (user.perks.isPerkEnabled(Perk.AUTO_SELL) && user.perks.hasPerk(event.player, Perk.AUTO_SELL)) {
-            try {
-                val dropsRemaining = ShopHandler.sellDrops(event.player, drops)
-                if (dropsRemaining.isNotEmpty()) {
-                    dropsRemaining.forEach { drop -> event.player.inventory.addItem(drop) }
-                    event.player.updateInventory()
-                }
-            } catch (e: IllegalStateException) {}
-        } else {
-            drops.forEach { drop -> event.player.inventory.addItem(drop) }
-            event.player.updateInventory()
-        }
-
-        // send inventory updates
-        event.player.updateInventory()
 
         // simulate block breaking
         event.block.type = Material.AIR
         event.block.state.update()
 
-        // we drop the blocks ourselves
-        event.isDropItems = false
+        Tasks.async {
+            // if auto-sell is enabled, sell our drops instead of adding them to the player's inventory
+            if (user.perks.isPerkEnabled(Perk.AUTO_SELL) && user.perks.hasPerk(event.player, Perk.AUTO_SELL)) {
+                val itemsNotSold = ShopHandler.sellItems(event.player, drops)
+                if (itemsNotSold.isNotEmpty()) {
+                    itemsNotSold.forEach { drop -> event.player.inventory.addItem(drop) }
+                    event.player.updateInventory()
+                }
+            } else {
+                drops.forEach { drop -> event.player.inventory.addItem(drop) }
+                event.player.updateInventory()
+            }
+        }
     }
 
     /**
@@ -83,44 +79,42 @@ object MiningMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private fun onMultiBlockBreakEvent(event: MultiBlockBreakEvent) {
         // get the item in the player's hand
-        val itemInHand = event.player.inventory.itemInMainHand
-        if (itemInHand != null) {
-            // make sure the item is a tool
-            if (!isTool(itemInHand)) {
-                return
-            }
+        val itemInHand = event.player.inventory.itemInMainHand ?: return
 
-            val user = UserHandler.getUser(event.player.uniqueId)
-            val ignoredBlocks = MechanicsModule.getDropsToInvIgnoredBlocks()
-            val validBlocks = event.blockList.filter { !ignoredBlocks.contains(it.type) && (event.yield == 100F || SPLITTABLE_RANDOM.nextInt(100) < event.yield) }
+        // make sure the item is a tool
+        if (!isTool(itemInHand)) {
+            return
+        }
 
-            // get drops based on tool and block
-            val drops = arrayListOf<ItemStack>()
-            for (block in validBlocks) {
-                drops.addAll(getBlockDrops(itemInHand, user, event.player, block))
-            }
+        val user = UserHandler.getUser(event.player.uniqueId)
+        val ignoredBlocks = MechanicsModule.getDropsToInvIgnoredBlocks()
+        val validBlocks = event.blockList.filter { !ignoredBlocks.contains(it.type) && (event.yield == 100F || SPLITTABLE_RANDOM.nextInt(100) < event.yield) }
 
+        val drops = arrayListOf<ItemStack>()
+        for (block in validBlocks) {
+            drops.addAll(getBlockDrops(itemInHand, user, event.player, block))
+        }
+
+        // simulate block breaking
+        for (block in validBlocks) {
+            block.type = Material.AIR
+            block.state.update()
+        }
+
+        Tasks.async {
             // if auto-sell is enabled, sell our drops instead of adding them to inventory
             if (user.perks.isPerkEnabled(Perk.AUTO_SELL) && user.perks.hasPerk(event.player, Perk.AUTO_SELL)) {
                 try {
-                    val dropsRemaining = ShopHandler.sellDrops(event.player, drops)
-                    if (dropsRemaining.isNotEmpty()) {
-                        dropsRemaining.forEach { drop -> event.player.inventory.addItem(drop) }
+                    val itemsNotSold = ShopHandler.sellItems(event.player, drops)
+                    if (itemsNotSold.isNotEmpty()) {
+                        itemsNotSold.forEach { drop -> event.player.inventory.addItem(drop) }
                         event.player.updateInventory()
                     }
-                } catch (e: IllegalStateException) {}
+                } catch (e: IllegalStateException) {
+                }
             } else {
                 drops.forEach { drop -> event.player.inventory.addItem(drop) }
                 event.player.updateInventory()
-            }
-
-            // send inventory updates
-            event.player.updateInventory()
-
-            // simulate block breaking
-            for (block in validBlocks) {
-                block.type = Material.AIR
-                block.state.update()
             }
         }
     }
@@ -130,14 +124,61 @@ object MiningMechanicsListeners : Listener {
     }
 
     private fun isTool(itemStack: ItemStack?): Boolean {
-        if (itemStack == null || itemStack.type == Material.AIR) {
-            return false
+        return itemStack != null && itemStack.type != Material.AIR && TOOL_IDS.contains(itemStack.type.ordinal)
+    }
+
+    private fun getBlockDrops(itemInHand: ItemStack, user: User, player: Player, block: Block): MutableList<ItemStack> {
+        val toAdd = arrayListOf<ItemStack>()
+
+        // 1. if block is glass & tool is silk touch
+        // 2. if block drops with item context is not empty
+        // 3. natural block drops
+        val drops = if (isGlass(block.type) && itemInHand.containsEnchantment(Enchantment.SILK_TOUCH)) {
+            listOf(ItemBuilder.of(block.type).amount(1).data(block.state.data.data.toShort()).build())
+        } else {
+            val vanillaDrops = block.getDrops(itemInHand)
+            if (vanillaDrops.isNotEmpty()) {
+                vanillaDrops
+            } else {
+                block.drops
+            }
         }
 
-        return when(itemStack.type.ordinal) {
-            255, 256, 257, 260, 268, 269, 270, 272, 274, 276, 277, 278, 283, 284, 285, 358 -> true
-            else -> false
+        val autoSmeltEnabled = UsersModule.isAutoSmeltPerkEnabledByDefault() || user.perks.isPerkEnabled(Perk.AUTO_SMELT) && user.perks.hasPerk(player, Perk.AUTO_SMELT)
+        val region = Regions.findRegion(block.location)
+        val useFortune = region != null && region.supportsEnchants() && itemInHand.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)
+
+        val dropsIterator = drops.iterator()
+        while (dropsIterator.hasNext()) {
+            var drop = dropsIterator.next()
+
+            if (itemInHand.containsEnchantment(Enchantment.SILK_TOUCH) && !autoSmeltEnabled) {
+                drop.amount = 1
+
+                drop.type = if (block.type == Material.REDSTONE_ORE || block.type == Material.GLOWING_REDSTONE_ORE) {
+                    Material.REDSTONE_ORE
+                } else {
+                    block.type
+                }
+
+                toAdd.add(drop)
+                break
+            }
+
+            if (autoSmeltEnabled) {
+                drop = getSmelted(block, drop)
+            }
+
+            if (useFortune) {
+                if (MechanicsModule.isFortuneBlock(block.type)) {
+                    drop.amount = getFortuneAmount(itemInHand.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS))
+                }
+            }
+
+            toAdd.add(drop)
         }
+
+        return toAdd
     }
 
     private fun getSmelted(broken: Block, returnItem: ItemStack): ItemStack {
@@ -146,9 +187,9 @@ object MiningMechanicsListeners : Listener {
             return returnItem
         }
 
-        for (smelt in autoSmeltBlocks) {
-            if (broken.type == smelt.key) {
-                returnItem.type = smelt.value
+        for ((source, product) in autoSmeltBlocks) {
+            if (broken.type == source) {
+                returnItem.type = product
                 break
             }
         }
@@ -157,12 +198,11 @@ object MiningMechanicsListeners : Listener {
     }
 
     private fun getFortuneAmount(level: Int): Int {
-        val mechanics = MechanicsModule
-        val isRandomAmount = mechanics.isFortuneRandom()
-        val multiplier = mechanics.getFortuneMultiplier()
-        var modifier = mechanics.getFortuneModifier()
-        val minDrops = mechanics.getFortuneMinDrops()
-        val maxDrops = mechanics.getFortuneMaxDrops()
+        val isRandomAmount = MechanicsModule.isFortuneRandom()
+        val multiplier = MechanicsModule.getFortuneMultiplier()
+        var modifier = MechanicsModule.getFortuneModifier()
+        val minDrops = MechanicsModule.getFortuneMinDrops()
+        val maxDrops = MechanicsModule.getFortuneMaxDrops()
         var amountToDrop = (floor(level * multiplier) + 1.0).toInt()
 
         when {
@@ -200,78 +240,6 @@ object MiningMechanicsListeners : Listener {
         }
     }
 
-    private fun getBlockDrops(_itemInHand: ItemStack, user: User, player: Player, block: Block): List<ItemStack> {
-        var itemInHand = _itemInHand
-        if (itemInHand.type == Material.BOW) {
-            itemInHand = ItemStack(Material.DIAMOND_PICKAXE, 1)
-        }
-
-        val toAdd = arrayListOf<ItemStack>()
-
-        var drops = if (block.getDrops(itemInHand).isNotEmpty()) {
-            block.getDrops(itemInHand)
-        } else {
-            block.drops
-        }
-
-        if (isGlass(block.type) && itemInHand.containsEnchantment(Enchantment.SILK_TOUCH)) {
-            drops = listOf(
-                ItemBuilder.of(block.type)
-                    .amount(1)
-                    .data(block.state.data.data.toShort())
-                    .build()
-            )
-        }
-
-        val isTool = isTool(itemInHand)
-        val autoSmeltEnabled = UsersModule.isAutoSmeltPerkEnabledByDefault() || user.perks.isPerkEnabled(Perk.AUTO_SMELT) && user.perks.hasPerk(player, Perk.AUTO_SMELT)
-        val hasSilkTouch = itemInHand.containsEnchantment(Enchantment.SILK_TOUCH)
-        val hasFortune = itemInHand.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)
-        val dropsIterator = drops.iterator()
-        val region = Regions.findRegion(block.location)
-
-        while (dropsIterator.hasNext()) {
-            var breaks = false
-            var drop = dropsIterator.next()
-
-            if (isTool) {
-                if (autoSmeltEnabled) {
-                    drop = getSmelted(
-                        block,
-                        drop
-                    )
-                }
-
-                if (hasSilkTouch && !autoSmeltEnabled) {
-                    drop.amount = 1
-
-                    drop.type = if (block.type == Material.REDSTONE_ORE || block.type == Material.GLOWING_REDSTONE_ORE) {
-                        Material.REDSTONE_ORE
-                    } else {
-                        block.type
-                    }
-
-                    breaks = true
-                }
-
-                if (region != null && region.supportsEnchants()) {
-                    if (hasFortune) {
-                        val mechanics = MechanicsModule
-                        if (mechanics.isFortuneBlock(block.type)) {
-                            drop.amount = getFortuneAmount(itemInHand.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS))
-                        }
-                    }
-                }
-            }
-
-            toAdd.add(drop)
-
-            if (breaks) {
-                break
-            }
-        }
-
-        return toAdd
-    }
+    private val TOOL_IDS = arrayListOf(255, 256, 257, 260, 268, 269, 270, 272, 274, 276, 277, 278, 283, 284, 285, 358)
 
 }

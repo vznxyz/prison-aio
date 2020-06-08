@@ -12,30 +12,30 @@ import org.bukkit.event.inventory.InventoryClickEvent
 
 object CrateKeyAdminListeners : Listener {
 
-    @EventHandler(ignoreCancelled = true)
-    fun onInventoryClickEvent(event: InventoryClickEvent) {
-        if (event.clickedInventory == null) {
-            return
-        }
-
-        if (event.click != ClickType.CREATIVE) {
-            return
-        }
-
-        if (event.whoClicked.gameMode != GameMode.CREATIVE || !event.whoClicked.hasPermission(Permissions.CRATES_ADMIN)) {
-            return
-        }
-
-        val itemClicked = event.clickedInventory.getItem(event.slot)
-        if (itemClicked != null) {
-            if (CrateKeyHandler.isCrateKeyItemStack(itemClicked)) {
-                event.isCancelled = true
-
-                val crateKey = CrateKeyHandler.extractKey(itemClicked) ?: return
-
-                KeyDetailsMenu(crateKey).openMenu(event.whoClicked as Player)
-            }
-        }
-    }
+//    @EventHandler(ignoreCancelled = true)
+//    fun onInventoryClickEvent(event: InventoryClickEvent) {
+//        if (event.clickedInventory == null) {
+//            return
+//        }
+//
+//        if (event.click != ClickType.CREATIVE) {
+//            return
+//        }
+//
+//        if (event.whoClicked.gameMode != GameMode.CREATIVE || !event.whoClicked.hasPermission(Permissions.CRATES_ADMIN)) {
+//            return
+//        }
+//
+//        val itemClicked = event.clickedInventory.getItem(event.slot)
+//        if (itemClicked != null) {
+//            if (CrateKeyHandler.isCrateKeyItemStack(itemClicked)) {
+//                event.isCancelled = true
+//
+//                val crateKey = CrateKeyHandler.extractKey(itemClicked) ?: return
+//
+//                KeyDetailsMenu(crateKey).openMenu(event.whoClicked as Player)
+//            }
+//        }
+//    }
 
 }

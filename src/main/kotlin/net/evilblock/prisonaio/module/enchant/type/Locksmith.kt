@@ -30,7 +30,7 @@ object Locksmith : AbstractEnchant("locksmith", "Locksmith", 5) {
     override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
         for ((key, value) in readKeyPercentMap()) {
             if (Chance.percent(value)) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "crate give to " + event.player.name + " " + key + " 1")
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "crate givekey to " + event.player.name + " " + key + " 1")
                 sendMessage(event.player, "You have found a " + ChatColor.RED + ChatColor.BOLD + key + " Key" + ChatColor.GRAY + "!")
                 break
             }

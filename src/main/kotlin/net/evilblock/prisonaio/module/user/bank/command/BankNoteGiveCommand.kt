@@ -35,14 +35,14 @@ object BankNoteGiveCommand {
 
         BankNoteHandler.trackBankNote(bankNote)
 
+        val formattedValue = bankNote.getFormattedValue()
+
         if (target.inventory.firstEmpty() == -1) {
             target.enderChest.addItem(bankNote.toItemStack())
         } else {
             target.inventory.addItem(bankNote.toItemStack())
             target.updateInventory()
         }
-
-        val formattedValue = bankNote.getFormattedValue()
 
         sender.sendMessage("${ChatColor.GREEN}You've given a $formattedValue ${ChatColor.GREEN}bank note to ${ChatColor.YELLOW}${target.name}${ChatColor.GREEN}.")
 

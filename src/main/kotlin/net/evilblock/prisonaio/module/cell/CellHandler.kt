@@ -73,6 +73,12 @@ object CellHandler : PluginHandler {
 
         loadWorld()
         loadGrid()
+
+        Tasks.asyncTimer(20L * 60L, 20L * 60L) {
+            for (cell in grid.values) {
+                cell.updateCachedCellValue()
+            }
+        }
     }
 
     private fun loadWorld() {
@@ -255,6 +261,10 @@ object CellHandler : PluginHandler {
             joinableCache.putIfAbsent(player, HashSet())
             joinableCache[player]!!.add(cell)
         }
+    }
+
+    fun forgetCell(cell: Cell) {
+        grid.remove(cell.gridIndex)
     }
 
     fun updateJoinableCache(uuid: UUID, cell: Cell, joinable: Boolean) {

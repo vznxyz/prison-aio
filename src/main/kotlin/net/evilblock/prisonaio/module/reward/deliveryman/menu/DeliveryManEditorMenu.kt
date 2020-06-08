@@ -9,6 +9,7 @@ import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.prisonaio.module.reward.deliveryman.DeliveryManHandler
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.menu.EditDeliveryManRewardMenu
+import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -114,7 +115,7 @@ class DeliveryManEditorMenu : Menu() {
                 description.add("${ChatColor.GRAY}Nothing")
             } else {
                 for (line in reward.rewardsText) {
-                    description.add(" ${ChatColor.GRAY}● ${ChatColor.RESET}$line")
+                    description.add(" ${ChatColor.GRAY}${Constants.DOT_SYMBOL} ${ChatColor.RESET}$line")
                 }
             }
 

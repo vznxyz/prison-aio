@@ -7,7 +7,11 @@ import org.bukkit.entity.Player
 
 object MineWandCommand {
 
-    @Command(names = ["mine wand"], description = "Give yourself the region selection wand", permission = "prisonaio.mines.wand")
+    @Command(
+        names = ["mine wand"],
+        description = "Give yourself the region selection wand",
+        permission = "prisonaio.mines.wand"
+    )
     @JvmStatic
     fun execute(player: Player) {
         player.inventory.addItem(RegionSelection.SELECTION_ITEM)

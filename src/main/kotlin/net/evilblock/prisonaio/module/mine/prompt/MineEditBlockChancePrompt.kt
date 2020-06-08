@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
 class MineEditBlockChancePrompt(private val mine: Mine, private val blockType: BlockType) : StringPrompt() {
 
     override fun getPromptText(context: ConversationContext): String {
-        return "${ChatColor.GREEN}Please provide a new percentage value."
+        return "${ChatColor.GREEN}Please input a new percentage value."
     }
 
     override fun acceptInput(context: ConversationContext, input: String): Prompt? {

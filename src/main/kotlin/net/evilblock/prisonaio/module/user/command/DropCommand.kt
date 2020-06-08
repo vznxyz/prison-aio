@@ -20,7 +20,7 @@ object DropCommand {
             (player.getMetadata("CONFIRM_DROP")[0].value() as BukkitTask).cancel()
         }
 
-        player.setMetadata("CONFIRM_DROP", FixedMetadataValue(PrisonAIO.instance, Tasks.asyncDelayed(10_000L) {
+        player.setMetadata("CONFIRM_DROP", FixedMetadataValue(PrisonAIO.instance, Tasks.asyncDelayed(20L * 10) {
             player.removeMetadata("CONFIRM_DROP", PrisonAIO.instance)
         }))
 

@@ -71,12 +71,12 @@ abstract class Currency<T>(internal val amount: T) {
 
         override fun give(player: OfflinePlayer) {
             val user = UserHandler.getUser(player.uniqueId)
-            user.updateTokensBalance(user.getTokensBalance() + amount)
+            user.addTokensBalance(amount)
         }
 
         override fun take(player: OfflinePlayer) {
             val user = UserHandler.getUser(player.uniqueId)
-            user.updateTokensBalance(user.getTokensBalance() - amount)
+            user.subtractTokensBalance(amount)
         }
 
     }

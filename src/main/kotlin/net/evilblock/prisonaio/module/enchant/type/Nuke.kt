@@ -1,7 +1,6 @@
 package net.evilblock.prisonaio.module.enchant.type
 
 import net.evilblock.cubed.util.Chance
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.enchant.event.NukeExplodeEvent
@@ -50,7 +49,7 @@ object Nuke : AbstractEnchant("nuke", "Nuke", 2) {
 			}
 
 			if (region is Mine) {
-				Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked the ${ChatColor.RED}${region.getRegionName()} ${ChatColor.GRAY}mine!")
+				Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked the ${ChatColor.RED}${region.id} ${ChatColor.GRAY}mine!")
 			}
 
 			val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100F)

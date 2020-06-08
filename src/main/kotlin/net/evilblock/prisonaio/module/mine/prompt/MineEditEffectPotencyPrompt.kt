@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffectType
 class MineEditEffectPotencyPrompt(private val mine: Mine, private val potionEffectType: PotionEffectType) : StringPrompt() {
 
     override fun getPromptText(context: ConversationContext): String {
-        return "${ChatColor.GREEN}Please provide a new potency value."
+        return "${ChatColor.GREEN}Please input a new potency value."
     }
 
     override fun acceptInput(context: ConversationContext, input: String): Prompt? {

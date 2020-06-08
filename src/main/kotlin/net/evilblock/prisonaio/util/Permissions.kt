@@ -2,6 +2,8 @@ package net.evilblock.prisonaio.util
 
 object Permissions {
 
+    const val SYSTEM_ADMIN = "prisonaio.system.admin"
+
     const val REGION_BYPASS = "prisonaio.regions.bypass"
 
     const val USERS_ADMIN = "prisonaio.users.admin"
@@ -10,9 +12,9 @@ object Permissions {
     const val CRATES_ADMIN = "prisonaio.crates.admin"
     const val BANK_NOTES_ADMIN = "prisonaio.banknotes.admin"
     const val TOKENS_ADMIN = "prisonaio.tokens.admin"
+    const val BATTLE_PASS_ADMIN = "prisonaio.battlepass.admin"
 
-    const val AUTO_SELL = "prisonaio.mechanics.autosell"
-
-    const val SYSTEM_ADMIN = "prisonaio.system.admin"
+    const val PERK_AUTO_SELL = "user.perks.autosell"
+    const val PERK_FLY = "user.perks.fly"
 
 }

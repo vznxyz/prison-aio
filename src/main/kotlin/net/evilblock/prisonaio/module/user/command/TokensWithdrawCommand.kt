@@ -16,6 +16,11 @@ object TokensWithdrawCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "amount") tokens: Long) {
+        if (tokens < 1) {
+            player.sendMessage("${ChatColor.RED}You must withdraw at least 1 token.")
+            return
+        }
+
         val user = UserHandler.getUser(player.uniqueId)
 
         if (tokens > user.getTokensBalance()){
@@ -28,7 +33,7 @@ object TokensWithdrawCommand {
             return
         }
 
-        user.updateTokensBalance(user.getTokensBalance() - tokens)
+        user.subtractTokensBalance(tokens)
 
         val bankNote = BankNote(
             value = tokens.toDouble(),

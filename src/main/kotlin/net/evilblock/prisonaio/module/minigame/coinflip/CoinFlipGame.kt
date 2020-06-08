@@ -1,6 +1,9 @@
 package net.evilblock.prisonaio.module.minigame.coinflip
 
+import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.Chance
+import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.prisonaio.module.minigame.coinflip.menu.CoinFlipGameMenu
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.Bukkit
@@ -18,11 +21,10 @@ class CoinFlipGame(
 
     var stage: Stage = Stage.WAITING_FOR_OPPONENT
     var stageTicks: Int = 0
-    var winner: UUID? = null
+    var winner: User? = null
 
     private var rollIndex = 0
     private var rollSequence = arrayListOf(3, 3, 3, 3, 4)
-    private var titleAnimation = 0
 
     fun isCreator(player: Player): Boolean {
         return creator.uuid == player.uniqueId
@@ -44,10 +46,6 @@ class CoinFlipGame(
 
     fun getColorInvertAnimationSwitch(): Boolean {
         return rollIndex % 2 == 0
-    }
-
-    fun getTitleAnimationSwitch(): Boolean {
-        return titleAnimation % 2 == 0
     }
 
     fun isWaitingForOpponent(): Boolean {
@@ -85,12 +83,12 @@ class CoinFlipGame(
                     stageTicks = 0
 
                     winner = if (Chance.random()) {
-                        creator.uuid
+                        creator
                     } else {
-                        opponent!!.uuid
+                        opponent!!
                     }
 
-                    if (winner == opponent!!.uuid) {
+                    if (winner == opponent!!) {
                         rollSequence.add(4)
                     }
                 }
@@ -100,19 +98,31 @@ class CoinFlipGame(
                     rollIndex++
                     stageTicks = 0
 
-                    if (rollIndex % 2 == 0) {
-                        titleAnimation++
-                    }
-
                     if (rollIndex >= rollSequence.size) {
                         stage = Stage.FINISHED
                         stageTicks = 0
-
-                        finishGame()
                     }
                 }
             }
-            else -> {}
+            Stage.FINISHED -> {
+                if (stageTicks >= 15) {
+                    for (player in Bukkit.getOnlinePlayers()) {
+                        val openMenu = Menu.currentlyOpenedMenus[player.uniqueId]
+                        if (openMenu != null) {
+                            if (openMenu is CoinFlipGameMenu) {
+                                if (openMenu.game == this) {
+                                    // close inventory sync because sometimes the menu auto-updater will re-open the menu after it has already been closed
+                                    Tasks.sync {
+                                        player.closeInventory()
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    finishGame()
+                }
+            }
         }
     }
 

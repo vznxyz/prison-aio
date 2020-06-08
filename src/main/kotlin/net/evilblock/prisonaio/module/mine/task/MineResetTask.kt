@@ -1,6 +1,5 @@
 package net.evilblock.prisonaio.module.mine.task
 
-import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.mine.MineHandler
 
 object MineResetTask : Runnable {
@@ -9,6 +8,16 @@ object MineResetTask : Runnable {
 
     override fun run() {
         for (mine in MineHandler.getMines()) {
+            if (mine.region == null) {
+                continue
+            }
+
+            if (mine.getRemainingPercentage() < 20.0) {
+                if (mine.nextReset > 5) {
+                    mine.nextReset = 5
+                }
+            }
+
             mine.nextReset--
 
             // check if we need to send an interval message for this tick
@@ -28,7 +37,8 @@ object MineResetTask : Runnable {
                     if (mine.spawnPoint != null) {
                         mine.getNearbyPlayers().forEach { it.teleport(mine.spawnPoint) }
                     }
-                } catch (e: Exception) {}
+                } catch (e: Exception) {
+                }
             }
         }
     }

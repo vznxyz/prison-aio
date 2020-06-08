@@ -9,7 +9,11 @@ import org.bukkit.entity.Player
 
 object MineSetSpawnCommand {
 
-    @Command(names = ["mine setspawn"], description = "Set the spawn point of a mine", permission = "prisonaio.mines.setspawn")
+    @Command(
+        names = ["mine setspawn"],
+        description = "Set the spawn point of a mine",
+        permission = "prisonaio.mines.setspawn"
+    )
     @JvmStatic
     fun execute(player: Player, @Param(name = "mine") mine: Mine) {
         // update the mine's region to the player's selection

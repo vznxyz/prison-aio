@@ -9,7 +9,11 @@ import org.bukkit.entity.Player
 
 object MineDeleteCommand {
 
-    @Command(names = ["mine delete"], description = "Delete an existing mine", permission = "prisonaio.mines.delete")
+    @Command(
+        names = ["mine delete"],
+        description = "Delete an existing mine",
+        permission = "prisonaio.mines.delete"
+    )
     @JvmStatic
     fun execute(player: Player, @Param(name = "mine") mine: Mine) {
         MineHandler.deleteMine(mine)

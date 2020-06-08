@@ -11,7 +11,7 @@ object AbstractEnchantParameterType : ParameterType<AbstractEnchant?> {
 
     override fun transform(sender: CommandSender, source: String): AbstractEnchant? {
         for (enchant in EnchantsManager.getRegisteredEnchants()) {
-            if (enchant.enchant.equals(source, ignoreCase = true)) {
+            if (enchant.id.equals(source, ignoreCase = true)) {
                 return enchant
             }
         }

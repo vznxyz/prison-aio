@@ -33,7 +33,8 @@ object RankupAllCommand {
                 continue
             }
 
-            if (rank.price > balance) {
+            val rankPrice = rank.getPrice(user.getCurrentPrestige())
+            if (rankPrice > balance) {
                 break
             }
 
@@ -45,12 +46,12 @@ object RankupAllCommand {
             }
 
             VaultHook.useEconomy { economy ->
-                val response = economy.withdrawPlayer(player, rank.price.toDouble())
+                val response = economy.withdrawPlayer(player, rankPrice.toDouble())
                 if (!response.transactionSuccess()) {
                     return@useEconomy
                 }
 
-                balance -= rank.price
+                balance -= rankPrice
 
                 user.updateCurrentRank(rank)
                 rank.executeCommands(player)
@@ -73,7 +74,7 @@ object RankupAllCommand {
         player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Rankups Purchased")
         player.sendMessage(" ${ChatColor.GRAY}Congratulations on your rankups from ${previousRank.displayName} ${ChatColor.GRAY}to ${user.getCurrentRank().displayName}${ChatColor.GRAY}!")
 
-        val formattedMoneySpent = NumberUtils.format(purchasedRanks.map { it.price }.sum())
+        val formattedMoneySpent = NumberUtils.format(purchasedRanks.map { it.getPrice(user.getCurrentPrestige()) }.sum())
         player.sendMessage(" ${ChatColor.GRAY}The rankups cost ${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedMoneySpent${ChatColor.GRAY}.")
 
         player.sendMessage("")

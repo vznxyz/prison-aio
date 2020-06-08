@@ -11,9 +11,7 @@ import net.evilblock.prisonaio.module.user.bank.listener.BankNoteListeners
 import net.evilblock.prisonaio.module.user.command.*
 import net.evilblock.prisonaio.module.user.command.admin.*
 import net.evilblock.prisonaio.module.user.command.parameter.UserParameterType
-import net.evilblock.prisonaio.module.user.listener.DropPickaxeListeners
-import net.evilblock.prisonaio.module.user.listener.UserCacheListeners
-import net.evilblock.prisonaio.module.user.listener.UserStatisticsListeners
+import net.evilblock.prisonaio.module.user.listener.*
 import net.evilblock.prisonaio.module.user.perk.Perk
 import net.evilblock.prisonaio.module.user.task.PlayTimeSyncTask
 import org.bukkit.ChatColor
@@ -61,7 +59,9 @@ object UsersModule : PluginModule() {
     override fun getListeners(): List<Listener> {
         return listOf(
             DropPickaxeListeners,
+            TokenShopListeners,
             UserCacheListeners,
+            UserPerksListeners,
             UserStatisticsListeners,
             BankNoteAdminListeners,
             BankNoteDupeListeners,
@@ -74,6 +74,7 @@ object UsersModule : PluginModule() {
             AutoSellCommand.javaClass,
             AutoSmeltCommand.javaClass,
             DropCommand.javaClass,
+            FlyCommand.javaClass,
             PingCommand.javaClass,
             PrestigeCommand.javaClass,
             ProfileCommand.javaClass,
@@ -93,8 +94,10 @@ object UsersModule : PluginModule() {
             TokensSetCommand.javaClass,
             TokensTakeCommand.javaClass,
             BankNoteGiveCommand.javaClass,
+            UserResetCommand.javaClass,
+            UserSetPrestigeCommand.javaClass,
             UserSetRankCommand.javaClass,
-            UserSetPrestigeCommand.javaClass
+            UserStatisticsCommands.javaClass
         )
     }
 
@@ -113,6 +116,18 @@ object UsersModule : PluginModule() {
         return ChatColor.translateAlternateColorCodes('&', config.getString("prestige.max-prestige-tag"))
     }
 
+    fun getPrestigeBlocksMinedRequirementBase(): Int {
+        return config.getInt("prestige.blocks-mined-requirement.base")
+    }
+
+    fun getPrestigeBlocksMinedRequirementModifier(): Int {
+        return config.getInt("prestige.blocks-mined-requirement.modifier")
+    }
+
+    fun getPrestigeCommands(): List<String> {
+        return config.getStringList("prestige.commands")
+    }
+
     fun isAutoSmeltPerkEnabledByDefault(): Boolean {
         return config.getBoolean("perks.auto-smelt.default-enabled")
     }
@@ -124,7 +139,6 @@ object UsersModule : PluginModule() {
     private fun readPermissionSalesMultipliers(): Map<String, Double> {
         val section = config.getConfigurationSection("perks.sales-boost.permission-multipliers")
         return section.getKeys(false).map {
-            println("getting multi for perm $it: ${section.getDouble(it)}")
             it to section.getDouble(it)
         }.sortedByDescending { it.second }.toMap()
     }

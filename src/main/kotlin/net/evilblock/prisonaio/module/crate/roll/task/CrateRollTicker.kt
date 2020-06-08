@@ -2,17 +2,27 @@ package net.evilblock.prisonaio.module.crate.roll.task
 
 import net.evilblock.prisonaio.module.crate.roll.CrateRollHandler
 
-class CrateRollTicker : Runnable {
+class CrateRollTicker : Thread("PrisonAIO Crate Roll Thread") {
 
     override fun run() {
-        CrateRollHandler.getActiveRolls().forEach { roll ->
-            if (roll.canTick()) {
-                roll.tick()
+        while (true) {
+            CrateRollHandler.getActiveRolls().forEach { roll ->
+                try {
+                    if (roll.canTick()) {
+                        roll.tick()
 
-                if (roll.isFinished()) {
-                    CrateRollHandler.forgetRoll(roll)
+                        if (roll.isFinished()) {
+                            CrateRollHandler.forgetRoll(roll)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
+
+            try {
+                sleep(50L)
+            } catch (ignore: Exception) {}
         }
     }
 

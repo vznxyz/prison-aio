@@ -7,8 +7,9 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
-import net.evilblock.prisonaio.module.shop.exception.ShopTransactionInterruptedException
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
+import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.io.File
@@ -52,62 +53,56 @@ object ShopHandler: PluginHandler {
         Files.write(Cubed.gson.toJson(shopsMap.values), getInternalDataFile(), Charsets.UTF_8)
     }
 
-    @Throws(IllegalStateException::class, ShopTransactionInterruptedException::class)
-    fun sellDrops(player: Player, drops: List<ItemStack>): List<ItemStack> {
-        val dropsRemaining = drops.toMutableList()
-
+    fun sellItems(player: Player, items: MutableList<ItemStack>): List<ItemStack> {
         val accessibleShops = shopsMap.values.filter { it.hasAccess(player) }.sortedBy { it.priority }
+        if (accessibleShops.isEmpty()) {
+            player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
+            return emptyList()
+        }
+
         for (shop in accessibleShops) {
-            try {
-                val receipt = shop.sellItems(player, drops, true)
-                for (receiptItem in receipt.items) {
-                    dropsRemaining.remove(receiptItem.item)
+            val receipt = shop.sellItems(player, items, true)
+            if (receipt.result == TransactionResult.SUCCESS) {
+                items.removeAll(receipt.items.map { it.item })
+
+                if (items.isEmpty()) {
+                    break
                 }
-            } catch (e: ShopTransactionInterruptedException) {
-                continue
             }
         }
 
-        if (accessibleShops.isEmpty()) {
-            throw IllegalStateException("Couldn't find a shop to sell to")
-        }
-
-        if (drops.size != dropsRemaining.size) {
-            player.updateInventory()
-        } else {
-            throw IllegalStateException("No items could be sold")
-        }
-
-        return dropsRemaining
+        return items
     }
 
-    @Throws(IllegalStateException::class, ShopTransactionInterruptedException::class)
     fun sellInventory(player: Player, autoSell: Boolean) {
-        var sold = false
+        val items = player.inventory.contents.filterNotNull().toMutableList()
+        if (items.isEmpty()) {
+            player.sendMessage("${ChatColor.RED}${TransactionResult.NO_ITEMS.defaultMessage}!")
+            return
+        }
 
         val accessibleShops = shopsMap.values.filter { it.hasAccess(player) }.sortedBy { it.priority }
+        if (accessibleShops.isEmpty()) {
+            player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
+            return
+        }
+
         for (shop in accessibleShops) {
-            try {
-                val receipt = shop.sellItems(player, player.inventory.contents.filterNotNull().toList(), autoSell)
+            val receipt = shop.sellItems(player, items, autoSell)
+            if (receipt.result == TransactionResult.SUCCESS) {
+                items.removeAll(receipt.items.map { it.item })
+
                 for (receiptItem in receipt.items) {
                     player.inventory.remove(receiptItem.item)
                 }
 
-                sold = true
-            } catch (e: ShopTransactionInterruptedException) {
-                continue
+                if (items.isEmpty()) {
+                    break
+                }
             }
         }
 
-        if (accessibleShops.isEmpty()) {
-            throw IllegalStateException("Couldn't find a shop to sell to")
-        }
-
-        if (sold) {
-            player.updateInventory()
-        } else {
-            throw IllegalStateException("No items could be sold")
-        }
+        player.updateInventory()
     }
 
     fun getShopById(id: String): Optional<Shop> {

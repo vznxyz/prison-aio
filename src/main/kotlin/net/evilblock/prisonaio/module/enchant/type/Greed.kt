@@ -44,8 +44,9 @@ object Greed : AbstractEnchant("greed", "Greed", 3) {
 
             if (randomItem.multiplier < multiplier) {
                 randomItem.multiplier = multiplier
-                val soldFor = (randomItem.itemType.buyPricePerUnit * randomItem.item.amount) * randomItem.multiplier
-                sendMessage(event.player, "You sold ${ChatColor.AQUA}${randomItem.item.amount}x ${Formats.formatItemStack(randomItem.item)} ${ChatColor.GRAY}for a multiplier of ${ChatColor.YELLOW}$multiplier ${ChatColor.GRAY}(${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(soldFor.toLong())}${ChatColor.GRAY})!")
+
+                val formattedPrice = (randomItem.itemType.buyPricePerUnit * randomItem.item.amount) * randomItem.multiplier
+                sendMessage(event.player, "You sold ${ChatColor.AQUA}${randomItem.item.amount}x ${Formats.formatItemStack(randomItem.item)} ${ChatColor.GRAY}for a multiplier of ${ChatColor.YELLOW}$multiplier ${ChatColor.GRAY}(${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(formattedPrice.toLong())}${ChatColor.GRAY})!")
             }
         }
     }

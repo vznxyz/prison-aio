@@ -1,0 +1,122 @@
+grid:
+  world-name: "PrivateMines"
+  gutter: 300
+  dimensions: 200
+mine:
+  npc:
+    commands:
+      left-hand: []
+      right-hand:
+        - "sellall"
+tiers:
+  - tier: 1
+    sales-tax: 10.0
+    player-limit: 5
+    blocks:
+      - material: "IRON_BLOCK"
+        data: 0
+        percentage: 75.0
+      - material: "DIAMOND_BLOCK"
+        data: 0
+        percentage: 25.0
+    reset-interval: 300000
+  - tier: 2
+    sales-tax: 10.0
+    player-limit: 10
+    blocks:
+      - material: "IRON_BLOCK"
+        data: 0
+        percentage: 75.0
+      - material: "DIAMOND_BLOCK"
+        data: 0
+        percentage: 25.0
+    reset-interval: 300000
+  - tier: 3
+    sales-tax: 10.0
+    player-limit: 15
+    blocks:
+      - material: "IRON_BLOCK"
+        data: 0
+        percentage: 75.0
+      - material: "DIAMOND_BLOCK"
+        data: 0
+        percentage: 25.0
+    reset-interval: 300000
+  - tier: 3
+    sales-tax: 10.0
+    player-limit: 20
+    blocks:
+      - material: "IRON_BLOCK"
+        data: 0
+        percentage: 75.0
+      - material: "DIAMOND_BLOCK"
+        data: 0
+        percentage: 25.0
+    reset-interval: 300000
+language:
+  help:
+    - "&c&lPrivate Mines &7&lHelp"
+    - "&7.........................."
+    - "&7.........................."
+    - "&7.........................."
+    - "&7.........................."
+    - "&7.........................."
+  notifications:
+    mine-created:
+      - ""
+      - " &c&lPrivate Mines"
+      - " &7Your tier {tier} Private Mine is ready to use!"
+      - " &eType /pmine to get started!"
+    mine-reset:
+      - ""
+      - " &c&lThe mine you are in has been reset!"
+      - " &7Owner: {owner} - Tier {tier}"
+      - ""
+    mine-gains:
+      - ""
+      - " &c&lPrivate Mine Gains"
+      - " &7You've earned &a{moneyGained} &7from your &7Tier {tier} Private Mine."
+      - ""
+    teleported:
+      - "&eYou've been teleported to {ownerOrSelf} Tier {tier} Private Mine!"
+    access-granted:
+      - ""
+      - " &c&lPrivate Mines"
+      - " &7You've been granted access to &e{owner}'s Mine&7."
+      - ""
+    access-revoked:
+      - ""
+      - " &c&lPrivate Mines"
+      - " &7Your access to &e{owner}'s Mine &7has been revoked."
+      - ""
+  menu:
+    main-menu:
+      title: "Private Mines"
+      buttons:
+        my-mines:
+          title: "&a&lMy Mines"
+          lore:
+            - "&7View the mines you have access to."
+        public-mines:
+          title: "&a&lPublic Mines"
+          lore:
+            - "&7View all of the public mines."
+    settings-menu:
+      title: "Private Mine (Tier {tier}) &c&lSettings"
+      buttons:
+        players:
+          title: "&c&lManage Players"
+          lore:
+            - "&7View, add, or remove players from"
+            - "your private mine."
+            - ""
+            - "&eClick to manage players"
+        public-access:
+          title: "&e&lPublic Access: {stateWithColor}"
+          lore:
+            - "&7This setting controls who can"
+            - "&7visit your private mine."
+            - ""
+            - "&eClick to toggle public access"
+    players-menu:
+      title: "Private Mine (Tier {tier}) - Players"

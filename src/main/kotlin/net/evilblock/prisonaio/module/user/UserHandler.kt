@@ -155,4 +155,8 @@ object UserHandler : PluginHandler {
         return usersMap.remove(uuid)
     }
 
+    fun getCollection(): MongoCollection<Document> {
+        return usersCollection
+    }
+
 }

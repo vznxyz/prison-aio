@@ -41,6 +41,14 @@ class UserPerks(@Transient internal var user: User) {
     }
 
     /**
+     * Removes the given [grant] from the user's [grantedPerks].
+     */
+    fun forgetPerkGrant(grant: PerkGrant) {
+        grantedPerks.remove(grant)
+        user.requiresSave = true
+    }
+
+    /**
      * If the player has access to the given [perk].
      */
     fun hasPerk(player: Player, perk: Perk): Boolean {

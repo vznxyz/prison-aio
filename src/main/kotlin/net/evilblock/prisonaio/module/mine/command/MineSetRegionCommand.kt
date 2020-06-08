@@ -10,7 +10,11 @@ import org.bukkit.entity.Player
 
 object MineSetRegionCommand {
 
-    @Command(names = ["mine setregion"], description = "Set the region of a mine", permission = "prisonaio.mines.setregion")
+    @Command(
+        names = ["mine setregion"],
+        description = "Set the region of a mine",
+        permission = "prisonaio.mines.setregion"
+    )
     @JvmStatic
     fun execute(player: Player, @Param(name = "mine") mine: Mine) {
         if (!RegionSelection.hasSelection(player)) {

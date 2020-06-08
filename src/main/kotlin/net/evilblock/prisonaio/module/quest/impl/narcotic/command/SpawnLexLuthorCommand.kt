@@ -26,7 +26,6 @@ object SpawnLexLuthorCommand {
         )
 
         EntityManager.trackEntity(lexLuthor)
-        EntityManager.saveData()
 
         player.sendMessage("${ChatColor.GREEN}Successfully spawned Lex Luthor NPC.")
     }

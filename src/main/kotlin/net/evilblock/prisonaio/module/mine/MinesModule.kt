@@ -2,10 +2,11 @@ package net.evilblock.prisonaio.module.mine
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.prisonaio.module.PluginModule
-import net.evilblock.prisonaio.module.mechanic.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.mine.command.*
 import net.evilblock.prisonaio.module.mine.command.parameter.MineParameterType
+import net.evilblock.prisonaio.module.mine.listener.MineEventEmitterListeners
 import net.evilblock.prisonaio.module.mine.listener.MineInventoryListeners
+import net.evilblock.prisonaio.module.mine.listener.MinePercentageListeners
 import net.evilblock.prisonaio.module.mine.listener.MineWandListeners
 import net.evilblock.prisonaio.module.mine.task.MineEffectsTask
 import net.evilblock.prisonaio.module.mine.task.MineResetTask
@@ -24,7 +25,7 @@ object MinesModule : PluginModule() {
     override fun onEnable() {
         MineHandler.initialLoad()
 
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), MineResetTask, 20L, 20L)
+        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), MineResetTask, 0L, 600L)
         getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), MineEffectsTask, 20L, 20L)
     }
 
@@ -40,9 +41,11 @@ object MinesModule : PluginModule() {
         return listOf(
             MineCreateCommand::class.java,
             MineDeleteCommand::class.java,
-            MineEditCommand::class.java,
+            MineManageCommand::class.java,
+            MineResetCommand::class.java,
             MineSetRegionCommand::class.java,
             MineSetSpawnCommand::class.java,
+            MineStatusesCommand::class.java,
             MineWandCommand::class.java
         )
     }
@@ -55,8 +58,9 @@ object MinesModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
-            RegionBypass,
+            MineEventEmitterListeners,
             MineInventoryListeners,
+            MinePercentageListeners,
             MineWandListeners
         )
     }

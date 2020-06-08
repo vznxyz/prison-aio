@@ -2,11 +2,13 @@ package net.evilblock.prisonaio.module.reward.minecrate.listener
 
 import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.mechanic.region.Regions
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrate
 import org.bukkit.ChatColor
+import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -71,6 +73,28 @@ object MineCrateListeners : Listener {
                     event.player.sendMessage("${RewardsModule.getChatPrefix()}You just found a MineCrate!")
 
                     return
+                }
+            }
+        }
+    }
+
+    /**
+     * Prevents multi-block-break events from breaking MineCrate blocks.
+     *
+     * If the player causing the event is the owner of a MineCrate in the block list,
+     * the MineCrate will be redeemed by the player.
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    private fun onMultiBlockBreakEvent(event: MultiBlockBreakEvent) {
+        val blockIterator = event.blockList.iterator()
+        while (blockIterator.hasNext()) {
+            val block = blockIterator.next()
+            if (block.type == Material.ENDER_CHEST && MineCrateHandler.isAttached(block.location)) {
+                blockIterator.remove()
+
+                val spawnedCrate = MineCrateHandler.getSpawnedCrate(block.location)
+                if (spawnedCrate.owner == event.player.uniqueId) {
+                    spawnedCrate.destroy(false)
                 }
             }
         }

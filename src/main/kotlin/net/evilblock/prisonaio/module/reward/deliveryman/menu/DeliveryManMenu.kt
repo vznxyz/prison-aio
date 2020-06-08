@@ -6,6 +6,7 @@ import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.reward.deliveryman.DeliveryManHandler
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
 import net.evilblock.prisonaio.module.user.User
+import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -68,7 +69,7 @@ class DeliveryManMenu(private val user: User) : Menu() {
             description.add("${ChatColor.GRAY}This reward contains the following:")
 
             for (line in reward.rewardsText) {
-                description.add(" ${ChatColor.GRAY}● $line")
+                description.add(" ${ChatColor.GRAY}${Constants.DOT_SYMBOL} $line")
             }
 
             description.add("")
@@ -83,7 +84,7 @@ class DeliveryManMenu(private val user: User) : Menu() {
                         "${ChatColor.GRAY}"
                     }
 
-                    description.add(" ${ChatColor.GRAY}● $color${requirement.getText()}")
+                    description.add(" ${ChatColor.GRAY}${Constants.DOT_SYMBOL} $color${requirement.getText()}")
                 }
             } else {
                 if (user.canClaimReward(reward)) {

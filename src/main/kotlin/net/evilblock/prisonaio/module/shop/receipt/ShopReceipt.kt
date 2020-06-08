@@ -4,18 +4,20 @@ import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.shop.Shop
+import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.text.NumberFormat
 import java.util.*
 
 data class ShopReceipt(
+    val result: TransactionResult,
     val uuid: UUID = UUID.randomUUID(),
     val shop: Shop,
     val type: ShopReceiptType,
-    val items: List<ShopReceiptItem>,
-    val multiplier: Double,
-    val finalCost: Double
+    val items: List<ShopReceiptItem> = emptyList(),
+    val multiplier: Double = 1.0,
+    val finalCost: Double = 0.0
 ) {
 
     val createdAt: Long = System.currentTimeMillis()

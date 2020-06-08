@@ -54,19 +54,6 @@ class BlocksMinedRequirement(private var blocksMined: Int) : DeliveryManRewardRe
             })
         }
 
-        override fun startEditProcedure(player: Player, reward: DeliveryManReward, requirement: DeliveryManRewardRequirement) {
-            ConversationUtil.startConversation(player, NumberPrompt { number ->
-                assert(number > 0)
-
-                (requirement as BlocksMinedRequirement).blocksMined = number
-                DeliveryManHandler.saveData()
-
-                player.sendMessage("${ChatColor.GREEN}Successfully updated requirement.")
-
-                EditDeliveryManRewardRequirementsMenu(reward).openMenu(player)
-            })
-        }
-
         override fun isCompatibleWithReward(reward: DeliveryManReward): Boolean {
             return reward.requirements.firstOrNull { it is BlocksMinedRequirement } == null
         }

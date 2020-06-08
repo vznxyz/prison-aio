@@ -7,7 +7,7 @@ import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-object RankParameterType : ParameterType<Rank?> {
+class RankParameterType : ParameterType<Rank?> {
 
     override fun transform(sender: CommandSender, source: String): Rank? {
         val optionalRank = RankHandler.getRankById(source)

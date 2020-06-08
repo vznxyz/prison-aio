@@ -1,10 +1,12 @@
 package net.evilblock.prisonaio.module.user
 
 import com.google.gson.annotations.JsonAdapter
+import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.achievement.Achievement
+import net.evilblock.prisonaio.module.battlepass.progress.BattlePass
 import net.evilblock.prisonaio.module.quest.Quest
 import net.evilblock.prisonaio.module.quest.QuestHandler
 import net.evilblock.prisonaio.module.quest.progression.QuestProgression
@@ -21,6 +23,7 @@ import net.evilblock.prisonaio.module.user.serialize.UserQuestProgressionSeriali
 import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.permissions.PermissionAttachment
 import java.util.*
@@ -86,6 +89,11 @@ class User(val uuid: UUID) {
     private val achievements: MutableMap<String, CompletedAchievementActivity> = hashMapOf()
 
     /**
+     * The user's Battle-Pass progress.
+     */
+    val battlePassData: BattlePass = BattlePass(this)
+
+    /**
      * The user's quest progressions.
      */
     @JsonAdapter(UserQuestProgressionSerializer::class)
@@ -100,6 +108,7 @@ class User(val uuid: UUID) {
     fun init() {
         perks.user = this
         statistics.user = this
+        battlePassData.user = this
     }
 
     /**
@@ -107,6 +116,10 @@ class User(val uuid: UUID) {
      */
     fun getUsername(): String {
         return Cubed.instance.uuidCache.name(uuid)
+    }
+
+    fun getPlayer(): Player? {
+        return Bukkit.getPlayer(uuid)
     }
 
     /**
@@ -152,19 +165,48 @@ class User(val uuid: UUID) {
      * Gets the user's setting option for the given [setting].
      */
     fun <T : UserSettingOption> getSettingOption(setting: UserSetting): T {
-        return settings.getOrDefault(setting, setting.defaultValue.invoke()) as T
+        if (!settings.containsKey(setting)) {
+            settings[setting] = setting.defaultValue.invoke()
+        }
+        return settings[setting] as T
     }
 
-    fun hasLeftProfileComment(player: UUID): Boolean {
+    /**
+     * Gets a copy of the user's [profileComments].
+     */
+    fun getProfileComments(): List<ProfileComment> {
+        return profileComments.toList()
+    }
+
+    /**
+     * If the given [player] has posted a comment on this user's profile.
+     */
+    fun hasPostedProfileComment(player: UUID): Boolean {
         return profileComments.firstOrNull { it.creator == player } != null
     }
 
+    /**
+     * Adds the given [comment] to the user's profile.
+     */
     fun addProfileComment(comment: ProfileComment) {
         profileComments.add(comment)
+        requiresSave = true
+
+        val player = getPlayer()
+        if (player != null && player.isOnline) {
+            FancyMessage("${ChatColor.YELLOW}A comment has been left on your profile by ${Cubed.instance.uuidCache.name(comment.creator)}! ")
+                .then("${ChatColor.GREEN}${ChatColor.BOLD}[VIEW]")
+                .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to view the comment."))
+                .command("/profile ${player.name} comments")
+        }
     }
 
+    /**
+     * Removes the given [comment] from the user's profile.
+     */
     fun removeProfileComment(comment: ProfileComment) {
         profileComments.remove(comment)
+        requiresSave = true
     }
 
     /**
@@ -236,10 +278,20 @@ class User(val uuid: UUID) {
 
     /**
      * Updates the user's [currentPrestige] to the given [prestige].
+     *
+     * If the user's [prestigeReqNotifsSent] is more than or equal to the given [prestige], then that
+     * field will be also be updated depending on if the user has met the new prestige requirement.
      */
     fun updateCurrentPrestige(prestige: Int) {
         currentPrestige = prestige
         requiresSave = true
+    }
+
+    /**
+     * Gets the amount of blocks the user is required to mine before being able to enter the next prestige.
+     */
+    fun getPrestigeRequirement(): Int {
+        return UsersModule.getPrestigeBlocksMinedRequirementBase() + ((currentPrestige + 1) * UsersModule.getPrestigeBlocksMinedRequirementModifier())
     }
 
     /**
@@ -267,13 +319,18 @@ class User(val uuid: UUID) {
      * Updates the user's tokens balance to the given [newBalance].
      */
     fun updateTokensBalance(newBalance: Long) {
-        tokensBalance = if (newBalance < 0) {
-            0
-        } else {
-            newBalance
-        }
-
+        tokensBalance = if (newBalance < 0) { 0 } else { newBalance }
         requiresSave = true
+    }
+
+    fun addTokensBalance(amount: Long) {
+        assert(amount > 0) { "Amount must be more than 0" }
+        updateTokensBalance(tokensBalance + amount)
+    }
+
+    fun subtractTokensBalance(amount: Long) {
+        assert(amount > 0) { "Amount must be more than 0" }
+        updateTokensBalance(tokensBalance - amount)
     }
 
     /**

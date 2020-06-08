@@ -12,7 +12,7 @@ import org.bukkit.entity.Player
 class MineEditResetIntervalPrompt(private val mine: Mine) : StringPrompt() {
 
     override fun getPromptText(context: ConversationContext): String {
-        return "${ChatColor.GREEN}Please provide a new reset interval in seconds."
+        return "${ChatColor.GREEN}Please input a new reset interval in seconds."
     }
 
     override fun acceptInput(context: ConversationContext, input: String): Prompt? {

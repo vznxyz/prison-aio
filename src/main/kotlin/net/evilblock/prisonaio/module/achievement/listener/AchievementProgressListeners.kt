@@ -1,7 +1,7 @@
 package net.evilblock.prisonaio.module.achievement.listener
 
 import net.evilblock.prisonaio.module.achievement.AchievementsModule
-import net.evilblock.prisonaio.module.rank.event.PlayerPrestigeEvent
+import net.evilblock.prisonaio.module.rank.event.AsyncPlayerPrestigeEvent
 import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -30,7 +30,7 @@ object AchievementProgressListeners : Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    fun onPlayerPrestigeEvent(event: PlayerPrestigeEvent) {
+    fun onPlayerPrestigeEvent(event: AsyncPlayerPrestigeEvent) {
         getAchievementsModule().getAchievements().forEach { achievement -> achievement.onPlayerPrestige(event) }
     }
 

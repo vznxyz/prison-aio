@@ -106,6 +106,11 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (player.inventory.firstEmpty() == -1) {
+                player.sendMessage("${ChatColor.RED}You need a free inventory space to pickup Jerry!")
+                return
+            }
+
             jerry.updateVisibility(hidden = true)
 
             val builder = ItemBuilder.of(Material.MONSTER_EGG)

@@ -4,6 +4,7 @@ import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.mechanic.command.HelpCommand
 import net.evilblock.prisonaio.module.mechanic.command.SpawnCommand
 import net.evilblock.prisonaio.module.mechanic.listener.*
+import net.evilblock.prisonaio.module.mechanic.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.mechanic.region.command.RegionBypassCommand
 import net.evilblock.prisonaio.module.mechanic.region.listener.RegionListeners
 import org.bukkit.ChatColor
@@ -36,6 +37,7 @@ object MechanicsModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
+            RegionBypass,
             CraftingMechanicsListeners,
             DisableAnvilMechanicsListeners,
             DisableBrewingMechanicsListeners,
@@ -119,14 +121,14 @@ object MechanicsModule : PluginModule() {
      * Gets a copy of the auto-smelt block list.
      */
     fun getAutoSmeltBlocks(): Map<Material, Material> {
-        return autoSmeltBlocksMap.toMap()
+        return autoSmeltBlocksMap
     }
 
     /**
      * Gets a copy of the drops-to-inv ignored blocks list.
      */
     fun getDropsToInvIgnoredBlocks(): Set<Material> {
-        return dropsToInvIgnoredBlocks.toSet()
+        return dropsToInvIgnoredBlocks
     }
 
     fun isFortuneRandom(): Boolean {

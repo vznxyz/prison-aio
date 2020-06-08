@@ -9,13 +9,23 @@ import org.bukkit.entity.Player
 
 object BookCommand {
 
-    @Command(names = ["ebook", "enchbook"], description = "Give a player an enchanted book", permission = "op")
+    @Command(
+        names = ["ebook", "enchbook"],
+        description = "Give a player an enchanted book",
+        permission = "op"
+    )
     @JvmStatic
-    fun execute(sender: CommandSender, @Param(name = "player", defaultValue = "self") target: Player, @Param(name = "enchant") enchant: AbstractEnchant, @Param(name = "level") level: Int) {
+    fun execute(
+        sender: CommandSender,
+        @Param(name = "player", defaultValue = "self") target: Player,
+        @Param(name = "enchant") enchant: AbstractEnchant,
+        @Param(name = "level") level: Int,
+        @Param(name = "add", defaultValue = "true") add: Boolean
+    ) {
         if (target.inventory.firstEmpty() == -1) {
-            target.enderChest.addItem(enchant.enchantBook(level))
+            target.enderChest.addItem(enchant.enchantBook(level, add))
         } else {
-            target.inventory.addItem(enchant.enchantBook(level))
+            target.inventory.addItem(enchant.enchantBook(level, add))
         }
 
         if (sender is Player) {

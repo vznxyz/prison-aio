@@ -73,10 +73,6 @@ object RegionListeners : Listener {
             return true
         }
 
-        if (plot.trusted.contains(player.uniqueId)) {
-            return true
-        }
-
         if (plot.members.contains(player.uniqueId)) {
             return true
         }

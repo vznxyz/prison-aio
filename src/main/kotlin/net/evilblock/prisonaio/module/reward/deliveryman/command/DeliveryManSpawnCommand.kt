@@ -19,7 +19,6 @@ object DeliveryManSpawnCommand {
         deliveryMan.initializeData()
 
         EntityManager.trackEntity(deliveryMan)
-        EntityManager.saveData()
 
         player.sendMessage("${ChatColor.GREEN}Successfully spawned Delivery Man!")
     }

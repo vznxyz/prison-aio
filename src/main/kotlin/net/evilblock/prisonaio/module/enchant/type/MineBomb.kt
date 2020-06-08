@@ -97,7 +97,6 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
         }
 
         val fireball = event.entity as Fireball
-
         if (fireball.shooter !is Player) {
             return
         }

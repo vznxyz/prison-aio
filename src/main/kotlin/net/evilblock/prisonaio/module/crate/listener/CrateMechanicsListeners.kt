@@ -1,20 +1,15 @@
 package net.evilblock.prisonaio.module.crate.listener
 
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.crate.key.CrateKey
 import net.evilblock.prisonaio.module.crate.key.CrateKeyHandler
 import net.evilblock.prisonaio.module.crate.menu.CratePreviewMenu
 import net.evilblock.prisonaio.module.crate.placed.PlacedCrate
 import net.evilblock.prisonaio.module.crate.placed.PlacedCrateHandler
 import net.evilblock.prisonaio.module.crate.roll.CrateRoll
 import net.evilblock.prisonaio.module.crate.roll.CrateRollHandler
-import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
-import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import org.bukkit.ChatColor
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
@@ -69,30 +64,33 @@ object CrateMechanicsListeners : Listener {
                     return
                 }
 
-                val crateKey = CrateKeyHandler.extractKey(itemInHand)
-                if (crateKey == null) {
-                    event.player.sendMessage("${ChatColor.RED}This key doesn't seem to be valid.")
-                    return
-                }
+//                val crateKey = CrateKeyHandler.extractKey(itemInHand)
+//                if (crateKey == null) {
+//                    event.player.sendMessage("${ChatColor.RED}This key doesn't seem to be valid.")
+//                    return
+//                }
 
-                if (crateKey.crate != placedCrate.crate) {
+                val crate = CrateKeyHandler.extractCrate(itemInHand)
+                if (crate != placedCrate.crate) {
                     event.player.sendMessage("${ChatColor.RED}This key doesn't go to that crate!")
                     return
                 }
 
                 PrisonAIO.instance.server.scheduler.runTaskAsynchronously(PrisonAIO.instance) {
-                    attemptRoll(event.player, placedCrate, crateKey)
+//                    attemptRoll(event.player, placedCrate, crateKey)
+                    attemptRoll(event.player, placedCrate)
                 }
             }
         }
     }
 
-    private fun attemptRoll(player: Player, placedCrate: PlacedCrate, crateKey: CrateKey) {
-        if (crateKey.uses >= crateKey.maxUses) {
-            player.sendMessage("${ChatColor.RED}The key you're trying to use seems to be duplicated and cannot be used. If you believe this is an error, please contact the support team.")
-            crateKey.dupedUseAttempts++
-            return
-        }
+//    private fun attemptRoll(player: Player, placedCrate: PlacedCrate, crateKey: CrateKey) {
+    private fun attemptRoll(player: Player, placedCrate: PlacedCrate) {
+//        if (crateKey.uses >= crateKey.maxUses) {
+//            player.sendMessage("${ChatColor.RED}The key you're trying to use seems to be duplicated and cannot be used. If you believe this is an error, please contact the support team.")
+//            crateKey.dupedUseAttempts++
+//            return
+//        }
 
         if (!placedCrate.crate.isSetup()) {
             player.sendMessage("${ChatColor.RED}That crate has not been setup completely!")
@@ -110,7 +108,7 @@ object CrateMechanicsListeners : Listener {
             CrateRollHandler.forgetRoll(activeRoll) // forget the active roll
         }
 
-        crateKey.uses++
+//        crateKey.uses++
 
         val roll = CrateRoll(player, placedCrate)
         CrateRollHandler.trackRoll(roll)
@@ -121,28 +119,6 @@ object CrateMechanicsListeners : Listener {
         } else {
             player.inventory.itemInMainHand.amount = player.inventory.itemInMainHand.amount - 1
             player.updateInventory()
-        }
-    }
-
-    /**
-     * Prevents multi-block-break events from breaking MineCrate blocks.
-     *
-     * If the player causing the event is the owner of a MineCrate in the block list,
-     * the MineCrate will be redeemed by the player.
-     */
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    private fun onMultiBlockBreakEvent(event: MultiBlockBreakEvent) {
-        val blockIterator = event.blockList.iterator()
-        while (blockIterator.hasNext()) {
-            val block = blockIterator.next()
-            if (block.type == Material.ENDER_CHEST && MineCrateHandler.isAttached(block.location)) {
-                blockIterator.remove()
-
-                val spawnedCrate = MineCrateHandler.getSpawnedCrate(block.location)
-                if (spawnedCrate.owner == event.player.uniqueId) {
-                    spawnedCrate.destroy(false)
-                }
-            }
         }
     }
 

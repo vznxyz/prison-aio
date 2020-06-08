@@ -14,8 +14,6 @@ interface DeliveryManRewardRequirementType<T : DeliveryManRewardRequirement> {
 
     fun startSetupProcedure(player: Player, reward: DeliveryManReward)
 
-    fun startEditProcedure(player: Player, reward: DeliveryManReward, requirement: DeliveryManRewardRequirement)
-
     fun isCompatibleWithReward(reward: DeliveryManReward): Boolean {
         return true
     }

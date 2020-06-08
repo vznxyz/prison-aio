@@ -2,7 +2,6 @@ package net.evilblock.prisonaio.module.shop.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
-import net.evilblock.cubed.util.bukkit.ConversationUtil
 import net.evilblock.cubed.util.bukkit.prompt.PricePrompt
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.shop.ShopHandler
@@ -125,7 +124,7 @@ class EditShopItemPriceMenu(private val previous: EditShopMenu, val item: ShopIt
             if (clickType.isLeftClick) {
                 player.closeInventory()
 
-                ConversationUtil.startConversation(player, PricePrompt("shop") { price ->
+                PricePrompt { price ->
                     if (type == PriceType.BUYING) {
                         item.buyPricePerUnit = price
                     } else {
@@ -137,7 +136,7 @@ class EditShopItemPriceMenu(private val previous: EditShopMenu, val item: ShopIt
                     player.sendMessage("${ChatColor.GREEN}Successfully updated ${type.name.toLowerCase()} price of item.")
 
                     openMenu(player)
-                })
+                }.start(player)
             } else if (clickType.isRightClick) {
                 if (type == PriceType.BUYING) {
                     item.buying = !item.buying

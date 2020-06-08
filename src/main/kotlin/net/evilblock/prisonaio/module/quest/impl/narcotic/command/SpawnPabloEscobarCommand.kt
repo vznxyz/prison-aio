@@ -25,7 +25,6 @@ object SpawnPabloEscobarCommand {
         )
 
         EntityManager.trackEntity(pabloEscobar)
-        EntityManager.saveData()
 
         player.sendMessage("${ChatColor.GREEN}Successfully spawned Pablo Escobar NPC.")
     }

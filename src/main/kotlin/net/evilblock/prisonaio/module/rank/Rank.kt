@@ -6,7 +6,7 @@ import org.bukkit.entity.Player
 class Rank(val id: String) {
 
     var displayName: String = id
-    var price: Long = 1L
+    internal var price: Long = 1L
     var sortOrder: Int = 1
 
     fun executeCommands(player: Player) {
@@ -45,6 +45,16 @@ class Rank(val id: String) {
         }
 
         return set
+    }
+
+    fun getPrice(prestige: Int): Double {
+        val priceMultiplier = if (prestige == 0) {
+            1.0
+        } else {
+            prestige * RankHandler.priceScaleMultiplier
+        }
+
+        return price * priceMultiplier
     }
 
 }

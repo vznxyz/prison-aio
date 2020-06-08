@@ -43,7 +43,7 @@ class UserRankupsMenu(private val user: User) : Menu() {
         override fun getDescription(player: Player): List<String> {
             return listOf(
                 "",
-                "${ChatColor.GRAY}This rankup costs ${ChatColor.GREEN}$${ChatColor.YELLOW}${NumberUtils.format(rank.price)}${ChatColor.GRAY}."
+                "${ChatColor.GRAY}This rankup costs ${ChatColor.GREEN}$${ChatColor.YELLOW}${NumberUtils.format(rank.getPrice(user.getCurrentPrestige()))}${ChatColor.GRAY}."
             )
         }
 

@@ -141,6 +141,10 @@ object EnchantsManager : Listener {
             return
         }
 
+        if (event.currentItem.amount > 1) {
+            return
+        }
+
         if (!isEnchantItem(event.cursor)) {
             return
         }

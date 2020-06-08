@@ -17,7 +17,7 @@ object CellChatListeners : Listener {
 
                 val message = StringBuilder()
                     .append("${ChatColor.GRAY}[${ChatColor.YELLOW}${visitingCell.name}${ChatColor.GRAY}] ")
-                    .append("${ChatColor.GREEN}${event.player.name}${ChatColor.GRAY}: ${event.message.substring(0, event.message.length - 1)}")
+                    .append("${ChatColor.GREEN}${event.player.name}${ChatColor.GRAY}: ${event.message.drop(1)}")
                     .toString()
 
                 visitingCell.sendMessages(message)

@@ -1,6 +1,5 @@
 package net.evilblock.prisonaio.module.minigame.coinflip.menu
 
-import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.AddButton
@@ -20,7 +19,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 
-class CoinFlipGameMenu(private val game: CoinFlipGame) : Menu() {
+class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
 
     init {
         autoUpdate = true
@@ -41,14 +40,10 @@ class CoinFlipGameMenu(private val game: CoinFlipGame) : Menu() {
                 "$formattedValue ${ChatColor.GREEN}${ChatColor.BOLD}STARTING"
             }
             CoinFlipGame.Stage.ROLLING -> {
-                if (game.getTitleAnimationSwitch()) {
-                    "$formattedValue ${ChatColor.DARK_GRAY}${ChatColor.BOLD}POT"
-                } else {
-                    "${game.creator.getUsername()} vs. ${game.opponent!!.getUsername()}"
-                }
+                "${game.creator.getUsername()} vs. ${game.opponent!!.getUsername()} ($formattedValue${ChatColor.DARK_GRAY})"
             }
             CoinFlipGame.Stage.FINISHED -> {
-                "${Cubed.instance.uuidCache.name(game.winner!!)} ${ChatColor.GREEN}${ChatColor.BOLD}WINS"
+                "${game.winner!!.getUsername()} ${ChatColor.GREEN}${ChatColor.BOLD}WINS"
             }
         }
     }
@@ -114,7 +109,26 @@ class CoinFlipGameMenu(private val game: CoinFlipGame) : Menu() {
                 }
             }
             CoinFlipGame.Stage.FINISHED -> {
+                val primaryColor: Byte
+                val secondaryColor: Byte
 
+                buttons[22] = PlayerButton(game.winner!!, false)
+
+                if (game.creator == game.winner!!) {
+                    primaryColor = CoinFlipHandler.PRIMARY_COLOR_ID
+                    secondaryColor = CoinFlipHandler.SECONDARY_COLOR_ID
+                } else {
+                    primaryColor = CoinFlipHandler.SECONDARY_COLOR_ID
+                    secondaryColor = CoinFlipHandler.PRIMARY_COLOR_ID
+                }
+
+                for (i in ANIMATION_PRIMARY) {
+                    buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, primaryColor, " ")
+                }
+
+                for (i in ANIMATION_SECONDARY) {
+                    buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, secondaryColor, " ")
+                }
             }
         }
 
@@ -130,7 +144,7 @@ class CoinFlipGameMenu(private val game: CoinFlipGame) : Menu() {
     }
 
     override fun getAutoUpdateTicks(): Long {
-        return 4L
+        return 10L
     }
 
     private inner class PlayerButton(private val user: User, private val white: Boolean) : SkullButton(owner = user.uuid) {
@@ -272,7 +286,7 @@ class CoinFlipGameMenu(private val game: CoinFlipGame) : Menu() {
         private val ANIMATION_SECONDARY = arrayListOf(
             1, 7,
             10, 12, 13, 14, 16,
-            19, 21, 23, 25, 27,
+            19, 21, 23, 25,
             28, 30, 31, 32, 34,
             37, 43
         )

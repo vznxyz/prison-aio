@@ -31,7 +31,7 @@ object TokenPouch : AbstractEnchant("token-pouch", "Token Pouch", 1000) {
 
         if (Chance.percent(0.01 * level)) {
             val tokenAmount = Chance.pick(2200, floor(2200 + level * 1.1).toInt())
-            user.updateTokensBalance(user.getTokensBalance() + tokenAmount)
+            user.addTokensBalance(tokenAmount.toLong())
 
             sendMessage(event.player, "You found a pouch with ${ChatColor.GOLD}$tokenAmount ${ChatColor.GRAY}tokens in it!")
         }

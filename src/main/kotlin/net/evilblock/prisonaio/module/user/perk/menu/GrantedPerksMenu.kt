@@ -2,7 +2,7 @@ package net.evilblock.prisonaio.module.user.perk.menu
 
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.menu.Button
-import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.user.User
@@ -65,7 +65,14 @@ class GrantedPerksMenu(private val user: User) : PaginatedMenu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isRightClick) {
+                ConfirmMenu("Are you sure?") { confirmed ->
+                    if (confirmed) {
+                        user.perks.forgetPerkGrant(grant)
+                        player.sendMessage("${ChatColor.GREEN}Successfully removed grant.")
+                    }
 
+                    openMenu(player)
+                }.openMenu(player)
             }
         }
     }

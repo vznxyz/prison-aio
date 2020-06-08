@@ -12,6 +12,8 @@ cell:
   max-members: 6
   # The maximum characters a cell's name can contain
   max-name-length: 32
+  # The maximum amount of cells a player can join at once
+  max-cells-per-player: 1
   # Jerry The Prison Guard settings
   jerry:
     hologram-lines:

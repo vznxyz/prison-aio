@@ -3,6 +3,7 @@ package net.evilblock.prisonaio.module.rank
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.rank.command.RankEditorCommand
+import net.evilblock.prisonaio.module.rank.command.SetRankSetScaleMultiplierCommand
 import net.evilblock.prisonaio.module.rank.command.parameter.RankParameterType
 
 object RanksModule : PluginModule() {
@@ -25,12 +26,13 @@ object RanksModule : PluginModule() {
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
-            RankEditorCommand.javaClass
+            RankEditorCommand.javaClass,
+            SetRankSetScaleMultiplierCommand.javaClass
         )
     }
 
     override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
-        return mapOf(Rank::class.java to RankParameterType)
+        return mapOf(Rank::class.java to RankParameterType())
     }
 
     fun readCommands(id: String): List<String> {

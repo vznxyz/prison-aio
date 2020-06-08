@@ -71,7 +71,10 @@ class CrateRoll(player: Player, val placedCrate: PlacedCrate) {
             if (stage + 1 < stages.size) {
                 stage++
             } else {
-                finish(Bukkit.getPlayer(rolledBy))
+                val player = Bukkit.getPlayer(rolledBy)
+                if (player != null) {
+                    finish(player)
+                }
             }
         }
 
@@ -94,7 +97,9 @@ class CrateRoll(player: Player, val placedCrate: PlacedCrate) {
         updateChestTileEntity(player = player, open = false)
 
         for (reward in winnings) {
-            reward.execute(player)
+            if (finished) {
+                reward.execute(player)
+            }
         }
     }
 

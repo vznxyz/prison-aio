@@ -5,6 +5,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.util.Reflection
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
+import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.cubed.util.nms.MinecraftProtocol
 import net.evilblock.prisonaio.module.cell.entity.JerryNpcEntity
 import net.evilblock.prisonaio.module.cell.permission.CellPermission
@@ -66,8 +67,13 @@ class Cell(
      */
     internal var guideNpc: JerryNpcEntity = JerryNpcEntity(guideLocation)
 
+    /**
+     * The cell's cached cell value.
+     */
+    internal var cachedCellValue: Long = 0L
+
     override fun getRegionName(): String {
-        return "${getOwnerName()}'s Cell"
+        return "${getOwnerUsername()}'s Cell"
     }
 
     override fun getBreakableRegion(): Cuboid? {
@@ -153,7 +159,7 @@ class Cell(
         }
     }
 
-    fun getOwnerName(): String {
+    fun getOwnerUsername(): String {
         return Cubed.instance.uuidCache.name(owner)
     }
 
@@ -161,7 +167,7 @@ class Cell(
      * Replaces variables in the given [string].
      */
     fun translateVariables(string: String): String {
-        return string.replace("{owner}", getOwnerName())
+        return string.replace("{owner}", getOwnerUsername())
             .replace("{announcement}", announcement)
             .replace("{memberCount}", members.size.toString())
             .replace("{onlineMemberCount}", getActiveMembers().size.toString())
@@ -329,7 +335,7 @@ class Cell(
                     player.teleport(Bukkit.getWorlds()[0].spawnLocation)
                 }
 
-                player.sendMessage("${ChatColor.YELLOW}You've been kicked from ${getOwnerName()}'s cell.")
+                player.sendMessage("${ChatColor.YELLOW}You've been kicked from ${getOwnerUsername()}'s cell.")
             }
         }
 
@@ -340,7 +346,7 @@ class Cell(
         for (activePlayer in getActivePlayers()) {
             if (!testPermission(activePlayer, CellPermission.ALLOW_VISITORS, false)) {
                 activePlayer.teleport(Bukkit.getWorlds()[0].spawnLocation)
-                activePlayer.sendMessage("${ChatColor.YELLOW}${getOwnerName()}'s is no longer allowing visitors in their cell.")
+                activePlayer.sendMessage("${ChatColor.YELLOW}${getOwnerUsername()}'s is no longer allowing visitors in their cell.")
             }
         }
     }
@@ -351,12 +357,12 @@ class Cell(
         }
 
         // send message AFTER player is added
-        sendMessages("${ChatColor.YELLOW}${player.name} has joined the session.")
+        sendMessages("${ChatColor.YELLOW}${player.name} has entered the cell.")
     }
 
     fun leaveSession(player: Player) {
         // send message BEFORE player is removed
-        sendMessages("${ChatColor.YELLOW}${player.name} has left the session.")
+        sendMessages("${ChatColor.YELLOW}${player.name} has left the cell.")
 
         visitors.remove(player.uniqueId)
     }
@@ -398,6 +404,18 @@ class Cell(
         Reflection.setDeclaredFieldValue(worldBorderPacket, "e", borderSize)
 
         MinecraftProtocol.send(player, worldBorderPacket)
+    }
+
+    fun updateCachedCellValue() {
+        var totalBalance = 0L
+
+        VaultHook.useEconomy { economy ->
+            for (member in members) {
+                totalBalance += economy.getBalance(Bukkit.getOfflinePlayer(member)).toLong()
+            }
+        }
+
+        cachedCellValue = totalBalance
     }
 
 }

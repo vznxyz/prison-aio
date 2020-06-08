@@ -57,6 +57,9 @@ class Mine(val id: String) : Region {
     @Transient
     var nextReset: Int = 0
 
+    @Transient
+    var blocksRemaining: Int = 0
+
     /**
      * The permission required to break inside this mine
      */
@@ -79,6 +82,19 @@ class Mine(val id: String) : Region {
         }
     }
 
+    fun getRegionSize(): Int {
+        if (region == null) {
+            return 0
+        }
+
+        val region = region!!
+        return (region.upperX - region.lowerX) * (region.upperY - region.lowerY) * (region.upperZ - region.lowerZ)
+    }
+
+    fun getRemainingPercentage(): Double {
+        return (blocksRemaining.toDouble() / getRegionSize().toDouble()) * 100.0
+    }
+
     override fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
         cancellable.isCancelled = true
     }
@@ -93,10 +109,20 @@ class Mine(val id: String) : Region {
     }
 
     override fun supportsEnchants(): Boolean {
+        // TODO: do something better later
+        if (id.contains("beacon", ignoreCase = true)) {
+            return false
+        }
+
         return true
     }
 
     override fun supportsRewards(): Boolean {
+        // TODO: do something better later
+        if (id.contains("beacon", ignoreCase = true)) {
+            return false
+        }
+
         return true
     }
 
@@ -134,6 +160,10 @@ class Mine(val id: String) : Region {
             val blockType = blockList[index]
             editSession.setBlock(Vector(location.x, location.y, location.z), BaseBlock(blockType.material.id, blockType.data.toInt()))
         }
+
+        editSession.flushQueue()
+
+        blocksRemaining = getRegionSize()
     }
 
     /**

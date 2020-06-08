@@ -30,7 +30,7 @@ object Tokenator : AbstractEnchant("tokenator", "Tokenator", 100) {
         val tokenAmount = (level * readMultiplier()).coerceAtLeast(1.0).roundToInt().toLong()
 
         val user = UserHandler.getUser(event.player.uniqueId)
-        user.updateTokensBalance(user.getTokensBalance() + tokenAmount)
+        user.addTokensBalance(tokenAmount)
     }
 
     private fun readCost(): Int {

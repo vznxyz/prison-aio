@@ -53,12 +53,12 @@ abstract class AbstractEnchant(val id: String, val enchant: String, val maxLevel
                 material == Material.WOOD_PICKAXE
     }
 
-    fun enchantBook(level: Int): ItemStack {
+    fun enchantBook(level: Int, add: Boolean): ItemStack {
         val item = ItemStack(Material.ENCHANTED_BOOK, 1)
         val im = item.itemMeta
         im.displayName = ChatColor.YELLOW.toString() + "Enchanted Book"
         val lore: MutableList<String> = ArrayList()
-        lore.add(lorified() + " " + level.toString())
+        lore.add(lorified() + " " + (if (add) "+" else "") + level.toString())
         lore.add(ChatColor.GRAY.toString() + "Drag and drop onto a pickaxe")
         lore.add(ChatColor.GRAY.toString() + "to apply this enchanted book.")
         im.lore = lore

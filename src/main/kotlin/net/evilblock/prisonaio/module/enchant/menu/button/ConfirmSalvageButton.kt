@@ -100,11 +100,11 @@ class ConfirmSalvageButton(private val parent: SalvagePickaxeMenu) : Button() {
                 return
             }
 
-            parent.setPendingConfirmation(true) // set pending confirmation
-            player.closeInventory() // close this menu
+            parent.setPendingConfirmation(true)
+            player.closeInventory()
 
             // open the confirmation menu
-            ConfirmMenu("&c&lAre you sure you want to Salvage?") { confirmed: Boolean ->
+            ConfirmMenu("&c&lAre you sure you want to salvage?") { confirmed: Boolean ->
                 if (confirmed) {
                     val totalReturns = enchants.entries.stream()
                         .filter { entry -> entry.key !is Cubed }
@@ -115,7 +115,7 @@ class ConfirmSalvageButton(private val parent: SalvagePickaxeMenu) : Button() {
                     player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.GRAY}You have salvaged your pickaxe for ${ChatColor.GOLD}$formattedTotalReturns ${ChatColor.GRAY}tokens. It is now gone forever.")
 
                     val user = UserHandler.getUser(player.uniqueId)
-                    user.updateTokensBalance(user.getTokensBalance() + totalReturns)
+                    user.addTokensBalance(totalReturns)
                 } else {
                     parent.setPendingConfirmation(false)
                     parent.openMenu(player)

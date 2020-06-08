@@ -204,7 +204,7 @@ class EditCrateRewardMenu(private val crate: Crate, val reward: CrateReward) : M
         }
 
         override fun getMaterial(player: Player): Material {
-            return Material.COMMAND_REPEATING
+            return Material.COMMAND
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {

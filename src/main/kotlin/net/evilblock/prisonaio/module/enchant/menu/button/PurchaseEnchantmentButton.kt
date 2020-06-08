@@ -124,7 +124,7 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
 
         if (clickType == ClickType.LEFT) { // purchase level
             player.sendMessage(EnchantsManager.CHAT_PREFIX.toString() + "Upgraded " + ChatColor.RED + enchant.strippedEnchant + ChatColor.GRAY + " by " + ChatColor.RED + "1" + ChatColor.GRAY + " level.")
-            user.updateTokensBalance(user.getTokensBalance() - enchant.getCost(nextLevel))
+            user.subtractTokensBalance(enchant.getCost(nextLevel))
             EnchantsManager.upgradeEnchant(parent.pickaxeInHand, enchant, 1, false)
         } else if (clickType == ClickType.DROP) { // purchase max levels
             var levelsPurchased = 0
@@ -146,7 +146,7 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
             }
 
             player.sendMessage(EnchantsManager.CHAT_PREFIX + "Upgraded " + ChatColor.RED + enchant.strippedEnchant + ChatColor.GRAY + " by " + ChatColor.RED + levelsPurchased + ChatColor.GRAY + " level" + pluralize(levelsPurchased) + ".")
-            user.updateTokensBalance(user.getTokensBalance() - levelsCost.toLong())
+            user.subtractTokensBalance(levelsCost.toLong())
             EnchantsManager.upgradeEnchant(parent.pickaxeInHand, enchant, levelsPurchased, false)
         }
     }

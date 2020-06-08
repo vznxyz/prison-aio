@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
+import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipGame
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipHandler
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -21,6 +22,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
+import java.text.NumberFormat
 
 class CoinFlipBrowserMenu : PaginatedMenu() {
 
@@ -101,6 +103,11 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                             .acceptInput { player, input ->
                                 val amount = input.toDouble()
 
+                                if (!VaultHook.useEconomyAndReturn { economy -> economy.has(player, CoinFlipHandler.getMinBetMoney()) }) {
+                                    player.sendMessage("${ChatColor.RED}You must bet at least $${NumberFormat.getInstance().format(CoinFlipHandler.getMinBetMoney())}.")
+                                    return@acceptInput
+                                }
+
                                 val currency = Currency.Money(amount)
                                 if (!currency.has(player)) {
                                     player.sendMessage("${ChatColor.RED}You don't have that much money to bet.")
@@ -116,11 +123,19 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
 
                                 CoinFlipHandler.trackGame(game)
                                 CoinFlipGameMenu(game).openMenu(player)
+
+                                player.sendMessage("${ChatColor.GREEN}You've created a Coinflip game for ${CoinFlipHandler.formatMoney(game.value.double())}${ChatColor.GREEN}.")
                             }
                     } else {
                         prompt.promptText("${ChatColor.GREEN}Please insert the amount of tokens you would like to bet.")
                             .acceptInput { player, input ->
                                 val amount = input.toLong()
+
+                                val user = UserHandler.getUser(player.uniqueId)
+                                if (!user.hasTokensBalance(CoinFlipHandler.getMinBetTokens())) {
+                                    player.sendMessage("${ChatColor.RED}You must bet at least ${NumberFormat.getInstance().format(CoinFlipHandler.getMinBetTokens())}.")
+                                    return@acceptInput
+                                }
 
                                 val currency = Currency.Tokens(amount)
                                 if (!currency.has(player)) {
@@ -131,12 +146,14 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                                 currency.take(player)
 
                                 val game = CoinFlipGame(
-                                    creator = UserHandler.getUser(player.uniqueId),
+                                    creator = user,
                                     value = currency
                                 )
 
                                 CoinFlipHandler.trackGame(game)
                                 CoinFlipGameMenu(game).openMenu(player)
+
+                                player.sendMessage("${ChatColor.GREEN}You've created a Coinflip game for ${CoinFlipHandler.formatTokens(game.value.long())}${ChatColor.GREEN}.")
                             }
                     }
 

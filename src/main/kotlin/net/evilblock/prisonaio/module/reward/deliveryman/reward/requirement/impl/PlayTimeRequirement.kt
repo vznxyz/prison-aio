@@ -54,19 +54,6 @@ class PlayTimeRequirement(private var duration: Long) : DeliveryManRewardRequire
             })
         }
 
-        override fun startEditProcedure(player: Player, reward: DeliveryManReward, requirement: DeliveryManRewardRequirement) {
-            ConversationUtil.startConversation(player, DurationPrompt { duration ->
-                assert(duration > 0)
-
-                (requirement as PlayTimeRequirement).duration = duration
-                DeliveryManHandler.saveData()
-
-                player.sendMessage("${ChatColor.GREEN}Successfully updated requirement.")
-
-                EditDeliveryManRewardRequirementsMenu(reward).openMenu(player)
-            })
-        }
-
         override fun isCompatibleWithReward(reward: DeliveryManReward): Boolean {
             return reward.requirements.firstOrNull { it is PlayTimeRequirement } == null
         }

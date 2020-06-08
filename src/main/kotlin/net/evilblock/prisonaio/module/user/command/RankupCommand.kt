@@ -12,7 +12,10 @@ import org.bukkit.entity.Player
 
 object RankupCommand {
 
-    @Command(names = ["rankup"], description = "Purchase the next rankup")
+    @Command(
+        names = ["rankup"],
+        description = "Purchase the next rankup"
+    )
     @JvmStatic
     fun execute(player: Player) {
         val user = UserHandler.getUser(player.uniqueId)
@@ -24,9 +27,10 @@ object RankupCommand {
         }
 
         val rank = optionalNextRank.get()
+        val rankPrice = rank.getPrice(user.getCurrentPrestige())
 
         val balance = VaultHook.useEconomyAndReturn { economy -> economy.getBalance(player) }
-        if (balance >= rank.price) {
+        if (balance >= rankPrice) {
             val previousRank = user.getCurrentRank()
 
             val playerRankupEvent = PlayerRankupEvent(player, previousRank, rank)
@@ -36,14 +40,14 @@ object RankupCommand {
                 return
             }
 
-            VaultHook.useEconomy { it.withdrawPlayer(player, rank.price.toDouble()) }
+            VaultHook.useEconomy { it.withdrawPlayer(player, rankPrice) }
 
             user.updateCurrentRank(rank)
             user.applyPermissions(player)
 
             rank.executeCommands(player)
 
-            val moneyNeeded = NumberUtils.format(rank.price)
+            val moneyNeeded = NumberUtils.format(rankPrice)
 
             player.sendMessage("")
             player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Rankup Purchased")
@@ -51,7 +55,7 @@ object RankupCommand {
             player.sendMessage(" ${ChatColor.GRAY}The rankup cost ${ChatColor.GREEN}$${ChatColor.YELLOW}$moneyNeeded${ChatColor.GRAY}.")
             player.sendMessage("")
         } else {
-            val moneyNeeded = NumberUtils.format((rank.price - balance).toLong())
+            val moneyNeeded = NumberUtils.format((rankPrice - balance).toLong())
             player.sendMessage("")
             player.sendMessage(" ${ChatColor.RED}${ChatColor.BOLD}Cannot Afford Rankup")
             player.sendMessage(" ${ChatColor.GRAY}You need ${ChatColor.GREEN}$${ChatColor.YELLOW}$moneyNeeded ${ChatColor.GRAY}more to rankup to ${rank.displayName}${ChatColor.GRAY}.")

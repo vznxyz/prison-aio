@@ -16,6 +16,11 @@ object WithdrawCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "amount") money: Double) {
+        if (money < 1) {
+            player.sendMessage("${ChatColor.RED}You must withdraw at least $1.")
+            return
+        }
+
         val balance = VaultHook.useEconomyAndReturn { economy -> economy.getBalance(player) }
 
         if (money > balance) {

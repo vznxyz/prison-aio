@@ -3,16 +3,13 @@ package net.evilblock.prisonaio.module.rank.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.cubed.util.bukkit.ConversationUtil
+import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.cubed.util.bukkit.prompt.PricePrompt
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.rank.Rank
 import net.evilblock.prisonaio.module.rank.RankHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.conversations.ConversationContext
-import org.bukkit.conversations.Prompt
-import org.bukkit.conversations.StringPrompt
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
@@ -71,27 +68,23 @@ class EditRankMenu(val rank: Rank) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             player.closeInventory()
 
-            ConversationUtil.startConversation(player, object : StringPrompt() {
-                override fun getPromptText(context: ConversationContext): String {
-                    return "${ChatColor.GREEN}Please input a new name. ${ChatColor.GRAY}(Colors supported)"
-                }
-
-                override fun acceptInput(context: ConversationContext, input: String): Prompt? {
+            EzPrompt.Builder()
+                .promptText("${ChatColor.GREEN}Please input a new name. ${ChatColor.GRAY}(Colors supported)")
+                .acceptInput { player, input ->
                     if (input.length >= 32) {
-                        context.forWhom.sendRawMessage("${ChatColor.RED}Rank name is too long! (${input.length} > 32 characters)")
-                        return Prompt.END_OF_CONVERSATION
+                        player.sendMessage("${ChatColor.RED}Rank name is too long! (${input.length} > 32 characters)")
+                        return@acceptInput
                     }
 
                     rank.displayName = ChatColor.translateAlternateColorCodes('&', input)
                     RankHandler.saveData()
 
-                    context.forWhom.sendRawMessage("${ChatColor.GREEN}Successfully updated name of rank.")
+                    player.sendMessage("${ChatColor.GREEN}Successfully updated name of rank.")
 
-                    openMenu(context.forWhom as Player)
-
-                    return Prompt.END_OF_CONVERSATION
+                    openMenu(player)
                 }
-            })
+                .build()
+                .start(player)
         }
     }
 
@@ -157,14 +150,14 @@ class EditRankMenu(val rank: Rank) : Menu() {
             if (clickType.isLeftClick) {
                 player.closeInventory()
 
-                ConversationUtil.startConversation(player, PricePrompt("rank") { price ->
+                PricePrompt { price ->
                     rank.price = price.toLong()
                     RankHandler.saveData()
 
                     player.sendMessage("${ChatColor.GREEN}Successfully updated price of rank.")
 
                     openMenu(player)
-                })
+                }.start(player)
             }
         }
     }

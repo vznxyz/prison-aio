@@ -17,7 +17,7 @@ object TokensTakeCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player") user: User, @Param(name = "amount") amount: Long) {
-        user.updateTokensBalance(user.getTokensBalance() - amount)
+        user.subtractTokensBalance(amount)
 
         val formattedAmount = NumberFormat.getInstance().format(amount)
         sender.sendMessage("${ChatColor.GREEN}You've taken ${ChatColor.YELLOW}$formattedAmount ${ChatColor.GREEN}tokens from ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s balance.")

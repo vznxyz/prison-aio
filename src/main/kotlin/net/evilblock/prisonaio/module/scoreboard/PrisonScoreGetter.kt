@@ -7,7 +7,7 @@ import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
-import net.evilblock.prisonaio.module.user.setting.option.ScoreboardVisibilitySettingOption
+import net.evilblock.prisonaio.module.user.setting.option.ScoreboardVisibilityOption
 import net.evilblock.prisonaio.util.Constants
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -24,7 +24,7 @@ object PrisonScoreGetter : ScoreGetter {
     override fun getScores(scores: LinkedList<String>, player: Player) {
         val user = UserHandler.getUser(player.uniqueId)
 
-        if (!user.getSettingOption<ScoreboardVisibilitySettingOption>(UserSetting.SCOREBOARD_VISIBILITY).getValue<Boolean>()) {
+        if (!user.getSettingOption<ScoreboardVisibilityOption>(UserSetting.SCOREBOARD_VISIBILITY).getValue<Boolean>()) {
             return
         }
 
@@ -44,36 +44,27 @@ object PrisonScoreGetter : ScoreGetter {
 
         val formattedTokensBalance = NumberUtils.format(user.getTokensBalance())
         scores.add("  ${ChatColor.RED}${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}$formattedTokensBalance")
+
         scores.add("")
 
         val optionalNextRank = RankHandler.getNextRank(user.getCurrentRank())
         if (optionalNextRank.isPresent) {
             val nextRank = optionalNextRank.get()
-            val formattedPrice = NumberUtils.format(nextRank.price)
+            val nextRankPrice = nextRank.getPrice(user.getCurrentPrestige())
+            val formattedPrice = NumberUtils.format(nextRankPrice)
 
-            val progressPercentage = if (moneyBalance > nextRank.price) {
+            val progressPercentage = if (moneyBalance > nextRankPrice) {
                 100.0
             } else {
-                (moneyBalance / nextRank.price) * 100.0
+                (moneyBalance / nextRankPrice) * 100.0
             }
 
-            val progressColor = when {
-                progressPercentage >= 100.0 -> {
-                    ChatColor.GREEN
-                }
-                progressPercentage >= 30.0 -> {
-                    ChatColor.YELLOW
-                }
-                else -> {
-                    ChatColor.RED
-                }
-            }
-
+            val progressColor = ProgressBarBuilder.colorPercentage(progressPercentage)
             val progressBar = ProgressBarBuilder(char = '⬛').build(progressPercentage)
 
             scores.add("  ${ChatColor.RED}${ChatColor.BOLD}Progress")
             scores.add("  ${ChatColor.GRAY}${user.getCurrentRank().displayName} ${ChatColor.GRAY}-> ${nextRank.displayName} ${ChatColor.GRAY}(${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedPrice${ChatColor.GRAY})")
-            scores.add("  ${ChatColor.GRAY}❙$progressBar${ChatColor.GRAY}❙ ($progressColor${progressPercentage.toInt()}%${ChatColor.GRAY})")
+            scores.add("  ${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ($progressColor${progressPercentage.toInt()}%${ChatColor.GRAY})")
             scores.add("")
         }
 

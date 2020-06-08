@@ -13,7 +13,7 @@ abstract class CrateReward {
 
     var name: String = "Unnamed Reward"
     var chance: Double = 0.0
-    internal var icon: ItemStack = ItemStack(Material.COMMAND_REPEATING)
+    internal var icon: ItemStack = ItemStack(Material.COMMAND)
     var commands: MutableList<String> = arrayListOf()
     var sortOrder: Int = 1
 

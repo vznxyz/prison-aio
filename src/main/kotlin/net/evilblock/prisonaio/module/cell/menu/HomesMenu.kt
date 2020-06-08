@@ -1,6 +1,5 @@
 package net.evilblock.prisonaio.module.cell.menu
 
-import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.prisonaio.module.cell.Cell
@@ -29,16 +28,12 @@ class HomesMenu : Menu() {
 
     private inner class CellButton(private val cell: Cell) : Button() {
         override fun getName(player: Player): String {
-            return if (cell.owner == player.uniqueId) {
-                "${ChatColor.GREEN}${ChatColor.BOLD}Your Cell"
-            } else {
-                val ownerName = Cubed.instance.uuidCache.name(cell.owner)
-                "${ChatColor.GREEN}${ChatColor.BOLD}$ownerName's Cell"
-            }
+            return "${ChatColor.GREEN}${ChatColor.BOLD}${cell.name}"
         }
 
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
+            description.add("${ChatColor.GRAY}Owned by ${cell.getOwnerUsername()}")
             description.add("")
             description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Current Session")
 

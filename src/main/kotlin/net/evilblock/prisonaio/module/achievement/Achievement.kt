@@ -1,6 +1,6 @@
 package net.evilblock.prisonaio.module.achievement
 
-import net.evilblock.prisonaio.module.rank.event.PlayerPrestigeEvent
+import net.evilblock.prisonaio.module.rank.event.AsyncPlayerPrestigeEvent
 import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
@@ -34,7 +34,7 @@ abstract class Achievement(
 
     open fun onPlayerRankup(event: PlayerRankupEvent) {}
 
-    open fun onPlayerPrestige(event: PlayerPrestigeEvent) {}
+    open fun onPlayerPrestige(event: AsyncPlayerPrestigeEvent) {}
 
     fun completedAchievement(player: Player) {
         val user = UserHandler.getUser(player.uniqueId)

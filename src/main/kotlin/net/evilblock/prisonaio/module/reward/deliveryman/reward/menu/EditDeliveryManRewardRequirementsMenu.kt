@@ -82,9 +82,8 @@ class EditDeliveryManRewardRequirementsMenu(private val reward: DeliveryManRewar
             val description = arrayListOf<String>()
 
             description.add("")
-            description.addAll(TextSplitter.split(length = 40, text = requirement.getText(), linePrefix = "${ChatColor.GRAY}", wordSuffix = " "))
+            description.addAll(TextSplitter.split(length = 40, text = requirement.getText(), linePrefix = "${ChatColor.GRAY}"))
             description.add("")
-            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit requirement")
             description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to remove requirement")
 
             return description
@@ -99,10 +98,6 @@ class EditDeliveryManRewardRequirementsMenu(private val reward: DeliveryManRewar
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (clickType.isLeftClick) {
-                requirement.getType().startEditProcedure(player, reward, requirement)
-            }
-
             if (clickType.isRightClick) {
                 ConfirmMenu("Are you sure?") { confirmed ->
                     if (confirmed) {
@@ -128,7 +123,7 @@ class EditDeliveryManRewardRequirementsMenu(private val reward: DeliveryManRewar
         override fun getButtons(player: Player): Map<Int, Button> {
             val buttons = hashMapOf<Int, Button>()
 
-            for (reqType in DeliveryManHandler.requirementRegistry) {
+            for (reqType in DeliveryManHandler.REQUIREMENT_REGISTRY) {
                 buttons[buttons.size] = RequirementTypeButton(reqType)
             }
 
@@ -156,7 +151,7 @@ class EditDeliveryManRewardRequirementsMenu(private val reward: DeliveryManRewar
                 val description = arrayListOf<String>()
 
                 description.add("")
-                description.addAll(TextSplitter.split(length = 40, text = type.getDescription(), linePrefix = "${ChatColor.GRAY}", wordSuffix = " "))
+                description.addAll(TextSplitter.split(length = 40, text = type.getDescription(), linePrefix = "${ChatColor.GRAY}"))
                 description.add("")
 
                 if (!type.isCompatibleWithReward(reward)) {

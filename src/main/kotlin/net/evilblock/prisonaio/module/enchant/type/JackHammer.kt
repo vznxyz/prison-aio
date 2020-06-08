@@ -26,11 +26,11 @@ object JackHammer : AbstractEnchant("jack-hammer", "Jack Hammer", 5000) {
         get() = Material.STONE_SLAB2
 
     override fun getCost(level: Int): Long {
-        return (readCost() + (level - 1) * 50).toLong()
+        return readCost() + ((level - 1) * 50)
     }
 
     override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
-        if (region.getBreakableRegion() == null) {
+        if (!region.supportsEnchants() || region.getBreakableRegion() == null) {
             return
         }
 

@@ -62,7 +62,7 @@ object Constants {
     val MONEY_SYMBOL = "${ChatColor.BOLD}$"
 
     @JvmStatic
-    val TOKENS_SYMBOL = "${ChatColor.BOLD}⏣"
+    val TOKENS_SYMBOL = "${ChatColor.BOLD}⛁"
 
     @JvmStatic
     val ARROW_UP = "${ChatColor.BOLD}⬆"
@@ -77,7 +77,13 @@ object Constants {
     val DOUBLE_ARROW_RIGHT = "»"
 
     @JvmStatic
-    val THICK_VERTICAL_LINE = "${ChatColor.BOLD}❙"
+    val THICK_VERTICAL_LINE = "❙"
+
+    @JvmStatic
+    val DOT_SYMBOL = "●"
+
+    @JvmStatic
+    val EXP_SYMBOL = "✪"
 
     /**
      * Example omitted - Solid line which almost entirely spans the

@@ -6,11 +6,14 @@ import net.evilblock.cubed.command.CommandHandler
 import net.evilblock.cubed.error.ErrorHandler
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
 import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.prisonaio.command.BuyCommand
 import net.evilblock.prisonaio.command.GKitzCommand
 import net.evilblock.prisonaio.command.ReloadCommand
 import net.evilblock.prisonaio.command.SaveCommand
 import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.prisonaio.module.battlepass.BattlePassModule
+import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.cell.CellsModule
 import net.evilblock.prisonaio.module.chat.ChatModule
 import net.evilblock.prisonaio.module.crate.CratesModule
@@ -18,10 +21,12 @@ import net.evilblock.prisonaio.module.crate.reward.CrateReward
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.environment.EnvironmentModule
 import net.evilblock.prisonaio.module.environment.wizard.command.RunWizardCommand
+import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mine.MinesModule
 import net.evilblock.prisonaio.module.mine.block.BlockType
 import net.evilblock.prisonaio.module.minigame.MinigamesModule
+import net.evilblock.prisonaio.module.privatemine.PrivateMinesModule
 import net.evilblock.prisonaio.module.quest.QuestsModule
 import net.evilblock.prisonaio.module.quest.progression.QuestProgression
 import net.evilblock.prisonaio.module.rank.RanksModule
@@ -35,6 +40,7 @@ import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.generator.ChunkGenerator
 import org.bukkit.plugin.java.JavaPlugin
 
 class PrisonAIO : JavaPlugin() {
@@ -53,6 +59,7 @@ class PrisonAIO : JavaPlugin() {
             builder.registerTypeAdapter(CrateReward::class.java, CrateReward.Serializer)
             builder.registerTypeAdapter(DeliveryManRewardRequirement::class.java, DeliveryManRewardRequirement.Serializer)
             builder.registerTypeAdapter(UserSettingOption::class.java, AbstractTypeSerializer<UserSettingOption>())
+            builder.registerTypeAdapter(Challenge::class.java, AbstractTypeSerializer<Challenge>())
         }
 
         loadModules()
@@ -88,10 +95,13 @@ class PrisonAIO : JavaPlugin() {
             ShopsModule,
             MinesModule,
             CellsModule,
+            PrivateMinesModule,
+//            BattlePassModule,
             UsersModule,
             ScoreboardModule,
             ChatModule,
-            MinigamesModule
+            MinigamesModule,
+            LeaderboardsModule
         )
 
         modulesList.filter { !it.requiresLateLoad() }.forEach { module ->
@@ -150,7 +160,7 @@ class PrisonAIO : JavaPlugin() {
     private fun loadTasks() {
         server.scheduler.runTaskTimerAsynchronously(this, {
             saveModules()
-        }, 20L * 60, 20L * 60)
+        }, 20L * 60L * 5L, 20L * 60L * 5L)
     }
 
     private fun loadCommands() {
@@ -173,6 +183,10 @@ class PrisonAIO : JavaPlugin() {
                 }
             }
         }
+    }
+
+    override fun getDefaultWorldGenerator(worldName: String?, id: String?): ChunkGenerator {
+        return EmptyChunkGenerator()
     }
 
     companion object {

@@ -18,13 +18,14 @@ import java.io.File
 
 object DeliveryManHandler : PluginHandler {
 
-    private val rewards: MutableMap<String, DeliveryManReward> = hashMapOf()
-
-    val requirementRegistry: MutableList<DeliveryManRewardRequirementType<*>> = arrayListOf(
+    @JvmStatic
+    val REQUIREMENT_REGISTRY: MutableList<DeliveryManRewardRequirementType<*>> = arrayListOf(
         BlocksMinedRequirement.BlocksMinedRequirementType,
         PlayTimeRequirement.PlayTimeRequirementType,
         PrestigeRequirement.PrestigeRequirementType
     )
+
+    private val rewards: MutableMap<String, DeliveryManReward> = hashMapOf()
 
     override fun getModule(): PluginModule {
         return RewardsModule

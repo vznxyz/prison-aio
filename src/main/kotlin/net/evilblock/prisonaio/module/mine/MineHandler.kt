@@ -4,6 +4,7 @@ import com.google.common.base.Charsets
 import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
@@ -33,14 +34,23 @@ object MineHandler : PluginHandler {
     }
 
     /**
-     * Recalculates the coordinates -> mine map, which is used as a processing efficient method
-     * of determining if a location (coordinates) is part of a mine's region.
+     * Recalculates the coordinates -> mine map, which is used as a processing efficient method of determining if a location (coordinate pair) is part of a mine's region.
      */
     fun recalculateCoordsMap() {
         val map = hashMapOf<CoordsIntPair, Mine>()
 
-        for (mine in minesMap.values.filter { mine -> mine.region != null }) {
-            mine.region!!.blocks.forEach { block -> map[CoordsIntPair(block.location)] = mine }
+        for (mine in minesMap.values) {
+            if (mine.region != null) {
+                val region = mine.region!!
+
+                for (x in region.lowerX..region.upperX) {
+                    for (y in region.lowerY..region.upperY) {
+                        for (z in region.lowerZ..region.upperZ) {
+                            map[CoordsIntPair(Location(region.world, x.toDouble(), y.toDouble(), z.toDouble()))] = mine
+                        }
+                    }
+                }
+            }
         }
 
         coordsMap = map
@@ -60,6 +70,14 @@ object MineHandler : PluginHandler {
         }
 
         recalculateCoordsMap()
+
+        Tasks.async {
+            for (mine in minesMap.values) {
+                if (mine.region != null) {
+                    mine.resetRegion()
+                }
+            }
+        }
     }
 
     override fun saveData() {

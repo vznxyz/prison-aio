@@ -47,7 +47,7 @@ data class BankNote(val uuid: UUID = UUID.randomUUID(),
 
         if (useTokens) {
             val user = UserHandler.getUser(player.uniqueId)
-            user.updateTokensBalance(user.getTokensBalance() + value.toLong())
+            user.addTokensBalance(value.toLong())
         } else {
             VaultHook.useEconomy { economy -> economy.depositPlayer(player, value) }
         }

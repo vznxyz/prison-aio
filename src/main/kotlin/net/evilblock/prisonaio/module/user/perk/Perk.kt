@@ -14,9 +14,10 @@ enum class Perk(
     val permission: String? = null
 ) {
 
-    AUTO_SELL("Auto-Sell", ItemStack(Material.EMERALD), Permissions.AUTO_SELL),
+    AUTO_SELL("Auto-Sell", ItemStack(Material.EMERALD), Permissions.PERK_AUTO_SELL),
     AUTO_SMELT("Auto-Smelt", ItemStack(Material.IRON_INGOT)),
-    SALES_BOOST("Sales Boost", ItemStack(Material.GOLD_NUGGET));
+    SALES_BOOST("Sales Boost", ItemStack(Material.GOLD_NUGGET)),
+    FLY("Fly", ItemStack(Material.FEATHER), Permissions.PERK_FLY);
 
     object PerkParameterType : ParameterType<Perk> {
 
@@ -34,9 +35,7 @@ enum class Perk(
             val completed = arrayListOf<String>()
 
             for (perk in values()) {
-                println("test1")
                 if (perk.name.startsWith(source, ignoreCase = true)) {
-                    println("test2")
                     completed.add(perk.name.toLowerCase())
                 }
             }

@@ -1,7 +1,7 @@
 package net.evilblock.prisonaio.module.environment.analytic.listener
 
 import net.evilblock.prisonaio.module.environment.analytic.Analytic
-import net.evilblock.prisonaio.module.user.event.PlayTimeSyncEvent
+import net.evilblock.prisonaio.module.user.event.AsyncPlayTimeSyncEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -23,7 +23,7 @@ object AnalyticListeners : Listener {
     }
 
     @EventHandler
-    fun onPlayTimeSyncEvent(event: PlayTimeSyncEvent) {
+    fun onPlayTimeSyncEvent(event: AsyncPlayTimeSyncEvent) {
         Analytic.TIME_PLAYED.updateValue(Analytic.TIME_PLAYED.getValue<Long>() + event.offset)
     }
 

@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.util.Vector
 import java.util.*
 
 object Laser : AbstractEnchant("laser", "Laser", 1) {
@@ -84,12 +83,12 @@ object Laser : AbstractEnchant("laser", "Laser", 1) {
             val eyeLocation = player.eyeLocation
             val lineOfSight = player.eyeLocation.direction.normalize()
             val rayTrace = RayTrace(eyeLocation.toVector(), lineOfSight)
-            val traversed: ArrayList<Vector> = rayTrace.traverse(20.0, 0.05) // vectors traversed
             val needsDestroyed: MutableList<Block> = ArrayList() // the blocks that need to be destroyed
 
-            for (vec in traversed) {
+            for (vec in rayTrace.traverse(20.0, 0.05)) {
                 val toLocation = vec.toLocation(player.world)
-                if (toLocation.block.type == Material.BEDROCK || toLocation.block.type == Material.AIR) {
+                // skip bedrock, air, and enderchest (MineCrate) blocks
+                if (toLocation.block.type == Material.BEDROCK || toLocation.block.type == Material.AIR || toLocation.block.type == Material.ENDER_CHEST) {
                     continue
                 }
 

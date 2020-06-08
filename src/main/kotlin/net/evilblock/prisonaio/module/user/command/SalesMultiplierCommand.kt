@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 object SalesMultiplierCommand {
 
     @Command(
-        names = ["salesmultiplier", "salesmulti", "salesboost"],
+        names = ["salesmultiplier", "salesmulti", "salesboost", "multi", "multiplier"],
         description = "Shows your active sales multiplier"
     )
     @JvmStatic

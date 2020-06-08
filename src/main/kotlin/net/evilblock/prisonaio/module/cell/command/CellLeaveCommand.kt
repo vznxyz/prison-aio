@@ -2,13 +2,19 @@ package net.evilblock.prisonaio.module.cell.command
 
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.Command
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.cell.CellHandler
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
 object CellLeaveCommand {
 
-    @Command(names = ["cell leave", "cells leave"], description = "Leave a cell", async = true)
+    @Command(
+        names = ["cell leave", "cells leave"],
+        description = "Leave a cell",
+        async = true
+    )
     @JvmStatic
     fun execute(player: Player) {
         val visitingCell = CellHandler.getVisitingCell(player)
@@ -23,6 +29,12 @@ object CellLeaveCommand {
         }
 
         visitingCell.memberLeave(player.uniqueId)
+
+        if (visitingCell.isActivePlayer(player)) {
+            Tasks.sync {
+                player.teleport(Bukkit.getWorlds()[0].spawnLocation)
+            }
+        }
 
         val ownerName = Cubed.instance.uuidCache.name(visitingCell.owner)
         player.sendMessage("${ChatColor.GREEN}Successfully left $ownerName's cell.")

@@ -28,7 +28,6 @@ object SpawnDealerCommand {
         )
 
         EntityManager.trackEntity(entity)
-        EntityManager.saveData()
 
         player.sendMessage("${ChatColor.GREEN}Successfully spawned drug-dealer NPC.")
     }
