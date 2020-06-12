@@ -4,7 +4,6 @@ import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.crate.Crate
 import net.evilblock.prisonaio.module.crate.CratesModule
-import net.evilblock.prisonaio.module.crate.key.CrateKey
 import net.evilblock.prisonaio.module.crate.key.CrateKeyHandler
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -16,8 +15,7 @@ object CrateGiveKeyToCommand {
     @Command(
         names = ["crate givekey to", "prison crate givekey to"],
         description = "Gives crate keys to a player",
-        permission = "prisonaio.crates.givekey",
-        async = true
+        permission = "prisonaio.crates.givekey"
     )
     @JvmStatic
     fun execute(sender: CommandSender,
@@ -36,18 +34,24 @@ object CrateGiveKeyToCommand {
             null
         }
 
-        try {
-            CrateKeyHandler.giveKey(player, crate, amount, issuedBy, reason)
-        } catch (e: Exception) {
-            sender.sendMessage("${ChatColor.RED}Failed to give key to ${player.name}.")
-            return
+        val message = StringBuilder()
+        if (sender is Player) {
+            message.append("${CratesModule.getChatPrefix()}You were given ${amount}x ${crate.name} ${ChatColor.GRAY}keys by ${ChatColor.YELLOW}${sender.name}${ChatColor.GRAY}.")
+        } else {
+            message.append("${CratesModule.getChatPrefix()}You were given ${amount}x ${crate.name} ${ChatColor.GRAY}keys.")
         }
 
-        if (sender is Player) {
-            player.sendMessage("${CratesModule.getChatPrefix()}You were given ${amount}x ${crate.name} ${ChatColor.GRAY}keys by ${ChatColor.YELLOW}${sender.name}${ChatColor.GRAY}.")
+        val keyItemStack = CrateKeyHandler.makeKeyItemStack(player, crate, amount, issuedBy, reason)
+
+        if (player.inventory.firstEmpty() == -1) {
+            player.enderChest.addItem(keyItemStack)
+            message.append("${ChatColor.RED}${ChatColor.BOLD}(ADDED TO ENDERCHEST)")
         } else {
-            player.sendMessage("${CratesModule.getChatPrefix()}You were given ${amount}x ${crate.name} ${ChatColor.GRAY}keys.")
+            player.inventory.addItem(keyItemStack)
         }
+
+        player.sendMessage(message.toString())
+        player.updateInventory()
 
         sender.sendMessage("${CratesModule.getChatPrefix()}You've given ${amount}x ${crate.name} ${ChatColor.GRAY}keys to ${ChatColor.YELLOW}${player.name}${ChatColor.GRAY}.")
     }

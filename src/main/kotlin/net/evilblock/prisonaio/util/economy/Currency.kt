@@ -2,8 +2,8 @@ package net.evilblock.prisonaio.util.economy
 
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.user.UserHandler
+import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
-import org.bukkit.entity.Player
 
 abstract class Currency<T>(internal val amount: T) {
 
@@ -70,13 +70,21 @@ abstract class Currency<T>(internal val amount: T) {
         }
 
         override fun give(player: OfflinePlayer) {
-            val user = UserHandler.getUser(player.uniqueId)
+            val user = if (UserHandler.isUserLoaded(player.uniqueId)) {
+                UserHandler.getUser(player.uniqueId)
+            } else {
+                if (Bukkit.isPrimaryThread()) {
+                    throw IllegalStateException("Couldn't give token currency to offline user on primary thread (requires load)")
+                }
+
+                UserHandler.fetchUser(player.uniqueId)
+            }
+
             user.addTokensBalance(amount)
         }
 
         override fun take(player: OfflinePlayer) {
-            val user = UserHandler.getUser(player.uniqueId)
-            user.subtractTokensBalance(amount)
+            UserHandler.getUser(player.uniqueId).subtractTokensBalance(amount)
         }
 
     }

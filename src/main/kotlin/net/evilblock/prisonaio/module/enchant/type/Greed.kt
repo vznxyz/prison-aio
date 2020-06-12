@@ -6,6 +6,7 @@ import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
+import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.Color
@@ -38,9 +39,11 @@ object Greed : AbstractEnchant("greed", "Greed", 3) {
 
             val multiplierMap = readLevelToMultiplierMap()
 
-            val multiplier: Double = multiplierMap.getOrElse(level) {
+            var multiplier: Double = multiplierMap.getOrElse(level) {
                 multiplierMap.entries.maxBy { it.key }!!.value
             }
+
+            multiplier = UserHandler.getUser(player.uniqueId).perks.getSalesMultiplier(event.player).coerceAtLeast(multiplier)
 
             if (randomItem.multiplier < multiplier) {
                 randomItem.multiplier = multiplier

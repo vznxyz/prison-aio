@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 
 object DropPickaxeListeners : Listener {
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     fun onPlayerDropItemEvent(event: PlayerDropItemEvent) {
         if (event.itemDrop.itemStack.type.name.contains("_PICKAXE")) {
             if (!event.player.hasMetadata("CONFIRM_DROP")) {

@@ -48,13 +48,7 @@ class Rank(val id: String) {
     }
 
     fun getPrice(prestige: Int): Double {
-        val priceMultiplier = if (prestige == 0) {
-            1.0
-        } else {
-            prestige * RankHandler.priceScaleMultiplier
-        }
-
-        return price * priceMultiplier
+        return price * RanksModule.getPrestigeRankPriceMultiplier(prestige)
     }
 
 }

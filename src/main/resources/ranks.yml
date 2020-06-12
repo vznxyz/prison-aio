@@ -16,3 +16,17 @@ ranks:
 default-permissions:
   - "prisonaio.shops.{rankId}"
   - "essentials.warp.{rankId}"
+prestige:
+  max-prestige: 50
+  max-prestige-tag: "&6&lMaster"
+  blocks-mined-requirement:
+    base: 5000 # The base amount of blocks required to prestige
+    modifier: 1000 # Each level adds 1000 blocks to the requirement
+  commands:
+    - "crate givekey to {playerName} Prestige 1"
+  rank-price-multipliers:
+    1: 1.3
+    2: 1.6
+    3: 1.8
+    25: 50.0
+    50: 100.0

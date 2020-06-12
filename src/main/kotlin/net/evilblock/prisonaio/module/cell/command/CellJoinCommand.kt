@@ -4,6 +4,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.cubed.util.TextUtil
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.cell.Cell
 import net.evilblock.prisonaio.module.cell.CellHandler
 import net.evilblock.prisonaio.module.cell.CellsModule
@@ -14,10 +15,11 @@ object CellJoinCommand {
 
     @Command(
         names = ["cell join", "cells join", "cell accept", "cells accept"],
-        description = "Join a cell you've been invited to"
+        description = "Join a cell you've been invited to",
+        async = true
     )
     @JvmStatic
-    fun execute(player: Player, @Param(name = "cellId") cell: Cell) {
+    fun execute(player: Player, @Param(name = "cell") cell: Cell) {
         val maxCells = CellsModule.getMaxCellsPerPlayer()
         if (CellHandler.getJoinableCells(player.uniqueId).size >= maxCells) {
             player.sendMessage("${ChatColor.RED}You can only join $maxCells ${TextUtil.pluralize(maxCells, "cell", "cells")} at once.")
@@ -44,7 +46,9 @@ object CellJoinCommand {
         val ownerName = Cubed.instance.uuidCache.name(cell.owner)
         player.sendMessage("${ChatColor.GREEN}Successfully joined $ownerName's cell.")
 
-        CellHandler.attemptJoinSession(player, cell)
+        Tasks.sync {
+            CellHandler.attemptJoinSession(player, cell)
+        }
     }
 
 }

@@ -13,8 +13,8 @@ import net.evilblock.prisonaio.module.user.command.admin.*
 import net.evilblock.prisonaio.module.user.command.parameter.UserParameterType
 import net.evilblock.prisonaio.module.user.listener.*
 import net.evilblock.prisonaio.module.user.perk.Perk
+import net.evilblock.prisonaio.module.user.perk.autosell.AutoSellNotification
 import net.evilblock.prisonaio.module.user.task.PlayTimeSyncTask
-import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
 object UsersModule : PluginModule() {
@@ -58,6 +58,7 @@ object UsersModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
+            AutoSellNotification,
             DropPickaxeListeners,
             TokenShopListeners,
             UserCacheListeners,
@@ -106,26 +107,6 @@ object UsersModule : PluginModule() {
             User::class.java to UserParameterType,
             Perk::class.java to Perk.PerkParameterType
         )
-    }
-
-    fun getMaxPrestige(): Int {
-        return config.getInt("prestige.max-prestige", 50)
-    }
-
-    fun getMaxPrestigeTag(): String {
-        return ChatColor.translateAlternateColorCodes('&', config.getString("prestige.max-prestige-tag"))
-    }
-
-    fun getPrestigeBlocksMinedRequirementBase(): Int {
-        return config.getInt("prestige.blocks-mined-requirement.base")
-    }
-
-    fun getPrestigeBlocksMinedRequirementModifier(): Int {
-        return config.getInt("prestige.blocks-mined-requirement.modifier")
-    }
-
-    fun getPrestigeCommands(): List<String> {
-        return config.getStringList("prestige.commands")
     }
 
     fun isAutoSmeltPerkEnabledByDefault(): Boolean {

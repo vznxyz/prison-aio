@@ -3,6 +3,7 @@ package net.evilblock.prisonaio.module.mechanic.region.listener
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin
 import net.evilblock.prisonaio.module.mechanic.region.Regions
 import net.evilblock.prisonaio.module.mechanic.region.bypass.RegionBypass
+import net.evilblock.prisonaio.module.mechanic.region.event.RegionBlockBreakEvent
 import net.evilblock.prisonaio.util.Permissions
 import net.evilblock.prisonaio.util.plot.PlotUtil
 import org.bukkit.ChatColor
@@ -113,7 +114,13 @@ object RegionListeners : Listener {
 
         val region = Regions.findRegion(event.block.location)
         if (region != null) {
-            region.onBlockBreak(event.player, event.block, event)
+            val regionBlockBreakEvent = RegionBlockBreakEvent(event.player, region, event.block)
+            regionBlockBreakEvent.call()
+
+            if (!regionBlockBreakEvent.isCancelled) {
+                region.onBlockBreak(event.player, event.block, event)
+            }
+
             return
         }
 

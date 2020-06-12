@@ -7,6 +7,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.prisonaio.module.shop.event.DetermineShopEvent
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
 import org.bukkit.ChatColor
@@ -54,6 +55,17 @@ object ShopHandler: PluginHandler {
     }
 
     fun sellItems(player: Player, items: MutableList<ItemStack>): List<ItemStack> {
+        val determineShopEvent = DetermineShopEvent(player)
+        determineShopEvent.call()
+
+        if (determineShopEvent.shop != null) {
+            val receipt = determineShopEvent.shop!!.sellItems(player, items, true)
+            if (receipt.result == TransactionResult.SUCCESS) {
+                items.removeAll(receipt.items.map { it.item })
+                return items
+            }
+        }
+
         val accessibleShops = shopsMap.values.filter { it.hasAccess(player) }.sortedBy { it.priority }
         if (accessibleShops.isEmpty()) {
             player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
@@ -75,10 +87,25 @@ object ShopHandler: PluginHandler {
     }
 
     fun sellInventory(player: Player, autoSell: Boolean) {
-        val items = player.inventory.contents.filterNotNull().toMutableList()
+        val determineShopEvent = DetermineShopEvent(player)
+        determineShopEvent.call()
+
+        val items = player.inventory.storageContents.filterNotNull().toMutableList()
         if (items.isEmpty()) {
             player.sendMessage("${ChatColor.RED}${TransactionResult.NO_ITEMS.defaultMessage}!")
             return
+        }
+
+        if (determineShopEvent.shop != null) {
+            val receipt = determineShopEvent.shop!!.sellItems(player, items, false)
+            if (receipt.result == TransactionResult.SUCCESS) {
+                for (receiptItem in receipt.items) {
+                    player.inventory.remove(receiptItem.item)
+                }
+
+                player.updateInventory()
+                return
+            }
         }
 
         val accessibleShops = shopsMap.values.filter { it.hasAccess(player) }.sortedBy { it.priority }

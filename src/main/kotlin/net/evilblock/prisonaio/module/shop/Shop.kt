@@ -80,7 +80,8 @@ class Shop(val id: String) {
             player = player,
             shop = this,
             items = itemsSold,
-            multiplier = 1.0
+            multiplier = 1.0,
+            autoSell = autoSell
         )
 
         Bukkit.getPluginManager().callEvent(sellEvent)

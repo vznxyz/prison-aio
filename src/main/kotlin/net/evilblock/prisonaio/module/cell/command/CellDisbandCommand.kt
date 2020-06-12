@@ -16,32 +16,32 @@ object CellDisbandCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        val visitingCell = CellHandler.getVisitingCell(player)
-        if (visitingCell == null) {
+        val cell = CellHandler.getAssumedCell(player.uniqueId)
+        if (cell == null) {
             player.sendMessage("${ChatColor.RED}You must be in a cell to disband it.")
             return
         }
 
-        if (!visitingCell.isOwner(player.uniqueId)) {
+        if (!cell.isOwner(player.uniqueId)) {
             player.sendMessage("${ChatColor.RED}You must be the owner of this cell to disband it.")
             return
         }
 
-        visitingCell.sendMessages("${ChatColor.YELLOW}The cell has been disbanded by the owner.")
+        cell.sendMessages("${ChatColor.YELLOW}The cell has been disbanded by the owner.")
 
-        for (member in visitingCell.getMembers()) {
-            CellHandler.updateJoinableCache(member, visitingCell, false)
+        for (member in cell.getMembers()) {
+            CellHandler.updateJoinableCache(member, cell, false)
         }
 
-        for (player in visitingCell.getActivePlayers()) {
-            CellHandler.updateVisitingCell(player, null)
+        for (activePlayer in cell.getActivePlayers()) {
+            CellHandler.updateVisitingCell(activePlayer, null)
 
             Tasks.sync {
-                player.teleport(Bukkit.getWorlds()[0].spawnLocation)
+                activePlayer.teleport(Bukkit.getWorlds()[0].spawnLocation)
             }
         }
 
-        CellHandler.forgetCell(visitingCell)
+        CellHandler.forgetCell(cell)
         player.sendMessage("${ChatColor.GREEN}You have successfully disbanded your cell.")
     }
 

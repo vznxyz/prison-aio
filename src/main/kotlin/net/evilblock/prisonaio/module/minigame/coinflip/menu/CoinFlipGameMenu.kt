@@ -25,6 +25,15 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
         autoUpdate = true
     }
 
+    override fun onOpen(player: Player) {
+        if (game.stage == CoinFlipGame.Stage.FINISHED && game.stageTicks >= 15) {
+            CoinFlipBrowserMenu().openMenu(player)
+            return
+        }
+
+        super.onOpen(player)
+    }
+
     override fun getTitle(player: Player): String {
         val formattedValue = if (game.value.isMoney()) {
             CoinFlipHandler.formatMoney(game.value.double())

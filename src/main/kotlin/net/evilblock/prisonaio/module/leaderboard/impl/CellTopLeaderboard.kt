@@ -4,7 +4,6 @@ import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.cell.CellHandler
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 
 object CellTopLeaderboard : Leaderboard("cell-top", "Cell Top") {
@@ -20,7 +19,7 @@ object CellTopLeaderboard : Leaderboard("cell-top", "Cell Top") {
     }
 
     override fun formatEntry(entry: LeaderboardEntry<*>): String {
-        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.RED}${Constants.TOKENS_SYMBOL}${ChatColor.GOLD}${NumberUtils.format(entry.value as Long)}"
+        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.AQUA}${ChatColor.BOLD}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(entry.value as Long)}"
     }
 
 }

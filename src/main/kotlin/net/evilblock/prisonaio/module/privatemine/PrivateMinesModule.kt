@@ -1,10 +1,7 @@
 package net.evilblock.prisonaio.module.privatemine
 
 import net.evilblock.prisonaio.module.PluginModule
-import net.evilblock.prisonaio.module.privatemine.command.CreateCommand
-import net.evilblock.prisonaio.module.privatemine.command.HelpCommand
-import net.evilblock.prisonaio.module.privatemine.command.KickCommand
-import net.evilblock.prisonaio.module.privatemine.command.MenuCommand
+import net.evilblock.prisonaio.module.privatemine.command.*
 import net.evilblock.prisonaio.module.privatemine.task.PrivateMineResetTask
 import net.evilblock.prisonaio.module.privatemine.data.PrivateMineTier
 import net.evilblock.prisonaio.module.privatemine.listener.*
@@ -22,10 +19,13 @@ object PrivateMinesModule : PluginModule() {
     }
 
     override fun onEnable() {
-        PrivateMineTier.initialLoad()
         PrivateMineHandler.initialLoad()
 
         getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), PrivateMineResetTask, 20L, 20L)
+    }
+
+    override fun onReload() {
+        PrivateMineHandler.loadConfig()
     }
 
     override fun onAutoSave() {
@@ -37,7 +37,8 @@ object PrivateMinesModule : PluginModule() {
             CreateCommand.javaClass,
             KickCommand.javaClass,
             HelpCommand.javaClass,
-            MenuCommand.javaClass
+            MenuCommand.javaClass,
+            ResetCommand.javaClass
         )
     }
 

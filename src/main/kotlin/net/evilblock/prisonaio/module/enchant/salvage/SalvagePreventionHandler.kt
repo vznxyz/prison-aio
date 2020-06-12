@@ -66,7 +66,7 @@ object SalvagePreventionHandler : PluginHandler {
 
         var matchingPickaxe: ItemStack? = null
         for (pickaxe in getPickaxes()) {
-            if (pickaxe.isSimilar(itemStack)) {
+            if (isSimilar(pickaxe, itemStack)) {
                 matchingPickaxe = pickaxe
                 break
             }
@@ -78,7 +78,7 @@ object SalvagePreventionHandler : PluginHandler {
 
         val matchingPickaxeEnchants = EnchantsManager.getEnchants(matchingPickaxe)
 
-        for ((enchant, level) in enchants) {
+        for ((enchant, level) in enchants.toMap()) {
             if (matchingPickaxeEnchants.containsKey(enchant)) {
                 val salvageableLevels = level - matchingPickaxeEnchants.getOrDefault(enchant, 0)
                 if (salvageableLevels <= 0) {
@@ -90,6 +90,32 @@ object SalvagePreventionHandler : PluginHandler {
         }
 
         return enchants
+    }
+
+    private fun isSimilar(first: ItemStack, second: ItemStack): Boolean {
+        if (first.type != second.type) {
+            return false
+        }
+
+        if (first.hasItemMeta() != second.hasItemMeta()) {
+            return false
+        }
+
+        if (first.itemMeta.hasDisplayName() != second.itemMeta.hasDisplayName()) {
+            return false
+        }
+
+        if (first.itemMeta.hasDisplayName()) {
+            if (first.itemMeta.displayName != second.itemMeta.displayName) {
+                return false
+            }
+        }
+
+        if (first.itemMeta.hasLore() != second.itemMeta.hasLore()) {
+            return false
+        }
+
+        return true
     }
 
 }

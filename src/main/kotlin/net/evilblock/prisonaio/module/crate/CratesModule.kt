@@ -9,9 +9,6 @@ import net.evilblock.prisonaio.module.crate.key.listener.CrateKeyDupeListeners
 import net.evilblock.prisonaio.module.crate.listener.CrateMechanicsListeners
 import net.evilblock.prisonaio.module.crate.listener.CrateSetupListeners
 import net.evilblock.prisonaio.module.crate.placed.PlacedCrateHandler
-import net.evilblock.prisonaio.module.crate.roll.CrateRollHandler
-import net.evilblock.prisonaio.module.crate.roll.listener.CrateRollInterruptListeners
-import net.evilblock.prisonaio.module.crate.roll.task.CrateRollTicker
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -28,23 +25,18 @@ object CratesModule : PluginModule() {
     override fun onEnable() {
         CrateHandler.initialLoad()
         CrateKeyHandler.initialLoad()
-        CrateRollHandler.initialLoad()
         PlacedCrateHandler.initialLoad()
-
-        CrateRollTicker().start()
     }
 
     override fun onDisable() {
         CrateHandler.saveData()
         CrateKeyHandler.saveData()
-        CrateRollHandler.saveData()
         PlacedCrateHandler.saveData()
     }
 
     override fun onAutoSave() {
         CrateHandler.saveData()
         CrateKeyHandler.saveData()
-        CrateRollHandler.saveData()
         PlacedCrateHandler.saveData()
     }
 
@@ -66,10 +58,8 @@ object CratesModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
-//            CrateKeyAdminListeners,
             CrateKeyDupeListeners,
             CrateMechanicsListeners,
-            CrateRollInterruptListeners,
             CrateSetupListeners
         )
     }

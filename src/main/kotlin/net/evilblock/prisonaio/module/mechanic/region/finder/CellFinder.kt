@@ -8,9 +8,9 @@ import org.bukkit.Location
 object CellFinder : RegionFinder {
 
     override fun findRegion(location: Location): Region? {
-        val optionalCell = CellHandler.getCellByLocation(location)
-        if (optionalCell.isPresent) {
-            return optionalCell.get()
+        val cell = CellHandler.getCellByLocation(location)
+        if (cell != null) {
+            return cell
         }
         return null
     }

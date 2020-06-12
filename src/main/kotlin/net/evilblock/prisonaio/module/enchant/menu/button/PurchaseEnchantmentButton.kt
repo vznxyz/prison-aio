@@ -22,7 +22,7 @@ import java.util.*
 class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private val enchant: AbstractEnchant) : Button() {
 
     override fun getName(player: Player): String {
-        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxeInHand)
+        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxe)
         val currentLevel = enchants[enchant] ?: 0
         return if (currentLevel >= enchant.maxLevel) {
             ChatColor.GREEN.toString() + ChatColor.BOLD + enchant.strippedEnchant
@@ -34,7 +34,7 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
 
     override fun getDescription(player: Player): List<String> {
         val user = UserHandler.getUser(player.uniqueId)
-        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxeInHand)
+        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxe)
         val currentLevel = enchants[enchant] ?: 0
         val nextLevel = currentLevel + 1
 
@@ -48,22 +48,22 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
         ))
 
         description.add("")
-        description.add(ChatColor.GRAY.toString() + "Price: " + ChatColor.GREEN + ChatColor.BOLD + NumberFormat.getInstance().format(enchant.getCost(nextLevel)) + " Tokens")
-        description.add(ChatColor.GRAY.toString() + "Max Level: " + ChatColor.GOLD + ChatColor.BOLD + NumberFormat.getInstance().format(enchant.maxLevel.toLong()))
+        description.add("${ChatColor.GRAY}Price: ${ChatColor.GREEN}${ChatColor.BOLD}${NumberFormat.getInstance().format(enchant.getCost(nextLevel))} Tokens")
+        description.add("${ChatColor.GRAY}Max Level: ${ChatColor.GOLD}${ChatColor.BOLD}${NumberFormat.getInstance().format(enchant.maxLevel.toLong())}")
 
         val isMaxed = currentLevel >= enchant.maxLevel
         if (isMaxed) {
-            description.add(ChatColor.LIGHT_PURPLE.toString() + ChatColor.BOLD + "Maxed")
+            description.add("${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Maxed")
         }
 
         if (user.hasTokensBalance(enchant.getCost(nextLevel))) {
             description.add("")
-            description.add(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Click to purchase")
-            description.add(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Press " + ChatColor.AQUA + ChatColor.BOLD + "Q" + ChatColor.YELLOW + ChatColor.BOLD + " to Buy Max")
+            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Click to purchase")
+            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Press ${ChatColor.AQUA}${ChatColor.BOLD}Q ${ChatColor.YELLOW}${ChatColor.BOLD}to Buy Max")
         } else {
             if (!isMaxed) {
                 description.add("")
-                description.add(ChatColor.RED.toString() + ChatColor.BOLD + "Not Enough Tokens")
+                description.add("${ChatColor.RED}${ChatColor.BOLD}Not Enough Tokens")
             }
         }
 
@@ -75,7 +75,7 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
     }
 
     override fun applyMetadata(player: Player, itemMeta: ItemMeta): ItemMeta? {
-        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxeInHand)
+        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxe)
 
         // add glow to item if the player has maxed out this enchantment
         val currentLevel = enchants[enchant] ?: 0
@@ -99,33 +99,28 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
     }
 
     override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-        if (parent.pickaxeInHand == null) {
-            return
-        }
-
-
         val user = UserHandler.getUser(player.uniqueId)
-        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxeInHand)
+        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxe)
         val currentLevel = enchants[enchant] ?: 0
         val nextLevel = currentLevel + 1
 
         // left click and drop click are purchase actions, so we can check a few conditions collectively
         if (clickType == ClickType.LEFT || clickType == ClickType.DROP) {
             if (user.getTokensBalance() < enchant.getCost(nextLevel)) {
-                player.sendMessage(EnchantsManager.CHAT_PREFIX + ChatColor.RED + "You don't have enough tokens to purchase the " + ChatColor.BOLD + enchant.strippedEnchant + ChatColor.RED + " enchantment.")
+                player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}You don't have enough tokens to purchase the ${ChatColor.BOLD}${enchant.strippedEnchant} ${ChatColor.RED}enchantment.")
                 return
             }
 
             if (currentLevel >= enchant.maxLevel) {
-                player.sendMessage(EnchantsManager.CHAT_PREFIX + ChatColor.RED + "Your pickaxe already has the max level enchant for the " + ChatColor.BOLD + enchant.strippedEnchant + ChatColor.RED + " enchantment.")
+                player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe already has the max level enchant for the ${ChatColor.BOLD}${enchant.strippedEnchant} ${ChatColor.RED}enchantment.")
                 return
             }
         }
 
         if (clickType == ClickType.LEFT) { // purchase level
-            player.sendMessage(EnchantsManager.CHAT_PREFIX.toString() + "Upgraded " + ChatColor.RED + enchant.strippedEnchant + ChatColor.GRAY + " by " + ChatColor.RED + "1" + ChatColor.GRAY + " level.")
+            player.sendMessage("${EnchantsManager.CHAT_PREFIX}Upgraded ${ChatColor.RED}${enchant.strippedEnchant} ${ChatColor.GRAY}by ${ChatColor.RED}1 ${ChatColor.GRAY}level.")
             user.subtractTokensBalance(enchant.getCost(nextLevel))
-            EnchantsManager.upgradeEnchant(parent.pickaxeInHand, enchant, 1, false)
+            EnchantsManager.upgradeEnchant(parent.pickaxe, enchant, 1, false)
         } else if (clickType == ClickType.DROP) { // purchase max levels
             var levelsPurchased = 0
             var levelsCost = 0.0
@@ -141,13 +136,13 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
             }
 
             if (levelsPurchased == 0) {
-                player.sendMessage(EnchantsManager.CHAT_PREFIX + ChatColor.RED + "You couldn't afford to purchase any levels.")
+                player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}You couldn't afford to purchase any levels.")
                 return
             }
 
-            player.sendMessage(EnchantsManager.CHAT_PREFIX + "Upgraded " + ChatColor.RED + enchant.strippedEnchant + ChatColor.GRAY + " by " + ChatColor.RED + levelsPurchased + ChatColor.GRAY + " level" + pluralize(levelsPurchased) + ".")
+            player.sendMessage("${EnchantsManager.CHAT_PREFIX}Upgraded ${ChatColor.RED}${enchant.strippedEnchant} ${ChatColor.GRAY}by ${ChatColor.RED}$levelsPurchased ${ChatColor.GRAY}level${pluralize(levelsPurchased)}.")
             user.subtractTokensBalance(levelsCost.toLong())
-            EnchantsManager.upgradeEnchant(parent.pickaxeInHand, enchant, levelsPurchased, false)
+            EnchantsManager.upgradeEnchant(parent.pickaxe, enchant, levelsPurchased, false)
         }
     }
 

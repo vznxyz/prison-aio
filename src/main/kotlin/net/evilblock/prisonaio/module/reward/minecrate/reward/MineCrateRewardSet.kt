@@ -7,8 +7,7 @@ import org.bukkit.entity.Player
 data class MineCrateRewardSet(
     val id: String,
     val chance: Double,
-    val maxRewards: Int,
-    val worlds: List<String>
+    val maxRewards: Int
 ) {
 
     val items: MutableList<RewardItem> = arrayListOf()

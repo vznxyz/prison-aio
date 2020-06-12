@@ -1,9 +1,7 @@
 package net.evilblock.prisonaio.module.mine
 
-import com.boydti.fawe.FaweAPI
-import com.boydti.fawe.util.EditSessionBuilder
-import com.sk89q.worldedit.Vector
-import com.sk89q.worldedit.blocks.BaseBlock
+import net.evilblock.cubed.lite.LiteEdit
+import net.evilblock.cubed.lite.LiteRegion
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.module.mechanic.region.Region
@@ -13,6 +11,7 @@ import net.evilblock.prisonaio.module.mine.config.MineEffectsConfig
 import net.evilblock.prisonaio.module.mine.config.MineResetConfig
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
+import net.minecraft.server.v1_12_R1.IBlockData
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
@@ -55,10 +54,7 @@ class Mine(val id: String) : Region {
     val effectsConfig: MineEffectsConfig = MineEffectsConfig()
 
     @Transient
-    var nextReset: Int = 0
-
-    @Transient
-    var blocksRemaining: Int = 0
+    var lastResetCheck: Long = System.currentTimeMillis()
 
     /**
      * The permission required to break inside this mine
@@ -80,19 +76,6 @@ class Mine(val id: String) : Region {
         Tasks.async {
             resetRegion()
         }
-    }
-
-    fun getRegionSize(): Int {
-        if (region == null) {
-            return 0
-        }
-
-        val region = region!!
-        return (region.upperX - region.lowerX) * (region.upperY - region.lowerY) * (region.upperZ - region.lowerZ)
-    }
-
-    fun getRemainingPercentage(): Double {
-        return (blocksRemaining.toDouble() / getRegionSize().toDouble()) * 100.0
     }
 
     override fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
@@ -139,31 +122,26 @@ class Mine(val id: String) : Region {
             throw IllegalStateException("Cannot reset mine if the blocks config contains no block types")
         }
 
-        nextReset = resetConfig.resetInterval
-
         val blockList = arrayListOf<BlockType>()
         for (i in 0 until (region!!.sizeX * region!!.sizeY * region!!.sizeZ)) {
             blockList.add(blocksConfig.pickRandomBlockType())
         }
 
-        // update the blocks synchronously
-        val wrappedWorld = FaweAPI.getWorld(region!!.world.name)
-        val editSession = EditSessionBuilder(wrappedWorld).fastmode(true).build()
+        var index = 0
 
-        region!!.getBlockLocations().forEachIndexed { index, location ->
-            if (RewardsModule.isEnabled()) {
-                if (MineCrateHandler.isAttached(location)) {
-                    return@forEachIndexed
+        val liteRegion = LiteRegion(region!!)
+        LiteEdit.fill(liteRegion, object : LiteEdit.FillHandler {
+            override fun getBlock(x: Int, y: Int, z: Int): IBlockData? {
+                if (RewardsModule.isEnabled()) {
+                    if (MineCrateHandler.isAttached(Location(region!!.world, x.toDouble(), y.toDouble(), z.toDouble()))) {
+                        return null
+                    }
                 }
+
+                val blockType = blockList[index++]
+                return getData(blockType.material, blockType.data.toInt())
             }
-
-            val blockType = blockList[index]
-            editSession.setBlock(Vector(location.x, location.y, location.z), BaseBlock(blockType.material.id, blockType.data.toInt()))
-        }
-
-        editSession.flushQueue()
-
-        blocksRemaining = getRegionSize()
+        }, LiteEdit.VoidProgressCallBack)
     }
 
     /**

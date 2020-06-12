@@ -12,6 +12,7 @@ import net.evilblock.prisonaio.module.quest.QuestHandler
 import net.evilblock.prisonaio.module.quest.progression.QuestProgression
 import net.evilblock.prisonaio.module.rank.Rank
 import net.evilblock.prisonaio.module.rank.RankHandler
+import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.rank.serialize.RankReferenceSerializer
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
 import net.evilblock.prisonaio.module.user.activity.type.CompletedAchievementActivity
@@ -291,7 +292,7 @@ class User(val uuid: UUID) {
      * Gets the amount of blocks the user is required to mine before being able to enter the next prestige.
      */
     fun getPrestigeRequirement(): Int {
-        return UsersModule.getPrestigeBlocksMinedRequirementBase() + ((currentPrestige + 1) * UsersModule.getPrestigeBlocksMinedRequirementModifier())
+        return RanksModule.getPrestigeBlocksMinedRequirementBase() + ((currentPrestige + 1) * RanksModule.getPrestigeBlocksMinedRequirementModifier())
     }
 
     /**

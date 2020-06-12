@@ -122,7 +122,13 @@ class SettingsMenu(private val mine: PrivateMine) : Menu() {
                 .promptText("${ChatColor.GREEN}Please specify the new sales tax for your Private Mine.\n${ChatColor.GRAY}Accepted range for this tier is ${ChatColor.GREEN}${mine.tier.salesTaxRange.minimumDouble}-${mine.tier.salesTaxRange.maximumDouble}%${ChatColor.GRAY}.")
                 .acceptInput { player, input ->
                     try {
-                        mine.salesTax = input.toDouble()
+                        val inputNumber = input.toDouble()
+                        if (inputNumber < mine.tier.salesTaxRange.minimumDouble || inputNumber > mine.tier.salesTaxRange.maximumDouble) {
+                            player.sendMessage("${ChatColor.RED}The input you entered is not within the accept range.")
+                            return@acceptInput
+                        }
+
+                        mine.salesTax = inputNumber
                         PrivateMineHandler.saveGrid()
                         player.sendMessage("${ChatColor.GREEN}You updated your Tier ${mine.tier.number} Private Mine's sales tax to ${mine.salesTax}%.")
                     } catch (e: NumberFormatException) {

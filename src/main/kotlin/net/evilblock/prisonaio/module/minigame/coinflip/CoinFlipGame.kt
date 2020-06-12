@@ -1,9 +1,6 @@
 package net.evilblock.prisonaio.module.minigame.coinflip
 
-import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.Chance
-import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.minigame.coinflip.menu.CoinFlipGameMenu
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.Bukkit
@@ -61,8 +58,12 @@ class CoinFlipGame(
     }
 
     fun finishGame() {
-        value.give(Bukkit.getOfflinePlayer(creator.uuid))
-        value.give(Bukkit.getOfflinePlayer(creator.uuid))
+        if (winner == null) {
+            value.give(Bukkit.getOfflinePlayer(creator.uuid))
+        } else {
+            value.give(Bukkit.getOfflinePlayer(winner!!.uuid))
+            value.give(Bukkit.getOfflinePlayer(winner!!.uuid))
+        }
 
         CoinFlipHandler.forgetGame(this)
     }
@@ -106,20 +107,6 @@ class CoinFlipGame(
             }
             Stage.FINISHED -> {
                 if (stageTicks >= 15) {
-                    for (player in Bukkit.getOnlinePlayers()) {
-                        val openMenu = Menu.currentlyOpenedMenus[player.uniqueId]
-                        if (openMenu != null) {
-                            if (openMenu is CoinFlipGameMenu) {
-                                if (openMenu.game == this) {
-                                    // close inventory sync because sometimes the menu auto-updater will re-open the menu after it has already been closed
-                                    Tasks.sync {
-                                        player.closeInventory()
-                                    }
-                                }
-                            }
-                        }
-                    }
-
                     finishGame()
                 }
             }

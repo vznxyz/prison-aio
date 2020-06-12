@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.cubed.util.hook.WorldEditUtils
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.privatemine.data.PrivateMineTier
@@ -35,18 +36,36 @@ object PrivateMineHandler : PluginHandler {
         return PrivateMinesModule
     }
 
+    private val tiers = hashMapOf<Int, PrivateMineTier>()
     private var gridIndex = 0
     private val grid: HashMap<Int, PrivateMine> = HashMap()
     private val mineAccess: HashMap<UUID, HashSet<PrivateMine>> = HashMap()
     private val currentlyAt: HashMap<UUID, PrivateMine> = HashMap()
 
     override fun initialLoad() {
+        loadConfig()
         loadWorld()
         loadGrid()
     }
 
     override fun saveData() {
         saveGrid()
+    }
+
+    fun loadConfig() {
+        for (tierMap in PrivateMinesModule.config.getList("tiers") as List<Map<String, Any>>) {
+            val tier = PrivateMineTier.fromMap(tierMap)
+
+            if (!tier.schematicFile.exists()) {
+                PrisonAIO.instance.logger.severe("Couldn't find schematic file for tier ${tier.number}")
+            }
+
+            tiers[tier.number] = tier
+        }
+    }
+
+    fun getTierByNumber(tier: Int): PrivateMineTier? {
+        return tiers[tier]
     }
 
     private fun loadWorld() {
@@ -205,7 +224,7 @@ object PrivateMineHandler : PluginHandler {
             mineAccess[player]!!.add(mine)
         }
 
-        mine.resetMineArea()
+        mine.resetRegion()
     }
 
     /**
@@ -239,27 +258,16 @@ object PrivateMineHandler : PluginHandler {
 
         Tasks.sync {
             // find the spawn points for player and npcs
-            val spawnPointScan = findSpawnPoints(cubeStart, tier)
-
-            if (spawnPointScan.playerSpawnPoint == null) {
-                throw IllegalStateException("Couldn't find player spawn point in schematic")
+            val dataScan = scanSchematic(cubeStart, tier)
+            if (!dataScan.isComplete()) {
+                throw IllegalStateException("Tier ${tier.number} schematic is missing a scanned data field")
             }
-
-            if (spawnPointScan.npcSpawnPoint == null) {
-                throw IllegalStateException("Couldn't find NPC spawn point in schematic")
-            }
-
-            val npc = PrivateMineNpcEntity(spawnPointScan.npcSpawnPoint!!)
-            npc.initializeData()
-
-            EntityManager.trackEntity(npc)
 
             val schematicSize = WorldEditUtils.readSchematicSize(tier.schematicFile)
             val cuboid = Cuboid(pasteLocation, pasteLocation.clone().add(schematicSize.x, schematicSize.y, schematicSize.z))
-            val innerCuboid = findInnerCuboid(cubeStart, tier) ?: throw IllegalStateException("Couldn't find inner cuboid in schematic")
 
             Tasks.async {
-                val mine = PrivateMine(gridIndex, owner, tier, spawnPointScan.playerSpawnPoint!!, cuboid, innerCuboid)
+                val mine = PrivateMine(gridIndex, owner, tier, dataScan.playerSpawnPoint!!, cuboid, Cuboid(dataScan.cuboidLower!!, dataScan.cuboidUpper!!))
 
                 // execute initial mine setup
                 initialMineSetup(mine)
@@ -267,35 +275,76 @@ object PrivateMineHandler : PluginHandler {
                 // save the world and grid to prevent data loss
                 getGridWorld().save()
                 saveGrid()
+
+                // spawn npc
+                val npc = PrivateMineNpcEntity(dataScan.npcSpawnPoint!!)
+                npc.initializeData()
+
+                EntityManager.trackEntity(npc)
             }
         }
     }
 
     /**
-     * Finds the cube where players are able to break generated blocks.
+     * Container for storing spawn points.
      */
-    private fun findInnerCuboid(start: Location, tier: PrivateMineTier): Cuboid? {
+    data class SchematicDataScan(
+        var playerSpawnPoint: Location? = null,
+        var npcSpawnPoint: Location? = null,
+        var cuboidLower: Location? = null,
+        var cuboidUpper: Location? = null
+    ) {
+        fun isComplete(): Boolean {
+            return playerSpawnPoint != null && npcSpawnPoint != null && cuboidLower != null && cuboidLower != null
+        }
+    }
+
+    /**
+     * Finds the spawn point for the NPC by searching for a SIGN tile entity.
+     */
+    private fun scanSchematic(start: Location, tier: PrivateMineTier): SchematicDataScan {
         val schematicSize = WorldEditUtils.readSchematicSize(tier.schematicFile)
 
         val minPoint = start.clone()
         val maxPoint = start.clone().add(schematicSize.x, schematicSize.y, schematicSize.z)
 
         val gridWorld = getGridWorld()
-        var lowerLocation: Location? = null
-        var upperLocation: Location? = null
+        val dataScan = SchematicDataScan()
 
         for (x in minPoint.x.toInt()..maxPoint.x.toInt()) {
             for (y in minPoint.y.toInt()..maxPoint.y.toInt()) {
-                for (z in minPoint.z.toInt()..maxPoint.z.toInt()) {
+                zLoop@ for (z in minPoint.z.toInt()..maxPoint.z.toInt()) {
                     val block = gridWorld.getBlockAt(x, y, z)
 
-                    if (block.state is Sign) {
+                    if (block.state is Skull) {
+                        val skull = block.state as Skull
+
+                        when (skull.skullType) {
+                            SkullType.PLAYER -> {
+                                dataScan.playerSpawnPoint = block.location.add(0.5, 2.0, 0.5)
+                                dataScan.playerSpawnPoint!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
+                            }
+                            SkullType.CREEPER -> {
+                                dataScan.npcSpawnPoint = block.location.add(0.5, 0.0, 0.5)
+                                dataScan.npcSpawnPoint!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
+                            }
+                            else -> {
+                                continue@zLoop
+                            }
+                        }
+
+                        // remove sign - run sync
+                        TaskManager.IMP.sync {
+                            block.type = Material.AIR
+                            block.state.update()
+                        }
+                    } else if (block.state is Sign) {
                         val sign = block.state as Sign
 
                         if (sign.getLine(0) == "CUBE-FINDER") {
                             when (sign.getLine(1)) {
-                                "LOWER" -> lowerLocation = sign.location
-                                "UPPER" -> upperLocation = sign.location
+                                "LOWER" -> dataScan.cuboidLower = sign.location
+                                "UPPER" -> dataScan.cuboidUpper = sign.location
                             }
 
                             // remove cube-finder blocks
@@ -309,66 +358,13 @@ object PrivateMineHandler : PluginHandler {
                                     below.state.update()
                                 }
                             }
-
-                            if (lowerLocation != null && upperLocation != null) {
-                                return Cuboid(lowerLocation, upperLocation)
-                            }
                         }
                     }
                 }
             }
         }
 
-        return null
-    }
-
-    /**
-     * Container for storing spawn points.
-     */
-    data class SpawnPointScan(var playerSpawnPoint: Location? = null, var npcSpawnPoint: Location? = null)
-
-    /**
-     * Finds the spawn point for the NPC by searching for a SIGN tile entity.
-     */
-    private fun findSpawnPoints(start: Location, tier: PrivateMineTier): SpawnPointScan {
-        val schematicSize = WorldEditUtils.readSchematicSize(tier.schematicFile)
-
-        val minPoint = start.clone()
-        val maxPoint = start.clone().add(schematicSize.x, schematicSize.y, schematicSize.z)
-
-        val gridWorld = getGridWorld()
-        val spawnPointScan = SpawnPointScan()
-
-        for (x in minPoint.x.toInt()..maxPoint.x.toInt()) {
-            for (y in minPoint.y.toInt()..maxPoint.y.toInt()) {
-                zLoop@ for (z in minPoint.z.toInt()..maxPoint.z.toInt()) {
-                    val block = gridWorld.getBlockAt(x, y, z)
-
-                    if (block.state is Skull) {
-                        val skull = block.state as Skull
-                        when (skull.skullType) {
-                            SkullType.PLAYER -> {
-                                spawnPointScan.playerSpawnPoint = block.location.add(0.5, 2.0, 0.5)
-                                spawnPointScan.playerSpawnPoint!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
-                            }
-                            SkullType.CREEPER -> {
-                                spawnPointScan.npcSpawnPoint = block.location.add(0.5, 0.0, 0.5)
-                                spawnPointScan.npcSpawnPoint!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
-                            }
-                            else -> continue@zLoop
-                        }
-
-                        // remove sign - run sync
-                        TaskManager.IMP.sync {
-                            block.type = Material.AIR
-                            block.state.update()
-                        }
-                    }
-                }
-            }
-        }
-
-        return spawnPointScan
+        return dataScan
     }
 
     /**

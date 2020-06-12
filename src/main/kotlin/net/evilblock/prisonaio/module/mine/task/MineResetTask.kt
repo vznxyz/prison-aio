@@ -1,10 +1,14 @@
 package net.evilblock.prisonaio.module.mine.task
 
+import net.evilblock.cubed.lite.LiteEdit
+import net.evilblock.cubed.lite.LiteRegion
+import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
+import java.util.concurrent.atomic.AtomicInteger
 
 object MineResetTask : Runnable {
 
-    private val secondMarkers = listOf(1, 2, 3, 4, 5, 15, 30, 60, 120, 180, 240, 300, 900, 1800, 3600)
+    private val nextResetCountdown = hashMapOf<Mine, AtomicInteger>()
 
     override fun run() {
         for (mine in MineHandler.getMines()) {
@@ -12,34 +16,45 @@ object MineResetTask : Runnable {
                 continue
             }
 
-            if (mine.getRemainingPercentage() < 20.0) {
-                if (mine.nextReset > 5) {
-                    mine.nextReset = 5
-                }
-            }
+            if (System.currentTimeMillis() - mine.lastResetCheck >= 30_000L) {
+                mine.lastResetCheck = System.currentTimeMillis()
 
-            mine.nextReset--
+                val liteRegion = LiteRegion(mine.region!!)
+                LiteEdit.countAir(liteRegion, object : LiteEdit.CountAirCallback {
+                    override fun callback(total: Int, air: Int, skipped: Int) {
+                        if (skipped != 0) {
+                            return
+                        }
 
-            // check if we need to send an interval message for this tick
-            if (secondMarkers.contains(mine.nextReset)) {
-                mine.resetConfig.sendIntervalMessage(mine, mine.nextReset)
-            }
-
-            // check if this mine is due for a reset
-            if (mine.nextReset <= 0) {
-                try {
-                    mine.resetRegion()
-
-                    // send reset message
-                    mine.resetConfig.sendResetMessage(mine)
-
-                    // teleport players inside the mine to the spawn point
-                    if (mine.spawnPoint != null) {
-                        mine.getNearbyPlayers().forEach { it.teleport(mine.spawnPoint) }
+                        val progress = air.toFloat() / total.toFloat()
+                        if (progress > 0.5F) {
+                            nextResetCountdown[mine] = AtomicInteger(6)
+                        }
                     }
-                } catch (e: Exception) {
-                }
+                })
             }
+        }
+
+        val toRemove = arrayListOf<Mine>()
+        for ((mine, seconds) in nextResetCountdown) {
+            if (seconds.decrementAndGet() > 0) {
+                mine.resetConfig.sendIntervalMessage(mine, seconds.get())
+            } else {
+                mine.resetRegion()
+                mine.resetConfig.sendResetMessage(mine)
+
+                if (mine.spawnPoint != null) {
+                    mine.getNearbyPlayers().forEach {
+                        it.teleport(mine.spawnPoint)
+                    }
+                }
+
+                toRemove.add(mine)
+            }
+        }
+
+        for (mine in toRemove) {
+            nextResetCountdown.remove(mine)
         }
     }
 

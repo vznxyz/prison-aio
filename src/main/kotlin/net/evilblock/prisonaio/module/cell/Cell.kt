@@ -4,6 +4,7 @@ import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.util.Reflection
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.cubed.util.nms.MinecraftProtocol
@@ -332,7 +333,11 @@ class Cell(
             val player = Bukkit.getPlayer(uuid)
             if (player != null) {
                 if (isActiveMember(player)) {
-                    player.teleport(Bukkit.getWorlds()[0].spawnLocation)
+                    CellHandler.updateVisitingCell(player, null)
+
+                    Tasks.sync {
+                        player.teleport(Bukkit.getWorlds()[0].spawnLocation)
+                    }
                 }
 
                 player.sendMessage("${ChatColor.YELLOW}You've been kicked from ${getOwnerUsername()}'s cell.")

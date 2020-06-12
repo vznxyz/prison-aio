@@ -31,6 +31,8 @@ object CellLeaveCommand {
         visitingCell.memberLeave(player.uniqueId)
 
         if (visitingCell.isActivePlayer(player)) {
+            CellHandler.updateVisitingCell(player, null)
+
             Tasks.sync {
                 player.teleport(Bukkit.getWorlds()[0].spawnLocation)
             }

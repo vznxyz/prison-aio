@@ -6,7 +6,6 @@ import net.evilblock.cubed.util.TextSplitter.split
 import net.evilblock.cubed.util.bukkit.ColorUtil.toChatColor
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
-import net.evilblock.prisonaio.module.enchant.EnchantsManager.getEnchants
 import net.evilblock.prisonaio.module.enchant.menu.SalvagePickaxeMenu
 import net.evilblock.prisonaio.module.enchant.salvage.SalvagePreventionHandler
 import net.evilblock.prisonaio.module.enchant.type.Cubed
@@ -17,34 +16,11 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
+import org.bukkit.inventory.ItemStack
 import java.text.NumberFormat
 import java.util.*
 
 class ConfirmSalvageButton(private val parent: SalvagePickaxeMenu) : Button() {
-
-    companion object {
-        private val enchantColorOrder = mapOf<Color, Int>(
-            Color.GREEN to 1,
-            Color.AQUA to 2,
-            Color.ORANGE to 3
-        )
-
-        private val ENCHANT_COMPARATOR = Comparator<Map.Entry<AbstractEnchant, Int>> { o1, o2 ->
-            val o1Order = enchantColorOrder.getOrDefault(o1.key.iconColor, 4)
-            val o2Order = enchantColorOrder.getOrDefault(o2.key.iconColor, 4)
-            when {
-                o1Order == o2Order -> {
-                    return@Comparator 0
-                }
-                o1Order > o2Order -> {
-                    return@Comparator 1
-                }
-                else -> {
-                    return@Comparator -1
-                }
-            }
-        }
-    }
 
     override fun getName(player: Player): String {
         return "${ChatColor.GREEN}${ChatColor.BOLD}Salvage Pickaxe"
@@ -52,14 +28,14 @@ class ConfirmSalvageButton(private val parent: SalvagePickaxeMenu) : Button() {
 
     override fun getDescription(player: Player): List<String> {
         val description: MutableList<String> = ArrayList()
-        val enchants = getEnchants(parent.pickaxeInHand)
+        val enchants = SalvagePreventionHandler.getSalvageableLevels(parent.pickaxe)
 
         enchants.entries.stream()
             .filter { entry -> entry.key !is Cubed }
             .sorted(ENCHANT_COMPARATOR)
             .forEach { entry ->
                 val formattedReturns = NumberFormat.getInstance().format(entry.key.getSalvageReturns(entry.value))
-                description.add("${toChatColor(entry.key.iconColor)}${ChatColor.BOLD}❙ ${ChatColor.GRAY}${entry.key.strippedEnchant} (${ChatColor.GOLD}$formattedReturns${ChatColor.GRAY})")
+                description.add("${toChatColor(entry.key.iconColor)}${ChatColor.BOLD}❙ ${ChatColor.GRAY}${entry.key.strippedEnchant} ${entry.value} (${ChatColor.GOLD}$formattedReturns${ChatColor.GRAY})")
             }
 
         description.add("")
@@ -89,7 +65,7 @@ class ConfirmSalvageButton(private val parent: SalvagePickaxeMenu) : Button() {
 
     override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
         if (clickType == ClickType.LEFT) { // item has no enchants on it, so it cannot be salvaged
-            val enchants = SalvagePreventionHandler.getSalvageableLevels(parent.pickaxeInHand)
+            val enchants = SalvagePreventionHandler.getSalvageableLevels(parent.pickaxe)
             if (enchants.isEmpty()) {
                 player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe doesn't have any enchantments, therefore it cannot be salvaged.")
                 return
@@ -99,8 +75,6 @@ class ConfirmSalvageButton(private val parent: SalvagePickaxeMenu) : Button() {
                 player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe has the Cubed enchantment, which makes the pickaxe un-salvagable.")
                 return
             }
-
-            parent.setPendingConfirmation(true)
             player.closeInventory()
 
             // open the confirmation menu
@@ -114,14 +88,41 @@ class ConfirmSalvageButton(private val parent: SalvagePickaxeMenu) : Button() {
                     val formattedTotalReturns = NumberFormat.getInstance().format(totalReturns)
                     player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.GRAY}You have salvaged your pickaxe for ${ChatColor.GOLD}$formattedTotalReturns ${ChatColor.GRAY}tokens. It is now gone forever.")
 
+                    val slot = player.inventory.first(parent.pickaxe)
+                    player.inventory.setItem(slot, ItemStack(Material.AIR))
+                    player.updateInventory()
+
                     val user = UserHandler.getUser(player.uniqueId)
                     user.addTokensBalance(totalReturns)
                 } else {
-                    parent.setPendingConfirmation(false)
                     parent.openMenu(player)
                     player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}You have canceled salvaging your pickaxe.")
                 }
             }.openMenu(player)
+        }
+    }
+
+    companion object {
+        private val enchantColorOrder = mapOf<Color, Int>(
+            Color.GREEN to 1,
+            Color.AQUA to 2,
+            Color.ORANGE to 3
+        )
+
+        private val ENCHANT_COMPARATOR = Comparator<Map.Entry<AbstractEnchant, Int>> { o1, o2 ->
+            val o1Order = enchantColorOrder.getOrDefault(o1.key.iconColor, 4)
+            val o2Order = enchantColorOrder.getOrDefault(o2.key.iconColor, 4)
+            when {
+                o1Order == o2Order -> {
+                    return@Comparator 0
+                }
+                o1Order > o2Order -> {
+                    return@Comparator 1
+                }
+                else -> {
+                    return@Comparator -1
+                }
+            }
         }
     }
 

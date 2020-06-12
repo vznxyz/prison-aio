@@ -39,29 +39,40 @@ object TokenShopListeners : Listener {
                                 return
                             }
 
-                            val quantity = NumberUtils.parseInput(sign.lines[2])
-                            val priceLineSplit = ChatColor.translateAlternateColorCodes('&', sign.lines[3]).split(" ")
+                            if (sign.lines[2].startsWith("-")) {
+                                event.isCancelled = true
+                                return
+                            }
 
-                            val buying = when {
-                                priceLineSplit[0].equals("b", ignoreCase = true) -> {
-                                    true
-                                }
-                                priceLineSplit[0].equals("s", ignoreCase = true) -> {
-                                    false
-                                }
-                                else -> {
-                                    throw IllegalStateException("Couldn't determine if buying or selling")
-                                }
+                            val quantity = NumberUtils.parseInput(sign.lines[2])
+                            assert(quantity.toInt() > 0) { "Quantity must be more than 0." }
+
+                            val priceLineSplit = ChatColor.stripColor(sign.lines[3]).split(" ")
+                            if (priceLineSplit[1].startsWith("-")) {
+                                event.isCancelled = true
+                                return
                             }
 
                             val price = NumberUtils.parseInput(priceLineSplit[1])
-                            assert(price.toInt() > 0)
+                            assert(price.toInt() > 0) { "Price must be more than 0." }
 
                             Tasks.async {
                                 val owningUser = if (UserHandler.isUserLoaded(owner)) {
                                     UserHandler.getUser(owner)
                                 } else {
                                     UserHandler.fetchUser(owner)
+                                }
+
+                                val buying = when {
+                                    priceLineSplit[0].equals("b", ignoreCase = true) -> {
+                                        true
+                                    }
+                                    priceLineSplit[0].equals("s", ignoreCase = true) -> {
+                                        false
+                                    }
+                                    else -> {
+                                        throw IllegalStateException("Couldn't determine if buying or selling")
+                                    }
                                 }
 
                                 if (buying) {
@@ -139,10 +150,30 @@ object TokenShopListeners : Listener {
     fun onSignChangeEvent(event: SignChangeEvent) {
         if (event.getLine(0).equals("[tokenshop]", ignoreCase = true)) {
             try {
+                if (event.lines[1].startsWith("-")) {
+                    event.isCancelled = true
+                    event.player.sendMessage("${ChatColor.RED}Quantity cannot be negative.")
+                    return
+                }
+
                 val quantity = NumberUtils.parseInput(event.lines[1])
-                assert(quantity.toInt() > 0)
+                if (quantity.toInt() < 1) {
+                    event.isCancelled = true
+                    event.player.sendMessage("${ChatColor.RED}Quantity must be at least 1.")
+                    return
+                }
 
                 val priceLineSplit = event.lines[2].split(" ")
+                if (priceLineSplit[1].startsWith("-")) {
+                    throw IllegalStateException("Price cannot be negative.")
+                }
+
+                val price = NumberUtils.parseInput(priceLineSplit[1])
+                if (price.toInt() < 1) {
+                    event.player.sendMessage("${ChatColor.RED}Price must be at least 1.")
+                    event.isCancelled = true
+                    return
+                }
 
                 val buying = when {
                     priceLineSplit[0].equals("b", ignoreCase = true) -> {
@@ -156,9 +187,6 @@ object TokenShopListeners : Listener {
                     }
                 }
 
-                val price = NumberUtils.parseInput(priceLineSplit[1])
-                assert(price.toInt() > 0)
-
                 val formattedPrice = when (price) {
                     is Int -> {
                         NumberUtils.format(price.toDouble())
@@ -171,10 +199,16 @@ object TokenShopListeners : Listener {
                     }
                 }
 
+                val buyOrSell = if (buying) {
+                    "${ChatColor.RED}${ChatColor.BOLD}B"
+                } else {
+                    "${ChatColor.GREEN}${ChatColor.BOLD}S"
+                }
+
                 event.setLine(0, TOKEN_SHOP_TAG)
                 event.setLine(1, event.player.name)
                 event.setLine(2, NumberUtils.format(quantity.toLong()))
-                event.setLine(3, "${if (buying) "${ChatColor.RED}${ChatColor.BOLD}B" else "${ChatColor.GREEN}${ChatColor.BOLD}S"} $formattedPrice")
+                event.setLine(3, "$buyOrSell ${ChatColor.BLACK}$formattedPrice")
             } catch (e: Exception) {
                 event.player.sendMessage("${ChatColor.RED}Failed to create a TokenShop because the format was incorrect. The format is as follows:")
                 event.player.sendMessage("${ChatColor.GRAY}[TokenShop]")

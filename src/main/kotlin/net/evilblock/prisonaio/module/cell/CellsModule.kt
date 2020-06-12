@@ -95,7 +95,7 @@ object CellsModule : PluginModule() {
     }
 
     fun getMaxNameLength(): Int {
-        return config.getInt("cell.max-name-length", 32)
+        return config.getInt("cell.max-name-length", 16)
     }
 
     fun getMaxCellsPerPlayer(): Int {

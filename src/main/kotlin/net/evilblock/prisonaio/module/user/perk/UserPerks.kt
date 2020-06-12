@@ -108,4 +108,8 @@ class UserPerks(@Transient internal var user: User) {
         return stackedMultiplier
     }
 
+    fun isAutoSellEnabled(player: Player): Boolean {
+        return isPerkEnabled(Perk.AUTO_SELL) && hasPerk(player, Perk.AUTO_SELL)
+    }
+
 }

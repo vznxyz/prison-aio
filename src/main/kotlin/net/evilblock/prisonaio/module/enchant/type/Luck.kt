@@ -33,6 +33,10 @@ object Luck : AbstractEnchant("luck", "Luck", 4) {
             return
         }
 
+        if (!region.supportsRewards()) {
+            return
+        }
+
         if (region.getBreakableRegion()?.contains(event.block) == false) {
             return
         }
@@ -41,7 +45,7 @@ object Luck : AbstractEnchant("luck", "Luck", 4) {
             return
         }
 
-        for (rewardSet in MineCrateHandler.getRewardSets().filter { it.worlds.contains(event.block.world.name) }.shuffled()) {
+        for (rewardSet in MineCrateHandler.getRewardSets().shuffled()) {
             if (Chance.percent(rewardSet.chance + (level * 5))) {
                 MineCrateHandler.resetCooldown(event.player)
 

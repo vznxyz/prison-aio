@@ -14,7 +14,6 @@ import kotlin.collections.ArrayList
 object RankHandler : PluginHandler {
 
     private val ranksMap: MutableMap<String, Rank> = hashMapOf()
-    internal var priceScaleMultiplier: Double = 1.3
 
     override fun getModule(): PluginModule {
         return RanksModule

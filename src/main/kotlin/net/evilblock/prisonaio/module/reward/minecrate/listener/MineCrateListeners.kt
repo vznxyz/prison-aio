@@ -4,6 +4,7 @@ import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.mechanic.region.Regions
+import net.evilblock.prisonaio.module.mechanic.region.event.RegionBlockBreakEvent
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrate
@@ -13,7 +14,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
-import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.player.PlayerInteractEvent
 
 object MineCrateListeners : Listener {
@@ -52,15 +52,15 @@ object MineCrateListeners : Listener {
     /**
      * Spawns MineCrates randomly when breaking blocks.
      */
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-    fun onBlockBreakEventHigh(event: BlockBreakEvent) {
+    @EventHandler(ignoreCancelled = true)
+    fun onRegionBlockBreakEvent(event: RegionBlockBreakEvent) {
         val region = Regions.findRegion(event.block.location)
-        if (region == null || !region.supportsRewards()) {
+        if (region == null || !region.supportsRewards() || region.getBreakableRegion()?.contains(event.block) == false) {
             return
         }
 
         if (!MineCrateHandler.isOnCooldown(event.player)) {
-            for (rewardSet in MineCrateHandler.getRewardSets().filter { it.worlds.contains(event.block.world.name) }.shuffled()) {
+            for (rewardSet in MineCrateHandler.getRewardSets().shuffled()) {
                 if (Chance.percent(rewardSet.chance)) {
                     MineCrateHandler.resetCooldown(event.player)
 
@@ -71,7 +71,6 @@ object MineCrateListeners : Listener {
                     }, 1L)
 
                     event.player.sendMessage("${RewardsModule.getChatPrefix()}You just found a MineCrate!")
-
                     return
                 }
             }

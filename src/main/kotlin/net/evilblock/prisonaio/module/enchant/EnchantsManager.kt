@@ -1,18 +1,15 @@
 package net.evilblock.prisonaio.module.enchant
 
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.enchant.menu.PurchaseEnchantMenu
 import net.evilblock.prisonaio.module.enchant.type.*
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import net.evilblock.prisonaio.module.mechanic.region.Regions
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.block.Sign
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryType
@@ -24,7 +21,7 @@ import java.util.*
 
 object EnchantsManager : Listener {
 
-    val CHAT_PREFIX: String = ChatColor.GRAY.toString() + "[" + ChatColor.RED + ChatColor.BOLD + "Enchants" + ChatColor.GRAY + "] "
+    val CHAT_PREFIX: String = "${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}Enchants${ChatColor.GRAY}] "
 
     private val enchants: MutableList<AbstractEnchant> = arrayListOf()
 
@@ -52,24 +49,6 @@ object EnchantsManager : Listener {
         registerEnchant(Exporter)
         registerEnchant(LuckyMoney)
         registerEnchant(Laser)
-    }
-
-    @EventHandler
-    fun onPlayerInteractEventSign(event: PlayerInteractEvent) {
-        if (event.action != Action.RIGHT_CLICK_BLOCK) {
-            return
-        }
-
-        if (event.clickedBlock.type != Material.WALL_SIGN) {
-            return
-        }
-
-        val sign = event.clickedBlock.state as Sign
-        if (sign.getLine(0) != ChatColor.RED.toString() + ChatColor.BOLD.toString() + "Enchant") {
-            return
-        }
-
-        PurchaseEnchantMenu.tryOpeningMenu(event.player)
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -127,7 +106,7 @@ object EnchantsManager : Listener {
             return
         }
 
-        update(event.currentItem)
+        update(event.whoClicked as Player, event.currentItem)
 
         if (event.clickedInventory.type == InventoryType.PLAYER && event.whoClicked.inventory.heldItemSlot == event.slot) {
             handleItemSwitch(event.whoClicked as Player, event.cursor)
@@ -198,37 +177,30 @@ object EnchantsManager : Listener {
     }
 
     @JvmStatic
-    fun update(newItem: ItemStack?) {
+    fun update(player: Player, newItem: ItemStack?) {
         if (newItem != null && newItem.type.toString().endsWith("_PICKAXE")) {
             if (newItem.hasItemMeta() && !newItem.itemMeta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
                 val im = newItem.itemMeta
                 im.addItemFlags(ItemFlag.HIDE_ENCHANTS)
                 newItem.itemMeta = im
             }
-
-            val map = getEnchants(newItem)
-            for (enchant in enchants) {
-                if (enchant is VanillaOverride) {
-                    val override = enchant as VanillaOverride
-                    if (newItem.enchantments.getOrDefault(override.override, 0) != map.getOrDefault(enchant, 0)) {
-                        val diff = newItem.enchantments.getOrDefault(override.override, 0) - map.getOrDefault(enchant, 0)
-                        upgradeEnchant(newItem, enchant, diff, true)
-                    }
-                }
-            }
         }
     }
 
     @JvmStatic
-    fun update(player: Player, newItem: ItemStack?) {
-        update(newItem)
-    }
-
-    @JvmStatic
     fun handleItemSwitch(player: Player, newItem: ItemStack?): Map<AbstractEnchant, Int> {
-        update(newItem)
+        update(player, newItem)
 
-        val map = getEnchants(newItem)
+        val map = getEnchants(newItem).toMutableMap()
+        if (newItem != null) {
+            if (map.getOrDefault(Cubed, 0) > 3) {
+                removeEnchant(newItem, Cubed)
+                addEnchant(newItem, Cubed, 3, false)
+                map[Cubed] = 3
+
+                PrisonAIO.instance.systemLog("Removed Cubed ${map[Cubed]!!} from ${player.name}'s pickaxe")
+            }
+        }
 
         for (enchant in enchants) {
             if (player.hasMetadata("JE-" + enchant.enchant)) {
@@ -248,6 +220,7 @@ object EnchantsManager : Listener {
                 player.setMetadata("JE-" + enchant.enchant, FixedMetadataValue(PrisonAIO.instance, map[enchant]))
             }
         }
+
         return map
     }
 
@@ -270,20 +243,24 @@ object EnchantsManager : Listener {
         if (level > 32000) {
             level = 32000
         }
+
         if (enchant is VanillaOverride) {
             item.addUnsafeEnchantment((enchant as VanillaOverride).override, level)
         }
+
         val lore = item.itemMeta.lore
-        val levelReplacer = level
+
         lore.replaceAll { line: String ->
             if (line.contains(enchant.lorified())) {
-                return@replaceAll enchant.lorified() + " " + levelReplacer
+                return@replaceAll "${enchant.lorified()} $level"
             }
             line
         }
+
         val im = item.itemMeta
         im.lore = lore
         item.itemMeta = im
+
         return true
     }
 
@@ -390,7 +367,7 @@ object EnchantsManager : Listener {
                 }
             }
         }
-        return map
+        return map.toMap()
     }
 
     @JvmStatic

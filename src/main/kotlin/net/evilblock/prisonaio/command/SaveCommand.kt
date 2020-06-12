@@ -1,14 +1,13 @@
 package net.evilblock.prisonaio.command
 
-import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.error.ErrorHandler
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
-import java.text.DecimalFormat
 
 object SaveCommand {
 
@@ -26,7 +25,9 @@ object SaveCommand {
 
         for (world in Bukkit.getWorlds()) {
             try {
-                world.save()
+                Tasks.sync {
+                    world.save()
+                }
             } catch (exception: Exception) {
                 ErrorHandler.generateErrorLog(
                     errorType = "saveWorld",

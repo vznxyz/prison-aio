@@ -1,14 +1,11 @@
 package net.evilblock.prisonaio.module.crate.listener
 
-import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.crate.key.CrateKeyHandler
 import net.evilblock.prisonaio.module.crate.menu.CratePreviewMenu
-import net.evilblock.prisonaio.module.crate.placed.PlacedCrate
 import net.evilblock.prisonaio.module.crate.placed.PlacedCrateHandler
 import net.evilblock.prisonaio.module.crate.roll.CrateRoll
-import net.evilblock.prisonaio.module.crate.roll.CrateRollHandler
 import org.bukkit.ChatColor
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
@@ -52,23 +49,21 @@ object CrateMechanicsListeners : Listener {
             event.isCancelled = true
 
             val placedCrate = PlacedCrateHandler.getPlacedCrate(event.clickedBlock)
+            if (!placedCrate.crate.isSetup()) {
+                event.player.sendMessage("${ChatColor.RED}That crate has not been setup completely!")
+                return
+            }
 
+            // left-click means we're previewing the crate
+            // right-click means we're attempting to roll the crate
             if (event.action == Action.LEFT_CLICK_BLOCK) {
-                // left-click means we're previewing the crate
                 CratePreviewMenu(placedCrate.crate).openMenu(event.player)
             } else if (event.action == Action.RIGHT_CLICK_BLOCK) {
-                // right-click means we're attempting to roll the crate
                 val itemInHand = event.player.inventory.itemInMainHand
 
                 if (!CrateKeyHandler.isCrateKeyItemStack(itemInHand)) {
                     return
                 }
-
-//                val crateKey = CrateKeyHandler.extractKey(itemInHand)
-//                if (crateKey == null) {
-//                    event.player.sendMessage("${ChatColor.RED}This key doesn't seem to be valid.")
-//                    return
-//                }
 
                 val crate = CrateKeyHandler.extractCrate(itemInHand)
                 if (crate != placedCrate.crate) {
@@ -76,49 +71,18 @@ object CrateMechanicsListeners : Listener {
                     return
                 }
 
-                PrisonAIO.instance.server.scheduler.runTaskAsynchronously(PrisonAIO.instance) {
-//                    attemptRoll(event.player, placedCrate, crateKey)
-                    attemptRoll(event.player, placedCrate)
+                if (event.player.inventory.itemInMainHand.amount == 1) {
+                    event.player.inventory.itemInMainHand = null
+                    event.player.updateInventory()
+                } else {
+                    event.player.inventory.itemInMainHand.amount = event.player.inventory.itemInMainHand.amount - 1
+                    event.player.updateInventory()
+                }
+
+                Tasks.async {
+                    CrateRoll(placedCrate).finish(event.player)
                 }
             }
-        }
-    }
-
-//    private fun attemptRoll(player: Player, placedCrate: PlacedCrate, crateKey: CrateKey) {
-    private fun attemptRoll(player: Player, placedCrate: PlacedCrate) {
-//        if (crateKey.uses >= crateKey.maxUses) {
-//            player.sendMessage("${ChatColor.RED}The key you're trying to use seems to be duplicated and cannot be used. If you believe this is an error, please contact the support team.")
-//            crateKey.dupedUseAttempts++
-//            return
-//        }
-
-        if (!placedCrate.crate.isSetup()) {
-            player.sendMessage("${ChatColor.RED}That crate has not been setup completely!")
-            return
-        }
-
-        if (CrateRollHandler.isRolling(player)) {
-            val activeRoll = CrateRollHandler.getActiveRoll(player)
-            // TODO: player rerolls > 0
-            if (activeRoll.placedCrate.crate.reroll) {
-                return
-            }
-
-            activeRoll.finish(player) // finish the active roll
-            CrateRollHandler.forgetRoll(activeRoll) // forget the active roll
-        }
-
-//        crateKey.uses++
-
-        val roll = CrateRoll(player, placedCrate)
-        CrateRollHandler.trackRoll(roll)
-
-        if (player.inventory.itemInMainHand.amount == 1) {
-            player.inventory.itemInMainHand = null
-            player.updateInventory()
-        } else {
-            player.inventory.itemInMainHand.amount = player.inventory.itemInMainHand.amount - 1
-            player.updateInventory()
         }
     }
 

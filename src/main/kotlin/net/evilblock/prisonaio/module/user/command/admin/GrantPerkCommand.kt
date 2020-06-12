@@ -30,8 +30,8 @@ object GrantPerkCommand {
         @Param(name = "player") user: User,
         @Param(name = "perk") perk: Perk,
         @Param(name = "duration") duration: Duration,
-        @Param(name = "reason", defaultValue = "Unspecified", wildcard = true) reason: String,
-        @Param(name = "metadata", defaultValue = NO_METADATA) metadata: String
+        @Param(name = "metadata", defaultValue = NO_METADATA) metadata: String,
+        @Param(name = "reason", defaultValue = "Unspecified", wildcard = true) reason: String
     ) {
         val issuedBy: UUID? = if (sender is Player) {
             sender.uniqueId

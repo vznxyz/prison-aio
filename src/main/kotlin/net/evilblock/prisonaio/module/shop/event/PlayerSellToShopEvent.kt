@@ -10,7 +10,8 @@ class PlayerSellToShopEvent(
     val player: Player,
     val shop: Shop,
     val items: List<ShopReceiptItem>,
-    var multiplier: Double
+    var multiplier: Double,
+    val autoSell: Boolean
 ) : PluginEvent(), Cancellable {
 
     private var cancelled: Boolean = false

@@ -15,45 +15,12 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import java.util.*
 
-class SalvagePickaxeMenu(player: Player) : Menu() {
-
-    companion object {
-        fun tryOpeningMenu(player: Player) {
-            try {
-                SalvagePickaxeMenu(player).openMenu(player)
-            } catch (e: IllegalStateException) {
-                player.sendMessage(EnchantsManager.CHAT_PREFIX + ChatColor.RED + e.message)
-            }
-        }
-    }
-
-    private val heldItemSlot: Int
-    val pickaxeInHand: ItemStack
-    private var pendingConfirmation = false
+class SalvagePickaxeMenu(internal val pickaxe: ItemStack) : Menu() {
 
     init {
+        this.updateAfterClick = true
         this.placeholder = true
         this.keepBottomMechanics = false
-
-        // get item in hand
-        // make sure item in hand isn't null
-        val itemInHand = player.inventory.getItem(player.inventory.heldItemSlot) ?: throw IllegalStateException("You have no item in your hand.")
-
-        // check if the item is a pickaxe
-        check(itemInHand.type.toString().endsWith("_PICKAXE")) { "You must be holding the pickaxe you would like to salvage." }
-
-        val heldItemSlot = player.inventory.heldItemSlot
-
-        // remove item from player's inventory
-        player.inventory.setItem(heldItemSlot, null)
-        player.updateInventory()
-
-        this.heldItemSlot = heldItemSlot
-        this.pickaxeInHand = itemInHand
-    }
-
-    fun setPendingConfirmation(pendingConfirmation: Boolean) {
-        this.pendingConfirmation = pendingConfirmation
     }
 
     override fun getTitle(player: Player): String {
@@ -66,7 +33,7 @@ class SalvagePickaxeMenu(player: Player) : Menu() {
         // header buttons
         buttons[0] = TokenShopButton()
         buttons[2] = TokenBalanceButton()
-        buttons[4] = PickaxeInHandButton(pickaxeInHand.clone()) // make sure to clone the item
+        buttons[4] = PickaxeInHandButton(pickaxe.clone()) // make sure to clone the item
         buttons[6] = PurchaseEnchantsMenuButton()
         buttons[8] = ExitButton()
 
@@ -79,19 +46,7 @@ class SalvagePickaxeMenu(player: Player) : Menu() {
         return buttons
     }
 
-    override fun onClose(player: Player, manualClose: Boolean) { // don't return pickaxe if pending confirmation (because confirm menu handles the pickaxe from now on)
-        if (pendingConfirmation) {
-            return
-        }
-
-        // return pickaxe to the player's hand if the pickaxe isn't null
-        player.inventory.heldItemSlot = heldItemSlot
-        player.inventory.setItem(heldItemSlot, pickaxeInHand)
-        player.updateInventory()
-    }
-
     private inner class PurchaseEnchantsMenuButton : Button() {
-
         override fun getName(player: Player): String {
             return ChatColor.GRAY.toString() + "» " + ChatColor.RED + ChatColor.BOLD + "Purchase Enchants" + ChatColor.GRAY + " «"
         }
@@ -113,10 +68,9 @@ class SalvagePickaxeMenu(player: Player) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType == ClickType.LEFT) {
                 player.closeInventory()
-                PurchaseEnchantMenu.tryOpeningMenu(player)
+                PurchaseEnchantMenu(pickaxe).openMenu(player)
             }
         }
-
     }
 
 }

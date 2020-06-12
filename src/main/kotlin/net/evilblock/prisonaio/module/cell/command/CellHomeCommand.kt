@@ -13,7 +13,7 @@ object CellHomeCommand {
     fun execute(player: Player) {
         val joinableCells = CellHandler.getJoinableCells(player.uniqueId)
         if (joinableCells.isEmpty()) {
-            player.sendMessage("${ChatColor.RED}You are not the owner of any cells.")
+            player.sendMessage("${ChatColor.RED}You aren't a member of any cells.")
             return
         }
 

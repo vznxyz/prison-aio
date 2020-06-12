@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 object SpawnCommand {
 
     @Command(
-        names = ["leaderboards spawn"],
+        names = ["leaderboards spawn", "lb spawn"],
         description = "Spawn a leaderboard NPC",
         permission = "op",
         async = true

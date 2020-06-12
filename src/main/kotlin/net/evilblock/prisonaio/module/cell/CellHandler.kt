@@ -11,7 +11,6 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.cubed.util.hook.WorldEditUtils
-import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.cell.permission.CellPermission
@@ -33,21 +32,22 @@ import kotlin.collections.set
 object CellHandler : PluginHandler {
 
     private var gridIndex = 0
-    private val grid: HashMap<Int, Cell> = HashMap()
+    private val grid: HashMap<Int, Cell> = hashMapOf()
+    private val nameToCell: HashMap<String, Cell> = hashMapOf()
 
     /**
      * The `joinable cell` cache.
      *
      * For quick lookup, we cache what cells a player can join.
      */
-    private val joinableCache: HashMap<UUID, HashSet<Cell>> = HashMap()
+    private val joinableCache: HashMap<UUID, HashSet<Cell>> = hashMapOf()
 
     /**
      * The `visiting cell` cache.
      *
      * For quick lookup, we cache what cell a player is currently visiting.
      */
-    private val visitingCache: HashMap<UUID, Cell> = HashMap()
+    private val visitingCache: HashMap<UUID, Cell> = hashMapOf()
 
     /**
      * The cached asynchronous grid world.
@@ -115,27 +115,34 @@ object CellHandler : PluginHandler {
     }
 
     /**
+     * Gets the [Cell] with the given [name].
+     */
+    fun getCellByName(name: String): Cell? {
+        return nameToCell[name.toLowerCase()]
+    }
+
+    /**
      * Gets the [Cell] with the given [uuid].
      */
-    fun getCellByUuid(uuid: UUID): Optional<Cell> {
+    fun getCellByUuid(uuid: UUID): Cell? {
         for (cell in getAllCells()) {
             if (cell.uuid == uuid) {
-                return Optional.of(cell)
+                return cell
             }
         }
-        return Optional.empty()
+        return null
     }
 
     /**
      * Gets the [Cell] that the given [location] belongs to.
      */
-    fun getCellByLocation(location: Location): Optional<Cell> {
+    fun getCellByLocation(location: Location): Cell? {
         for (cell in getAllCells()) {
             if (cell.cuboid.contains(location)) {
-                return Optional.of(cell)
+                return cell
             }
         }
-        return Optional.empty()
+        return null
     }
 
     /**
@@ -181,6 +188,18 @@ object CellHandler : PluginHandler {
      */
     fun getOwnedCells(playerUuid: UUID): Set<Cell> {
         return joinableCache.getOrDefault(playerUuid, hashSetOf()).filter { it.owner == playerUuid }.toSet()
+    }
+
+    /**
+     * Returns the assumed [Cell] for the given [playerUuid].
+     */
+    fun getAssumedCell(playerUuid: UUID): Cell? {
+        val joinableCells = getJoinableCells(playerUuid)
+        return if (joinableCells.size == 1) {
+            joinableCells.first()
+        } else {
+            null
+        }
     }
 
     fun fetchPreviousCell(uuid: UUID): Cell? {
@@ -256,6 +275,7 @@ object CellHandler : PluginHandler {
 
     private fun synchronizeCaches(cell: Cell) {
         grid[cell.gridIndex] = cell
+        nameToCell[cell.name.toLowerCase()] = cell
 
         for (player in cell.getMembers()) {
             joinableCache.putIfAbsent(player, HashSet())
@@ -265,6 +285,7 @@ object CellHandler : PluginHandler {
 
     fun forgetCell(cell: Cell) {
         grid.remove(cell.gridIndex)
+        nameToCell.remove(cell.name.toLowerCase())
     }
 
     fun updateJoinableCache(uuid: UUID, cell: Cell, joinable: Boolean) {
@@ -275,6 +296,12 @@ object CellHandler : PluginHandler {
         } else {
             joinableCache[uuid]!!.remove(cell)
         }
+    }
+
+    fun renameCell(cell: Cell, name: String) {
+        nameToCell.remove(cell.name.toLowerCase())
+        cell.name = name
+        synchronizeCaches(cell)
     }
 
     /**
@@ -529,5 +556,11 @@ object CellHandler : PluginHandler {
     private fun gridCoordsToBlockCoords(pos: Pair<Int, Int>): Pair<Int, Int> {
         return Pair(pos.first * CellsModule.getGridGutterWidth(), pos.second * CellsModule.getGridGutterWidth())
     }
+
+    internal val BLOCKED_NAMES = listOf(
+        "f+[a4]+g+[o0]+t+".toRegex(),
+        "n+[i1l|]+gg+[e3]+r+".toRegex(),
+        "b+[e3]+[a4]+n+[e3]+r+".toRegex()
+    )
 
 }

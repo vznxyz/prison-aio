@@ -11,7 +11,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
-object Cubed : AbstractEnchant("cubed", "Cubed", 5) {
+object Cubed : AbstractEnchant("cubed", "Cubed", 3) {
 
     override val iconColor: Color
         get() = Color.ORANGE

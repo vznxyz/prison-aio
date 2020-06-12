@@ -78,17 +78,13 @@ object UserHandler : PluginHandler {
         }
     }
 
-    private fun fetchUserDocument(uuid: UUID): Document? {
-        return usersCollection.find(Document("uuid", uuid.toString())).first()
-    }
-
     /**
      * Loads a player's user data.
      */
     fun loadUser(uuid: UUID, throws: Boolean = false): User {
         assert(!Bukkit.isPrimaryThread()) { "Cannot load user on primary thread" }
 
-        val document = fetchUserDocument(uuid)
+        val document = usersCollection.find(Document("uuid", uuid.toString())).first()
         if (document != null) {
             val user = Cubed.gson.fromJson(document.toJson(JSON_WRITER_SETTINGS), User::class.java)
             user.init()

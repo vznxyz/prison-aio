@@ -35,7 +35,6 @@ object JackHammer : AbstractEnchant("jack-hammer", "Jack Hammer", 5000) {
         }
 
         val chance = level * readChance()
-
         if (Chance.percent(chance)) {
             val blocks: MutableList<Block> = ArrayList()
 
@@ -46,15 +45,19 @@ object JackHammer : AbstractEnchant("jack-hammer", "Jack Hammer", 5000) {
                 }
             }
 
+            // broadcast multi block break
+            val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100f)
+            Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
+
+            if (multiBlockBreakEvent.isCancelled) {
+                return
+            }
+
             // simulate block breaking
             for (block in blocks) {
                 block.type = Material.AIR
                 block.state.update()
             }
-
-            // broadcast multi block break
-            val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100f)
-            Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
 
             // send notification
             sendMessage(event.player, "The layer you were mining has collapsed!")

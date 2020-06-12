@@ -4,6 +4,7 @@ import me.clip.deluxetags.DeluxeTag
 import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.hook.VaultHook
+import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.util.Constants
@@ -27,8 +28,8 @@ object ChatFormatListeners : Listener {
         val user = UserHandler.getUser(event.player.uniqueId)
         val tagPrefix = ChatColor.translateAlternateColorCodes('&', DeluxeTag.getPlayerDisplayTag(event.player.uniqueId.toString()) ?: "")
 
-        val prestigeTag = if (user.getCurrentPrestige() >= UsersModule.getMaxPrestige()) {
-            UsersModule.getMaxPrestigeTag()
+        val prestigeTag = if (user.getCurrentPrestige() >= RanksModule.getMaxPrestige()) {
+            RanksModule.getMaxPrestigeTag()
         } else {
             (user.getCurrentPrestige()).toString()
         }

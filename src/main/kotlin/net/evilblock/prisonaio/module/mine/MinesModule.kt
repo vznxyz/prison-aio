@@ -6,7 +6,6 @@ import net.evilblock.prisonaio.module.mine.command.*
 import net.evilblock.prisonaio.module.mine.command.parameter.MineParameterType
 import net.evilblock.prisonaio.module.mine.listener.MineEventEmitterListeners
 import net.evilblock.prisonaio.module.mine.listener.MineInventoryListeners
-import net.evilblock.prisonaio.module.mine.listener.MinePercentageListeners
 import net.evilblock.prisonaio.module.mine.listener.MineWandListeners
 import net.evilblock.prisonaio.module.mine.task.MineEffectsTask
 import net.evilblock.prisonaio.module.mine.task.MineResetTask
@@ -25,7 +24,7 @@ object MinesModule : PluginModule() {
     override fun onEnable() {
         MineHandler.initialLoad()
 
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), MineResetTask, 0L, 600L)
+        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), MineResetTask, 20L * 10L, 20L * 1L)
         getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), MineEffectsTask, 20L, 20L)
     }
 
@@ -45,7 +44,7 @@ object MinesModule : PluginModule() {
             MineResetCommand::class.java,
             MineSetRegionCommand::class.java,
             MineSetSpawnCommand::class.java,
-            MineStatusesCommand::class.java,
+            MineListCommand::class.java,
             MineWandCommand::class.java
         )
     }
@@ -60,7 +59,6 @@ object MinesModule : PluginModule() {
         return listOf(
             MineEventEmitterListeners,
             MineInventoryListeners,
-            MinePercentageListeners,
             MineWandListeners
         )
     }

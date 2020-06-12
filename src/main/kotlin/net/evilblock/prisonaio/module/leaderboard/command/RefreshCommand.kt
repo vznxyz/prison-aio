@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender
 object RefreshCommand {
 
     @Command(
-        names = ["leaderboards refresh"],
+        names = ["leaderboards refresh", "lb refresh"],
         description = "Forcefully refresh the leaderboards data",
         permission = "op",
         async = true

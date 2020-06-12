@@ -34,7 +34,7 @@ class ShopEditorMenu : PaginatedMenu() {
     override fun getAllPagesButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        ShopHandler.getShops().forEachIndexed { index, shop ->
+        ShopHandler.getShops().sortedBy { it.priority }.forEachIndexed { index, shop ->
             buttons[index] = ShopButton(shop)
         }
 

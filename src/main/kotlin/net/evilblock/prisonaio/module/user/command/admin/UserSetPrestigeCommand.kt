@@ -3,6 +3,7 @@ package net.evilblock.prisonaio.module.user.command.admin
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.rank.Rank
+import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.UsersModule
@@ -24,7 +25,7 @@ object UserSetPrestigeCommand {
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player") user: User, @Param(name = "prestige") prestige: Int) {
         assert(prestige > 0) { "Cannot set prestige to less than 0" }
-        assert(prestige > 0) { "Cannot set prestige to more than ${UsersModule.getMaxPrestige()}" }
+        assert(prestige > 0) { "Cannot set prestige to more than ${RanksModule.getMaxPrestige()}" }
 
         user.updateCurrentPrestige(prestige)
         UserHandler.saveUser(user)

@@ -2,7 +2,6 @@ package net.evilblock.prisonaio.module.enchant.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
-import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.menu.button.*
 import net.evilblock.prisonaio.module.enchant.type.*
 import org.bukkit.ChatColor
@@ -16,28 +15,11 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import java.util.*
 
-class PurchaseEnchantMenu(player: Player) : Menu() {
-
-    private val heldItemSlot: Int
-    val pickaxeInHand: ItemStack?
+class PurchaseEnchantMenu(val pickaxe: ItemStack) : Menu() {
 
     init {
+        this.updateAfterClick = true
         this.placeholder = true
-
-        // get item in hand
-        val itemInHand = player.inventory.getItem(player.inventory.heldItemSlot) ?: throw IllegalStateException("You have no item in your hand.")
-
-        // make sure item in hand isn't null
-        // check if the item is a pickaxe
-        check(itemInHand.type.toString().endsWith("_PICKAXE")) { "You must be holding the pickaxe you would like to enchant." }
-
-        val heldItemSlot = player.inventory.heldItemSlot
-        // remove item from player's inventory
-        player.inventory.setItem(heldItemSlot, null)
-        player.updateInventory()
-
-        this.heldItemSlot = heldItemSlot
-        this.pickaxeInHand = itemInHand
     }
 
     override fun getTitle(player: Player): String {
@@ -50,7 +32,7 @@ class PurchaseEnchantMenu(player: Player) : Menu() {
         // header buttons
         buttons[0] = TokenShopButton()
         buttons[2] = TokenBalanceButton()
-        buttons[4] = PickaxeInHandButton(pickaxeInHand!!.clone()) // make sure to clone the item
+        buttons[4] = PickaxeInHandButton(pickaxe.clone()) // make sure to clone the item
         buttons[6] = SalvagePickaxeButton()
         buttons[8] = ExitButton()
 
@@ -85,17 +67,7 @@ class PurchaseEnchantMenu(player: Player) : Menu() {
         return buttons
     }
 
-    override fun onClose(player: Player, manualClose: Boolean) {
-        // add the pickaxe back to the player's hand ONLY IF the pickaxe isn't null
-        if (pickaxeInHand != null) {
-            player.inventory.heldItemSlot = heldItemSlot
-            player.inventory.setItem(heldItemSlot, pickaxeInHand)
-            player.updateInventory()
-        }
-    }
-
-    class SalvagePickaxeButton : Button() {
-
+    private inner class SalvagePickaxeButton : Button() {
         override fun getName(player: Player): String {
             return ChatColor.GRAY.toString() + "» " + ChatColor.RED + ChatColor.BOLD + "Salvage Pickaxe" + ChatColor.GRAY + " «"
         }
@@ -117,19 +89,7 @@ class PurchaseEnchantMenu(player: Player) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType == ClickType.LEFT) {
                 player.closeInventory()
-                SalvagePickaxeMenu.tryOpeningMenu(player)
-            }
-        }
-
-    }
-
-    companion object {
-        @JvmStatic
-        fun tryOpeningMenu(player: Player) {
-            try {
-                PurchaseEnchantMenu(player).openMenu(player)
-            } catch (e: IllegalStateException) {
-                player.sendMessage(EnchantsManager.CHAT_PREFIX + ChatColor.RED + e.message)
+                SalvagePickaxeMenu(pickaxe).openMenu(player)
             }
         }
     }

@@ -18,6 +18,10 @@ object MinigamesModule : PluginModule() {
         CoinFlipHandler.initialLoad()
     }
 
+    override fun onDisable() {
+        CoinFlipHandler.cancelGames()
+    }
+
     override fun getCommands(): List<Class<*>> {
         return listOf(
             CoinFlipBrowseCommand.javaClass

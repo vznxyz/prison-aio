@@ -25,6 +25,12 @@ object CoinFlipHandler : PluginHandler {
         getModule().getPlugin().server.scheduler.runTaskTimerAsynchronously(getModule().getPlugin(), CoinFlipGameTicker, 4L, 4L)
     }
 
+    fun cancelGames() {
+        for (game in games.values.toList()) {
+            game.finishGame()
+        }
+    }
+
     fun getGames(): List<CoinFlipGame> {
         return games.values.toList()
     }

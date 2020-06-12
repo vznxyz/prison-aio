@@ -1,9 +1,8 @@
 package net.evilblock.prisonaio.module.privatemine.data
 
-import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.privatemine.PrivateMinesModule
 import org.apache.commons.lang.math.DoubleRange
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import java.io.File
 
 class PrivateMineTier(
@@ -17,26 +16,6 @@ class PrivateMineTier(
     var schematicFile: File = File(File(Bukkit.getPluginManager().getPlugin("WorldEdit").dataFolder, "schematics"), "PrivateMines-Tier${number}.schematic")
 
     companion object {
-        const val SHOP_NAME_PREFIX = "PrivateMinesShop-Tier"
-
-        private val map = hashMapOf<Int, PrivateMineTier>()
-
-        fun fromInt(tier: Int): PrivateMineTier? {
-            return map[tier]
-        }
-
-        fun initialLoad() {
-            for (tierMap in PrivateMinesModule.config.getList("tiers") as List<Map<String, Any>>) {
-                val tier = fromMap(tierMap)
-
-                if (!tier.schematicFile.exists()) {
-                    PrisonAIO.instance.logger.severe("Couldn't find schematic file for tier ${tier.number}")
-                }
-
-                map[tier.number] = tier
-            }
-        }
-
         @JvmStatic
         fun fromMap(map: Map<String, Any>): PrivateMineTier {
             val resetInterval = if (map["reset-interval"] is Int) {
@@ -47,7 +26,8 @@ class PrivateMineTier(
 
             return PrivateMineTier(
                     number = map["tier"] as Int,
-                    blocks = (map["blocks"] as List<Map<String, Any>>).map { PrivateMineBlockData.fromMap(it) },
+                    blocks = listOf(PrivateMineBlockData(Material.REDSTONE_BLOCK, 0, 100.0)),
+//                    blocks = (map["blocks"] as List<Map<String, Any>>).map { PrivateMineBlockData.fromMap(it) },
                     resetInterval = resetInterval,
                     salesTaxRange = DoubleRange(map["sales-tax"] as Double),
                     playerLimit = map["player-limit"] as Int

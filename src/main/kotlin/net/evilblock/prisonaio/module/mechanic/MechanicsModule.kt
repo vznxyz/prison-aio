@@ -1,6 +1,7 @@
 package net.evilblock.prisonaio.module.mechanic
 
 import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.prisonaio.module.mechanic.command.HotFixCommands
 import net.evilblock.prisonaio.module.mechanic.command.HelpCommand
 import net.evilblock.prisonaio.module.mechanic.command.SpawnCommand
 import net.evilblock.prisonaio.module.mechanic.listener.*
@@ -41,9 +42,14 @@ object MechanicsModule : PluginModule() {
             CraftingMechanicsListeners,
             DisableAnvilMechanicsListeners,
             DisableBrewingMechanicsListeners,
+            DisableExplosionsListeners,
             DisableFarmingMechanicsListeners,
+            DisableNicknameListeners,
+            DisableRedstoneListeners,
+            DisableSpawnMobEggsListeners,
             MiningMechanicsListeners,
             MobMechanicsListeners,
+            PreventDropsInSpawnListeners,
             RegionListeners,
             StreamListeners,
             VanillaMechanicsListeners
@@ -52,6 +58,7 @@ object MechanicsModule : PluginModule() {
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
+            HotFixCommands.javaClass,
             HelpCommand.javaClass,
             SpawnCommand.javaClass,
             RegionBypassCommand.javaClass

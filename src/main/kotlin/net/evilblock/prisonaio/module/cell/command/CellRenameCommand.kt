@@ -14,18 +14,31 @@ object CellRenameCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "name", wildcard = true) name: String) {
-        val visitingCell = CellHandler.getVisitingCell(player)
-        if (visitingCell == null) {
+        val cell = CellHandler.getAssumedCell(player.uniqueId)
+        if (cell == null) {
             player.sendMessage("${ChatColor.RED}You must be inside a cell to rename it.")
             return
         }
 
-        if (!visitingCell.isOwner(player.uniqueId)) {
+        for (blockedName in CellHandler.BLOCKED_NAMES) {
+            if (blockedName.matches(name)) {
+                player.sendMessage("${ChatColor.RED}The name you input contains inappropriate content. Please try a different name.")
+                return
+            }
+        }
+
+        if (!cell.isOwner(player.uniqueId)) {
             player.sendMessage("${ChatColor.RED}Only the owner can rename the cell.")
             return
         }
 
-        visitingCell.updateName(player, name)
+        if (CellHandler.getCellByName(name) != null) {
+            player.sendMessage("${ChatColor.RED}The name `$name` is already taken by another cell.")
+            return
+        }
+
+        CellHandler.renameCell(cell, name)
+        cell.sendMessages("${ChatColor.YELLOW}The cell has been renamed to `$name` by ${player.name}!")
     }
 
 }

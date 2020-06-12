@@ -10,10 +10,13 @@ import java.util.*
 
 object CellInviteCommand {
 
-    @Command(names = ["cell invite", "cells invite"], description = "Invite a player to your cell")
+    @Command(
+        names = ["cell invite", "cells invite"],
+        description = "Invite a player to your cell"
+    )
     @JvmStatic
     fun execute(sender: Player, @Param(name = "player") playerUuid: UUID) {
-        val cell = CellHandler.getVisitingCell(sender)
+        val cell = CellHandler.getAssumedCell(sender.uniqueId)
         if (cell == null) {
             sender.sendMessage("${ChatColor.RED}You must be inside your cell to invite other players.")
             return

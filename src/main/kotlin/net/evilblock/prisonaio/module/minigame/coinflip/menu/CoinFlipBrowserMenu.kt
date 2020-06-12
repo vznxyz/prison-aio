@@ -11,7 +11,6 @@ import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipGame
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipHandler
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -102,8 +101,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                             .regex("[0-9]*(\\.?[0-9]*)?".toRegex())
                             .acceptInput { player, input ->
                                 val amount = input.toDouble()
-
-                                if (!VaultHook.useEconomyAndReturn { economy -> economy.has(player, CoinFlipHandler.getMinBetMoney()) }) {
+                                if (amount < CoinFlipHandler.getMinBetMoney().coerceAtLeast(1.0)) {
                                     player.sendMessage("${ChatColor.RED}You must bet at least $${NumberFormat.getInstance().format(CoinFlipHandler.getMinBetMoney())}.")
                                     return@acceptInput
                                 }
@@ -130,10 +128,8 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                         prompt.promptText("${ChatColor.GREEN}Please insert the amount of tokens you would like to bet.")
                             .acceptInput { player, input ->
                                 val amount = input.toLong()
-
-                                val user = UserHandler.getUser(player.uniqueId)
-                                if (!user.hasTokensBalance(CoinFlipHandler.getMinBetTokens())) {
-                                    player.sendMessage("${ChatColor.RED}You must bet at least ${NumberFormat.getInstance().format(CoinFlipHandler.getMinBetTokens())}.")
+                                if (amount < CoinFlipHandler.getMinBetTokens().coerceAtLeast(1L)) {
+                                    player.sendMessage("${ChatColor.RED}You must bet at least ${NumberFormat.getInstance().format(CoinFlipHandler.getMinBetMoney())} tokens.")
                                     return@acceptInput
                                 }
 
@@ -146,7 +142,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                                 currency.take(player)
 
                                 val game = CoinFlipGame(
-                                    creator = user,
+                                    creator = UserHandler.getUser(player.uniqueId),
                                     value = currency
                                 )
 
@@ -213,9 +209,9 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
 
             if (clickType.isRightClick) {
                 if (game.isCreator(player) && game.isWaitingForOpponent()) {
-                    ConfirmMenu("Are you sure?", "Your deposited funds will not be returned to you if you cancel your game.") { confirmed ->
+                    ConfirmMenu("Are you sure?") { confirmed ->
                         if (confirmed) {
-                            CoinFlipHandler.forgetGame(game)
+                            game.finishGame()
                         }
 
                         this@CoinFlipBrowserMenu.openMenu(player)

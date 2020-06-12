@@ -7,6 +7,7 @@ import net.evilblock.prisonaio.module.enchant.event.NukeExplodeEvent
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.mechanic.region.Region
 import net.evilblock.prisonaio.module.mine.Mine
+import net.evilblock.prisonaio.module.privatemine.PrivateMine
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.event.block.BlockBreakEvent
@@ -50,6 +51,15 @@ object Nuke : AbstractEnchant("nuke", "Nuke", 2) {
 
 			if (region is Mine) {
 				Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked the ${ChatColor.RED}${region.id} ${ChatColor.GRAY}mine!")
+			} else if (region is PrivateMine) {
+				val tierNumber = region.tier.number
+
+				if (region.owner == event.player.uniqueId) {
+					Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked their ${ChatColor.RED}Tier $tierNumber Private Mine${ChatColor.GRAY}!")
+				} else {
+					val ownerName = region.getOwnerName()
+					Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked $ownerName's ${ChatColor.RED}Tier $tierNumber Private Mine${ChatColor.GRAY}!")
+				}
 			}
 
 			val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100F)

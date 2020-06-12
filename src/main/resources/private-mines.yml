@@ -10,49 +10,29 @@ mine:
         - "sellall"
 tiers:
   - tier: 1
-    sales-tax: 10.0
+    sales-tax: 2.5
     player-limit: 5
     blocks:
-      - material: "IRON_BLOCK"
+      - material: "REDSTONE_BLOCK"
         data: 0
-        percentage: 75.0
-      - material: "DIAMOND_BLOCK"
-        data: 0
-        percentage: 25.0
-    reset-interval: 300000
+        percentage: 100.0
+    reset-interval: 100000
   - tier: 2
-    sales-tax: 10.0
+    sales-tax: 5.0
     player-limit: 10
     blocks:
-      - material: "IRON_BLOCK"
+      - material: "REDSTONE_BLOCK"
         data: 0
-        percentage: 75.0
-      - material: "DIAMOND_BLOCK"
-        data: 0
-        percentage: 25.0
-    reset-interval: 300000
+        percentage: 100.0
+    reset-interval: 100000
   - tier: 3
     sales-tax: 10.0
     player-limit: 15
     blocks:
-      - material: "IRON_BLOCK"
+      - material: "REDSTONE_BLOCK"
         data: 0
-        percentage: 75.0
-      - material: "DIAMOND_BLOCK"
-        data: 0
-        percentage: 25.0
-    reset-interval: 300000
-  - tier: 3
-    sales-tax: 10.0
-    player-limit: 20
-    blocks:
-      - material: "IRON_BLOCK"
-        data: 0
-        percentage: 75.0
-      - material: "DIAMOND_BLOCK"
-        data: 0
-        percentage: 25.0
-    reset-interval: 300000
+        percentage: 100.0
+    reset-interval: 100000
 language:
   help:
     - "&c&lPrivate Mines &7&lHelp"

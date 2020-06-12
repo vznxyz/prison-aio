@@ -1,12 +1,17 @@
 package net.evilblock.prisonaio.module.privatemine
 
-import com.boydti.fawe.bukkit.wrapper.AsyncWorld
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.lite.LiteEdit
+import net.evilblock.cubed.lite.LiteRegion
+import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.module.mechanic.region.Region
+import net.evilblock.prisonaio.module.privatemine.data.PrivateMineBlockData
 import net.evilblock.prisonaio.module.privatemine.data.PrivateMineTier
+import net.evilblock.prisonaio.module.reward.RewardsModule
+import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
+import net.minecraft.server.v1_12_R1.IBlockData
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.block.Block
@@ -14,7 +19,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import java.util.*
 import kotlin.collections.HashSet
-import kotlin.random.Random
 
 class PrivateMine(
     val gridIndex: Int,
@@ -46,14 +50,12 @@ class PrivateMine(
     @Transient var moneyGained: Long = 0L
 
     /**
-     * The last time in milliseconds that this mine was reset.
-     */
-    @Transient var lastReset: Long = -1
-
-    /**
      * The players that are currently active in this mine.
      */
     @Transient internal var activePlayers: HashSet<Player> = hashSetOf()
+
+    @Transient
+    var lastResetCheck: Long = System.currentTimeMillis()
 
     override fun getRegionName(): String {
         return "${getOwnerName()}'s Private Mine (Tier ${tier})"
@@ -64,7 +66,7 @@ class PrivateMine(
     }
 
     override fun resetBreakableRegion() {
-        resetMineArea()
+        resetRegion()
     }
 
     override fun supportsEnchants(): Boolean {
@@ -76,9 +78,7 @@ class PrivateMine(
     }
 
     override fun onBlockBreak(player: Player, block: Block, cancellable: Cancellable) {
-        if (innerCuboid.contains(block)) {
-            cancellable.isCancelled = false
-        }
+        cancellable.isCancelled = !innerCuboid.contains(block)
     }
 
     fun getOwnerName(): String {
@@ -114,11 +114,6 @@ class PrivateMine(
 
         PrivateMinesModule.getNotificationLines("teleported").forEach {
             player.sendMessage(translateVariables(it).replace("{ownerOrSelf}", ownerOrSelf))
-        }
-
-        // reset mine if it's been a while
-        if (System.currentTimeMillis() - lastReset > tier.resetInterval) {
-            resetMineArea()
         }
     }
 
@@ -170,32 +165,52 @@ class PrivateMine(
     /**
      * Resets the mine area with new blocks.
      */
-    fun resetMineArea() {
-        // prevent never-ending while loop
+    fun resetRegion() {
         if (tier.blocks.isEmpty()) {
             return
         }
 
-        lastReset = System.currentTimeMillis()
+        val blockList = arrayListOf<PrivateMineBlockData>()
+        for (i in 0 until (innerCuboid.sizeX * innerCuboid.sizeY * innerCuboid.sizeZ)) {
+            blockList.add(pickRandomBlockType())
+        }
 
-        Tasks.sync {
-            val blocks = tier.blocks.toMutableList()
-            val asyncWorld = AsyncWorld.wrap(PrivateMineHandler.getGridWorld())
+        var index = 0
 
-            innerCuboid.blocks.forEach { block ->
-                var changed = false
-                while (!changed) {
-                    for (possibleBlockData in blocks.shuffled()) {
-                        if (Random.nextInt(0, 100) >= 100 - possibleBlockData.percentage) {
-                            asyncWorld.setBlock(block.x, block.y, block.z, possibleBlockData.material.id, possibleBlockData.data.toInt())
-                            changed = true
-                            break
-                        }
+        val liteRegion = LiteRegion(innerCuboid)
+        LiteEdit.fill(liteRegion, object : LiteEdit.FillHandler {
+            override fun getBlock(x: Int, y: Int, z: Int): IBlockData? {
+                if (RewardsModule.isEnabled()) {
+                    if (MineCrateHandler.isAttached(Location(innerCuboid.world, x.toDouble(), y.toDouble(), z.toDouble()))) {
+                        return null
                     }
                 }
-            }
 
-            asyncWorld.commit()
+                val blockType = blockList[index++]
+                return getData(blockType.material, blockType.data.toInt())
+            }
+        }, LiteEdit.VoidProgressCallBack)
+    }
+
+    private fun pickRandomBlockType(): PrivateMineBlockData {
+        if (tier.blocks.isEmpty()) {
+            throw IllegalStateException("Cannot pick random block if block list is empty")
+        }
+
+        val filteredBlockTypes = tier.blocks.filter { blockType -> blockType.percentage > 0.0 }
+        if (filteredBlockTypes.isEmpty()) {
+            throw IllegalStateException("Cannot pick random block if block list has no blocks with percentages more than 0%")
+        }
+
+        if (filteredBlockTypes.size == 1) {
+            return filteredBlockTypes[0]
+        }
+
+        while (true) {
+            val randomBlockType = tier.blocks.random()
+            if (Chance.percent(randomBlockType.percentage)) {
+                return randomBlockType
+            }
         }
     }
 

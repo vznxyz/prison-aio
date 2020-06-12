@@ -10,16 +10,20 @@ import java.util.*
 
 object CellKickCommand {
 
-    @Command(names = ["cell kick", "cells kick"], description = "Kick a player from your cell", async = true)
+    @Command(
+        names = ["cell kick", "cells kick"],
+        description = "Kick a player from your cell",
+        async = true
+    )
     @JvmStatic
     fun execute(player: Player, @Param(name = "player") playerUuid: UUID) {
-        val visitingCell = CellHandler.getVisitingCell(player)
-        if (visitingCell == null) {
+        val cell = CellHandler.getAssumedCell(playerUuid)
+        if (cell == null) {
             player.sendMessage("${ChatColor.RED}You must be inside a cell to kick a player from it.")
             return
         }
 
-        if (visitingCell.owner != player.uniqueId) {
+        if (!cell.isOwner(player.uniqueId)) {
             player.sendMessage("${ChatColor.RED}Only the owner can kick players from the cell.")
             return
         }
@@ -29,17 +33,17 @@ object CellKickCommand {
             return
         }
 
-        if (visitingCell.isOwner(playerUuid)) {
+        if (cell.isOwner(playerUuid)) {
             player.sendMessage("${ChatColor.RED}You can't kick the owner from their own cell.")
             return
         }
 
-        if (!visitingCell.isMember(playerUuid)) {
+        if (!cell.isMember(playerUuid)) {
             player.sendMessage("${ChatColor.RED}That player is not a member of the cell.")
             return
         }
 
-        visitingCell.kickMember(playerUuid)
+        cell.kickMember(playerUuid)
 
         val playerName = Cubed.instance.uuidCache.name(playerUuid)
         player.sendMessage("${ChatColor.GREEN}Successfully kicked $playerName from the cell.")

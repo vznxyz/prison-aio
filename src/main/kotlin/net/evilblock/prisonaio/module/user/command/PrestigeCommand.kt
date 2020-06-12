@@ -3,9 +3,9 @@ package net.evilblock.prisonaio.module.user.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.rank.RankHandler
+import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.rank.event.AsyncPlayerPrestigeEvent
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.util.Constants
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -27,7 +27,7 @@ object PrestigeCommand {
             return
         }
 
-        if (user.getCurrentPrestige() >= UsersModule.getMaxPrestige()) {
+        if (user.getCurrentPrestige() >= RanksModule.getMaxPrestige()) {
             player.sendMessage("${ChatColor.RED}You have achieved the maximum prestige possible.")
             return
         }
@@ -51,13 +51,18 @@ object PrestigeCommand {
         user.updateCurrentPrestige(prestigeEvent.to)
         user.updateCurrentRank(RankHandler.getStartingRank())
 
-        for (command in UsersModule.getPrestigeCommands()) {
+        println("executing prestige commands")
+        for (command in RanksModule.getPrestigeCommands()) {
             val translatedCommand = command
                 .replace("{playerName}", player.name)
                 .replace("{playerUuid}", player.uniqueId.toString())
                 .replace("{prestige}", prestigeEvent.to.toString())
 
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), translatedCommand)
+            println("executing command $translatedCommand")
+
+            Tasks.sync {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), translatedCommand)
+            }
         }
 
         player.sendMessage("")
@@ -66,7 +71,7 @@ object PrestigeCommand {
         player.sendMessage(" ${ChatColor.GRAY}rank has been reset to ${RankHandler.getStartingRank().displayName} ${ChatColor.GRAY}for you to rankup again.")
         player.sendMessage("")
 
-        if (prestigeEvent.to != UsersModule.getMaxPrestige()) {
+        if (prestigeEvent.to != RanksModule.getMaxPrestige()) {
             val newRequirement = user.getPrestigeRequirement()
             val formattedRequirement = NumberFormat.getInstance().format(newRequirement)
 

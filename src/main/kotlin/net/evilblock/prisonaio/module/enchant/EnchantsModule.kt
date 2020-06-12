@@ -2,10 +2,7 @@ package net.evilblock.prisonaio.module.enchant
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.prisonaio.module.PluginModule
-import net.evilblock.prisonaio.module.enchant.command.BookCommand
-import net.evilblock.prisonaio.module.enchant.command.EnchantCommand
-import net.evilblock.prisonaio.module.enchant.command.PickaxeCommand
-import net.evilblock.prisonaio.module.enchant.command.ToggleEnchantsMessagesCommand
+import net.evilblock.prisonaio.module.enchant.command.*
 import net.evilblock.prisonaio.module.enchant.command.parameter.AbstractEnchantParameterType
 import net.evilblock.prisonaio.module.enchant.salvage.SalvagePreventionHandler
 import net.evilblock.prisonaio.module.enchant.salvage.command.SalvagePreventionCommand
@@ -42,6 +39,7 @@ object EnchantsModule : PluginModule() {
             BookCommand.javaClass,
             EnchantCommand.javaClass,
             PickaxeCommand.javaClass,
+            RemoveEnchantCommand.javaClass,
             ToggleEnchantsMessagesCommand.javaClass,
             SalvagePreventionCommand.javaClass
         )

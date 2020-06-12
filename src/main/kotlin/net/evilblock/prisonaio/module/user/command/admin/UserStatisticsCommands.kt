@@ -19,6 +19,7 @@ object UserStatisticsCommands {
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player") user: User, @Param(name = "amount") amount: Int) {
         assert(amount > 0) { "Number must be above 0" }
+
         user.statistics.setBlocksMined(amount)
         UserHandler.saveUser(user)
 

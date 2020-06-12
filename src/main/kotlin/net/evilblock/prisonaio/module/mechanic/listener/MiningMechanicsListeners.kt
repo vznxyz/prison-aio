@@ -59,8 +59,7 @@ object MiningMechanicsListeners : Listener {
         event.block.state.update()
 
         Tasks.async {
-            // if auto-sell is enabled, sell our drops instead of adding them to the player's inventory
-            if (user.perks.isPerkEnabled(Perk.AUTO_SELL) && user.perks.hasPerk(event.player, Perk.AUTO_SELL)) {
+            if (user.perks.isAutoSellEnabled(event.player)) {
                 val itemsNotSold = ShopHandler.sellItems(event.player, drops)
                 if (itemsNotSold.isNotEmpty()) {
                     itemsNotSold.forEach { drop -> event.player.inventory.addItem(drop) }
@@ -76,7 +75,7 @@ object MiningMechanicsListeners : Listener {
     /**
      * Handles auto-sell and drops-to-inventory for a multi block break.
      */
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private fun onMultiBlockBreakEvent(event: MultiBlockBreakEvent) {
         // get the item in the player's hand
         val itemInHand = event.player.inventory.itemInMainHand ?: return
@@ -102,8 +101,7 @@ object MiningMechanicsListeners : Listener {
         }
 
         Tasks.async {
-            // if auto-sell is enabled, sell our drops instead of adding them to inventory
-            if (user.perks.isPerkEnabled(Perk.AUTO_SELL) && user.perks.hasPerk(event.player, Perk.AUTO_SELL)) {
+            if (user.perks.isAutoSellEnabled(event.player)) {
                 try {
                     val itemsNotSold = ShopHandler.sellItems(event.player, drops)
                     if (itemsNotSold.isNotEmpty()) {

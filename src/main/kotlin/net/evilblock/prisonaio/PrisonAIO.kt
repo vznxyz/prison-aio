@@ -7,7 +7,6 @@ import net.evilblock.cubed.error.ErrorHandler
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
-import net.evilblock.prisonaio.command.BuyCommand
 import net.evilblock.prisonaio.command.GKitzCommand
 import net.evilblock.prisonaio.command.ReloadCommand
 import net.evilblock.prisonaio.command.SaveCommand
@@ -96,7 +95,7 @@ class PrisonAIO : JavaPlugin() {
             MinesModule,
             CellsModule,
             PrivateMinesModule,
-//            BattlePassModule,
+            BattlePassModule,
             UsersModule,
             ScoreboardModule,
             ChatModule,
@@ -158,14 +157,13 @@ class PrisonAIO : JavaPlugin() {
     }
 
     private fun loadTasks() {
-        server.scheduler.runTaskTimerAsynchronously(this, {
+        Tasks.asyncTimer(20L * 60L * 3L, 20L * 60L * 3L) {
             saveModules()
-        }, 20L * 60L * 5L, 20L * 60L * 5L)
+        }
     }
 
     private fun loadCommands() {
         CommandHandler.registerClass(RunWizardCommand::class.java)
-        CommandHandler.registerClass(BuyCommand::class.java)
         CommandHandler.registerClass(GKitzCommand::class.java)
         CommandHandler.registerClass(ReloadCommand::class.java)
         CommandHandler.registerClass(SaveCommand::class.java)

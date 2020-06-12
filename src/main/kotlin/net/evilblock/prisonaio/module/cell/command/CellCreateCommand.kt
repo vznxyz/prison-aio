@@ -17,13 +17,20 @@ object CellCreateCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "name", wildcard = true) name: String) {
-        if (name.length > 16) {
-            player.sendMessage("${ChatColor.RED}The name you input is too long! (${name.length} > 16)")
-            return
+        for (blockedName in CellHandler.BLOCKED_NAMES) {
+            if (blockedName.matches(name)) {
+                player.sendMessage("${ChatColor.RED}The name you input contains inappropriate content. Please try a different name.")
+                return
+            }
         }
 
         if (CellHandler.getOwnedCells(player.uniqueId).isNotEmpty()) {
             player.sendMessage("${ChatColor.RED}You can only have one cell at a time. To generate a new cell, delete your old cell and then try again.")
+            return
+        }
+
+        if (CellHandler.getCellByName(name) != null) {
+            player.sendMessage("${ChatColor.RED}A cell with the name `$name` already exists.")
             return
         }
 

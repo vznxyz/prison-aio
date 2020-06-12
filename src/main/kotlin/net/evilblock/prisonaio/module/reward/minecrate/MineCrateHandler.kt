@@ -58,8 +58,7 @@ object MineCrateHandler : PluginHandler {
             val rewardSet = MineCrateRewardSet(
                 id = key,
                 chance = section.getDouble("chance"),
-                maxRewards = section.getInt("max-rewards"),
-                worlds = section.getStringList("worlds")
+                maxRewards = section.getInt("max-rewards")
             )
 
             for (itemsSection in section.getList("items") as List<Map<String, Any>>) {

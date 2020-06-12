@@ -5,18 +5,19 @@ import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.leaderboard.command.RefreshCommand
+import net.evilblock.prisonaio.module.leaderboard.command.ResultsCommand
 import net.evilblock.prisonaio.module.leaderboard.command.SpawnCommand
-import net.evilblock.prisonaio.module.leaderboard.impl.CellTopLeaderboard
-import net.evilblock.prisonaio.module.leaderboard.impl.MoneyBalanceLeaderboard
-import net.evilblock.prisonaio.module.leaderboard.impl.TokensBalanceLeaderboard
+import net.evilblock.prisonaio.module.leaderboard.impl.*
 import net.evilblock.prisonaio.module.leaderboard.npc.LeaderboardNpcEntity
 
 object LeaderboardsModule : PluginModule() {
 
 	private val leaderboards: List<Leaderboard> = listOf(
+		BlocksMinedLeaderboard,
 		CellTopLeaderboard,
 		MoneyBalanceLeaderboard,
-		TokensBalanceLeaderboard
+		TokensBalanceLeaderboard,
+		PrestigeLeaderboard
 	)
 
 	override fun getName(): String {
@@ -40,6 +41,7 @@ object LeaderboardsModule : PluginModule() {
 	override fun getCommands(): List<Class<*>> {
 		return listOf(
 			RefreshCommand.javaClass,
+			ResultsCommand.javaClass,
 			SpawnCommand.javaClass
 		)
 	}
@@ -52,7 +54,9 @@ object LeaderboardsModule : PluginModule() {
 
 	fun refreshLeaderboards() {
 		for (leaderboard in leaderboards) {
-			leaderboard.refresh()
+			try {
+				leaderboard.refresh()
+			} catch (ignore: Exception) {}
 		}
 	}
 
