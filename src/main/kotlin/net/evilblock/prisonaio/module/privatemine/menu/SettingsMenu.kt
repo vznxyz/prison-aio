@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.privatemine.menu
 
 import net.evilblock.cubed.menu.Button
@@ -119,11 +126,11 @@ class SettingsMenu(private val mine: PrivateMine) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             EzPrompt.Builder()
-                .promptText("${ChatColor.GREEN}Please specify the new sales tax for your Private Mine.\n${ChatColor.GRAY}Accepted range for this tier is ${ChatColor.GREEN}${mine.tier.salesTaxRange.minimumDouble}-${mine.tier.salesTaxRange.maximumDouble}%${ChatColor.GRAY}.")
+                .promptText("${ChatColor.GREEN}Please input the new sales tax.\n${ChatColor.GRAY}Accepted range for this tier is ${ChatColor.GREEN}${mine.tier.salesTaxRange.minimumDouble}-${mine.tier.salesTaxRange.maximumDouble}%${ChatColor.GRAY}.")
                 .acceptInput { player, input ->
                     try {
                         val inputNumber = input.toDouble()
-                        if (inputNumber < mine.tier.salesTaxRange.minimumDouble || inputNumber > mine.tier.salesTaxRange.maximumDouble) {
+                        if (!mine.tier.salesTaxRange.containsDouble(inputNumber)) {
                             player.sendMessage("${ChatColor.RED}The input you entered is not within the accept range.")
                             return@acceptInput
                         }

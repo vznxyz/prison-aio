@@ -1,8 +1,14 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.privatemine.data
 
 import org.apache.commons.lang.math.DoubleRange
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import java.io.File
 
 class PrivateMineTier(
@@ -26,10 +32,9 @@ class PrivateMineTier(
 
             return PrivateMineTier(
                     number = map["tier"] as Int,
-                    blocks = listOf(PrivateMineBlockData(Material.REDSTONE_BLOCK, 0, 100.0)),
-//                    blocks = (map["blocks"] as List<Map<String, Any>>).map { PrivateMineBlockData.fromMap(it) },
+                    blocks = (map["blocks"] as List<Map<String, Any>>).map { PrivateMineBlockData.fromMap(it) },
                     resetInterval = resetInterval,
-                    salesTaxRange = DoubleRange(map["sales-tax"] as Double),
+                    salesTaxRange = DoubleRange(0.0, map["sales-tax"] as Double),
                     playerLimit = map["player-limit"] as Int
             )
         }

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user
 
 import com.google.gson.annotations.JsonAdapter
@@ -92,7 +99,7 @@ class User(val uuid: UUID) {
     /**
      * The user's Battle-Pass progress.
      */
-    val battlePassData: BattlePass = BattlePass(this)
+    var battlePassData: BattlePass = BattlePass(this)
 
     /**
      * The user's quest progressions.
@@ -109,6 +116,11 @@ class User(val uuid: UUID) {
     fun init() {
         perks.user = this
         statistics.user = this
+
+        if (battlePassData == null) {
+            battlePassData = BattlePass(this)
+        }
+
         battlePassData.user = this
     }
 
@@ -157,7 +169,7 @@ class User(val uuid: UUID) {
     /**
      * Updates the user's setting option for the given [setting].
      */
-    fun <T : UserSettingOption> updateSettingOption(setting: UserSetting, value: T) {
+    fun updateSettingOption(setting: UserSetting, value: UserSettingOption) {
         settings[setting] = value
         requiresSave = true
     }
@@ -165,11 +177,11 @@ class User(val uuid: UUID) {
     /**
      * Gets the user's setting option for the given [setting].
      */
-    fun <T : UserSettingOption> getSettingOption(setting: UserSetting): T {
+    fun getSettingOption(setting: UserSetting): UserSettingOption {
         if (!settings.containsKey(setting)) {
             settings[setting] = setting.defaultValue.invoke()
         }
-        return settings[setting] as T
+        return settings[setting]!!
     }
 
     /**

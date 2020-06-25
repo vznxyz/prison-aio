@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell.listener
 
 import net.evilblock.prisonaio.module.cell.CellHandler
@@ -26,10 +33,13 @@ object CellWorldListeners : Listener {
      */
     @EventHandler
     fun onWeatherChangeEvent(event: WeatherChangeEvent) {
+        if (event.toWeatherState()) {
+            event.isCancelled = true
+        }
+
         event.world.thunderDuration = 0
         event.world.isThundering = false
         event.world.weatherDuration = 999999999
-        event.isCancelled = true
     }
 
     /**

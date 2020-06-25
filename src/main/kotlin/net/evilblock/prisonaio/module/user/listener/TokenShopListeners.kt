@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.listener
 
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.hook.VaultHook
-import net.evilblock.prisonaio.module.mechanic.region.bypass.RegionBypass
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.Bukkit
@@ -233,7 +240,7 @@ object TokenShopListeners : Listener {
 
             if (sign.getLine(1) != event.player.name) {
                 event.isCancelled = true
-                event.player.sendMessage("${ChatColor.RED}You can't destroy that TokenShop as it doesn't belong to you!")
+                event.player.sendMessage("${ChatColor.RED}You can't destroy that TokenShop because it doesn't belong to you!")
             }
         }
     }

@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mechanic.listener
 
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
-import net.evilblock.prisonaio.module.mechanic.region.Regions
+import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -19,7 +26,6 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
-import java.util.*
 import kotlin.math.floor
 import kotlin.random.Random
 
@@ -28,18 +34,16 @@ import kotlin.random.Random
  */
 object MiningMechanicsListeners : Listener {
 
-    private val SPLITTABLE_RANDOM = SplittableRandom()
-
     /**
      * Handles auto-sell and drops-to-inventory for a single block break.
      */
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    fun onBlockBreakEventHighest(event: BlockBreakEvent) {
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
+    fun onBlockBreakEvent(event: BlockBreakEvent) {
         // get the item in the player's hand
         val itemInHand = event.player.inventory.itemInMainHand ?: return
 
         // make sure the item is a tool
-        if (!isTool(itemInHand)) {
+        if (!MechanicsModule.isTool(itemInHand)) {
             return
         }
 
@@ -58,8 +62,10 @@ object MiningMechanicsListeners : Listener {
         event.block.type = Material.AIR
         event.block.state.update()
 
+        val region = RegionsModule.findRegion(event.block.location)
+
         Tasks.async {
-            if (user.perks.isAutoSellEnabled(event.player)) {
+            if (region.supportsAutoSell() && user.perks.isAutoSellEnabled(event.player)) {
                 val itemsNotSold = ShopHandler.sellItems(event.player, drops)
                 if (itemsNotSold.isNotEmpty()) {
                     itemsNotSold.forEach { drop -> event.player.inventory.addItem(drop) }
@@ -81,13 +87,13 @@ object MiningMechanicsListeners : Listener {
         val itemInHand = event.player.inventory.itemInMainHand ?: return
 
         // make sure the item is a tool
-        if (!isTool(itemInHand)) {
+        if (!MechanicsModule.isTool(itemInHand)) {
             return
         }
 
         val user = UserHandler.getUser(event.player.uniqueId)
         val ignoredBlocks = MechanicsModule.getDropsToInvIgnoredBlocks()
-        val validBlocks = event.blockList.filter { !ignoredBlocks.contains(it.type) && (event.yield == 100F || SPLITTABLE_RANDOM.nextInt(100) < event.yield) }
+        val validBlocks = event.blockList.filter { !ignoredBlocks.contains(it.type) && (event.yield == 100F || Random.nextInt(100) < event.yield) }
 
         val drops = arrayListOf<ItemStack>()
         for (block in validBlocks) {
@@ -100,8 +106,10 @@ object MiningMechanicsListeners : Listener {
             block.state.update()
         }
 
+        val region = RegionsModule.findRegion(event.block.location)
+
         Tasks.async {
-            if (user.perks.isAutoSellEnabled(event.player)) {
+            if (region.supportsAutoSell() && user.perks.isAutoSellEnabled(event.player)) {
                 try {
                     val itemsNotSold = ShopHandler.sellItems(event.player, drops)
                     if (itemsNotSold.isNotEmpty()) {
@@ -119,10 +127,6 @@ object MiningMechanicsListeners : Listener {
 
     private fun isGlass(type: Material): Boolean {
         return type == Material.GLASS || type == Material.STAINED_GLASS || type == Material.STAINED_GLASS_PANE
-    }
-
-    private fun isTool(itemStack: ItemStack?): Boolean {
-        return itemStack != null && itemStack.type != Material.AIR && TOOL_IDS.contains(itemStack.type.ordinal)
     }
 
     private fun getBlockDrops(itemInHand: ItemStack, user: User, player: Player, block: Block): MutableList<ItemStack> {
@@ -143,8 +147,8 @@ object MiningMechanicsListeners : Listener {
         }
 
         val autoSmeltEnabled = UsersModule.isAutoSmeltPerkEnabledByDefault() || user.perks.isPerkEnabled(Perk.AUTO_SMELT) && user.perks.hasPerk(player, Perk.AUTO_SMELT)
-        val region = Regions.findRegion(block.location)
-        val useFortune = region != null && region.supportsEnchants() && itemInHand.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)
+        val region = RegionsModule.findRegion(block.location)
+        val useFortune = region.supportsAbilityEnchants() && itemInHand.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)
 
         val dropsIterator = drops.iterator()
         while (dropsIterator.hasNext()) {
@@ -237,7 +241,5 @@ object MiningMechanicsListeners : Listener {
             1
         }
     }
-
-    private val TOOL_IDS = arrayListOf(255, 256, 257, 260, 268, 269, 270, 272, 274, 276, 277, 278, 283, 284, 285, 358)
 
 }

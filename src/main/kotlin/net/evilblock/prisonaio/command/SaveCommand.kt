@@ -1,7 +1,14 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.cubed.error.ErrorHandler
+import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.util.Permissions
@@ -19,10 +26,6 @@ object SaveCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender) {
-        PrisonAIO.instance.systemLog("Saving data...")
-
-        val startAt = System.currentTimeMillis()
-
         for (world in Bukkit.getWorlds()) {
             try {
                 Tasks.sync {
@@ -40,10 +43,6 @@ object SaveCommand {
         }
 
         PrisonAIO.instance.saveModules()
-
-        val endAt = System.currentTimeMillis()
-
-        PrisonAIO.instance.systemLog("Finished saving data in ${endAt - startAt}ms!")
     }
 
 }

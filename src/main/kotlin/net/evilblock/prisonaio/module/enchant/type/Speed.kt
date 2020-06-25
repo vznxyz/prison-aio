@@ -1,6 +1,15 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
@@ -25,7 +34,14 @@ object Speed : AbstractEnchant("speed", "Speed", 10) {
     }
 
     override fun onHold(player: Player, item: ItemStack?, level: Int) {
-        player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, Int.MAX_VALUE, level - 1))
+        if (Bukkit.isPrimaryThread()) {
+            player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, Int.MAX_VALUE, level - 1))
+        } else {
+            Tasks.sync {
+                player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, Int.MAX_VALUE, level - 1))
+            }
+        }
+
         player.isSprinting = true
     }
 

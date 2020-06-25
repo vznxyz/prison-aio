@@ -1,12 +1,17 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mine
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.mine.command.*
 import net.evilblock.prisonaio.module.mine.command.parameter.MineParameterType
-import net.evilblock.prisonaio.module.mine.listener.MineEventEmitterListeners
 import net.evilblock.prisonaio.module.mine.listener.MineInventoryListeners
-import net.evilblock.prisonaio.module.mine.listener.MineWandListeners
 import net.evilblock.prisonaio.module.mine.task.MineEffectsTask
 import net.evilblock.prisonaio.module.mine.task.MineResetTask
 import org.bukkit.event.Listener
@@ -45,21 +50,19 @@ object MinesModule : PluginModule() {
             MineSetRegionCommand::class.java,
             MineSetSpawnCommand::class.java,
             MineListCommand::class.java,
-            MineWandCommand::class.java
+            MineTeleportCommand::class.java
         )
     }
 
     override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
         return mapOf(
-            Mine::class.java to MineParameterType
+            Mine::class.java to MineParameterType()
         )
     }
 
     override fun getListeners(): List<Listener> {
         return listOf(
-            MineEventEmitterListeners,
-            MineInventoryListeners,
-            MineWandListeners
+            MineInventoryListeners
         )
     }
 

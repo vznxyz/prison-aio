@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mechanic.listener
 
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
@@ -14,7 +21,7 @@ object DisableAnvilMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onCraftAnvil(event: CraftItemEvent) {
         if (MechanicsModule.areAnvilMechanicsDisabled()) {
-            if (event.recipe.result.type === Material.ANVIL) {
+            if (event.recipe.result.type == Material.ANVIL) {
                 event.isCancelled = true
             }
         }
@@ -23,11 +30,11 @@ object DisableAnvilMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onInteractAnvil(event: PlayerInteractEvent) {
         if (MechanicsModule.areAnvilMechanicsDisabled()) {
-            if (event.action !== Action.RIGHT_CLICK_BLOCK) {
+            if (event.action != Action.RIGHT_CLICK_BLOCK) {
                 return
             }
 
-            if (event.clickedBlock.type === Material.ANVIL) {
+            if (event.clickedBlock.type == Material.ANVIL) {
                 event.isCancelled = true
             }
         }
@@ -36,7 +43,7 @@ object DisableAnvilMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onPlaceAnvil(event: BlockPlaceEvent) {
         if (MechanicsModule.areAnvilMechanicsDisabled()) {
-            if (event.block.type === Material.ANVIL) {
+            if (event.block.type == Material.ANVIL) {
                 event.isCancelled = true
             }
         }

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.bank
 
 import net.evilblock.cubed.util.bukkit.HiddenLore
@@ -32,6 +39,14 @@ data class BankNote(val uuid: UUID = UUID.randomUUID(),
                 "${ChatColor.GRAY}its value into your account."
             ))
             .build()
+    }
+
+    fun getPlainFormat(): String {
+        return if (useTokens) {
+            "${value.toLong()} tokens"
+        } else {
+            "$${value}"
+        }
     }
 
     fun getFormattedValue(): String {

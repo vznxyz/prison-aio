@@ -1,8 +1,15 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
-import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.cell.CellHandler
 import net.evilblock.prisonaio.module.cell.CellsModule
 import org.bukkit.ChatColor
@@ -43,7 +50,7 @@ object CellCreateCommand {
 
         try {
             CellHandler.createNewCell(player.uniqueId, name) { cell ->
-                PrisonAIO.instance.server.scheduler.runTask(PrisonAIO.instance) {
+                Tasks.sync {
                     CellHandler.attemptJoinSession(player, cell)
                     player.sendMessage("${ChatColor.GREEN}You are now the owner of this cell. Use ${ChatColor.YELLOW}/cell home ${ChatColor.GREEN}to teleport back to your cell.")
                 }

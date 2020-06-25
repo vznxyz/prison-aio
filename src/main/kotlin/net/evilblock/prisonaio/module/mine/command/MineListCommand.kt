@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mine.command
 
 import net.evilblock.cubed.command.Command
@@ -10,7 +17,8 @@ object MineListCommand {
     @Command(
         names = ["mine list"],
         description = "Lists all of the mine IDs",
-        permission = "op"
+        permission = "op",
+        async = true
     )
     @JvmStatic
     fun execute(sender: CommandSender) {

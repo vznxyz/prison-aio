@@ -1,9 +1,17 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.progress
 
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.prisonaio.module.battlepass.tier.Tier
 import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
+import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.serialize.ChallengeListReferenceSerializer
 import net.evilblock.prisonaio.module.battlepass.challenge.serialize.RewardListReferenceSerializer
 import net.evilblock.prisonaio.module.battlepass.tier.reward.Reward
@@ -53,6 +61,11 @@ class BattlePass(@Transient var user: User) {
     }
 
     fun completeChallenge(challenge: Challenge) {
+        if (challenge.daily) {
+            DailyChallengeHandler.getSession().getProgress(user.uuid).completeChallenge(challenge)
+            return
+        }
+
         completedChallenges.add(challenge)
         experience += challenge.rewardXp
         user.requiresSave = true

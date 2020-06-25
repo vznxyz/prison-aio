@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.command
 
 import net.evilblock.cubed.command.Command
@@ -9,7 +16,7 @@ import org.bukkit.entity.Player
 object EnchantCommand {
 
     @Command(
-        names = ["enchant", "ench"],
+        names = ["enchant", "ench", "upgrade"],
         description = "Enchant your pickaxe"
     )
     @JvmStatic
@@ -19,6 +26,7 @@ object EnchantCommand {
             return
         }
 
+        EnchantsManager.handleItemSwitch(player, player.inventory.itemInMainHand, null)
         PurchaseEnchantMenu(player.inventory.itemInMainHand).openMenu(player)
     }
 

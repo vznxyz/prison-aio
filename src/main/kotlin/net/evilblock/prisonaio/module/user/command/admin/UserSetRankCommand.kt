@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.command.admin
 
 import net.evilblock.cubed.command.Command
@@ -17,7 +24,7 @@ object UserSetRankCommand {
     @Command(
         names = ["user setrank"],
         description = "Update a user's rank",
-        permission = Permissions.USERS_ADMIN,
+        permission = "prisonaio.user.rank.set",
         async = true
     )
     @JvmStatic

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mine
 
 import com.google.common.base.Charsets
@@ -8,8 +15,7 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
-import net.evilblock.prisonaio.module.mine.util.CoordsIntPair
-import org.bukkit.Location
+import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.entity.Player
 import java.io.File
 import java.util.*
@@ -19,7 +25,6 @@ import kotlin.collections.HashMap
 object MineHandler : PluginHandler {
 
     private val minesMap: HashMap<String, Mine> = hashMapOf()
-    private var coordsMap: HashMap<CoordsIntPair, Mine> = hashMapOf()
 
     override fun getModule(): PluginModule {
         return MinesModule
@@ -31,29 +36,6 @@ object MineHandler : PluginHandler {
 
     override fun getInternalDataFile(): File {
         return File(File(PrisonAIO.instance.dataFolder, "internal"), "mines.json")
-    }
-
-    /**
-     * Recalculates the coordinates -> mine map, which is used as a processing efficient method of determining if a location (coordinate pair) is part of a mine's region.
-     */
-    fun recalculateCoordsMap() {
-        val map = hashMapOf<CoordsIntPair, Mine>()
-
-        for (mine in minesMap.values) {
-            if (mine.region != null) {
-                val region = mine.region!!
-
-                for (x in region.lowerX..region.upperX) {
-                    for (y in region.lowerY..region.upperY) {
-                        for (z in region.lowerZ..region.upperZ) {
-                            map[CoordsIntPair(Location(region.world, x.toDouble(), y.toDouble(), z.toDouble()))] = mine
-                        }
-                    }
-                }
-            }
-        }
-
-        coordsMap = map
     }
 
     override fun initialLoad() {
@@ -69,11 +51,11 @@ object MineHandler : PluginHandler {
             }
         }
 
-        recalculateCoordsMap()
-
         Tasks.async {
             for (mine in minesMap.values) {
-                if (mine.region != null) {
+                RegionsModule.updateBlockCache(mine)
+
+                if (mine.region != null && mine.blocksConfig.blockTypes.isNotEmpty()) {
                     mine.resetRegion()
                 }
             }
@@ -81,6 +63,8 @@ object MineHandler : PluginHandler {
     }
 
     override fun saveData() {
+        super.saveData()
+
         Files.write(Cubed.gson.toJson(minesMap), getInternalDataFile(), Charsets.UTF_8)
     }
 
@@ -92,18 +76,6 @@ object MineHandler : PluginHandler {
         return Optional.ofNullable(minesMap[id.toLowerCase()])
     }
 
-    fun getMineByLocation(location: Location): Optional<Mine> {
-        return getMineByLocation(CoordsIntPair(location))
-    }
-
-    fun getMineByLocation(coords: CoordsIntPair): Optional<Mine> {
-        val mine = coordsMap[coords]
-        if (mine != null) {
-            return Optional.of(mine)
-        }
-        return Optional.empty()
-    }
-
     fun createMine(id: String): Mine {
         val mine = Mine(id)
         minesMap[id.toLowerCase()] = mine
@@ -112,7 +84,6 @@ object MineHandler : PluginHandler {
 
     fun deleteMine(id: String) {
         minesMap.remove(id)
-        recalculateCoordsMap()
     }
 
     fun deleteMine(mine: Mine) {

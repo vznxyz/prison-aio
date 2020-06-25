@@ -1,14 +1,23 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.privatemine
 
+import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.lite.LiteEdit
 import net.evilblock.cubed.lite.LiteRegion
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import net.evilblock.prisonaio.module.mechanic.region.Region
 import net.evilblock.prisonaio.module.privatemine.data.PrivateMineBlockData
 import net.evilblock.prisonaio.module.privatemine.data.PrivateMineTier
+import net.evilblock.prisonaio.module.privatemine.serializer.TierReferenceSerializer
+import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.minecraft.server.v1_12_R1.IBlockData
@@ -23,16 +32,16 @@ import kotlin.collections.HashSet
 class PrivateMine(
     val gridIndex: Int,
     val owner: UUID,
-    val tier: PrivateMineTier,
+    @JsonAdapter(TierReferenceSerializer::class) val tier: PrivateMineTier,
     val spawnPoint: Location,
-    val cuboid: Cuboid,
+    private val cuboid: Cuboid,
     val innerCuboid: Cuboid
 ) : Region {
 
     /**
      * The sales tax of this mine, which is applied when visiting players sell to a shop.
      */
-    var salesTax: Double = tier.salesTaxRange.minimumDouble
+    var salesTax: Double = tier.salesTaxRange.maximumDouble
 
     /**
      * Players that have been whitelisted and can visit this mine at any time.
@@ -61,19 +70,35 @@ class PrivateMine(
         return "${getOwnerName()}'s Private Mine (Tier ${tier})"
     }
 
-    override fun getBreakableRegion(): Cuboid? {
+    override fun getCuboid(): Cuboid {
+        return cuboid
+    }
+
+    override fun is3D(): Boolean {
+        return false
+    }
+
+    override fun getBreakableCuboid(): Cuboid? {
         return innerCuboid
     }
 
-    override fun resetBreakableRegion() {
+    override fun resetBreakableCuboid() {
         resetRegion()
     }
 
-    override fun supportsEnchants(): Boolean {
+    override fun supportsAbilityEnchants(): Boolean {
+        return true
+    }
+
+    override fun supportsPassiveEnchants(): Boolean {
         return true
     }
 
     override fun supportsRewards(): Boolean {
+        return true
+    }
+
+    override fun supportsAutoSell(): Boolean {
         return true
     }
 

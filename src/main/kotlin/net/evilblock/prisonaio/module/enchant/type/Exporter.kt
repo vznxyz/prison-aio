@@ -1,11 +1,18 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
 import net.evilblock.cubed.util.TimeUtil.formatIntoDetailedString
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
+import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
-import net.evilblock.prisonaio.module.mechanic.region.Regions
 import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
@@ -50,8 +57,8 @@ object Exporter : AbstractEnchant("exporter", "Exporter", 3) {
      */
     override fun onInteract(event: PlayerInteractEvent, enchantedItem: ItemStack, level: Int) {
         val isRightClick = event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK
-        val miningRegion = Regions.findRegion(event.player.location)
-        if (isRightClick && miningRegion != null) {
+        val miningRegion = RegionsModule.findRegion(event.player.location)
+        if (isRightClick && miningRegion.supportsAbilityEnchants()) {
             val cooldownMap = readLevelToCooldownMap()
 
             val cooldown: Int = cooldownMap.getOrElse(level) {

@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.privatemine
 
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.privatemine.command.*
 import net.evilblock.prisonaio.module.privatemine.task.PrivateMineResetTask
-import net.evilblock.prisonaio.module.privatemine.data.PrivateMineTier
 import net.evilblock.prisonaio.module.privatemine.listener.*
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
@@ -25,6 +31,8 @@ object PrivateMinesModule : PluginModule() {
     }
 
     override fun onReload() {
+        super.onReload()
+
         PrivateMineHandler.loadConfig()
     }
 

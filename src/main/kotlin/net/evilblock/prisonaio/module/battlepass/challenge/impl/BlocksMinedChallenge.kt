@@ -1,9 +1,17 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.challenge.impl
 
 import net.evilblock.cubed.util.ProgressBarBuilder
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeType
+import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
@@ -29,10 +37,18 @@ class BlocksMinedChallenge(id: String, internal var blocksMined: Int) : Challeng
     }
 
     override fun getProgressText(player: Player, user: User): String {
-        val percentage = ProgressBarBuilder.percentage(user.statistics.getBlocksMined(), blocksMined)
+        val value = if (daily) {
+            DailyChallengeHandler.getSession().getProgress(player.uniqueId).getBlocksMined()
+        } else {
+            user.statistics.getBlocksMined()
+        }
+
+        val percentage = ProgressBarBuilder.percentage(value, blocksMined)
+
         val progressColor = ProgressBarBuilder.colorPercentage(percentage)
         val progressBar = ProgressBarBuilder().build(percentage)
-        return "${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}($progressColor$percentage%${ChatColor.GRAY})"
+
+        return "${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}($progressColor${DECIMAL_FORMAT.format(percentage)}%${ChatColor.GRAY})"
     }
 
     override fun getType(): ChallengeType {

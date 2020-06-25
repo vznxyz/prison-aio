@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
 import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
-import net.evilblock.prisonaio.module.mechanic.region.Region
+import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Color
@@ -30,7 +37,7 @@ object JackHammer : AbstractEnchant("jack-hammer", "Jack Hammer", 5000) {
     }
 
     override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
-        if (!region.supportsEnchants() || region.getBreakableRegion() == null) {
+        if (!region.supportsAbilityEnchants() || region.getBreakableCuboid() == null) {
             return
         }
 
@@ -39,24 +46,18 @@ object JackHammer : AbstractEnchant("jack-hammer", "Jack Hammer", 5000) {
             val blocks: MutableList<Block> = ArrayList()
 
             // get all blocks in mine region that are on the same y as the original block broken
-            for (block in region.getBreakableRegion()!!) {
-                if (block.location.blockY == event.block.location.blockY) {
-                    blocks.add(block)
+            for (x in region.getBreakableCuboid()!!.lowerX..region.getBreakableCuboid()!!.upperX) {
+                for (z in region.getBreakableCuboid()!!.lowerZ..region.getBreakableCuboid()!!.upperZ) {
+                    blocks.add(region.getBreakableCuboid()!!.world.getBlockAt(x, event.block.location.blockY, z))
                 }
             }
 
             // broadcast multi block break
-            val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100f)
+            val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100F)
             Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
 
             if (multiBlockBreakEvent.isCancelled) {
                 return
-            }
-
-            // simulate block breaking
-            for (block in blocks) {
-                block.type = Material.AIR
-                block.state.update()
             }
 
             // send notification

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.command
 
 import net.evilblock.cubed.command.Command
@@ -13,7 +20,11 @@ import org.bukkit.inventory.ItemStack
 
 object PickaxeCommand {
 
-    @Command(names = ["pickaxe", "pick"], description = "Spawn a pickaxe with enchantments pre-applied", permission = "op")
+    @Command(
+        names = ["pickaxe", "pick"],
+        description = "Spawn a pickaxe with enchantments pre-applied",
+        permission = "prisonaio.enchants.pickaxe"
+    )
     @JvmStatic
     fun execute(
         sender: CommandSender,

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mechanic.listener
 
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
@@ -8,6 +15,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 
 object VanillaMechanicsListeners : Listener {
@@ -46,10 +54,18 @@ object VanillaMechanicsListeners : Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     fun onPlayerItemDamageEvent(event: PlayerItemDamageEvent) {
-        if (MechanicsModule.isItemDamageDisabled()) {
+        if (MechanicsModule.isItemDamageDisabled() && MechanicsModule.isTool(event.item)) {
             event.isCancelled = true
+            event.player.updateInventory()
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun onPlayerItemBreakEvent(event: PlayerItemBreakEvent) {
+        if (MechanicsModule.isItemDamageDisabled() && MechanicsModule.isTool(event.brokenItem)) {
+            event.brokenItem.durability = event.brokenItem.type.maxDurability
             event.player.updateInventory()
         }
     }

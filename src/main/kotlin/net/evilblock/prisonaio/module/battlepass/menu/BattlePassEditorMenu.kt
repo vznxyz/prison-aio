@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.menu
 
 import net.evilblock.cubed.menu.Button
@@ -5,6 +12,7 @@ import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.prisonaio.module.battlepass.challenge.menu.ChallengeEditorMenu
+import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.tier.menu.TierEditorMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -56,8 +64,10 @@ class BattlePassEditorMenu : Menu() {
             if (clickType.isLeftClick) {
                 ConfirmMenu("Reset Daily Challenges?") { confirmed ->
                     if (confirmed) {
+                        DailyChallengeHandler.newSession()
+                        DailyChallengeHandler.saveData()
+
                         player.sendMessage("${ChatColor.GREEN}You have reset the BattlePass's daily challenges!")
-                        // TODO: reset daily challenges
                     }
 
                     openMenu(player)

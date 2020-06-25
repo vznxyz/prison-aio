@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.command.admin
 
 import net.evilblock.cubed.command.Command
@@ -21,7 +28,7 @@ object GrantPerkCommand {
     @Command(
         names = ["user perks grant"],
         description = "Grant a user a perk",
-        permission = Permissions.USERS_ADMIN,
+        permission = "prisonaio.user.perks.grant",
         async = true
     )
     @JvmStatic

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell.command
 
 import net.evilblock.cubed.Cubed
@@ -17,7 +24,7 @@ object CellKickCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "player") playerUuid: UUID) {
-        val cell = CellHandler.getAssumedCell(playerUuid)
+        val cell = CellHandler.getAssumedCell(player.uniqueId)
         if (cell == null) {
             player.sendMessage("${ChatColor.RED}You must be inside a cell to kick a player from it.")
             return
@@ -30,11 +37,6 @@ object CellKickCommand {
 
         if (player.uniqueId == playerUuid) {
             player.sendMessage("${ChatColor.RED}You can't kick yourself from the cell.")
-            return
-        }
-
-        if (cell.isOwner(playerUuid)) {
-            player.sendMessage("${ChatColor.RED}You can't kick the owner from their own cell.")
             return
         }
 

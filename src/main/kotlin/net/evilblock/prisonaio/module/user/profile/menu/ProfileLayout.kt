@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.profile.menu
 
 import net.evilblock.cubed.menu.Button
@@ -9,7 +16,7 @@ import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileCommentsMenu
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileStatisticsMenu
-import net.evilblock.prisonaio.module.user.setting.UserSettingsMenu
+import net.evilblock.prisonaio.module.user.setting.menu.UserSettingsMenu
 import net.evilblock.prisonaio.util.Constants
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor

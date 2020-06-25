@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.command
 
 import net.evilblock.cubed.command.Command
@@ -22,9 +29,21 @@ object BattlePassSetPremiumCommand {
         UserHandler.saveUser(user)
 
         if (premium) {
-            sender.sendMessage("${ChatColor.GREEN}You have granted ${ChatColor.YELLOW}${user.getUsername()} ${ChatColor.GREEN}the Premium BattlePass.")
+            val player = user.getPlayer()
+            if (player != null) {
+                player.sendMessage("")
+                player.sendMessage(" ${ChatColor.GOLD}${ChatColor.BOLD}BattlePass Upgraded")
+                player.sendMessage(" ${ChatColor.GRAY}Your BattlePass is now Premium! This means you")
+                player.sendMessage(" ${ChatColor.GRAY}now have access to all of the premium challenges")
+                player.sendMessage(" ${ChatColor.GRAY}and their rewards! Use `/bp` to view new challenges.")
+                player.sendMessage("")
+            }
+        }
+
+        if (premium) {
+            sender.sendMessage("${ChatColor.GREEN}You have granted ${ChatColor.WHITE}${user.getUsername()} ${ChatColor.GREEN}the Premium BattlePass.")
         } else {
-            sender.sendMessage("${ChatColor.GREEN}You have revoked ${ChatColor.YELLOW}${user.getUsername()}${ChatColor.GREEN}'s Premium BattlePass.")
+            sender.sendMessage("${ChatColor.GREEN}You have revoked ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s Premium BattlePass.")
         }
     }
 

@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user
 
 import com.mongodb.BasicDBObject
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.ReplaceOptions
 import net.evilblock.cubed.Cubed
-import net.evilblock.cubed.error.ErrorHandler
+import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.storage.StorageModule
@@ -38,6 +45,8 @@ object UserHandler : PluginHandler {
     }
 
     override fun saveData() {
+        super.saveData()
+
         for (user in getUsers()) {
             if (user.requiresSave()) {
                 saveUser(user)

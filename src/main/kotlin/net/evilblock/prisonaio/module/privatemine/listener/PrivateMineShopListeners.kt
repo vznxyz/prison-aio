@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.privatemine.listener
 
 import net.evilblock.cubed.util.hook.VaultHook
@@ -22,13 +29,16 @@ object PrivateMineShopListeners : Listener {
         // ignore if the player owns the mine
         if (event.player.uniqueId != currentMine.owner) {
             val mineOwner = Bukkit.getOfflinePlayer(currentMine.owner)
-            val salesTax = event.getSellCost() / currentMine.salesTax
 
-            currentMine.moneyGained += salesTax.toLong()
+            if (currentMine.salesTax.coerceAtLeast(0.0) != 0.0) {
+                val taxedMoney = event.getSellCost() / currentMine.salesTax
 
-            VaultHook.useEconomy { economy ->
-                economy.withdrawPlayer(event.player, salesTax)
-                economy.depositPlayer(mineOwner, salesTax)
+                currentMine.moneyGained += taxedMoney.toLong()
+
+                VaultHook.useEconomy { economy ->
+                    economy.withdrawPlayer(event.player, taxedMoney)
+                    economy.depositPlayer(mineOwner, taxedMoney)
+                }
             }
         }
     }

@@ -1,10 +1,16 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
-import net.evilblock.prisonaio.module.mechanic.region.Region
+import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.event.block.BlockBreakEvent
@@ -31,7 +37,7 @@ object Cubed : AbstractEnchant("cubed", "Cubed", 3) {
                     val block = Location(l.world, x.toDouble(), y.toDouble(), z.toDouble())
                     val type = block.block.type
                     if (type != Material.ENDER_CHEST && type != Material.BEDROCK && type != Material.AIR) {
-                        if (region.getBreakableRegion() != null && region.getBreakableRegion()!!.contains(block.block) && WorldGuardPlugin.inst().canBuild(event.player, block)) {
+                        if (region.getBreakableCuboid() != null && region.getBreakableCuboid()!!.contains(block.block)) {
                             blocks.add(block.block)
                         }
                     }
@@ -46,17 +52,12 @@ object Cubed : AbstractEnchant("cubed", "Cubed", 3) {
         val cubedNerf = readNerf()
 
         val yield = if (level <= cubedNerf.size && level > 0) {
-            cubedNerf[level - 1]
+            cubedNerf.sorted()[level - 1]
         } else {
             100f
         }
 
-        val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, `yield`)
-        Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
-
-        for (block in blocks) {
-            block.setType(Material.AIR, false)
-        }
+        MultiBlockBreakEvent(event.player, event.block, blocks, `yield`).call()
     }
 
     override fun getCost(level: Int): Long {

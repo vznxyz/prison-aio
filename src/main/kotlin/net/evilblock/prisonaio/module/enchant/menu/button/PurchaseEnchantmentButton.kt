@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.menu.button
 
 import net.evilblock.cubed.menu.Button
@@ -22,7 +29,7 @@ import java.util.*
 class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private val enchant: AbstractEnchant) : Button() {
 
     override fun getName(player: Player): String {
-        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxe)
+        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.readEnchantsFromLore(parent.pickaxe)
         val currentLevel = enchants[enchant] ?: 0
         return if (currentLevel >= enchant.maxLevel) {
             ChatColor.GREEN.toString() + ChatColor.BOLD + enchant.strippedEnchant
@@ -34,7 +41,7 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
 
     override fun getDescription(player: Player): List<String> {
         val user = UserHandler.getUser(player.uniqueId)
-        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxe)
+        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.readEnchantsFromLore(parent.pickaxe)
         val currentLevel = enchants[enchant] ?: 0
         val nextLevel = currentLevel + 1
 
@@ -75,7 +82,7 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
     }
 
     override fun applyMetadata(player: Player, itemMeta: ItemMeta): ItemMeta? {
-        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxe)
+        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.readEnchantsFromLore(parent.pickaxe)
 
         // add glow to item if the player has maxed out this enchantment
         val currentLevel = enchants[enchant] ?: 0
@@ -100,7 +107,7 @@ class PurchaseEnchantmentButton(private val parent: PurchaseEnchantMenu, private
 
     override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
         val user = UserHandler.getUser(player.uniqueId)
-        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.getEnchants(parent.pickaxe)
+        val enchants: Map<AbstractEnchant, Int> = EnchantsManager.readEnchantsFromLore(parent.pickaxe)
         val currentLevel = enchants[enchant] ?: 0
         val nextLevel = currentLevel + 1
 

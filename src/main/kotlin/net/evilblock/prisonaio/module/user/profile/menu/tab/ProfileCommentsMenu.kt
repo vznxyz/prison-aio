@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.profile.menu.tab
 
 import net.evilblock.cubed.Cubed
@@ -27,7 +34,7 @@ class ProfileCommentsMenu(user: User) : PaginatedProfileLayoutMenu(layout = Prof
         val buttons = hashMapOf<Int, Button>()
 
         if (!layout.user.hasPostedProfileComment(player.uniqueId)) {
-            val allowingComments = layout.user.getSettingOption<CommentsRestrictionOption>(UserSetting.PROFILE_COMMENTS_RESTRICTION).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
+            val allowingComments = (layout.user.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
             if (allowingComments) {
                 buttons[0] = AddCommentButton()
             } else {
@@ -35,7 +42,7 @@ class ProfileCommentsMenu(user: User) : PaginatedProfileLayoutMenu(layout = Prof
             }
         }
 
-        layout.user.getProfileComments().sortedBy { it.createdAt }.forEach {
+        layout.user.getProfileComments().sortedByDescending { it.createdAt }.forEach {
             buttons[buttons.size] = CommentButton(it)
         }
 
@@ -74,7 +81,7 @@ class ProfileCommentsMenu(user: User) : PaginatedProfileLayoutMenu(layout = Prof
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                val allowingComments = layout.user.getSettingOption<CommentsRestrictionOption>(UserSetting.PROFILE_COMMENTS_RESTRICTION).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
+                val allowingComments = (layout.user.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
                 if (allowingComments && !layout.user.hasPostedProfileComment(player.uniqueId)) {
                     EzPrompt.Builder()
                         .promptText("${ChatColor.GREEN}Please type the message you'd like to post on ${layout.user.getUsername()}'s profile. ${ChatColor.GRAY}(Limited to 120 characters)")

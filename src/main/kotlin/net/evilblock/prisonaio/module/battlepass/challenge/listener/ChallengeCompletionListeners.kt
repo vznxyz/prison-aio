@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.challenge.listener
 
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -20,6 +27,14 @@ object ChallengeCompletionListeners : Listener {
         Tasks.async {
             val user = UserHandler.getUser(event.player.uniqueId)
             for (challenge in ChallengeHandler.getChallenges()) {
+                if (challenge.daily) {
+                    continue
+                }
+
+                if (!user.battlePassData.isPremium()) {
+                    continue
+                }
+
                 if (user.battlePassData.hasCompletedChallenge(challenge)) {
                     continue
                 }
@@ -37,6 +52,14 @@ object ChallengeCompletionListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onAsyncPlayTimeSyncEvent(event: AsyncPlayTimeSyncEvent) {
         for (challenge in ChallengeHandler.getChallenges()) {
+            if (challenge.daily) {
+                continue
+            }
+
+            if (!event.user.battlePassData.isPremium()) {
+                continue
+            }
+
             if (event.user.battlePassData.hasCompletedChallenge(challenge)) {
                 continue
             }
@@ -55,6 +78,14 @@ object ChallengeCompletionListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onAsyncPlayerPrestigeEvent(event: AsyncPlayerPrestigeEvent) {
         for (challenge in ChallengeHandler.getChallenges()) {
+            if (challenge.daily) {
+                continue
+            }
+
+            if (!event.user.battlePassData.isPremium()) {
+                continue
+            }
+
             if (event.user.battlePassData.hasCompletedChallenge(challenge)) {
                 continue
             }
@@ -73,6 +104,14 @@ object ChallengeCompletionListeners : Listener {
             val user = UserHandler.getUser(event.player.uniqueId)
 
             for (challenge in ChallengeHandler.getChallenges()) {
+                if (challenge.daily) {
+                    continue
+                }
+
+                if (!user.battlePassData.isPremium()) {
+                    continue
+                }
+
                 if (user.battlePassData.hasCompletedChallenge(challenge)) {
                     continue
                 }
@@ -92,6 +131,14 @@ object ChallengeCompletionListeners : Listener {
             val user = UserHandler.getUser(event.player.uniqueId)
 
             for (challenge in ChallengeHandler.getChallenges()) {
+                if (challenge.daily) {
+                    continue
+                }
+
+                if (!user.battlePassData.isPremium()) {
+                    continue
+                }
+
                 if (user.battlePassData.hasCompletedChallenge(challenge)) {
                     continue
                 }

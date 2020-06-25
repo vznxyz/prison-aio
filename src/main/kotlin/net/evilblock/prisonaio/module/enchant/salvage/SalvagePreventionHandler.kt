@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.salvage
 
 import com.google.common.base.Charsets
@@ -43,6 +50,8 @@ object SalvagePreventionHandler : PluginHandler {
     }
 
     override fun saveData() {
+        super.saveData()
+
         Files.write(Cubed.gson.toJson(pickaxes), getInternalDataFile(), Charsets.UTF_8)
     }
 
@@ -59,7 +68,7 @@ object SalvagePreventionHandler : PluginHandler {
     }
 
     fun getSalvageableLevels(itemStack: ItemStack): Map<AbstractEnchant, Int> {
-        val enchants = EnchantsManager.getEnchants(itemStack).toMutableMap()
+        val enchants = EnchantsManager.readEnchantsFromLore(itemStack).toMutableMap()
         if (enchants.isEmpty()) {
             return emptyMap()
         }
@@ -76,7 +85,7 @@ object SalvagePreventionHandler : PluginHandler {
             return enchants
         }
 
-        val matchingPickaxeEnchants = EnchantsManager.getEnchants(matchingPickaxe)
+        val matchingPickaxeEnchants = EnchantsManager.readEnchantsFromLore(matchingPickaxe)
 
         for ((enchant, level) in enchants.toMap()) {
             if (matchingPickaxeEnchants.containsKey(enchant)) {

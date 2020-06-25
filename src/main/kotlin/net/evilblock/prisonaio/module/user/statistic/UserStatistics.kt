@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.statistic
 
 import net.evilblock.prisonaio.module.mine.Mine
@@ -22,15 +29,20 @@ class UserStatistics(@Transient internal var user: User) {
     private var playTime: Long = 0L
 
     /**
+     * This user's kills count.
+     */
+    private var kills: Int = 0
+
+    /**
+     * This user's deaths count.
+     */
+    private var deaths: Int = 0
+
+    /**
      * The timestamp that the user logged into the server, if currently logged in.
      */
     @Transient
     internal var lastPlayTimeSync: Long = 0L
-
-    fun addBlocksMined(amount: Int) {
-        blocksMined += amount
-        user.requiresSave = true
-    }
 
     fun getBlocksMined(): Int {
         return blocksMined
@@ -41,14 +53,24 @@ class UserStatistics(@Transient internal var user: User) {
         user.requiresSave = true
     }
 
-    fun addBlocksMinedAtMine(mine: Mine, amount: Int) {
-        val previous = blocksMinedAtMines.getOrDefault(mine.id.toLowerCase(), 0)
-        blocksMinedAtMines[mine.id.toLowerCase()] = previous + amount
+    fun addBlocksMined(amount: Int) {
+        blocksMined += amount
         user.requiresSave = true
     }
 
     fun getBlocksMinedAtMine(mine: Mine): Int {
         return blocksMinedAtMines.getOrDefault(mine.id.toLowerCase(), 0)
+    }
+
+    fun setBlocksMinedAtMine(mine: Mine, amount: Int) {
+        blocksMinedAtMines[mine.id.toLowerCase()] = amount
+        user.requiresSave = true
+    }
+
+    fun addBlocksMinedAtMine(mine: Mine, amount: Int) {
+        val previous = blocksMinedAtMines.getOrDefault(mine.id.toLowerCase(), 0)
+        blocksMinedAtMines[mine.id.toLowerCase()] = previous + amount
+        user.requiresSave = true
     }
 
     fun syncPlayTime() {
@@ -70,6 +92,29 @@ class UserStatistics(@Transient internal var user: User) {
         } else {
             playTime + (System.currentTimeMillis() - lastPlayTimeSync)
         }
+    }
+
+    fun setPlayTime(time: Long) {
+        playTime = time
+        user.requiresSave = true
+    }
+
+    fun getKills(): Int {
+        return kills
+    }
+
+    fun addKill() {
+        kills++
+        user.requiresSave = true
+    }
+
+    fun getDeaths(): Int {
+        return deaths
+    }
+
+    fun addDeath() {
+        deaths++
+        user.requiresSave = true
     }
 
 }

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.privatemine
 
 import com.boydti.fawe.util.TaskManager
@@ -16,6 +23,7 @@ import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.privatemine.data.PrivateMineTier
 import net.evilblock.prisonaio.module.privatemine.entity.PrivateMineNpcEntity
+import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.*
 import org.bukkit.block.BlockFace
 import org.bukkit.block.Sign
@@ -49,6 +57,8 @@ object PrivateMineHandler : PluginHandler {
     }
 
     override fun saveData() {
+        super.saveData()
+
         saveGrid()
     }
 
@@ -87,18 +97,6 @@ object PrivateMineHandler : PluginHandler {
      */
     fun getAllMines(): Set<PrivateMine> {
         return HashSet(grid.values)
-    }
-
-    /**
-     * Gets the [PrivateMine] that the given [location] belongs to.
-     */
-    fun getMineByLocation(location: Location): Optional<PrivateMine> {
-        for (mine in grid.values) {
-            if (mine.cuboid.contains(location)) {
-                return Optional.of(mine)
-            }
-        }
-        return Optional.empty()
     }
 
     /**
@@ -225,6 +223,8 @@ object PrivateMineHandler : PluginHandler {
         }
 
         mine.resetRegion()
+
+        RegionsModule.updateBlockCache(mine)
     }
 
     /**

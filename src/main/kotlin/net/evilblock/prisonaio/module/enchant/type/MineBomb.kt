@@ -1,13 +1,19 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.event.MineBombExplodeEvent
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
-import net.evilblock.prisonaio.module.mechanic.region.Regions
+import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
@@ -20,20 +26,21 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
+import kotlin.random.Random
 
 object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
 
     private const val COOLDOWN = 20 * 1000.toLong()
-    private val random = SplittableRandom()
+
+    private val lastFired = HashMap<UUID, Long>()
 
     init {
         PrisonAIO.instance.server.pluginManager.registerEvents(this, PrisonAIO.instance)
     }
-
-    private val lastFired = HashMap<UUID, Long>()
 
     override val iconColor: Color
         get() = Color.LIME
@@ -50,12 +57,17 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
         }
 
         if (!event.player.isOp && System.currentTimeMillis() - lastFired.getOrDefault(event.player.uniqueId, 0L) <= COOLDOWN) {
-            val remainingSeconds = ((System.currentTimeMillis() - lastFired[event.player.uniqueId]!!) / 1000).toInt()
+            val remainingSeconds = (((lastFired[event.player.uniqueId]!! + COOLDOWN) - System.currentTimeMillis()) / 1000.0).toInt()
             if (remainingSeconds < 30) {
                 event.isCancelled = true
                 sendMessage(event.player, "${ChatColor.RED}You can't use this ability for another " + TimeUtil.formatIntoDetailedString(remainingSeconds) + ".")
                 return
             }
+        }
+
+        val region = RegionsModule.findRegion(event.player.location)
+        if (!region.supportsAbilityEnchants() || region.getBreakableCuboid() == null) {
+            return
         }
 
         lastFired[event.player.uniqueId] = System.currentTimeMillis()
@@ -103,8 +115,8 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
 
         val player =  fireball.shooter as Player
 
-        val region = Regions.findRegion(location)
-        if (region == null || !region.supportsEnchants() || region.getBreakableRegion() == null) {
+        val region = RegionsModule.findRegion(location)
+        if (!region.supportsAbilityEnchants() || region.getBreakableCuboid() == null) {
             return
         }
 
@@ -120,11 +132,10 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
                     }
 
                     val dist = block.location.distance(location)
-                    if (dist <= level || dist <= largeRadius && 85.0 > random.nextDouble() * 100.0) {
+                    if (dist <= level || dist <= largeRadius && 85.0 > Random.nextDouble() * 100.0) {
                         if (block.location.distance(location) <= largeRadius && block.type != Material.ENDER_CHEST) {
-                            val inRegion = region.getBreakableRegion()!!.contains(block)
-                            val canBuild = WorldGuardPlugin.inst().canBuild(player, block)
-                            if (inRegion && canBuild) {
+                            val regionCriteria = region.supportsAbilityEnchants() && region.getBreakableCuboid() != null && region.getBreakableCuboid()!!.contains(block)
+                            if (regionCriteria) {
                                 blocks.add(block)
                             }
                         }
@@ -148,16 +159,18 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
 
         // broadcast multi block break event
         val multiBlockBreakEvent = MultiBlockBreakEvent(player, mineBombEvent.origin, blocks, 100F)
-        Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
+        multiBlockBreakEvent.call()
 
-        val particle = when {
-            level >= 3 -> Particle.EXPLOSION_HUGE
-            level >= 2 -> Particle.EXPLOSION_LARGE
-            else -> Particle.EXPLOSION_NORMAL
+        if (!multiBlockBreakEvent.isCancelled) {
+            val particle = when {
+                level >= 3 -> Particle.EXPLOSION_HUGE
+                level >= 2 -> Particle.EXPLOSION_LARGE
+                else -> Particle.EXPLOSION_NORMAL
+            }
+
+            // spawn the particle
+            location.world.spawnParticle(particle, location, 1)
         }
-
-        // spawn the particle
-        location.world.spawnParticle(particle, location, 1)
     }
 
     @EventHandler
@@ -184,6 +197,11 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
 
         val shooter = fireball.shooter as Player
         event.damager.sendMessage("${EnchantsManager.CHAT_PREFIX}You have stolen ${ChatColor.RED}${shooter.name}'s ${ChatColor.GRAY}mine bomb!")
+    }
+
+    @EventHandler
+    fun onPlayerQuitEvent(event: PlayerQuitEvent) {
+        lastFired.remove(event.player.uniqueId)
     }
 
     override fun getCost(level: Int): Long {

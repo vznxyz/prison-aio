@@ -4,10 +4,6 @@ help-messages:
   - "&eUse `/cell create` to create a new cell."
   - "{LONG_LINE}"
 
-global-region:
-  # If players can open enderchests in the global region
-  allow-open-enderchest: true
-
 vanilla-mechanics:
   # If fall damage is disabled
   disable-fall-damage: true

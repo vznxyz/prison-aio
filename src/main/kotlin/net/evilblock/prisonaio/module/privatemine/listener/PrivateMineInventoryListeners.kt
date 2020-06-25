@@ -1,6 +1,15 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.privatemine.listener
 
 import net.evilblock.prisonaio.module.privatemine.PrivateMineHandler
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.setting.UserSetting
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -13,14 +22,17 @@ object PrivateMineInventoryListeners : Listener {
      */
     @EventHandler
     fun onPlayerToggleSneakEvent(event: PlayerToggleSneakEvent) {
-        if (event.isSneaking) {
-            if (event.player.world == PrivateMineHandler.getGridWorld()) {
-                if (event.player.inventory.firstEmpty() == -1) {
-                    val currentMine = PrivateMineHandler.getCurrentMine(event.player)
+        val user = UserHandler.getUser(event.player.uniqueId)
+        if (user.getSettingOption(UserSetting.SNEAK_TO_TELEPORT).getValue()) {
+            if (event.isSneaking) {
+                if (event.player.world == PrivateMineHandler.getGridWorld()) {
+                    if (event.player.inventory.firstEmpty() == -1) {
+                        val currentMine = PrivateMineHandler.getCurrentMine(event.player)
                         if (currentMine != null) {
                             event.player.sendMessage("${ChatColor.YELLOW}You have been teleported to the mine's spawn because you pressed shift while having a full inventory.")
                             event.player.teleport(currentMine.spawnPoint)
                         }
+                    }
                 }
             }
         }

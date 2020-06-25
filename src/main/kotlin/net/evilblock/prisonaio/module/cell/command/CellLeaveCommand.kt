@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell.command
 
 import net.evilblock.cubed.Cubed
@@ -17,7 +24,7 @@ object CellLeaveCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        val visitingCell = CellHandler.getVisitingCell(player)
+        val visitingCell = CellHandler.getAssumedCell(player.uniqueId)
         if (visitingCell == null) {
             player.sendMessage("${ChatColor.RED}You must be inside a cell to leave it.")
             return

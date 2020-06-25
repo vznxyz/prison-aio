@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell.command
 
 import net.evilblock.cubed.Cubed
@@ -20,16 +27,22 @@ object CellInfoCommand {
     fun execute(sender: Player, @Param(name = "cell", defaultValue = "self") cell: Cell) {
         sender.sendMessage("${ChatColor.GRAY}${Constants.LONG_LINE}")
 
-        val ownerName = Cubed.instance.uuidCache.name(cell.owner)
-        sender.sendMessage("${ChatColor.RED}${ChatColor.BOLD}$ownerName's Cell ${ChatColor.GRAY}[${ChatColor.WHITE}${cell.getActiveMembers().size}${ChatColor.GRAY}/${cell.getMembers().size}]")
+        val playersOnline = "${ChatColor.GREEN}${cell.getActiveMembers().size}${ChatColor.GRAY}/${cell.getMembers().size}"
+        sender.sendMessage("${ChatColor.RED}${ChatColor.BOLD}${cell.name} ${ChatColor.GRAY}[$playersOnline]")
 
         val memberNames = cell.getMembers().map { uuid ->
             val username = Cubed.instance.uuidCache.name(uuid)
 
-            return@map if (Bukkit.getPlayer(uuid) == null) {
-                "${ChatColor.RED}$username"
+            val role = if (cell.isOwner(uuid)) {
+                "**"
             } else {
-                "${ChatColor.GREEN}$username"
+                ""
+            }
+
+            return@map if (Bukkit.getPlayer(uuid) == null) {
+                "${ChatColor.RED}$role$username"
+            } else {
+                "${ChatColor.GREEN}$role$username"
             }
         }
 

@@ -1,8 +1,16 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.cell.CellHandler
+import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -42,6 +50,8 @@ object CellDisbandCommand {
         }
 
         CellHandler.forgetCell(cell)
+        RegionsModule.clearBlockCache(cell)
+
         player.sendMessage("${ChatColor.GREEN}You have successfully disbanded your cell.")
     }
 

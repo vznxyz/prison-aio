@@ -1,6 +1,13 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mechanic.listener
 
-import net.evilblock.prisonaio.module.mechanic.region.bypass.RegionBypass
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority

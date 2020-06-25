@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.challenge
 
 import com.google.common.base.Charsets
@@ -9,9 +16,6 @@ import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.impl.*
-import net.evilblock.prisonaio.module.mine.MineHandler
-import net.evilblock.prisonaio.module.user.User
-import org.bukkit.ChatColor
 import java.io.File
 
 object ChallengeHandler : PluginHandler {
@@ -57,6 +61,8 @@ object ChallengeHandler : PluginHandler {
     }
 
     override fun saveData() {
+        super.saveData()
+
         Files.write(Cubed.gson.toJson(challenges.values, DATA_TYPE), getInternalDataFile(), Charsets.UTF_8)
     }
 
@@ -74,14 +80,6 @@ object ChallengeHandler : PluginHandler {
 
     fun forgetChallenge(challenge: Challenge) {
         challenges.remove(challenge.id.toLowerCase())
-    }
-
-    fun generateDailyChallenges(user: User) {
-        val dailyChallenges = arrayListOf<Challenge>()
-        dailyChallenges.add(BlocksMinedChallenge("daily-mine-5k-blocks", "${ChatColor.GOLD}${ChatColor.BOLD}Mine 5,000 Blocks", 5000, 5))
-        dailyChallenges.add(BlocksMinedChallenge("daily-mine-10k-blocks", "${ChatColor.GOLD}${ChatColor.BOLD}Mine 10,000 Blocks", 10000, 10))
-        dailyChallenges.add(BlocksMinedAtMineChallenge("daily-mine-10k-blocks-at-h", "${ChatColor.GOLD}${ChatColor.BOLD}Mine 10,000 Blocks", MineHandler.getMines().random(), 10000, 10))
-        dailyChallenges.add(BlocksMinedAtMineChallenge("daily-mine-10k-blocks-at-h", "${ChatColor.GOLD}${ChatColor.BOLD}Mine 10,000 Blocks", MineHandler.getMines().random(), 10000, 10))
     }
 
 }

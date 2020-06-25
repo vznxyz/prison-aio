@@ -1,12 +1,21 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.challenge
 
 import net.evilblock.cubed.serialize.AbstractTypeSerializable
 import net.evilblock.prisonaio.module.user.User
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.text.NumberFormat
 
-abstract class Challenge(val id: String, internal val daily: Boolean = false) : AbstractTypeSerializable {
+abstract class Challenge(val id: String, internal var daily: Boolean = false) : AbstractTypeSerializable {
 
     var name: String = "Default name"
 
@@ -55,6 +64,11 @@ abstract class Challenge(val id: String, internal val daily: Boolean = false) : 
 
     companion object {
         private val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}JunkiePass${ChatColor.GRAY}]"
+        internal val DECIMAL_FORMAT = DecimalFormat("#.##")
+
+        init {
+            DECIMAL_FORMAT.roundingMode = RoundingMode.HALF_UP
+        }
     }
 
 }

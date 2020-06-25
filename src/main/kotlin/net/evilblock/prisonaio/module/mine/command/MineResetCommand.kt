@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mine.command
 
 import net.evilblock.cubed.command.Command
@@ -16,7 +23,7 @@ object MineResetCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "mine") mine: Mine) {
-        if (mine.getBreakableRegion() != null) {
+        if (mine.getBreakableCuboid() != null) {
             mine.resetRegion()
             player.sendMessage("${ChatColor.GREEN}You successfully reset the ${mine.id} mine.")
         } else {

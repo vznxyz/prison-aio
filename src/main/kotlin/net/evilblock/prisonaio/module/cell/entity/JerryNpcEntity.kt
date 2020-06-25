@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell.entity
 
 import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.prisonaio.module.cell.Cell
 import net.evilblock.prisonaio.module.cell.menu.JerryMenu
-import net.evilblock.prisonaio.module.mechanic.region.bypass.RegionBypass
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.Location

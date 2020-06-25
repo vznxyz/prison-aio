@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.challenge.menu
 
 import net.evilblock.cubed.menu.Button
@@ -8,6 +15,7 @@ import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeHandler
+import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.menu.BattlePassMenu
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.util.Constants
@@ -22,19 +30,25 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
     private var page: Int = 1
 
     override fun getTitle(player: Player): String {
-        return "${ChatColor.GOLD}${ChatColor.BOLD}JunkiePass ${if (daily) "Daily" else "Premium"} Challenges"
+        return "${ChatColor.GOLD}${ChatColor.BOLD}${if (daily) "Daily" else "Premium"} Challenges"
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
         val offset = (page - 1) * SLOTS.size
 
-        for ((index, challenge) in ChallengeHandler.getChallenges().filter { it.daily == daily }.drop(offset).withIndex()) {
-            buttons[SLOTS[index]] = ChallengeButton(challenge)
+        val challengeSet = if (daily) {
+            DailyChallengeHandler.getSession().getChallenges()
+        } else {
+            ChallengeHandler.getChallenges()
+        }
 
-            if (index - 1 >= SLOTS.size) {
+        for ((index, challenge) in challengeSet.sortedBy { it.rewardXp }.drop(offset).withIndex()) {
+            if (index >= SLOTS.size) {
                 break
             }
+
+            buttons[SLOTS[index]] = ChallengeButton(challenge)
         }
 
         buttons[45] = PreviousPageButton()
@@ -74,7 +88,7 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
                 description.add(challenge.getProgressText(player, user))
             }
 
-            if (user.battlePassData.hasCompletedChallenge(challenge)) {
+            if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassData.hasCompletedChallenge(challenge)) {
                 description.add("")
                 description.add("${ChatColor.GREEN}You've completed this challenge!")
             }
@@ -87,7 +101,7 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
         }
 
         override fun getDamageValue(player: Player): Byte {
-            return if (user.battlePassData.hasCompletedChallenge(challenge)) {
+            return if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassData.hasCompletedChallenge(challenge)) {
                 13.toByte()
             } else {
                 1.toByte()

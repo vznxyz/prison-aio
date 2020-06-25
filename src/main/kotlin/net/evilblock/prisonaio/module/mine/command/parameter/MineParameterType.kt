@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mine.command.parameter
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
@@ -7,7 +14,7 @@ import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-object MineParameterType : ParameterType<Mine?> {
+class MineParameterType : ParameterType<Mine?> {
 
     override fun transform(sender: CommandSender, source: String): Mine? {
         val optionalMine = MineHandler.getMineById(source)

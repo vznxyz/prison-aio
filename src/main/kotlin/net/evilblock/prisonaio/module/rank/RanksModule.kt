@@ -1,10 +1,16 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.rank
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.rank.command.RankEditorCommand
 import net.evilblock.prisonaio.module.rank.command.RankScaleCommand
-import net.evilblock.prisonaio.module.rank.command.RanksReloadCommand
 import net.evilblock.prisonaio.module.rank.command.parameter.RankParameterType
 import org.bukkit.ChatColor
 
@@ -27,6 +33,8 @@ object RanksModule : PluginModule() {
     }
 
     override fun onReload() {
+        super.onReload()
+
         loadConfig()
     }
 
@@ -37,8 +45,7 @@ object RanksModule : PluginModule() {
     override fun getCommands(): List<Class<*>> {
         return listOf(
             RankEditorCommand.javaClass,
-            RankScaleCommand.javaClass,
-            RanksReloadCommand.javaClass
+            RankScaleCommand.javaClass
         )
     }
 

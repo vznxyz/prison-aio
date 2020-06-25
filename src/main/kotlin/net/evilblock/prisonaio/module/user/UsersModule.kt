@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
@@ -8,12 +15,15 @@ import net.evilblock.prisonaio.module.user.command.WithdrawCommand
 import net.evilblock.prisonaio.module.user.bank.listener.BankNoteAdminListeners
 import net.evilblock.prisonaio.module.user.bank.listener.BankNoteDupeListeners
 import net.evilblock.prisonaio.module.user.bank.listener.BankNoteListeners
+import net.evilblock.prisonaio.module.user.bank.listener.BankNoteLogListeners
 import net.evilblock.prisonaio.module.user.command.*
 import net.evilblock.prisonaio.module.user.command.admin.*
 import net.evilblock.prisonaio.module.user.command.parameter.UserParameterType
 import net.evilblock.prisonaio.module.user.listener.*
 import net.evilblock.prisonaio.module.user.perk.Perk
 import net.evilblock.prisonaio.module.user.perk.autosell.AutoSellNotification
+import net.evilblock.prisonaio.module.user.setting.listener.UserChatSettingsListeners
+import net.evilblock.prisonaio.module.user.setting.listener.UserSettingsListeners
 import net.evilblock.prisonaio.module.user.task.PlayTimeSyncTask
 import org.bukkit.event.Listener
 
@@ -48,6 +58,8 @@ object UsersModule : PluginModule() {
     }
 
     override fun onReload() {
+        super.onReload()
+
         permissionSalesMultipliers = readPermissionSalesMultipliers()
     }
 
@@ -64,9 +76,12 @@ object UsersModule : PluginModule() {
             UserCacheListeners,
             UserPerksListeners,
             UserStatisticsListeners,
+            UserSettingsListeners,
+            UserChatSettingsListeners,
             BankNoteAdminListeners,
             BankNoteDupeListeners,
-            BankNoteListeners
+            BankNoteListeners,
+            BankNoteLogListeners
         )
     }
 

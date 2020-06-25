@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.command.admin
 
 import net.evilblock.cubed.command.Command
@@ -13,7 +20,7 @@ object TokensGiveCommand {
     @Command(
         names = ["token give", "tokens give"],
         description = "Adds tokens to a player's balance",
-        permission = "prisonaio.tokens.give",
+        permission = "prisonaio.user.tokens.give",
         async = true
     )
     @JvmStatic

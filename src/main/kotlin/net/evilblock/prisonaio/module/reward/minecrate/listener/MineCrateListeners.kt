@@ -1,10 +1,16 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.reward.minecrate.listener
 
 import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
-import net.evilblock.prisonaio.module.mechanic.region.Regions
-import net.evilblock.prisonaio.module.mechanic.region.event.RegionBlockBreakEvent
+import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrate
@@ -54,8 +60,7 @@ object MineCrateListeners : Listener {
      */
     @EventHandler(ignoreCancelled = true)
     fun onRegionBlockBreakEvent(event: RegionBlockBreakEvent) {
-        val region = Regions.findRegion(event.block.location)
-        if (region == null || !region.supportsRewards() || region.getBreakableRegion()?.contains(event.block) == false) {
+        if (!event.region.supportsRewards() || event.region.getBreakableCuboid()?.contains(event.block) == false) {
             return
         }
 
@@ -93,7 +98,7 @@ object MineCrateListeners : Listener {
 
                 val spawnedCrate = MineCrateHandler.getSpawnedCrate(block.location)
                 if (spawnedCrate.owner == event.player.uniqueId) {
-                    spawnedCrate.destroy(false)
+                    spawnedCrate.destroy()
                 }
             }
         }

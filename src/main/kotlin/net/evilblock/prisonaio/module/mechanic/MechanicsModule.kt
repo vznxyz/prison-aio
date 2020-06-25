@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mechanic
 
 import net.evilblock.prisonaio.module.PluginModule
@@ -5,12 +12,12 @@ import net.evilblock.prisonaio.module.mechanic.command.HotFixCommands
 import net.evilblock.prisonaio.module.mechanic.command.HelpCommand
 import net.evilblock.prisonaio.module.mechanic.command.SpawnCommand
 import net.evilblock.prisonaio.module.mechanic.listener.*
-import net.evilblock.prisonaio.module.mechanic.region.bypass.RegionBypass
-import net.evilblock.prisonaio.module.mechanic.region.command.RegionBypassCommand
-import net.evilblock.prisonaio.module.mechanic.region.listener.RegionListeners
+import net.evilblock.prisonaio.module.region.command.RegionBypassCommand
+import net.evilblock.prisonaio.module.region.command.RegionWandCommand
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.event.Listener
+import org.bukkit.inventory.ItemStack
 import java.util.*
 
 object MechanicsModule : PluginModule() {
@@ -38,7 +45,6 @@ object MechanicsModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
-            RegionBypass,
             CraftingMechanicsListeners,
             DisableAnvilMechanicsListeners,
             DisableBrewingMechanicsListeners,
@@ -50,7 +56,6 @@ object MechanicsModule : PluginModule() {
             MiningMechanicsListeners,
             MobMechanicsListeners,
             PreventDropsInSpawnListeners,
-            RegionListeners,
             StreamListeners,
             VanillaMechanicsListeners
         )
@@ -61,7 +66,8 @@ object MechanicsModule : PluginModule() {
             HotFixCommands.javaClass,
             HelpCommand.javaClass,
             SpawnCommand.javaClass,
-            RegionBypassCommand.javaClass
+            RegionBypassCommand.javaClass,
+            RegionWandCommand::class.java
         )
     }
 
@@ -120,10 +126,6 @@ object MechanicsModule : PluginModule() {
         return config.getBoolean("vanilla-mechanics.disable-brewing-mechanics", true)
     }
 
-    fun canOpenEnderChestInGlobalRegion(): Boolean {
-        return config.getBoolean("global-region.allow-open-enderchest", true)
-    }
-
     /**
      * Gets a copy of the auto-smelt block list.
      */
@@ -161,5 +163,11 @@ object MechanicsModule : PluginModule() {
     fun isFortuneBlock(type: Material): Boolean {
         return config.getStringList("fortune.block-list").contains(type.name)
     }
+
+    fun isTool(itemStack: ItemStack?): Boolean {
+        return itemStack != null && itemStack.type != Material.AIR && TOOL_IDS.contains(itemStack.type.ordinal)
+    }
+
+    private val TOOL_IDS = arrayListOf(255, 256, 257, 260, 268, 269, 270, 272, 274, 276, 277, 278, 283, 284, 285, 358)
 
 }

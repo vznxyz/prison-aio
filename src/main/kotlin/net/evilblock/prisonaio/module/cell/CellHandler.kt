@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell
 
 import com.boydti.fawe.bukkit.wrapper.AsyncWorld
@@ -14,7 +21,8 @@ import net.evilblock.cubed.util.hook.WorldEditUtils
 import net.evilblock.prisonaio.module.PluginHandler
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.cell.permission.CellPermission
-import net.evilblock.prisonaio.module.mechanic.region.bypass.RegionBypass
+import net.evilblock.prisonaio.module.region.RegionsModule
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.*
 import org.bukkit.block.Block
@@ -64,6 +72,8 @@ object CellHandler : PluginHandler {
     }
 
     override fun saveData() {
+        super.saveData()
+
         saveGrid()
         getGridWorld().save()
     }
@@ -183,6 +193,16 @@ object CellHandler : PluginHandler {
         }.toSet()
     }
 
+    fun updateJoinableCache(uuid: UUID, cell: Cell, joinable: Boolean) {
+        joinableCache.putIfAbsent(uuid, HashSet())
+
+        if (joinable) {
+            joinableCache[uuid]!!.add(cell)
+        } else {
+            joinableCache[uuid]!!.remove(cell)
+        }
+    }
+
     /**
      * Returns a set of [Cell]s that the given [playerUuid] owns.
      */
@@ -288,16 +308,6 @@ object CellHandler : PluginHandler {
         nameToCell.remove(cell.name.toLowerCase())
     }
 
-    fun updateJoinableCache(uuid: UUID, cell: Cell, joinable: Boolean) {
-        joinableCache.putIfAbsent(uuid, HashSet())
-
-        if (joinable) {
-            joinableCache[uuid]!!.add(cell)
-        } else {
-            joinableCache[uuid]!!.remove(cell)
-        }
-    }
-
     fun renameCell(cell: Cell, name: String) {
         nameToCell.remove(cell.name.toLowerCase())
         cell.name = name
@@ -345,6 +355,8 @@ object CellHandler : PluginHandler {
 
             val cell = Cell(gridIndex, name, owner, scanResults.playerSpawnLocation!!, scanResults.jerrySpawnLocation!!, schematicData.cuboid)
             cell.initializeData()
+
+            RegionsModule.updateBlockCache(cell)
 
             synchronizeCaches(cell)
             saveData()
@@ -524,6 +536,9 @@ object CellHandler : PluginHandler {
 
                     // synchronize this cell data into our caches
                     synchronizeCaches(cell)
+
+                    // update region block cache
+                    RegionsModule.updateBlockCache(cell)
 
                     // set highest grid index so we know where to create the next cell
                     if (cell.gridIndex > this.gridIndex) {

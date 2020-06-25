@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mechanic.listener
 
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
@@ -16,7 +23,7 @@ object DisableBrewingMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onCraftBrewingStand(event: CraftItemEvent) {
         if (MechanicsModule.areBrewingMechanicsDisabled()) {
-            if (event.recipe.result.type === Material.BREWING_STAND || event.recipe.result.type === Material.BREWING_STAND_ITEM) {
+            if (event.recipe.result.type == Material.BREWING_STAND || event.recipe.result.type == Material.BREWING_STAND_ITEM) {
                 event.isCancelled = true
             }
         }
@@ -25,11 +32,11 @@ object DisableBrewingMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onInteractBrewingStand(event: PlayerInteractEvent) {
         if (MechanicsModule.areBrewingMechanicsDisabled()) {
-            if (event.action !== Action.RIGHT_CLICK_BLOCK) {
+            if (event.action != Action.RIGHT_CLICK_BLOCK) {
                 return
             }
 
-            if (event.clickedBlock.type === Material.ANVIL) {
+            if (event.clickedBlock.type == Material.BREWING_STAND || event.clickedBlock.type == Material.BREWING_STAND_ITEM) {
                 event.isCancelled = true
             }
         }
@@ -38,7 +45,7 @@ object DisableBrewingMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onPlaceBrewingStand(event: BlockPlaceEvent) {
         if (MechanicsModule.areBrewingMechanicsDisabled()) {
-            if (event.block.type === Material.BREWING_STAND || event.block.type === Material.BREWING_STAND_ITEM) {
+            if (event.block.type == Material.BREWING_STAND || event.block.type == Material.BREWING_STAND_ITEM) {
                 event.isCancelled = true
             }
         }

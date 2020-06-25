@@ -1,9 +1,15 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
-import net.evilblock.prisonaio.module.mechanic.region.Region
+import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.event.block.BlockBreakEvent
@@ -39,11 +45,10 @@ object Explosive : AbstractEnchant("explosive", "Explosive", 50) {
                     val type = block.block.type
 
                     if (type != Material.ENDER_CHEST && type != Material.BEDROCK && type != Material.AIR) {
-                        val isInRegion = region.getBreakableRegion() != null && region.getBreakableRegion()!!.contains(block)
-                        val canBuild = WorldGuardPlugin.inst().canBuild(event.player, block)
+                        val regionCriteria = region.supportsAbilityEnchants() && region.getBreakableCuboid() != null && region.getBreakableCuboid()!!.contains(block)
                         val chance = random.nextInt(100) <= level
 
-                        if (isInRegion && canBuild && chance) {
+                        if (regionCriteria && chance) {
                             blocks.add(block.block)
                         }
                     }

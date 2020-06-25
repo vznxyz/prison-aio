@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell
 
 import mkremins.fanciful.FancyMessage
@@ -10,7 +17,7 @@ import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.cubed.util.nms.MinecraftProtocol
 import net.evilblock.prisonaio.module.cell.entity.JerryNpcEntity
 import net.evilblock.prisonaio.module.cell.permission.CellPermission
-import net.evilblock.prisonaio.module.mechanic.region.Region
+import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.util.Constants
 import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder
 import org.bukkit.Bukkit
@@ -29,7 +36,7 @@ import kotlin.math.max
 class Cell(
     val gridIndex: Int,
     var name: String,
-    val owner: UUID,
+    var owner: UUID,
     var homeLocation: Location,
     guideLocation: Location,
     internal var cuboid: Cuboid
@@ -77,8 +84,36 @@ class Cell(
         return "${getOwnerUsername()}'s Cell"
     }
 
-    override fun getBreakableRegion(): Cuboid? {
+    override fun getCuboid(): Cuboid {
         return cuboid
+    }
+
+    override fun is3D(): Boolean {
+        return false
+    }
+
+    override fun getBreakableCuboid(): Cuboid? {
+        return cuboid
+    }
+
+    override fun resetBreakableCuboid() {
+
+    }
+
+    override fun supportsAbilityEnchants(): Boolean {
+        return false
+    }
+
+    override fun supportsPassiveEnchants(): Boolean {
+        return true
+    }
+
+    override fun supportsRewards(): Boolean {
+        return false
+    }
+
+    override fun supportsAutoSell(): Boolean {
+        return false
     }
 
     fun initializeData() {
@@ -146,18 +181,6 @@ class Cell(
         }
 
         cancellable.isCancelled = false
-    }
-
-    override fun onEntityDamage(entity: Entity, cause: EntityDamageEvent.DamageCause, cancellable: Cancellable) {
-        if (entity is Player) {
-            cancellable.isCancelled = true
-        }
-    }
-
-    override fun onEntityDamageEntity(attacker: Entity, victim: Entity, cause: EntityDamageEvent.DamageCause, damage: Double, cancellable: Cancellable) {
-        if (victim is Player) {
-            cancellable.isCancelled = true
-        }
     }
 
     fun getOwnerUsername(): String {
@@ -236,6 +259,15 @@ class Cell(
 
     fun isOwner(uuid: UUID): Boolean {
         return owner == uuid
+    }
+
+    fun updateOwner(owner: UUID) {
+        this.owner = owner
+
+        val newOwnerUsername = Cubed.instance.uuidCache.name(owner)
+        for (player in getActiveMembers()) {
+            player.sendMessage("${ChatColor.YELLOW}The ownership of the cell has been relinquished to $newOwnerUsername.")
+        }
     }
 
     fun getMembers(): Set<UUID> {

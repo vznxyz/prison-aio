@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.mechanic.region.Region
+import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
@@ -45,4 +52,5 @@ object LuckyMoney : AbstractEnchant("lucky-money", "Lucky Money", 3) {
             sendMessage(event.player, "You found ${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberFormat.getInstance().format(money)} ${ChatColor.GREEN}while mining!")
         }
     }
+
 }

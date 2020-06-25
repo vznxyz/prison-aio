@@ -1,13 +1,21 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
 import net.evilblock.cubed.util.Chance
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.enchant.event.NukeExplodeEvent
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
-import net.evilblock.prisonaio.module.mechanic.region.Region
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.privatemine.PrivateMine
+import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.event.block.BlockBreakEvent
@@ -33,52 +41,58 @@ object Nuke : AbstractEnchant("nuke", "Nuke", 2) {
 	}
 
 	override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
+		if (region.getBreakableCuboid() == null) {
+			return
+		}
+
 		if (Chance.percent(readChance())) {
-			if (region.getBreakableRegion() == null) {
-				return
-			}
-
-			val blocks = arrayListOf<Block>()
-			val explode = arrayListOf<Location>()
-
-			region.getBreakableRegion()?.blocks?.forEach { block ->
-				blocks.add(block)
-
-				if (Chance.percent(2)) {
-					explode.add(block.location)
-				}
-			}
-
-			if (region is Mine) {
-				Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked the ${ChatColor.RED}${region.id} ${ChatColor.GRAY}mine!")
-			} else if (region is PrivateMine) {
-				val tierNumber = region.tier.number
-
-				if (region.owner == event.player.uniqueId) {
-					Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked their ${ChatColor.RED}Tier $tierNumber Private Mine${ChatColor.GRAY}!")
-				} else {
-					val ownerName = region.getOwnerName()
-					Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked $ownerName's ${ChatColor.RED}Tier $tierNumber Private Mine${ChatColor.GRAY}!")
-				}
-			}
-
-			val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100F)
-			Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
-
-			if (multiBlockBreakEvent.isCancelled) {
-				return
-			}
-
-			val nukeEvent = NukeExplodeEvent(event.player, event.block, region, level)
-			Bukkit.getPluginManager().callEvent(nukeEvent)
-
-			region.resetBreakableRegion()
-
-			for (location in explode) {
-				location.world.spawnParticle(Particle.EXPLOSION_HUGE, location, 1)
-			}
-
 			event.isCancelled = true
+
+			Tasks.async {
+				val blocks = arrayListOf<Block>()
+				val explode = arrayListOf<Location>()
+
+				region.getBreakableCuboid()?.blocks?.forEach { block ->
+					blocks.add(block)
+
+					if (Chance.percent(2)) {
+						explode.add(block.location)
+					}
+				}
+
+				Tasks.sync {
+					val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100F)
+					Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
+
+					if (multiBlockBreakEvent.isCancelled) {
+						return@sync
+					}
+
+					val nukeEvent = NukeExplodeEvent(event.player, event.block, region, level)
+					Bukkit.getPluginManager().callEvent(nukeEvent)
+
+					Tasks.async {
+						region.resetBreakableCuboid()
+
+						if (region is Mine) {
+							Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked the ${ChatColor.RED}${region.id} ${ChatColor.GRAY}mine!")
+						} else if (region is PrivateMine) {
+							val tierNumber = region.tier.number
+
+							if (region.owner == event.player.uniqueId) {
+								Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked their ${ChatColor.RED}Tier $tierNumber Private Mine${ChatColor.GRAY}!")
+							} else {
+								val ownerName = region.getOwnerName()
+								Bukkit.broadcastMessage("${ChatColor.RED}${event.player.name} ${ChatColor.GRAY}has nuked $ownerName's ${ChatColor.RED}Tier $tierNumber Private Mine${ChatColor.GRAY}!")
+							}
+						}
+
+						for (location in explode) {
+							location.world.spawnParticle(Particle.EXPLOSION_HUGE, location, 1)
+						}
+					}
+				}
+			}
 		}
 	}
 

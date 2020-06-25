@@ -1,11 +1,22 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.setting
 
+import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.setting.option.ChatModeOption
 import net.evilblock.prisonaio.module.user.setting.option.ChatModeOption.ChatMode
-import net.evilblock.prisonaio.module.user.setting.option.PrivateMessagesOption
 import net.evilblock.prisonaio.module.user.setting.option.CommentsRestrictionOption
 import net.evilblock.prisonaio.module.user.setting.option.CommentsRestrictionOption.RestrictionOptionValue
+import net.evilblock.prisonaio.module.user.setting.option.PrivateMessagesOption
+import net.evilblock.prisonaio.module.user.setting.option.PrivateMessageSoundsOption
 import net.evilblock.prisonaio.module.user.setting.option.ScoreboardVisibilityOption
+import net.evilblock.prisonaio.module.user.setting.option.SneakToTeleportOption
+import net.evilblock.source.messaging.MessagingManager
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -14,7 +25,8 @@ enum class UserSetting(
     private val description: String,
     private val icon: ItemStack,
     val defaultValue: () -> UserSettingOption,
-    private val options: () -> List<UserSettingOption>
+    private val options: () -> List<UserSettingOption>,
+    val onUpdate: (User, UserSettingOption) -> Unit = { _, _ -> }
 ) {
 
     SCOREBOARD_VISIBILITY(
@@ -53,6 +65,38 @@ enum class UserSetting(
                 PrivateMessagesOption(PrivateMessagesOption.OptionValue.RECEIVE_INITIATED),
                 PrivateMessagesOption(PrivateMessagesOption.OptionValue.DISABLED)
             )
+        },
+        onUpdate = { user, option ->
+            when (option.getValue<PrivateMessagesOption.OptionValue>()) {
+                PrivateMessagesOption.OptionValue.RECEIVE_ALL -> {
+                    MessagingManager.toggleMessages(user.uuid, true)
+                }
+                PrivateMessagesOption.OptionValue.RECEIVE_INITIATED -> {
+                    MessagingManager.toggleMessages(user.uuid, true)
+                }
+                PrivateMessagesOption.OptionValue.DISABLED -> {
+                    MessagingManager.toggleMessages(user.uuid, false)
+                }
+            }
+        }
+    ),
+    PRIVATE_MESSAGE_SOUNDS(
+        displayName = "Play Private Message Sounds",
+        description = "This setting controls if sounds will play when you receive private messages.",
+        icon = ItemStack(Material.NOTE_BLOCK),
+        defaultValue = { PrivateMessageSoundsOption(true) },
+        options = {
+            arrayListOf(
+                PrivateMessageSoundsOption(true),
+                PrivateMessageSoundsOption(false)
+            )
+        },
+        onUpdate = { user, option ->
+            if (option.getValue()) {
+                MessagingManager.toggleSounds(user.uuid, true)
+            } else {
+                MessagingManager.toggleSounds(user.uuid, false)
+            }
         }
     ),
     PROFILE_COMMENTS_RESTRICTION(
@@ -64,6 +108,18 @@ enum class UserSetting(
             arrayListOf(
                 CommentsRestrictionOption(RestrictionOptionValue.ALLOWED),
                 CommentsRestrictionOption(RestrictionOptionValue.DISABLED)
+            )
+        }
+    ),
+    SNEAK_TO_TELEPORT(
+        displayName = "Sneak to Teleport",
+        description = "This setting controls if pressing your sneak button will teleport you to the mine's spawn when you have a full inventory.",
+        icon = ItemStack(Material.ENDER_PEARL),
+        defaultValue = { SneakToTeleportOption(true) },
+        options = {
+            arrayListOf(
+                SneakToTeleportOption(true),
+                SneakToTeleportOption(false)
             )
         }
     );

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.challenge.menu
 
 import net.evilblock.cubed.menu.Button
@@ -31,7 +38,7 @@ class ChallengeEditorMenu : PaginatedMenu() {
     override fun getGlobalButtons(player: Player): Map<Int, Button>? {
         val buttons = hashMapOf<Int, Button>()
 
-        buttons[0] = AddChallengeButton()
+        buttons[2] = AddChallengeButton()
 
         for (i in 9..17) {
             buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 0, " ")
@@ -43,7 +50,7 @@ class ChallengeEditorMenu : PaginatedMenu() {
     override fun getAllPagesButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        for (challenge in ChallengeHandler.getChallenges().filter { !it.daily }) {
+        for (challenge in ChallengeHandler.getChallenges().sortedBy { it.rewardXp }) {
             buttons[buttons.size] = ChallengeButton(challenge)
         }
 
@@ -125,6 +132,9 @@ class ChallengeEditorMenu : PaginatedMenu() {
             description.add("${ChatColor.GRAY}(ID: ${challenge.id})")
             description.add("")
             description.addAll(TextSplitter.split(length = 40, text = challenge.getText(), linePrefix = "${ChatColor.GRAY}"))
+            description.add("")
+            description.add("${ChatColor.GRAY}Reward XP: ${ChatColor.GREEN}+${challenge.rewardXp}")
+            description.add("${ChatColor.GRAY}Daily: ${if (challenge.daily) "${ChatColor.GREEN}Yes" else "${ChatColor.RED}No"}")
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit challenge")
             description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to delete challenge")

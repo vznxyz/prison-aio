@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
 import net.evilblock.cubed.util.TimeUtil.formatIntoDetailedString
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
-import net.evilblock.prisonaio.module.mechanic.region.Regions
+import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.util.nms.RayTrace
 import org.bukkit.*
 import org.bukkit.block.Block
@@ -92,9 +99,9 @@ object Laser : AbstractEnchant("laser", "Laser", 1) {
                     continue
                 }
 
-                val regionAtBlock = Regions.findRegion(toLocation)
-                if (regionAtBlock != null && regionAtBlock.supportsEnchants() && regionAtBlock.getBreakableRegion() != null) {
-                    if (!regionAtBlock.getBreakableRegion()!!.contains(toLocation)) {
+                val regionAtBlock = RegionsModule.findRegion(toLocation)
+                if (regionAtBlock.supportsAbilityEnchants() && regionAtBlock.getBreakableCuboid() != null) {
+                    if (!regionAtBlock.getBreakableCuboid()!!.contains(toLocation)) {
                         continue
                     }
 

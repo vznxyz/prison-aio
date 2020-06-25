@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.command.admin
 
 import net.evilblock.cubed.command.Command
@@ -12,7 +19,7 @@ object TokensResetCommand {
     @Command(
         names = ["token reset", "tokens reset"],
         description = "Reset a player's token balance",
-        permission = "prisonaio.tokens.reset",
+        permission = "prisonaio.user.tokens.reset",
         async = true
     )
     @JvmStatic

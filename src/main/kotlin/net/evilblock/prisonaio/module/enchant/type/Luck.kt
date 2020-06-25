@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.type
 
 import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.mechanic.region.Region
+import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrate
@@ -37,7 +44,7 @@ object Luck : AbstractEnchant("luck", "Luck", 4) {
             return
         }
 
-        if (region.getBreakableRegion()?.contains(event.block) == false) {
+        if (region.getBreakableCuboid()?.contains(event.block) == false) {
             return
         }
 

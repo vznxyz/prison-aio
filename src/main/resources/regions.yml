@@ -1,0 +1,3 @@
+global-region:
+  # If players can open enderchests in the global region
+  allow-open-enderchest: true

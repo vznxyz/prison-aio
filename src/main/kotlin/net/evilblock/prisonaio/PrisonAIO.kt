@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio
 
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.CubedOptions
 import net.evilblock.cubed.command.CommandHandler
-import net.evilblock.cubed.error.ErrorHandler
+import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
@@ -15,6 +22,7 @@ import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.cell.CellsModule
 import net.evilblock.prisonaio.module.chat.ChatModule
+import net.evilblock.prisonaio.module.combat.CombatModule
 import net.evilblock.prisonaio.module.crate.CratesModule
 import net.evilblock.prisonaio.module.crate.reward.CrateReward
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
@@ -29,6 +37,7 @@ import net.evilblock.prisonaio.module.privatemine.PrivateMinesModule
 import net.evilblock.prisonaio.module.quest.QuestsModule
 import net.evilblock.prisonaio.module.quest.progression.QuestProgression
 import net.evilblock.prisonaio.module.rank.RanksModule
+import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.requirement.DeliveryManRewardRequirement
 import net.evilblock.prisonaio.module.scoreboard.ScoreboardModule
@@ -84,6 +93,7 @@ class PrisonAIO : JavaPlugin() {
         val modulesList = listOf(
             EnvironmentModule,
             StorageModule,
+            RegionsModule,
             MechanicsModule,
             RewardsModule,
             EnchantsModule,
@@ -100,7 +110,8 @@ class PrisonAIO : JavaPlugin() {
             ScoreboardModule,
             ChatModule,
             MinigamesModule,
-            LeaderboardsModule
+            LeaderboardsModule,
+            CombatModule
         )
 
         modulesList.filter { !it.requiresLateLoad() }.forEach { module ->
@@ -141,6 +152,10 @@ class PrisonAIO : JavaPlugin() {
     }
 
     fun saveModules() {
+        systemLog("Saving data...")
+
+        val startAt = System.currentTimeMillis()
+
         enabledModules.forEach { module ->
             try {
                 module.onAutoSave()
@@ -154,6 +169,10 @@ class PrisonAIO : JavaPlugin() {
                 systemLog("${ChatColor.RED}Failed to save module ${module.getName()}!")
             }
         }
+
+        val endAt = System.currentTimeMillis()
+
+        systemLog("Finished saving data in ${endAt - startAt}ms!")
     }
 
     private fun loadTasks() {

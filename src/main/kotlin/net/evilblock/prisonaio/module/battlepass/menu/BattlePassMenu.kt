@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.battlepass.menu
 
 import mkremins.fanciful.FancyMessage
@@ -241,11 +248,6 @@ class BattlePassMenu(private val user: User) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                if (daily) {
-                    player.sendMessage("${ChatColor.RED}Coming very, VERY soon!")
-                    return
-                }
-
                 BrowseChallengesMenu(user, daily).openMenu(player)
             }
         }

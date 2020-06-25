@@ -1,10 +1,20 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.cell
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.cell.command.*
-import net.evilblock.prisonaio.module.cell.command.admin.RefreshCellValueCommand
+import net.evilblock.prisonaio.module.cell.command.admin.CellForceDisbandCommand
+import net.evilblock.prisonaio.module.cell.command.admin.CellForceKickCommand
+import net.evilblock.prisonaio.module.cell.command.admin.CellForceLeaderCommand
+import net.evilblock.prisonaio.module.cell.command.admin.CellRefreshValueCommand
 import net.evilblock.prisonaio.module.cell.command.parameter.CellParameterType
 import net.evilblock.prisonaio.module.cell.listener.*
 import org.bukkit.ChatColor
@@ -62,8 +72,12 @@ object CellsModule : PluginModule() {
             CellRevokeInviteCommand.javaClass,
             CellSetAnnouncementCommand.javaClass,
             CellSetHomeCommand.javaClass,
+            CellSetLeaderCommand.javaClass,
             CellVisitCommand.javaClass,
-            RefreshCellValueCommand.javaClass
+            CellForceDisbandCommand.javaClass,
+            CellForceKickCommand.javaClass,
+            CellForceLeaderCommand.javaClass,
+            CellRefreshValueCommand.javaClass
         )
     }
 

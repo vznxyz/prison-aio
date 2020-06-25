@@ -1,9 +1,18 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.user.bank
 
 import com.google.common.base.Charsets
 import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.logging.LogFile
+import net.evilblock.cubed.logging.LogHandler
 import net.evilblock.cubed.util.bukkit.HiddenLore
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.PluginHandler
@@ -17,6 +26,7 @@ import java.util.*
 object BankNoteHandler : PluginHandler {
 
     private val bankNotes = hashMapOf<UUID, BankNote>()
+    val logFile: LogFile = LogFile(File(File(getModule().getPlugin().dataFolder, "logs"), "bank-notes.txt"))
 
     override fun getModule(): PluginModule {
         return UsersModule
@@ -43,9 +53,13 @@ object BankNoteHandler : PluginHandler {
                 }
             }
         }
+
+        LogHandler.trackLogFile(logFile)
     }
 
     override fun saveData() {
+        super.saveData()
+
         Files.write(Cubed.gson.toJson(bankNotes.values), getInternalDataFile(), Charsets.UTF_8)
     }
 

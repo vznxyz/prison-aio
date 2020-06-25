@@ -1,14 +1,22 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.mine
 
 import net.evilblock.cubed.lite.LiteEdit
 import net.evilblock.cubed.lite.LiteRegion
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import net.evilblock.prisonaio.module.mechanic.region.Region
 import net.evilblock.prisonaio.module.mine.block.BlockType
 import net.evilblock.prisonaio.module.mine.config.MineBlocksConfig
 import net.evilblock.prisonaio.module.mine.config.MineEffectsConfig
 import net.evilblock.prisonaio.module.mine.config.MineResetConfig
+import net.evilblock.prisonaio.module.mine.event.MineBlockBreakEvent
+import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.minecraft.server.v1_12_R1.IBlockData
@@ -68,14 +76,38 @@ class Mine(val id: String) : Region {
         return "Mine $id"
     }
 
-    override fun getBreakableRegion(): Cuboid? {
+    override fun getCuboid(): Cuboid? {
         return region
     }
 
-    override fun resetBreakableRegion() {
+    override fun is3D(): Boolean {
+        return true
+    }
+
+    override fun getBreakableCuboid(): Cuboid? {
+        return region
+    }
+
+    override fun resetBreakableCuboid() {
         Tasks.async {
             resetRegion()
         }
+    }
+
+    override fun supportsAbilityEnchants(): Boolean {
+        return true
+    }
+
+    override fun supportsPassiveEnchants(): Boolean {
+        return true
+    }
+
+    override fun supportsRewards(): Boolean {
+        return true
+    }
+
+    override fun supportsAutoSell(): Boolean {
+        return true
     }
 
     override fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
@@ -89,24 +121,8 @@ class Mine(val id: String) : Region {
             cancellable.isCancelled = true
             return
         }
-    }
 
-    override fun supportsEnchants(): Boolean {
-        // TODO: do something better later
-        if (id.contains("beacon", ignoreCase = true)) {
-            return false
-        }
-
-        return true
-    }
-
-    override fun supportsRewards(): Boolean {
-        // TODO: do something better later
-        if (id.contains("beacon", ignoreCase = true)) {
-            return false
-        }
-
-        return true
+        MineBlockBreakEvent(player, block, this).call()
     }
 
     /**

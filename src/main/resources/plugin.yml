@@ -4,8 +4,8 @@ description: "All-in-one Prison"
 author: joeleoli
 version: "1.0"
 depend:
-  - Vault
+  - Source
   - Cubed
-  - WorldGuard
+  - Vault
 softdepend:
   - DeluxeTags

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2020. Joel Evans
+ *
+ * Use and or redistribution of compiled JAR file and or source code is permitted only if given
+ * explicit permission from original author: Joel Evans
+ */
+
 package net.evilblock.prisonaio.module.enchant.command
 
 import net.evilblock.cubed.command.Command
@@ -12,7 +19,7 @@ object BookCommand {
     @Command(
         names = ["ebook", "enchbook"],
         description = "Give a player an enchanted book",
-        permission = "op"
+        permission = "prisonaio.enchants.ebook"
     )
     @JvmStatic
     fun execute(
