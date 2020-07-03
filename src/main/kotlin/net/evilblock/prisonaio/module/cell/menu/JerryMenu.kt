@@ -12,7 +12,7 @@ import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.HiddenLore
 import net.evilblock.cubed.util.bukkit.ItemBuilder
-import net.evilblock.cubed.util.nms.MobEggUtil
+import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.cell.CellsModule
 import net.evilblock.prisonaio.module.cell.entity.JerryNpcEntity
 import org.bukkit.ChatColor
@@ -109,7 +109,7 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
         }
 
         override fun getButtonItem(player: Player): ItemStack {
-            return MobEggUtil.setMonsterEggType(super.getButtonItem(player), EntityType.VILLAGER)
+            return ItemUtils.setMonsterEggType(super.getButtonItem(player), EntityType.VILLAGER)
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
@@ -128,7 +128,7 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
                     "${ChatColor.GRAY}you'd like to move Jerry to."
                 )
 
-            val itemStack = MobEggUtil.setMonsterEggType(builder.build(), EntityType.VILLAGER)
+            val itemStack = ItemUtils.setMonsterEggType(builder.build(), EntityType.VILLAGER)
 
             player.closeInventory()
             player.inventory.addItem(itemStack)

@@ -20,7 +20,7 @@ class UserPerks(@Transient internal var user: User) {
     private var grantedPerks: MutableList<PerkGrant> = arrayListOf()
 
     /**
-     * The user's perk states, meaning what perks are toggled.
+     * The user's perk toggle states.
      */
     private var perkStates: MutableMap<Perk, Boolean> = EnumMap(Perk::class.java)
 

@@ -12,8 +12,6 @@ import net.evilblock.prisonaio.module.mechanic.command.HotFixCommands
 import net.evilblock.prisonaio.module.mechanic.command.HelpCommand
 import net.evilblock.prisonaio.module.mechanic.command.SpawnCommand
 import net.evilblock.prisonaio.module.mechanic.listener.*
-import net.evilblock.prisonaio.module.region.command.RegionBypassCommand
-import net.evilblock.prisonaio.module.region.command.RegionWandCommand
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.event.Listener
@@ -65,9 +63,7 @@ object MechanicsModule : PluginModule() {
         return listOf(
             HotFixCommands.javaClass,
             HelpCommand.javaClass,
-            SpawnCommand.javaClass,
-            RegionBypassCommand.javaClass,
-            RegionWandCommand::class.java
+            SpawnCommand.javaClass
         )
     }
 
