@@ -124,6 +124,16 @@ enum class UserSetting(
         }
     );
 
+    private var cached: Any = this.defaultValue()
+
+    fun <T> getDefaultValue(): T {
+        return cached as T
+    }
+
+    fun <T> newDefaultValue(): T {
+        return this.defaultValue() as T
+    }
+
     fun getDisplayName(): String {
         return displayName
     }
