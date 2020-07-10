@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.user
 import com.google.gson.annotations.JsonAdapter
 import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.achievement.Achievement
@@ -20,6 +21,7 @@ import net.evilblock.prisonaio.module.quest.progression.QuestProgression
 import net.evilblock.prisonaio.module.rank.Rank
 import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.rank.RanksModule
+import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.rank.serialize.RankReferenceSerializer
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
 import net.evilblock.prisonaio.module.user.activity.type.CompletedAchievementActivity
@@ -287,6 +289,74 @@ class User(val uuid: UUID) {
     fun updateCurrentRank(rank: Rank) {
         currentRank = rank
         requiresSave = true
+    }
+
+    fun purchaseMaxRankups(player: Player, manual: Boolean = false) {
+        val previousRank = currentRank
+
+        val optionalNextRank = RankHandler.getNextRank(previousRank)
+        if (!optionalNextRank.isPresent) {
+            if (manual) {
+                player.sendMessage("${ChatColor.RED}You have achieved max rank and cannot rankup anymore. Try /prestige!")
+            }
+            return
+        }
+
+        var balance = getMoneyBalance()
+
+        val purchasedRanks = arrayListOf<Rank>()
+        for (rank in RankHandler.getSortedRanks()) {
+            if (previousRank.sortOrder >= rank.sortOrder) {
+                continue
+            }
+
+            val rankPrice = rank.getPrice(currentPrestige)
+            if (rankPrice > balance) {
+                break
+            }
+
+            val playerRankupEvent = PlayerRankupEvent(player, previousRank, rank)
+            Bukkit.getServer().pluginManager.callEvent(playerRankupEvent)
+
+            if (playerRankupEvent.isCancelled) {
+                return
+            }
+
+            VaultHook.useEconomy { economy ->
+                val response = economy.withdrawPlayer(player, rankPrice.toDouble())
+                if (!response.transactionSuccess()) {
+                    return@useEconomy
+                }
+
+                balance -= rankPrice
+
+                updateCurrentRank(rank)
+                rank.executeCommands(player)
+
+                purchasedRanks.add(rank)
+            }
+        }
+
+        applyPermissions(player)
+
+        if (purchasedRanks.isEmpty()) {
+            if (manual) {
+                player.sendMessage("")
+                player.sendMessage(" ${ChatColor.RED}${ChatColor.BOLD}Cannot Afford Rankup")
+                player.sendMessage(" ${ChatColor.GRAY}You don't have enough money to purchase any rankups.")
+                player.sendMessage("")
+            }
+            return
+        }
+
+        player.sendMessage("")
+        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Rankups Purchased${ if (!manual) "${ChatColor.GRAY}(Auto Rankup)" else "" }")
+        player.sendMessage(" ${ChatColor.GRAY}Congratulations on your rankups from ${previousRank.displayName} ${ChatColor.GRAY}to ${currentRank.displayName}${ChatColor.GRAY}!")
+
+        val formattedMoneySpent = NumberUtils.format(purchasedRanks.map { it.getPrice(currentPrestige) }.sum())
+        player.sendMessage(" ${ChatColor.GRAY}The rankups cost ${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedMoneySpent${ChatColor.GRAY}.")
+
+        player.sendMessage("")
     }
 
     /**

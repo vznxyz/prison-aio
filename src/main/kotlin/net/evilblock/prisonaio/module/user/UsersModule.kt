@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.user
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
 import net.evilblock.prisonaio.module.user.bank.command.BankNoteGiveCommand
@@ -24,6 +25,7 @@ import net.evilblock.prisonaio.module.user.perk.Perk
 import net.evilblock.prisonaio.module.user.perk.autosell.AutoSellNotification
 import net.evilblock.prisonaio.module.user.setting.listener.UserChatSettingsListeners
 import net.evilblock.prisonaio.module.user.setting.listener.UserSettingsListeners
+import net.evilblock.prisonaio.module.user.setting.task.UserSettingsTickTask
 import net.evilblock.prisonaio.module.user.task.PlayTimeSyncTask
 import org.bukkit.event.Listener
 
@@ -45,7 +47,8 @@ object UsersModule : PluginModule() {
         UserHandler.initialLoad()
         BankNoteHandler.initialLoad()
 
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), PlayTimeSyncTask, 20L * 30, 2L * 30)
+        Tasks.asyncTimer(PlayTimeSyncTask, 20L * 30, 2L * 30)
+        Tasks.asyncTimer(UserSettingsTickTask, 20L, 20L)
     }
 
     override fun onDisable() {

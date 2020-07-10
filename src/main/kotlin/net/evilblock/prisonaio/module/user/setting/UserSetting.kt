@@ -16,6 +16,7 @@ import net.evilblock.prisonaio.module.user.setting.option.PrivateMessagesOption
 import net.evilblock.prisonaio.module.user.setting.option.PrivateMessageSoundsOption
 import net.evilblock.prisonaio.module.user.setting.option.ScoreboardVisibilityOption
 import net.evilblock.prisonaio.module.user.setting.option.SneakToTeleportOption
+import net.evilblock.prisonaio.module.user.setting.option.AutoRankupOption
 import net.evilblock.source.messaging.MessagingManager
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -120,6 +121,18 @@ enum class UserSetting(
             arrayListOf(
                 SneakToTeleportOption(true),
                 SneakToTeleportOption(false)
+            )
+        }
+    ),
+    AUTO_RANKUP(
+        displayName = "Auto Rankup",
+        description = "This setting controls if rankups will be automatically purchased when you have enough funds to afford it.",
+        icon = ItemStack(Material.EXP_BOTTLE),
+        defaultOption = { AutoRankupOption(true) },
+        options = {
+            arrayListOf(
+                AutoRankupOption(true),
+                AutoRankupOption(false)
             )
         }
     );
