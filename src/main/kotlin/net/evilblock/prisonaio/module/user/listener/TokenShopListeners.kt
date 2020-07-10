@@ -90,8 +90,7 @@ object TokenShopListeners : Listener {
                                         return@async
                                     }
 
-                                    val playerBalance = VaultHook.useEconomyAndReturn { it.getBalance(event.player) }
-                                    if (playerBalance < price.toLong()) {
+                                    if (VaultHook.getBalance(buyingPlayer.uniqueId) < price.toLong()) {
                                         buyingPlayer.sendMessage("${ChatColor.RED}You don't have enough money to buy tokens from that TokenShop.")
                                         return@async
                                     }

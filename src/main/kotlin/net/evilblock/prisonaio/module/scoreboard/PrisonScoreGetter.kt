@@ -78,7 +78,7 @@ object PrisonScoreGetter : ScoreGetter {
             scores.add("  ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Prestige ${user.getCurrentPrestige()}")
         }
 
-        val moneyBalance = VaultHook.useEconomyAndReturn { economy -> economy.getBalance(Bukkit.getOfflinePlayer(user.uuid)) }
+        val moneyBalance = user.getMoneyBalance()
         val formattedMoneyBalance = NumberUtils.format(moneyBalance)
         scores.add("  ${ChatColor.RED}${Constants.MONEY_SYMBOL} ${ChatColor.GRAY}$formattedMoneyBalance")
 

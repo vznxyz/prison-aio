@@ -28,7 +28,7 @@ object WithdrawCommand {
             return
         }
 
-        val balance = VaultHook.useEconomyAndReturn { economy -> economy.getBalance(player) }
+        val balance = VaultHook.getBalance(player.uniqueId)
 
         if (money > balance) {
             player.sendMessage("${ChatColor.RED}You don't have enough money in your account to withdraw that amount.")

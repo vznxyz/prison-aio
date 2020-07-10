@@ -56,7 +56,7 @@ object ChatFormatListeners : Listener {
             tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}⭑ ${ChatColor.GRAY}Prestige ${user.getCurrentPrestige()}"))
         }
 
-        val moneyBalance = VaultHook.useEconomyAndReturn { economy -> economy.getBalance(Bukkit.getOfflinePlayer(user.uuid)) }
+        val moneyBalance = user.getMoneyBalance()
         val formattedMoneyBalance = NumberUtils.format(moneyBalance)
         tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}$ ${ChatColor.GRAY}$formattedMoneyBalance"))
 

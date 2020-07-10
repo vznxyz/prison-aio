@@ -35,7 +35,7 @@ object RankupAllCommand {
             return
         }
 
-        var balance = VaultHook.useEconomyAndReturn { economy -> economy.getBalance(player) }
+        var balance = VaultHook.getBalance(player.uniqueId)
 
         val purchasedRanks = arrayListOf<Rank>()
         for (rank in RankHandler.getSortedRanks()) {

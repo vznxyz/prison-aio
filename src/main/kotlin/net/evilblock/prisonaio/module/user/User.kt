@@ -311,7 +311,7 @@ class User(val uuid: UUID) {
      * Gets the user's current money balance.
      */
     fun getMoneyBalance(): Double {
-        return VaultHook.useEconomyAndReturn { economy -> economy.getBalance(Bukkit.getOfflinePlayer(uuid)) }
+        return VaultHook.getBalance(uuid)
     }
 
     /**
