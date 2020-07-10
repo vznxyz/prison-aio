@@ -124,7 +124,7 @@ enum class UserSetting(
         }
     );
 
-    private var cached: Any = this.defaultOption()
+    private var cached: UserSettingOption = this.defaultOption()
 
     fun getDisplayName(): String {
         return displayName
@@ -138,8 +138,8 @@ enum class UserSetting(
         return icon
     }
 
-    fun <T : UserSettingOption> getDefaultOption(): T {
-        return cached as T
+    fun getDefaultOption(): UserSettingOption {
+        return cached
     }
 
     fun <T : UserSettingOption> newDefaultOption(): T {

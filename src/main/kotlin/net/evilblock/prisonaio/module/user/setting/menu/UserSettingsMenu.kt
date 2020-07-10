@@ -19,6 +19,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
+import java.lang.StringBuilder
 
 class UserSettingsMenu(private val user: User) : Menu() {
 
@@ -53,11 +54,19 @@ class UserSettingsMenu(private val user: User) : Menu() {
             description.add("")
 
             for (option in setting.getOptions<UserSettingOption>()) {
-                if (user.getSettingOption(setting) == option) {
-                    description.add(" ${ChatColor.BLUE}${ChatColor.BOLD}» ${ChatColor.GREEN}${option.getName()}")
+                val builder = StringBuilder()
+
+                builder.append(if (user.getSettingOption(setting) == option) {
+                    " ${ChatColor.BLUE}${ChatColor.BOLD}» ${ChatColor.GREEN}${option.getName()}"
                 } else {
-                    description.add("    ${ChatColor.YELLOW}${option.getName()}")
+                    "    ${ChatColor.YELLOW}${option.getName()}"
+                })
+
+                if (setting.getDefaultOption() == option) {
+                    builder.append(" ${ChatColor.GRAY}(Default)")
                 }
+
+                description.add(builder.toString())
             }
 
             description.add("")
