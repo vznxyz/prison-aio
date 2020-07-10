@@ -24,7 +24,7 @@ enum class UserSetting(
     private val displayName: String,
     private val description: String,
     private val icon: ItemStack,
-    val defaultValue: () -> UserSettingOption,
+    val defaultOption: () -> UserSettingOption,
     private val options: () -> List<UserSettingOption>,
     val onUpdate: (User, UserSettingOption) -> Unit = { _, _ -> }
 ) {
@@ -33,7 +33,7 @@ enum class UserSetting(
         displayName = "Scoreboard Visibility",
         description = "This setting controls if the scoreboard is visible.",
         icon = ItemStack(Material.ITEM_FRAME),
-        defaultValue = { ScoreboardVisibilityOption(true) },
+        defaultOption = { ScoreboardVisibilityOption(true) },
         options = {
             arrayListOf(
                 ScoreboardVisibilityOption(true),
@@ -45,7 +45,7 @@ enum class UserSetting(
         displayName = "Chat Mode",
         description = "This setting controls what chat mode you'll receive messages from.",
         icon = ItemStack(Material.SIGN),
-        defaultValue = { ChatModeOption(ChatMode.GLOBAL_CHAT) },
+        defaultOption = { ChatModeOption(ChatMode.GLOBAL_CHAT) },
         options = {
             arrayListOf(
                 ChatModeOption(ChatMode.HIDDEN),
@@ -58,7 +58,7 @@ enum class UserSetting(
         displayName = "Receive Private Messages",
         description = "This setting controls if other players can you send private messages.",
         icon = ItemStack(Material.BOOK_AND_QUILL),
-        defaultValue = { PrivateMessagesOption(PrivateMessagesOption.OptionValue.RECEIVE_ALL) },
+        defaultOption = { PrivateMessagesOption(PrivateMessagesOption.OptionValue.RECEIVE_ALL) },
         options = {
             arrayListOf(
                 PrivateMessagesOption(PrivateMessagesOption.OptionValue.RECEIVE_ALL),
@@ -84,7 +84,7 @@ enum class UserSetting(
         displayName = "Play Private Message Sounds",
         description = "This setting controls if sounds will play when you receive private messages.",
         icon = ItemStack(Material.NOTE_BLOCK),
-        defaultValue = { PrivateMessageSoundsOption(true) },
+        defaultOption = { PrivateMessageSoundsOption(true) },
         options = {
             arrayListOf(
                 PrivateMessageSoundsOption(true),
@@ -103,7 +103,7 @@ enum class UserSetting(
         displayName = "Allow Profile Comments",
         description = "This setting controls if other players are allowed to post comments on your profile.",
         icon = ItemStack(Material.EMPTY_MAP),
-        defaultValue = { CommentsRestrictionOption(RestrictionOptionValue.ALLOWED) },
+        defaultOption = { CommentsRestrictionOption(RestrictionOptionValue.ALLOWED) },
         options = {
             arrayListOf(
                 CommentsRestrictionOption(RestrictionOptionValue.ALLOWED),
@@ -115,7 +115,7 @@ enum class UserSetting(
         displayName = "Sneak to Teleport",
         description = "This setting controls if pressing your sneak button will teleport you to the mine's spawn when you have a full inventory.",
         icon = ItemStack(Material.ENDER_PEARL),
-        defaultValue = { SneakToTeleportOption(true) },
+        defaultOption = { SneakToTeleportOption(true) },
         options = {
             arrayListOf(
                 SneakToTeleportOption(true),
@@ -124,15 +124,7 @@ enum class UserSetting(
         }
     );
 
-    private var cached: Any = this.defaultValue()
-
-    fun <T> getDefaultValue(): T {
-        return cached as T
-    }
-
-    fun <T> newDefaultValue(): T {
-        return this.defaultValue() as T
-    }
+    private var cached: Any = this.defaultOption()
 
     fun getDisplayName(): String {
         return displayName
@@ -144,6 +136,14 @@ enum class UserSetting(
 
     fun getIcon(): ItemStack {
         return icon
+    }
+
+    fun <T : UserSettingOption> getDefaultOption(): T {
+        return cached as T
+    }
+
+    fun <T : UserSettingOption> newDefaultOption(): T {
+        return this.defaultOption() as T
     }
 
     fun <T : UserSettingOption> getOptions(): List<T> {

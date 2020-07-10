@@ -179,7 +179,7 @@ class User(val uuid: UUID) {
      */
     fun getSettingOption(setting: UserSetting): UserSettingOption {
         if (!settings.containsKey(setting)) {
-            settings[setting] = setting.newDefaultValue()
+            settings[setting] = setting.newDefaultOption()
         }
         return settings[setting]!!
     }
