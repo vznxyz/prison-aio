@@ -431,8 +431,9 @@ object CellHandler : PluginHandler {
                 }
 
                 Tasks.async {
-                    WorldEditUtils.paste(schematicFile, schematicData.pasteLocation)
-                    println("Pasted schematic at vector ${schematicData.pasteLocation.x}, ${schematicData.pasteLocation.z}")
+                    val pasteVector = Vector(schematicData.pasteLocation.x, schematicData.pasteLocation.y, schematicData.pasteLocation.z)
+                    WorldEditUtils.paste(schematicFile, schematicData.pasteLocation.world, pasteVector, true)
+                    println("Pasted schematic at vector ${schematicData.pasteLocation.x}, ${schematicData.pasteLocation.y}, ${schematicData.pasteLocation.z}")
 
                     onFinish.invoke(true)
                 }

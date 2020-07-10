@@ -11,6 +11,7 @@ import com.boydti.fawe.util.TaskManager
 import com.google.common.base.Charsets
 import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
+import com.sk89q.worldedit.Vector
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.util.bukkit.AngleUtils
@@ -250,8 +251,9 @@ object PrivateMineHandler : PluginHandler {
         val pasteLocation = Location(getGridWorld(), blockCoords.first.toDouble(), 68.0, blockCoords.second.toDouble())
 
         // paste schematic
-        WorldEditUtils.paste(tier.schematicFile, pasteLocation)
-        println("Pasted schematic at vector ${pasteLocation.x}, ${pasteLocation.z}")
+        val pasteVector = Vector(pasteLocation.x, pasteLocation.y, pasteLocation.z)
+        WorldEditUtils.paste(tier.schematicFile, pasteLocation.world, pasteVector, true)
+        println("Pasted schematic at vector ${pasteLocation.x}, ${pasteLocation.y}, ${pasteLocation.z}")
 
         // find the breakable region of the pasted schematic
         val cubeStart = Location(getGridWorld(), blockCoords.first.toDouble(), 68.0, blockCoords.second.toDouble())
