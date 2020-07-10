@@ -63,6 +63,11 @@ class CombatRegion(val id: String, private var cuboid: Cuboid) : Region {
     }
 
     override fun onEntityDamageEntity(attacker: Entity, victim: Entity, cause: EntityDamageEvent.DamageCause, damage: Double, cancellable: Cancellable) {
+        if (cause == EntityDamageEvent.DamageCause.FIRE || cause == EntityDamageEvent.DamageCause.FIRE_TICK || cause == EntityDamageEvent.DamageCause.LAVA) {
+            cancellable.isCancelled = false
+            return
+        }
+
         if (attacker is Player && victim is Player) {
             if (attacker == victim) {
                 cancellable.isCancelled = false

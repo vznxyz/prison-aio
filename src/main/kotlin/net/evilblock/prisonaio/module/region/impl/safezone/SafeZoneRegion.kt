@@ -51,40 +51,4 @@ class SafeZoneRegion : Region {
         return false
     }
 
-    override fun onBlockBreak(player: Player, block: Block, cancellable: Cancellable) {
-        cancellable.isCancelled = true
-    }
-
-    override fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
-        cancellable.isCancelled = true
-    }
-
-    override fun onBucketEmpty(player: Player, emptiedAt: Block, cancellable: Cancellable) {
-        cancellable.isCancelled = true
-    }
-
-    override fun onBucketFill(player: Player, filledFrom: Block, cancellable: Cancellable) {
-        cancellable.isCancelled = true
-    }
-
-    override fun onBlockExplode(block: Block, cancellable: Cancellable) {
-        cancellable.isCancelled = true
-    }
-
-    override fun onBlockIgnite(block: Block, entity: Entity?, cause: BlockIgniteEvent.IgniteCause, cancellable: Cancellable) {
-        cancellable.isCancelled = true
-    }
-
-    override fun onEntityDamage(entity: Entity, cause: EntityDamageEvent.DamageCause, cancellable: Cancellable) {
-        cancellable.isCancelled = true
-    }
-
-    override fun onEntityDamageEntity(attacker: Entity, victim: Entity, cause: EntityDamageEvent.DamageCause, damage: Double, cancellable: Cancellable) {
-        cancellable.isCancelled = true
-    }
-
-    override fun onFoodLevelChange(cancellable: Cancellable) {
-        cancellable.isCancelled = true
-    }
-
 }
