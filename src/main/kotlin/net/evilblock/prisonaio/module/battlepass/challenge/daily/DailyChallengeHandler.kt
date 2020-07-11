@@ -65,7 +65,8 @@ object DailyChallengeHandler : PluginHandler {
     fun newSession() {
         currentSession.clear()
         currentSession = DailyChallengeSession()
-        PrisonAIO.instance.systemLog("Generated new Daily Challenges session")
+
+        PrisonAIO.instance.systemLog("Generated new Daily Challenges session!")
     }
 
     private val DATA_TYPE = object : TypeToken<DailyChallengeSession>() {}.type
