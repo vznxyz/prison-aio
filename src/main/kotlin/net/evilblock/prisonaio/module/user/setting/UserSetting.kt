@@ -128,7 +128,7 @@ enum class UserSetting(
         displayName = "Auto Rankup",
         description = "This setting controls if rankups will be automatically purchased when you have enough funds to afford it.",
         icon = ItemStack(Material.EXP_BOTTLE),
-        defaultOption = { AutoRankupOption(true) },
+        defaultOption = { AutoRankupOption(false) },
         options = {
             arrayListOf(
                 AutoRankupOption(true),
