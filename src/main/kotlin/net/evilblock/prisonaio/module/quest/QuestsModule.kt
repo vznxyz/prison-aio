@@ -8,7 +8,9 @@
 package net.evilblock.prisonaio.module.quest
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.quest.command.QuestGuideCommand
 import net.evilblock.prisonaio.module.quest.dialogue.command.QuestDialogueSkipCommand
 import net.evilblock.prisonaio.module.quest.dialogue.listener.DialogueChatListeners
@@ -30,6 +32,10 @@ object QuestsModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "quests"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

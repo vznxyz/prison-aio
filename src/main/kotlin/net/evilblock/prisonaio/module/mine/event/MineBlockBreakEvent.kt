@@ -7,7 +7,7 @@
 
 package net.evilblock.prisonaio.module.mine.event
 
-import net.evilblock.prisonaio.module.PluginEvent
+import net.evilblock.cubed.plugin.PluginEvent
 import net.evilblock.prisonaio.module.mine.Mine
 import org.bukkit.block.Block
 import org.bukkit.entity.Player

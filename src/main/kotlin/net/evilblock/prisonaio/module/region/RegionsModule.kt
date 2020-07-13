@@ -7,10 +7,11 @@
 
 package net.evilblock.prisonaio.module.region
 
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.region.listener.RegionListeners
 import net.evilblock.prisonaio.module.region.listener.RegionWandListeners
-import net.evilblock.prisonaio.module.PluginModule
-import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.command.RegionBypassCommand
 import net.evilblock.prisonaio.module.region.command.RegionDebugCommand
@@ -30,6 +31,10 @@ object RegionsModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "regions"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {
@@ -89,7 +94,7 @@ object RegionsModule : PluginModule() {
     }
 
     fun canOpenEnderChestInGlobalRegion(): Boolean {
-        return MechanicsModule.config.getBoolean("global-region.allow-open-enderchest", true)
+        return config.getBoolean("global-region.allow-open-enderchest", true)
     }
 
 }

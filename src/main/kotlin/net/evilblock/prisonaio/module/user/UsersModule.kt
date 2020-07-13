@@ -8,8 +8,10 @@
 package net.evilblock.prisonaio.module.user
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
 import net.evilblock.prisonaio.module.user.bank.command.BankNoteGiveCommand
 import net.evilblock.prisonaio.module.user.command.WithdrawCommand
@@ -39,6 +41,10 @@ object UsersModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "users"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

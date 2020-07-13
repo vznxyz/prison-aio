@@ -7,9 +7,9 @@
 
 package net.evilblock.prisonaio.module.reward.minecrate
 
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.reward.MineCrateRewardSet
 import org.bukkit.ChatColor

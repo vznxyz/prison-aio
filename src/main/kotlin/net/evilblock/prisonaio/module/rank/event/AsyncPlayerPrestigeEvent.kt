@@ -7,8 +7,7 @@
 
 package net.evilblock.prisonaio.module.rank.event
 
-import net.evilblock.prisonaio.module.PluginEvent
-import net.evilblock.prisonaio.module.rank.Rank
+import net.evilblock.cubed.plugin.PluginEvent
 import net.evilblock.prisonaio.module.user.User
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable

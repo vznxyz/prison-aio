@@ -7,7 +7,7 @@
 
 package net.evilblock.prisonaio.module.shop.event
 
-import net.evilblock.prisonaio.module.PluginEvent
+import net.evilblock.cubed.plugin.PluginEvent
 import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
 import org.bukkit.entity.Player

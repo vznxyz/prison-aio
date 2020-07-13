@@ -7,9 +7,9 @@
 
 package net.evilblock.prisonaio.module.minigame.coinflip
 
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.minigame.MinigamesModule
 import net.evilblock.prisonaio.module.minigame.coinflip.task.CoinFlipGameTicker
 import org.bukkit.ChatColor
@@ -29,7 +29,7 @@ object CoinFlipHandler : PluginHandler {
     }
 
     override fun initialLoad() {
-        getModule().getPlugin().server.scheduler.runTaskTimerAsynchronously(getModule().getPlugin(), CoinFlipGameTicker, 4L, 4L)
+        getModule().getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getModule().getPluginFramework(), CoinFlipGameTicker, 4L, 4L)
     }
 
     fun cancelGames() {

@@ -8,7 +8,9 @@
 package net.evilblock.prisonaio.module.mine
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.mine.command.*
 import net.evilblock.prisonaio.module.mine.command.parameter.MineParameterType
 import net.evilblock.prisonaio.module.mine.listener.MineInventoryListeners
@@ -26,11 +28,15 @@ object MinesModule : PluginModule() {
         return "mines"
     }
 
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
+    }
+
     override fun onEnable() {
         MineHandler.initialLoad()
 
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), MineResetTask, 20L * 10L, 20L * 1L)
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), MineEffectsTask, 20L, 20L)
+        getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), MineResetTask, 20L * 10L, 20L * 1L)
+        getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), MineEffectsTask, 20L, 20L)
     }
 
     override fun onDisable() {

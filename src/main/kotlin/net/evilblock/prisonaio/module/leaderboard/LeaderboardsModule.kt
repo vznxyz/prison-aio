@@ -9,8 +9,10 @@ package net.evilblock.prisonaio.module.leaderboard
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.entity.EntityManager
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.leaderboard.command.RefreshCommand
 import net.evilblock.prisonaio.module.leaderboard.command.ResultsCommand
 import net.evilblock.prisonaio.module.leaderboard.command.SpawnCommand
@@ -33,6 +35,10 @@ object LeaderboardsModule : PluginModule() {
 
 	override fun getConfigFileName(): String {
 		return "leaderboards"
+	}
+
+	override fun getPluginFramework(): PluginFramework {
+		return PrisonAIO.instance
 	}
 
 	override fun onEnable() {

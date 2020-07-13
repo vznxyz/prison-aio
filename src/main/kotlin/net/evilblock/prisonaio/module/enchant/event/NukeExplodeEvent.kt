@@ -7,7 +7,7 @@
 
 package net.evilblock.prisonaio.module.enchant.event
 
-import net.evilblock.prisonaio.module.PluginEvent
+import net.evilblock.cubed.plugin.PluginEvent
 import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.block.Block
 import org.bukkit.entity.Player

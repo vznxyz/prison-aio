@@ -9,7 +9,9 @@ package net.evilblock.prisonaio.module.cell
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.cell.command.*
 import net.evilblock.prisonaio.module.cell.command.admin.CellForceDisbandCommand
 import net.evilblock.prisonaio.module.cell.command.admin.CellForceKickCommand
@@ -32,10 +34,14 @@ object CellsModule : PluginModule() {
         return "cells"
     }
 
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
+    }
+
     override fun onEnable() {
         CellHandler.initialLoad()
 
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), {
+        getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), {
             for (cell in CellHandler.getAllCells()) {
                 cell.expireInvitations()
             }

@@ -7,8 +7,8 @@
 
 package net.evilblock.prisonaio.module.combat.logger
 
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import java.util.*
 

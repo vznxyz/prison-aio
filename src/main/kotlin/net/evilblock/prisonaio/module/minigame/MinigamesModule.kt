@@ -7,7 +7,9 @@
 
 package net.evilblock.prisonaio.module.minigame
 
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipHandler
 import net.evilblock.prisonaio.module.minigame.coinflip.command.CoinFlipBrowseCommand
 
@@ -19,6 +21,10 @@ object MinigamesModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "minigames"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

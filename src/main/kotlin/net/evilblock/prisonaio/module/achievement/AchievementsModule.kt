@@ -7,7 +7,9 @@
 
 package net.evilblock.prisonaio.module.achievement
 
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.achievement.listener.AchievementProgressListeners
 import net.evilblock.prisonaio.module.achievement.type.PrestigeAchievement
 import org.bukkit.event.Listener
@@ -22,6 +24,10 @@ object AchievementsModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "achievements"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

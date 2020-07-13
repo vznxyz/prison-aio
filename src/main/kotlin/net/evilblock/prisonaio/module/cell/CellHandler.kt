@@ -13,13 +13,13 @@ import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
 import com.sk89q.worldedit.Vector
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.AngleUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.cubed.util.hook.WorldEditUtils
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.cell.permission.CellPermission
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass

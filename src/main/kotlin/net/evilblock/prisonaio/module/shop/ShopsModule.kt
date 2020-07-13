@@ -8,7 +8,10 @@
 package net.evilblock.prisonaio.module.shop
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.shop.command.*
 import net.evilblock.prisonaio.module.shop.command.parameter.ShopParameterType
 import net.evilblock.prisonaio.module.shop.command.parameter.ShopReceiptParameterType
@@ -27,10 +30,14 @@ object ShopsModule : PluginModule() {
         return "shops"
     }
 
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
+    }
+
     override fun onEnable() {
         ShopHandler.initialLoad()
 
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), ShopReceiptExpireTask, 2L, 2L)
+        Tasks.asyncTimer(ShopReceiptExpireTask, 2L, 2L)
     }
 
     override fun onAutoSave() {

@@ -9,8 +9,6 @@ package net.evilblock.prisonaio.module.crate.key
 
 import net.evilblock.cubed.util.bukkit.HiddenLore
 import net.evilblock.cubed.util.bukkit.ItemBuilder
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.crate.Crate
 import net.evilblock.prisonaio.module.crate.CrateHandler
 import net.evilblock.prisonaio.module.crate.CratesModule
@@ -20,6 +18,8 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 object CrateKeyHandler : PluginHandler {
 
     override fun getModule(): PluginModule {

@@ -8,7 +8,9 @@
 package net.evilblock.prisonaio.module.rank
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.rank.command.RankEditorCommand
 import net.evilblock.prisonaio.module.rank.command.RankScaleCommand
 import net.evilblock.prisonaio.module.rank.command.parameter.RankParameterType
@@ -24,6 +26,10 @@ object RanksModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "ranks"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

@@ -8,7 +8,9 @@
 package net.evilblock.prisonaio.module.combat
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldownHandler
 import net.evilblock.prisonaio.module.combat.apple.listener.GodAppleListeners
 import net.evilblock.prisonaio.module.combat.deathmessage.DeathMessageHandler
@@ -37,6 +39,10 @@ object CombatModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "combat"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

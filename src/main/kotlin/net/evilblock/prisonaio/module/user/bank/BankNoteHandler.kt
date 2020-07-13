@@ -13,10 +13,10 @@ import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.logging.LogFile
 import net.evilblock.cubed.logging.LogHandler
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.HiddenLore
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.user.UsersModule
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -26,7 +26,7 @@ import java.util.*
 object BankNoteHandler : PluginHandler {
 
     private val bankNotes = hashMapOf<UUID, BankNote>()
-    val logFile: LogFile = LogFile(File(File(getModule().getPlugin().dataFolder, "logs"), "bank-notes.txt"))
+    val logFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "bank-notes.txt"))
 
     override fun getModule(): PluginModule {
         return UsersModule

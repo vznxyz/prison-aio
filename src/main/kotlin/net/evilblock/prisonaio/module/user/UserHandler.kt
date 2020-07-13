@@ -12,8 +12,8 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.ReplaceOptions
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.logging.ErrorHandler
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.module.storage.StorageModule
 import org.bson.Document
 import org.bson.json.JsonMode
@@ -39,7 +39,7 @@ object UserHandler : PluginHandler {
 
     override fun initialLoad() {
         // delay a bit otherwise the method thinks there's no online players
-        getModule().getPlugin().server.scheduler.runTaskLater(getModule().getPlugin(), {
+        getModule().getPluginFramework().server.scheduler.runTaskLater(getModule().getPluginFramework(), {
             loadOnlinePlayers()
         }, 10L)
     }

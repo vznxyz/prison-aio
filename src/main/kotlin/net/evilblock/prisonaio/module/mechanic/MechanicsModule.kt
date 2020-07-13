@@ -7,7 +7,9 @@
 
 package net.evilblock.prisonaio.module.mechanic
 
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.mechanic.command.HotFixCommands
 import net.evilblock.prisonaio.module.mechanic.command.HelpCommand
 import net.evilblock.prisonaio.module.mechanic.command.SpawnCommand
@@ -29,6 +31,10 @@ object MechanicsModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "mechanics"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {
@@ -77,7 +83,7 @@ object MechanicsModule : PluginModule() {
             try {
                 autoSmeltBlocksMap[Material.valueOf(split[0])] = Material.valueOf(split[1])
             } catch (e: Exception) {
-                getPlugin().logger.warning("Error with string in auto-smelt block list config: `$string`")
+                getPluginFramework().logger.warning("Error with string in auto-smelt block list config: `$string`")
             }
         }
 
@@ -85,7 +91,7 @@ object MechanicsModule : PluginModule() {
             try {
                 dropsToInvIgnoredBlocks.add(Material.valueOf(string))
             } catch (e: Exception) {
-                getPlugin().logger.warning("Error with string in drops-to-inv ignored block list config: `$string`")
+                getPluginFramework().logger.warning("Error with string in drops-to-inv ignored block list config: `$string`")
             }
         }
     }

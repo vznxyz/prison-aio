@@ -7,9 +7,9 @@
 
 package net.evilblock.prisonaio.module.quest
 
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.quest.dialogue.DialoguePlayer
 import net.evilblock.prisonaio.module.quest.dialogue.DialogueSequence
 import net.evilblock.prisonaio.module.quest.impl.narcotic.NarcoticsQuest
@@ -31,7 +31,7 @@ object QuestHandler : PluginHandler {
         for (quest in quests) {
             for (mission in quest.getSortedMissions()) {
                 if (mission is Listener) {
-                    getModule().getPlugin().server.pluginManager.registerEvents(mission, getModule().getPlugin())
+                    getModule().getPluginFramework().server.pluginManager.registerEvents(mission, getModule().getPluginFramework())
                 }
             }
         }

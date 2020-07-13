@@ -9,7 +9,9 @@ package net.evilblock.prisonaio.module.storage
 
 import com.mongodb.client.MongoDatabase
 import net.evilblock.cubed.Cubed
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.storage.command.WipeDatabaseCommand
 
 object StorageModule : PluginModule() {
@@ -22,6 +24,10 @@ object StorageModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "storage"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun getCommands(): List<Class<*>> {

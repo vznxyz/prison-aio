@@ -7,7 +7,9 @@
 
 package net.evilblock.prisonaio.module.environment
 
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.environment.analytic.AnalyticHandler
 import net.evilblock.prisonaio.module.environment.analytic.command.AnalyticsCommand
 import net.evilblock.prisonaio.module.environment.analytic.command.WipeAnalyticsCommand
@@ -26,6 +28,10 @@ object EnvironmentModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "environment"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

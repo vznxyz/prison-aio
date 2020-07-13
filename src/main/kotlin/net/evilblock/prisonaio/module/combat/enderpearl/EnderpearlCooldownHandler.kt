@@ -7,9 +7,9 @@
 
 package net.evilblock.prisonaio.module.combat.enderpearl
 
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import org.bukkit.Bukkit
 import java.util.*

@@ -7,7 +7,9 @@
 
 package net.evilblock.prisonaio.module.privatemine
 
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.privatemine.command.*
 import net.evilblock.prisonaio.module.privatemine.task.PrivateMineResetTask
 import net.evilblock.prisonaio.module.privatemine.listener.*
@@ -24,10 +26,14 @@ object PrivateMinesModule : PluginModule() {
         return "private-mines"
     }
 
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
+    }
+
     override fun onEnable() {
         PrivateMineHandler.initialLoad()
 
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), PrivateMineResetTask, 20L, 20L)
+        getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), PrivateMineResetTask, 20L, 20L)
     }
 
     override fun onReload() {

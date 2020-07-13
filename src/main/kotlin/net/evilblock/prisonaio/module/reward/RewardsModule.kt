@@ -7,7 +7,9 @@
 
 package net.evilblock.prisonaio.module.reward
 
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.reward.deliveryman.DeliveryManHandler
 import net.evilblock.prisonaio.module.reward.deliveryman.command.DeliveryManEditorCommand
 import net.evilblock.prisonaio.module.reward.deliveryman.command.DeliveryManSpawnCommand
@@ -28,11 +30,15 @@ object RewardsModule : PluginModule() {
         return "rewards"
     }
 
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
+    }
+
     override fun onEnable() {
         DeliveryManHandler.initialLoad()
         MineCrateHandler.initialLoad()
 
-        getPlugin().server.scheduler.runTaskTimerAsynchronously(getPlugin(), MineCrateExpireTask, 20L, 20L)
+        getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), MineCrateExpireTask, 20L, 20L)
     }
 
     override fun onDisable() {

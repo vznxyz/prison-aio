@@ -7,7 +7,9 @@
 
 package net.evilblock.prisonaio.module.battlepass
 
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.listener.ChallengeCompletionListeners
@@ -24,6 +26,10 @@ object BattlePassModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "battle-pass"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

@@ -10,14 +10,14 @@ package net.evilblock.prisonaio
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.CubedOptions
 import net.evilblock.cubed.command.CommandHandler
-import net.evilblock.cubed.logging.ErrorHandler
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.prisonaio.command.GKitzCommand
 import net.evilblock.prisonaio.command.ReloadCommand
 import net.evilblock.prisonaio.command.SaveCommand
-import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.cell.CellsModule
@@ -45,15 +45,33 @@ import net.evilblock.prisonaio.module.shop.ShopsModule
 import net.evilblock.prisonaio.module.storage.StorageModule
 import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
-import net.evilblock.prisonaio.util.Permissions
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.generator.ChunkGenerator
-import org.bukkit.plugin.java.JavaPlugin
 
-class PrisonAIO : JavaPlugin() {
+class PrisonAIO : PluginFramework() {
 
-    val enabledModules = arrayListOf<PluginModule>()
+    val enabledModules = arrayListOf<PluginModule>(
+        EnvironmentModule,
+        StorageModule,
+        RegionsModule,
+        MechanicsModule,
+        RewardsModule,
+        EnchantsModule,
+        RanksModule,
+        CratesModule,
+//            AchievementsModule,
+        QuestsModule,
+        ShopsModule,
+        MinesModule,
+        CellsModule,
+        PrivateMinesModule,
+        BattlePassModule,
+        UsersModule,
+        ScoreboardModule,
+        ChatModule,
+        MinigamesModule,
+        LeaderboardsModule,
+        CombatModule
+    )
 
     override fun onEnable() {
         instance = this
@@ -89,90 +107,8 @@ class PrisonAIO : JavaPlugin() {
         }
     }
 
-    private fun loadModules() {
-        val modulesList = listOf(
-            EnvironmentModule,
-            StorageModule,
-            RegionsModule,
-            MechanicsModule,
-            RewardsModule,
-            EnchantsModule,
-            RanksModule,
-            CratesModule,
-//            AchievementsModule,
-            QuestsModule,
-            ShopsModule,
-            MinesModule,
-            CellsModule,
-            PrivateMinesModule,
-            BattlePassModule,
-            UsersModule,
-            ScoreboardModule,
-            ChatModule,
-            MinigamesModule,
-            LeaderboardsModule,
-            CombatModule
-        )
-
-        modulesList.filter { !it.requiresLateLoad() }.forEach { module ->
-            logger.info("Loading ${module.getName()} module...")
-
-            try {
-                module.onEnable()
-                module.getCommands().forEach { command -> CommandHandler.registerClass(command) }
-                module.getCommandParameterTypes().forEach { parameterEntry -> CommandHandler.registerParameterType(parameterEntry.key, parameterEntry.value) }
-                module.getListeners().forEach { listener -> server.pluginManager.registerEvents(listener, this) }
-
-                logger.info("Enabled ${module.getName()} module!")
-
-                enabledModules.add(module)
-            } catch (e: Exception) {
-                logger.severe("Failed to enable ${module.getName()} module:")
-                e.printStackTrace()
-            }
-        }
-
-        Tasks.delayed(1L) {
-            modulesList.filter { it.requiresLateLoad() }.forEach { module ->
-                logger.info("Loading ${module.getName()} module... (late load)")
-
-                try {
-                    module.onEnable()
-                    module.getCommands().forEach { command -> CommandHandler.registerClass(command) }
-                    module.getCommandParameterTypes().forEach { parameterEntry -> CommandHandler.registerParameterType(parameterEntry.key, parameterEntry.value) }
-                    module.getListeners().forEach { listener -> server.pluginManager.registerEvents(listener, this) }
-
-                    logger.info("Enabled ${module.getName()} module (late load)!")
-                } catch (e: Exception) {
-                    logger.severe("Failed to enable ${module.getName()} module (late load):")
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
-
-    fun saveModules() {
-        systemLog("Saving data...")
-
-        val startAt = System.currentTimeMillis()
-
-        enabledModules.forEach { module ->
-            try {
-                module.onAutoSave()
-            } catch (exception: Exception) {
-                ErrorHandler.generateErrorLog(
-                    errorType = "saveModule",
-                    event = mapOf("ModuleName" to module.getName()),
-                    exception = exception
-                )
-
-                systemLog("${ChatColor.RED}Failed to save module ${module.getName()}!")
-            }
-        }
-
-        val endAt = System.currentTimeMillis()
-
-        systemLog("Finished saving data in ${endAt - startAt}ms!")
+    override fun getModules(): List<PluginModule> {
+        return enabledModules
     }
 
     private fun loadTasks() {
@@ -188,28 +124,12 @@ class PrisonAIO : JavaPlugin() {
         CommandHandler.registerClass(SaveCommand::class.java)
     }
 
-    fun systemLog(vararg messages: String) {
-        for (message in messages) {
-            logger.info(message)
-        }
-
-        for (player in Bukkit.getOnlinePlayers()) {
-            if (player.isOp || player.hasPermission(Permissions.SYSTEM_ADMIN)) {
-                for (message in messages) {
-                    player.sendMessage("$SYSTEM_PREFIX ${ChatColor.GRAY}$message")
-                }
-            }
-        }
-    }
-
     override fun getDefaultWorldGenerator(worldName: String?, id: String?): ChunkGenerator {
         return EmptyChunkGenerator()
     }
 
     companion object {
         @JvmStatic lateinit var instance: PrisonAIO
-
-        private val SYSTEM_PREFIX = "${ChatColor.DARK_RED}${ChatColor.BOLD}[SYSTEM]"
     }
 
 }

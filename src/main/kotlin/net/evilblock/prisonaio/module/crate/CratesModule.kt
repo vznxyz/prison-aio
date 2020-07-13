@@ -8,7 +8,9 @@
 package net.evilblock.prisonaio.module.crate
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.crate.command.*
 import net.evilblock.prisonaio.module.crate.command.parameter.CrateParameterType
 import net.evilblock.prisonaio.module.crate.key.CrateKeyHandler
@@ -27,6 +29,10 @@ object CratesModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "crates"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

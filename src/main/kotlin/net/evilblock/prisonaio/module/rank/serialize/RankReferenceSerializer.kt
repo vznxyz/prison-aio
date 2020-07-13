@@ -8,10 +8,8 @@
 package net.evilblock.prisonaio.module.rank.serialize
 
 import com.google.gson.*
-import net.evilblock.prisonaio.module.PluginModule
 import net.evilblock.prisonaio.module.rank.Rank
 import net.evilblock.prisonaio.module.rank.RankHandler
-import net.evilblock.prisonaio.module.rank.RanksModule
 import java.lang.reflect.Type
 
 object RankReferenceSerializer : JsonSerializer<Rank>, JsonDeserializer<Rank> {

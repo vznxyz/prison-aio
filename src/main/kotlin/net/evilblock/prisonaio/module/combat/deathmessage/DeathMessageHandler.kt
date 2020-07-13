@@ -1,7 +1,7 @@
 package net.evilblock.prisonaio.module.combat.deathmessage
 
-import net.evilblock.prisonaio.module.PluginHandler
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import net.evilblock.prisonaio.module.combat.deathmessage.listeners.DamageListener
 import net.evilblock.prisonaio.module.combat.deathmessage.objects.Damage
@@ -30,7 +30,7 @@ object DeathMessageHandler : PluginHandler {
             VoidTracker(),
             BurnTracker()
         ).forEach { tracker ->
-            getModule().getPlugin().server.pluginManager.registerEvents(tracker, getModule().getPlugin())
+            getModule().getPluginFramework().server.pluginManager.registerEvents(tracker, getModule().getPluginFramework())
         }
     }
 

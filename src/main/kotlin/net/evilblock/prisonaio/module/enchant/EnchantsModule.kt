@@ -8,7 +8,9 @@
 package net.evilblock.prisonaio.module.enchant
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.PluginModule
+import net.evilblock.cubed.plugin.PluginFramework
+import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.command.*
 import net.evilblock.prisonaio.module.enchant.command.parameter.AbstractEnchantParameterType
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
@@ -24,6 +26,10 @@ object EnchantsModule : PluginModule() {
 
     override fun getConfigFileName(): String {
         return "enchants"
+    }
+
+    override fun getPluginFramework(): PluginFramework {
+        return PrisonAIO.instance
     }
 
     override fun onEnable() {

@@ -1,6 +1,6 @@
 package net.evilblock.prisonaio.module.combat.deathmessage.event
 
-import net.evilblock.prisonaio.module.PluginEvent
+import net.evilblock.cubed.plugin.PluginEvent
 import net.evilblock.prisonaio.module.combat.deathmessage.objects.Damage
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
