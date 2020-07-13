@@ -22,8 +22,6 @@ import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.cell.CellsModule
 import net.evilblock.prisonaio.module.chat.ChatModule
 import net.evilblock.prisonaio.module.combat.CombatModule
-import net.evilblock.prisonaio.module.crate.CratesModule
-import net.evilblock.prisonaio.module.crate.reward.CrateReward
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.environment.EnvironmentModule
 import net.evilblock.prisonaio.module.environment.wizard.command.RunWizardCommand
@@ -48,29 +46,7 @@ import org.bukkit.generator.ChunkGenerator
 
 class PrisonAIO : PluginFramework() {
 
-    val enabledModules = arrayListOf(
-        EnvironmentModule,
-        StorageModule,
-        RegionsModule,
-        MechanicsModule,
-        RewardsModule,
-        EnchantsModule,
-        RanksModule,
-        CratesModule,
-//            AchievementsModule,
-        QuestsModule,
-        ShopsModule,
-        MinesModule,
-        CellsModule,
-        PrivateMinesModule,
-        BattlePassModule,
-        UsersModule,
-        ScoreboardModule,
-        ChatModule,
-        MinigamesModule,
-        LeaderboardsModule,
-        CombatModule
-    )
+    val enabledModules: MutableList<PluginModule> = arrayListOf()
 
     override fun onEnable() {
         instance = this
@@ -81,7 +57,6 @@ class PrisonAIO : PluginFramework() {
         Cubed.instance.useGsonBuilderThenRebuild { builder ->
             builder.registerTypeAdapter(QuestProgression::class.java, QuestProgression.Serializer)
             builder.registerTypeAdapter(BlockType::class.java, BlockType.Serializer)
-            builder.registerTypeAdapter(CrateReward::class.java, CrateReward.Serializer)
             builder.registerTypeAdapter(DeliveryManRewardRequirement::class.java, DeliveryManRewardRequirement.Serializer)
             builder.registerTypeAdapter(UserSettingOption::class.java, AbstractTypeSerializer<UserSettingOption>())
             builder.registerTypeAdapter(Challenge::class.java, AbstractTypeSerializer<Challenge>())
@@ -93,6 +68,31 @@ class PrisonAIO : PluginFramework() {
     }
 
     override fun getModules(): List<PluginModule> {
+        if (enabledModules.isEmpty()) {
+            enabledModules.addAll(listOf(
+                EnvironmentModule,
+                StorageModule,
+                RegionsModule,
+                MechanicsModule,
+                RewardsModule,
+                EnchantsModule,
+                RanksModule,
+//            AchievementsModule,
+                QuestsModule,
+                ShopsModule,
+                MinesModule,
+                CellsModule,
+                PrivateMinesModule,
+                BattlePassModule,
+                UsersModule,
+                ScoreboardModule,
+                ChatModule,
+                MinigamesModule,
+                LeaderboardsModule,
+                CombatModule
+            ))
+        }
+
         return enabledModules
     }
 
