@@ -13,7 +13,6 @@ import net.evilblock.cubed.command.CommandHandler
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.prisonaio.command.GKitzCommand
 import net.evilblock.prisonaio.command.ReloadCommand
@@ -49,7 +48,7 @@ import org.bukkit.generator.ChunkGenerator
 
 class PrisonAIO : PluginFramework() {
 
-    val enabledModules = arrayListOf<PluginModule>(
+    val enabledModules = arrayListOf(
         EnvironmentModule,
         StorageModule,
         RegionsModule,
@@ -88,33 +87,13 @@ class PrisonAIO : PluginFramework() {
             builder.registerTypeAdapter(Challenge::class.java, AbstractTypeSerializer<Challenge>())
         }
 
-        loadModules()
-        loadTasks()
+        super.onEnable()
+
         loadCommands()
-    }
-
-    override fun onDisable() {
-        enabledModules.forEach { module ->
-            logger.info("Disabling ${module.getName()} module...")
-
-            try {
-                module.onDisable()
-                logger.info("Disabled ${module.getName()} module!")
-            } catch (e: Exception) {
-                logger.severe("Failed to disable ${module.getName()} module:")
-                e.printStackTrace()
-            }
-        }
     }
 
     override fun getModules(): List<PluginModule> {
         return enabledModules
-    }
-
-    private fun loadTasks() {
-        Tasks.asyncTimer(20L * 60L * 3L, 20L * 60L * 3L) {
-            saveModules()
-        }
     }
 
     private fun loadCommands() {
