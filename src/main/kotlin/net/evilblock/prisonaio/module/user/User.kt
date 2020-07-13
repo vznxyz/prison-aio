@@ -47,7 +47,7 @@ class User(val uuid: UUID) {
     internal var requiresSave: Boolean = false
 
     /**
-     * Used to assign permissions granted by the user's [currentRank] and [currentPrestige].
+     * Used to assign permissions granted by the user's [rank] and [prestige].
      */
     @Transient
     var attachment: PermissionAttachment? = null
@@ -56,15 +56,20 @@ class User(val uuid: UUID) {
      * The user's current rank.
      */
     @JsonAdapter(value = RankReferenceSerializer::class)
-    private var currentRank: Rank = RankHandler.getStartingRank()
+    private var rank: Rank = RankHandler.getStartingRank()
 
     /**
-     * The user's current prestige.
+     * The user's prestige.
      */
-    private var currentPrestige: Int = 0
+    private var prestige: Int = 0
 
     /**
-     * The user's current tokens balance.
+     * The user's prestige tokens balance.
+     */
+    private var prestigeTokens: Int = 0
+
+    /**
+     * The user's tokens balance.
      */
     private var tokensBalance: Long = 0L
 
@@ -133,6 +138,9 @@ class User(val uuid: UUID) {
         return Cubed.instance.uuidCache.name(uuid)
     }
 
+    /**
+     * Tries to fetch the bukkit [Player] representing this user.
+     */
     fun getPlayer(): Player? {
         return Bukkit.getPlayer(uuid)
     }
@@ -157,15 +165,170 @@ class User(val uuid: UUID) {
     /**
      * Gets the user's current rank.
      */
-    fun getCurrentRank(): Rank {
-        return currentRank
+    fun getRank(): Rank {
+        return rank
     }
 
     /**
-     * Gets the user's current prestige.
+     * Updates the user's [User.rank] to the given [rank].
      */
-    fun getCurrentPrestige(): Int {
-        return currentPrestige
+    fun updateRank(rank: Rank) {
+        this.rank = rank
+        requiresSave = true
+    }
+
+    /**
+     * Attempts to purchase any rankups the user can afford.
+     */
+    fun purchaseMaxRankups(player: Player, manual: Boolean = false) {
+        val previousRank = rank
+
+        val optionalNextRank = RankHandler.getNextRank(previousRank)
+        if (!optionalNextRank.isPresent) {
+            if (manual) {
+                player.sendMessage("${ChatColor.RED}You have achieved max rank and cannot rankup anymore. Try /prestige!")
+            }
+            return
+        }
+
+        var balance = getMoneyBalance()
+
+        val purchasedRanks = arrayListOf<Rank>()
+        for (rank in RankHandler.getSortedRanks()) {
+            if (previousRank.sortOrder >= rank.sortOrder) {
+                continue
+            }
+
+            val rankPrice = rank.getPrice(prestige)
+            if (rankPrice > balance) {
+                break
+            }
+
+            val playerRankupEvent = PlayerRankupEvent(player, previousRank, rank)
+            Bukkit.getServer().pluginManager.callEvent(playerRankupEvent)
+
+            if (playerRankupEvent.isCancelled) {
+                return
+            }
+
+            VaultHook.useEconomy { economy ->
+                val response = economy.withdrawPlayer(player, rankPrice.toDouble())
+                if (!response.transactionSuccess()) {
+                    return@useEconomy
+                }
+
+                balance -= rankPrice
+
+                updateRank(rank)
+                rank.executeCommands(player)
+
+                purchasedRanks.add(rank)
+            }
+        }
+
+        applyPermissions(player)
+
+        if (purchasedRanks.isEmpty()) {
+            if (manual) {
+                player.sendMessage("")
+                player.sendMessage(" ${ChatColor.RED}${ChatColor.BOLD}Cannot Afford Rankup")
+                player.sendMessage(" ${ChatColor.GRAY}You don't have enough money to purchase any rankups.")
+                player.sendMessage("")
+            }
+            return
+        }
+
+        player.sendMessage("")
+        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Rankups Purchased${ if (!manual) "${ChatColor.GRAY}(Auto Rankup)" else "" }")
+        player.sendMessage(" ${ChatColor.GRAY}Congratulations on your rankups from ${previousRank.displayName} ${ChatColor.GRAY}to ${rank.displayName}${ChatColor.GRAY}!")
+
+        val formattedMoneySpent = NumberUtils.format(purchasedRanks.map { it.getPrice(prestige) }.sum())
+        player.sendMessage(" ${ChatColor.GRAY}The rankups cost ${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedMoneySpent${ChatColor.GRAY}.")
+
+        player.sendMessage("")
+    }
+
+    /**
+     * Gets the user's prestige.
+     */
+    fun getPrestige(): Int {
+        return prestige
+    }
+
+    /**
+     * Updates the user's [prestige] to the given [prestige].
+     */
+    fun updatePrestige(prestige: Int) {
+        this.prestige = prestige
+        requiresSave = true
+    }
+
+    /**
+     * Gets the user's [prestigeTokens].
+     */
+    fun getPrestigeTokens(): Int {
+        return this.prestigeTokens
+    }
+
+    /**
+     * Sets the user's [prestigeTokens] to the given [tokens].
+     */
+    fun setPrestigeTokens(tokens: Int) {
+        this.prestigeTokens = tokens
+        requiresSave = true
+    }
+
+    /**
+     * Gets the amount of blocks the user is required to mine before being able to enter the next prestige.
+     */
+    fun getPrestigeRequirement(): Int {
+        return RanksModule.getPrestigeBlocksMinedRequirementBase() + ((prestige + 1) * RanksModule.getPrestigeBlocksMinedRequirementModifier())
+    }
+
+    /**
+     * Gets the user's current money balance.
+     */
+    fun getMoneyBalance(): Double {
+        return VaultHook.getBalance(uuid)
+    }
+
+    /**
+     * Gets the user's current [tokensBalance].
+     */
+    fun getTokensBalance(): Long {
+        return tokensBalance
+    }
+
+    /**
+     * If the user's balance is more than or equal to the given [amount].
+     */
+    fun hasTokensBalance(amount: Long): Boolean {
+        return tokensBalance >= amount
+    }
+
+    /**
+     * Updates the user's tokens balance to the given [newBalance].
+     */
+    fun updateTokensBalance(newBalance: Long) {
+        tokensBalance = if (newBalance < 0) { 0 } else { newBalance }
+        requiresSave = true
+    }
+
+    /**
+     * Adds the given [amount] to the user's token balance.
+     */
+    fun addTokensBalance(amount: Long) {
+        assert(amount > 0) { "Amount must be more than 0" }
+        updateTokensBalance(tokensBalance + amount)
+    }
+
+    /**
+     * Subtracts the given [amount] from the users [tokensBalance].
+     */
+    fun subtractTokensBalance(amount: Long) {
+        assert(amount > 0) { "Amount must be more than 0" }
+        assert(tokensBalance - amount > 0) { "Can't subtract tokens to make balance negative" }
+        updateTokensBalance(tokensBalance - amount)
     }
 
     /**
@@ -222,9 +385,7 @@ class User(val uuid: UUID) {
     fun removeProfileComment(comment: ProfileComment) {
         profileComments.remove(comment)
         requiresSave = true
-    }
-
-    /**
+    }/**
      * If the user has completed the given [achievement].
      */
     fun hasCompletedAchievement(achievement: Achievement): Boolean {
@@ -284,140 +445,7 @@ class User(val uuid: UUID) {
     }
 
     /**
-     * Updates the user's [currentRank] to the given [rank].
-     */
-    fun updateCurrentRank(rank: Rank) {
-        currentRank = rank
-        requiresSave = true
-    }
-
-    fun purchaseMaxRankups(player: Player, manual: Boolean = false) {
-        val previousRank = currentRank
-
-        val optionalNextRank = RankHandler.getNextRank(previousRank)
-        if (!optionalNextRank.isPresent) {
-            if (manual) {
-                player.sendMessage("${ChatColor.RED}You have achieved max rank and cannot rankup anymore. Try /prestige!")
-            }
-            return
-        }
-
-        var balance = getMoneyBalance()
-
-        val purchasedRanks = arrayListOf<Rank>()
-        for (rank in RankHandler.getSortedRanks()) {
-            if (previousRank.sortOrder >= rank.sortOrder) {
-                continue
-            }
-
-            val rankPrice = rank.getPrice(currentPrestige)
-            if (rankPrice > balance) {
-                break
-            }
-
-            val playerRankupEvent = PlayerRankupEvent(player, previousRank, rank)
-            Bukkit.getServer().pluginManager.callEvent(playerRankupEvent)
-
-            if (playerRankupEvent.isCancelled) {
-                return
-            }
-
-            VaultHook.useEconomy { economy ->
-                val response = economy.withdrawPlayer(player, rankPrice.toDouble())
-                if (!response.transactionSuccess()) {
-                    return@useEconomy
-                }
-
-                balance -= rankPrice
-
-                updateCurrentRank(rank)
-                rank.executeCommands(player)
-
-                purchasedRanks.add(rank)
-            }
-        }
-
-        applyPermissions(player)
-
-        if (purchasedRanks.isEmpty()) {
-            if (manual) {
-                player.sendMessage("")
-                player.sendMessage(" ${ChatColor.RED}${ChatColor.BOLD}Cannot Afford Rankup")
-                player.sendMessage(" ${ChatColor.GRAY}You don't have enough money to purchase any rankups.")
-                player.sendMessage("")
-            }
-            return
-        }
-
-        player.sendMessage("")
-        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Rankups Purchased${ if (!manual) "${ChatColor.GRAY}(Auto Rankup)" else "" }")
-        player.sendMessage(" ${ChatColor.GRAY}Congratulations on your rankups from ${previousRank.displayName} ${ChatColor.GRAY}to ${currentRank.displayName}${ChatColor.GRAY}!")
-
-        val formattedMoneySpent = NumberUtils.format(purchasedRanks.map { it.getPrice(currentPrestige) }.sum())
-        player.sendMessage(" ${ChatColor.GRAY}The rankups cost ${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedMoneySpent${ChatColor.GRAY}.")
-
-        player.sendMessage("")
-    }
-
-    /**
-     * Updates the user's [currentPrestige] to the given [prestige].
-     *
-     * If the user's [prestigeReqNotifsSent] is more than or equal to the given [prestige], then that
-     * field will be also be updated depending on if the user has met the new prestige requirement.
-     */
-    fun updateCurrentPrestige(prestige: Int) {
-        currentPrestige = prestige
-        requiresSave = true
-    }
-
-    /**
-     * Gets the amount of blocks the user is required to mine before being able to enter the next prestige.
-     */
-    fun getPrestigeRequirement(): Int {
-        return RanksModule.getPrestigeBlocksMinedRequirementBase() + ((currentPrestige + 1) * RanksModule.getPrestigeBlocksMinedRequirementModifier())
-    }
-
-    /**
-     * Gets the user's current money balance.
-     */
-    fun getMoneyBalance(): Double {
-        return VaultHook.getBalance(uuid)
-    }
-
-    /**
-     * Gets the user's current [tokensBalance].
-     */
-    fun getTokensBalance(): Long {
-        return tokensBalance
-    }
-
-    /**
-     * If the user's balance is more than or equal to the given [amount].
-     */
-    fun hasTokensBalance(amount: Long): Boolean {
-        return tokensBalance >= amount
-    }
-
-    /**
-     * Updates the user's tokens balance to the given [newBalance].
-     */
-    fun updateTokensBalance(newBalance: Long) {
-        tokensBalance = if (newBalance < 0) { 0 } else { newBalance }
-        requiresSave = true
-    }
-
-    fun addTokensBalance(amount: Long) {
-        assert(amount > 0) { "Amount must be more than 0" }
-        updateTokensBalance(tokensBalance + amount)
-    }
-
-    fun subtractTokensBalance(amount: Long) {
-        assert(amount > 0) { "Amount must be more than 0" }
-        updateTokensBalance(tokensBalance - amount)
-    }
-
-    /**
-     * Applies the permissions granted by the user's [currentRank] and [currentPrestige].
+     * Applies the permissions granted by the user's [rank] and [prestige].
      */
     fun applyPermissions(player: Player) {
         if (attachment == null) {
@@ -429,7 +457,7 @@ class User(val uuid: UUID) {
             }
         }
 
-        for (permission in currentRank.getCompoundedPermissions()) {
+        for (permission in rank.getCompoundedPermissions()) {
             if (permission.startsWith("-")) {
                 attachment!!.setPermission(permission.substring(1), false)
             } else {

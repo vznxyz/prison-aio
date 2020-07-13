@@ -31,7 +31,7 @@ class PrestigeRequirement(private var prestige: Int) : DeliveryManRewardRequirem
     }
 
     override fun test(player: Player): Boolean {
-        return UserHandler.getUser(player.uniqueId).getCurrentPrestige() >= prestige
+        return UserHandler.getUser(player.uniqueId).getPrestige() >= prestige
     }
 
     object PrestigeRequirementType : DeliveryManRewardRequirementType<PrestigeRequirement> {

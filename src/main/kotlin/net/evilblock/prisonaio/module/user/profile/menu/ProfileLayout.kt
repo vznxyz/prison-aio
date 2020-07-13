@@ -81,12 +81,12 @@ class ProfileLayout(
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.add("${ChatColor.RED}${Constants.RANK_SYMBOL} ${ChatColor.GRAY}Rank ${user.getCurrentRank().displayName}")
+            description.add("${ChatColor.RED}${Constants.RANK_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}")
 
-            if (user.getCurrentPrestige() == 0) {
+            if (user.getPrestige() == 0) {
                 description.add("${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Not Prestiged")
             } else {
-                description.add("${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Prestige ${user.getCurrentPrestige()}")
+                description.add("${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Prestige ${user.getPrestige()}")
             }
 
             val formattedMoneyBalance = NumberUtils.format(user.getMoneyBalance())

@@ -9,13 +9,10 @@ package net.evilblock.prisonaio.module.user.command.admin
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
-import net.evilblock.prisonaio.module.rank.Rank
 import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.util.Constants
-import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -34,7 +31,7 @@ object UserSetPrestigeCommand {
         assert(prestige > 0) { "Cannot set prestige to less than 0" }
         assert(prestige > 0) { "Cannot set prestige to more than ${RanksModule.getMaxPrestige()}" }
 
-        user.updateCurrentPrestige(prestige)
+        user.updatePrestige(prestige)
         UserHandler.saveUser(user)
 
         val player = Bukkit.getPlayer(user.uuid)

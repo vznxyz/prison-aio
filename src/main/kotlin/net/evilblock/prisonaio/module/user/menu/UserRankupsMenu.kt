@@ -35,11 +35,11 @@ class UserRankupsMenu(private val user: User) : Menu() {
 
     private inner class RankupButton(private val user: User, private val rank: Rank) : Button() {
         override fun getName(player: Player): String {
-            if (user.getCurrentRank().sortOrder >= rank.sortOrder) {
+            if (user.getRank().sortOrder >= rank.sortOrder) {
                 return "${ChatColor.GREEN}${ChatColor.BOLD}Rank ${rank.displayName}"
             }
 
-            val optionalNextRank = RankHandler.getNextRank(user.getCurrentRank())
+            val optionalNextRank = RankHandler.getNextRank(user.getRank())
             if (optionalNextRank.isPresent && optionalNextRank.get() == rank) {
                 return "${ChatColor.YELLOW}${ChatColor.BOLD}Rank ${rank.displayName}"
             }
@@ -50,7 +50,7 @@ class UserRankupsMenu(private val user: User) : Menu() {
         override fun getDescription(player: Player): List<String> {
             return listOf(
                 "",
-                "${ChatColor.GRAY}This rankup costs ${ChatColor.GREEN}$${ChatColor.YELLOW}${NumberUtils.format(rank.getPrice(user.getCurrentPrestige()))}${ChatColor.GRAY}."
+                "${ChatColor.GRAY}This rankup costs ${ChatColor.GREEN}$${ChatColor.YELLOW}${NumberUtils.format(rank.getPrice(user.getPrestige()))}${ChatColor.GRAY}."
             )
         }
 

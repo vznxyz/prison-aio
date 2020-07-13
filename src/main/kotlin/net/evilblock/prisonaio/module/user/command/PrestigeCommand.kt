@@ -29,12 +29,12 @@ object PrestigeCommand {
     @JvmStatic
     fun execute(player: Player) {
         val user = UserHandler.getUser(player.uniqueId)
-        if (user.getCurrentRank() != RankHandler.getLastRank()) {
+        if (user.getRank() != RankHandler.getLastRank()) {
             player.sendMessage("${ChatColor.RED}You must be the ${RankHandler.getLastRank().displayName} ${ChatColor.RED}rank to prestige.")
             return
         }
 
-        if (user.getCurrentPrestige() >= RanksModule.getMaxPrestige()) {
+        if (user.getPrestige() >= RanksModule.getMaxPrestige()) {
             player.sendMessage("${ChatColor.RED}You have achieved the maximum prestige possible.")
             return
         }
@@ -48,15 +48,15 @@ object PrestigeCommand {
             return
         }
 
-        val prestigeEvent = AsyncPlayerPrestigeEvent(player, user, user.getCurrentPrestige(), user.getCurrentPrestige() + 1)
+        val prestigeEvent = AsyncPlayerPrestigeEvent(player, user, user.getPrestige(), user.getPrestige() + 1)
         Bukkit.getPluginManager().callEvent(prestigeEvent)
 
         if (prestigeEvent.isCancelled) {
             return
         }
 
-        user.updateCurrentPrestige(prestigeEvent.to)
-        user.updateCurrentRank(RankHandler.getStartingRank())
+        user.updatePrestige(prestigeEvent.to)
+        user.updateRank(RankHandler.getStartingRank())
 
         for (command in RanksModule.getPrestigeCommands()) {
             val translatedCommand = command

@@ -10,10 +10,8 @@ package net.evilblock.prisonaio.module.chat.listener
 import me.clip.deluxetags.DeluxeTag
 import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.util.Constants
 import org.apache.commons.lang.WordUtils
 import org.bukkit.Bukkit
@@ -35,25 +33,25 @@ object ChatFormatListeners : Listener {
         val user = UserHandler.getUser(event.player.uniqueId)
         val tagPrefix = ChatColor.translateAlternateColorCodes('&', DeluxeTag.getPlayerDisplayTag(event.player.uniqueId.toString()) ?: "")
 
-        val prestigeTag = if (user.getCurrentPrestige() >= RanksModule.getMaxPrestige()) {
+        val prestigeTag = if (user.getPrestige() >= RanksModule.getMaxPrestige()) {
             RanksModule.getMaxPrestigeTag()
         } else {
-            (user.getCurrentPrestige()).toString()
+            (user.getPrestige()).toString()
         }
 
         val formattedMessage = String.format(event.format, event.player.displayName, "")
-            .replace("{prisonRank}", user.getCurrentRank().displayName)
+            .replace("{prisonRank}", user.getRank().displayName)
             .replace("{prisonPrestige}", prestigeTag)
             .replace("{tagPrefix}", tagPrefix)
 
         val tooltipLines = arrayListOf<FancyMessage>()
         tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}${event.player.name}"))
-        tooltipLines.add(FancyMessage(" ${ChatColor.RED}⚔ ${ChatColor.GRAY}Rank ${user.getCurrentRank().displayName}"))
+        tooltipLines.add(FancyMessage(" ${ChatColor.RED}⚔ ${ChatColor.GRAY}Rank ${user.getRank().displayName}"))
 
-        if (user.getCurrentPrestige() == 0) {
+        if (user.getPrestige() == 0) {
             tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}⭑ ${ChatColor.GRAY}Not Prestiged"))
         } else {
-            tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}⭑ ${ChatColor.GRAY}Prestige ${user.getCurrentPrestige()}"))
+            tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}⭑ ${ChatColor.GRAY}Prestige ${user.getPrestige()}"))
         }
 
         val moneyBalance = user.getMoneyBalance()

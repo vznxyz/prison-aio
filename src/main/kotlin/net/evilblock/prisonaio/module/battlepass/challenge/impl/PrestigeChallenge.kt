@@ -35,7 +35,7 @@ class PrestigeChallenge(id: String, internal var prestige: Int) : Challenge(id) 
         val value = if (daily) {
             DailyChallengeHandler.getSession().getProgress(player.uniqueId).getTimesPrestiged()
         } else {
-            user.getCurrentPrestige()
+            user.getPrestige()
         }
 
         val percentage = ProgressBarBuilder.percentage(value, prestige)

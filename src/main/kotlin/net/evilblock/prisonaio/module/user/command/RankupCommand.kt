@@ -27,17 +27,17 @@ object RankupCommand {
     fun execute(player: Player) {
         val user = UserHandler.getUser(player.uniqueId)
 
-        val optionalNextRank = RankHandler.getNextRank(user.getCurrentRank())
+        val optionalNextRank = RankHandler.getNextRank(user.getRank())
         if (!optionalNextRank.isPresent) {
             player.sendMessage("${ChatColor.RED}You have achieved max rank and cannot rankup anymore. Try /prestige!")
             return
         }
 
         val rank = optionalNextRank.get()
-        val rankPrice = rank.getPrice(user.getCurrentPrestige())
+        val rankPrice = rank.getPrice(user.getPrestige())
 
         if (user.getMoneyBalance() >= rankPrice) {
-            val previousRank = user.getCurrentRank()
+            val previousRank = user.getRank()
 
             val playerRankupEvent = PlayerRankupEvent(player, previousRank, rank)
             Bukkit.getServer().pluginManager.callEvent(playerRankupEvent)
@@ -48,7 +48,7 @@ object RankupCommand {
 
             VaultHook.useEconomy { it.withdrawPlayer(player, rankPrice) }
 
-            user.updateCurrentRank(rank)
+            user.updateRank(rank)
             user.applyPermissions(player)
 
             rank.executeCommands(player)

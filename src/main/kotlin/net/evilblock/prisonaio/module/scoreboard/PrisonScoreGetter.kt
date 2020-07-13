@@ -11,7 +11,6 @@ import net.evilblock.cubed.scoreboard.ScoreGetter
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.ProgressBarBuilder
 import net.evilblock.cubed.util.TimeUtil
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldownHandler
 import net.evilblock.prisonaio.module.combat.enderpearl.EnderpearlCooldownHandler
 import net.evilblock.prisonaio.module.combat.region.CombatRegion
@@ -21,7 +20,6 @@ import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.util.Constants
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.*
@@ -70,12 +68,12 @@ object PrisonScoreGetter : ScoreGetter {
 
         scores.add("")
         scores.add("  ${ChatColor.RED}${ChatColor.BOLD}${player.name}")
-        scores.add("  ${ChatColor.RED}${Constants.RANK_SYMBOL} ${ChatColor.GRAY}Rank ${user.getCurrentRank().displayName}")
+        scores.add("  ${ChatColor.RED}${Constants.RANK_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}")
 
-        if (user.getCurrentPrestige() == 0) {
+        if (user.getPrestige() == 0) {
             scores.add("  ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Not Prestiged")
         } else {
-            scores.add("  ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Prestige ${user.getCurrentPrestige()}")
+            scores.add("  ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Prestige ${user.getPrestige()}")
         }
 
         val moneyBalance = user.getMoneyBalance()
@@ -87,10 +85,10 @@ object PrisonScoreGetter : ScoreGetter {
 
         scores.add("")
 
-        val optionalNextRank = RankHandler.getNextRank(user.getCurrentRank())
+        val optionalNextRank = RankHandler.getNextRank(user.getRank())
         if (optionalNextRank.isPresent) {
             val nextRank = optionalNextRank.get()
-            val nextRankPrice = nextRank.getPrice(user.getCurrentPrestige())
+            val nextRankPrice = nextRank.getPrice(user.getPrestige())
             val formattedPrice = NumberUtils.format(nextRankPrice)
 
             val progressPercentage = if (moneyBalance > nextRankPrice) {
@@ -103,7 +101,7 @@ object PrisonScoreGetter : ScoreGetter {
             val progressBar = ProgressBarBuilder(char = '⬛').build(progressPercentage)
 
             scores.add("  ${ChatColor.RED}${ChatColor.BOLD}Progress")
-            scores.add("  ${ChatColor.GRAY}${user.getCurrentRank().displayName} ${ChatColor.GRAY}-> ${nextRank.displayName} ${ChatColor.GRAY}(${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedPrice${ChatColor.GRAY})")
+            scores.add("  ${ChatColor.GRAY}${user.getRank().displayName} ${ChatColor.GRAY}-> ${nextRank.displayName} ${ChatColor.GRAY}(${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedPrice${ChatColor.GRAY})")
             scores.add("  ${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ($progressColor${progressPercentage.toInt()}%${ChatColor.GRAY})")
             scores.add("")
         }
