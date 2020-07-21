@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.util
 
+import net.evilblock.cubed.util.bukkit.Constants
 import org.bukkit.ChatColor
 import org.bukkit.inventory.ItemStack
 import java.text.NumberFormat

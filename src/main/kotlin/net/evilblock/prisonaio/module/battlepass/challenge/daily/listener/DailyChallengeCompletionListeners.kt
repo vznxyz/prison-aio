@@ -27,6 +27,10 @@ object DailyChallengeCompletionListeners : Listener {
         Tasks.async {
             val progress = DailyChallengeHandler.getSession().getProgress(event.player.uniqueId)
             for (challenge in DailyChallengeHandler.getSession().getChallenges()) {
+                if (!challenge.daily) {
+                    continue
+                }
+
                 if (progress.hasCompletedChallenge(challenge)) {
                     continue
                 }
@@ -47,6 +51,10 @@ object DailyChallengeCompletionListeners : Listener {
         progress.addPlayTime(event.offset)
 
         for (challenge in DailyChallengeHandler.getSession().getChallenges()) {
+            if (!challenge.daily) {
+                continue
+            }
+
             if (progress.hasCompletedChallenge(challenge)) {
                 continue
             }
@@ -68,6 +76,10 @@ object DailyChallengeCompletionListeners : Listener {
         progress.addTimePrestiged()
 
         for (challenge in DailyChallengeHandler.getSession().getChallenges()) {
+            if (!challenge.daily) {
+                continue
+            }
+
             if (progress.hasCompletedChallenge(challenge)) {
                 continue
             }
@@ -87,6 +99,10 @@ object DailyChallengeCompletionListeners : Listener {
             progress.addBlocksMined(1)
 
             for (challenge in DailyChallengeHandler.getSession().getChallenges()) {
+                if (!challenge.daily) {
+                    continue
+                }
+
                 if (progress.hasCompletedChallenge(challenge)) {
                     continue
                 }
@@ -107,6 +123,10 @@ object DailyChallengeCompletionListeners : Listener {
             progress.addBlocksMinedAtMine(event.mine, 1)
 
             for (challenge in DailyChallengeHandler.getSession().getChallenges()) {
+                if (!challenge.daily) {
+                    continue
+                }
+
                 if (progress.hasCompletedChallenge(challenge)) {
                     continue
                 }

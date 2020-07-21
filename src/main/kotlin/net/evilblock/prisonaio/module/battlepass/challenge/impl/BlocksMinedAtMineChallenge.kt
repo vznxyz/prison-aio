@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.battlepass.challenge.impl
 
 import com.google.gson.annotations.JsonAdapter
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.ProgressBarBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
@@ -19,7 +20,6 @@ import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
 import net.evilblock.prisonaio.module.mine.serialize.MineReferenceSerializer
 import net.evilblock.prisonaio.module.user.User
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player

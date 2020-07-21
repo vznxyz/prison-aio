@@ -7,7 +7,7 @@
 
 package net.evilblock.prisonaio.module.environment.setting
 
-import net.evilblock.prisonaio.util.Constants
+import net.evilblock.cubed.util.bukkit.Constants
 import org.bukkit.ChatColor
 
 enum class Setting(val defaultValue: Any? = null) {

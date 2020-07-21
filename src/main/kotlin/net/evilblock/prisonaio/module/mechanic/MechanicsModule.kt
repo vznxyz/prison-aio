@@ -7,9 +7,16 @@
 
 package net.evilblock.prisonaio.module.mechanic
 
+import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
+import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
+import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackGiveCommand
+import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackViewCommand
+import net.evilblock.prisonaio.module.mechanic.backpack.command.parameter.BackpackParameterType
+import net.evilblock.prisonaio.module.mechanic.backpack.listener.BackpackListeners
 import net.evilblock.prisonaio.module.mechanic.command.HotFixCommands
 import net.evilblock.prisonaio.module.mechanic.command.HelpCommand
 import net.evilblock.prisonaio.module.mechanic.command.SpawnCommand
@@ -39,6 +46,8 @@ object MechanicsModule : PluginModule() {
 
     override fun onEnable() {
         loadConfig()
+
+        BackpackHandler.initialLoad()
     }
 
     override fun onReload() {
@@ -50,7 +59,7 @@ object MechanicsModule : PluginModule() {
     override fun getListeners(): List<Listener> {
         return listOf(
             CraftingMechanicsListeners,
-            DisableAnvilMechanicsListeners,
+            AnvilMechanicsListeners,
             DisableBrewingMechanicsListeners,
             DisableExplosionsListeners,
             DisableFarmingMechanicsListeners,
@@ -61,7 +70,8 @@ object MechanicsModule : PluginModule() {
             MobMechanicsListeners,
             PreventDropsInSpawnListeners,
             StreamListeners,
-            VanillaMechanicsListeners
+            VanillaMechanicsListeners,
+            BackpackListeners
         )
     }
 
@@ -69,7 +79,15 @@ object MechanicsModule : PluginModule() {
         return listOf(
             HotFixCommands.javaClass,
             HelpCommand.javaClass,
-            SpawnCommand.javaClass
+            SpawnCommand.javaClass,
+            BackpackGiveCommand.javaClass,
+            BackpackViewCommand.javaClass
+        )
+    }
+
+    override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
+        return mapOf(
+            Backpack::class.java to BackpackParameterType
         )
     }
 

@@ -11,13 +11,13 @@ import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.TexturedHeadButton
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.prisonaio.module.battlepass.challenge.menu.BrowseChallengesMenu
 import net.evilblock.prisonaio.module.battlepass.tier.Tier
 import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
 import net.evilblock.prisonaio.module.battlepass.tier.reward.Reward
 import net.evilblock.prisonaio.module.user.User
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player

@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.shop
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
+import net.evilblock.cubed.menu.template.MenuTemplateHandler
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -16,6 +17,7 @@ import net.evilblock.prisonaio.module.shop.command.*
 import net.evilblock.prisonaio.module.shop.command.parameter.ShopParameterType
 import net.evilblock.prisonaio.module.shop.command.parameter.ShopReceiptParameterType
 import net.evilblock.prisonaio.module.shop.listener.ShopReceiptListeners
+import net.evilblock.prisonaio.module.shop.menu.template.ShopMenuTemplate
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
 import net.evilblock.prisonaio.module.shop.receipt.task.ShopReceiptExpireTask
 import org.bukkit.event.Listener
@@ -37,6 +39,9 @@ object ShopsModule : PluginModule() {
     override fun onEnable() {
         ShopHandler.initialLoad()
 
+        // instead of registering the factory, we let the shop system handle creation/management of templates
+        // MenuTemplateHandler.registerFactory(ShopMenuTemplate.ShopMenuTemplateFactory)
+
         Tasks.asyncTimer(ShopReceiptExpireTask, 2L, 2L)
     }
 
@@ -46,6 +51,7 @@ object ShopsModule : PluginModule() {
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
+            OpenShopCommand.javaClass,
             SellAllCommand.javaClass,
             ShopEditorCommand.javaClass,
             ShopReceiptCommand.javaClass

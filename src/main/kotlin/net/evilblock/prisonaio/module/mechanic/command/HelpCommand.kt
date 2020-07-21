@@ -8,8 +8,8 @@
 package net.evilblock.prisonaio.module.mechanic.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.command.CommandSender
 
 object HelpCommand {

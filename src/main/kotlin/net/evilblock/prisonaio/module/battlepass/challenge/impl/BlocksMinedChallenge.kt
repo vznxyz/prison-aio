@@ -7,13 +7,13 @@
 
 package net.evilblock.prisonaio.module.battlepass.challenge.impl
 
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.ProgressBarBuilder
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeType
 import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.user.User
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player

@@ -10,9 +10,9 @@ package net.evilblock.prisonaio.module.cell.command
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.cell.Cell
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player

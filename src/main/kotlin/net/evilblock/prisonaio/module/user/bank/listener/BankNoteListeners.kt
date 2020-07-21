@@ -7,8 +7,8 @@
 
 package net.evilblock.prisonaio.module.user.bank.listener
 
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
-import net.evilblock.prisonaio.util.Constants
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor

@@ -8,11 +8,11 @@
 package net.evilblock.prisonaio.module.leaderboard.impl
 
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import java.util.*
 

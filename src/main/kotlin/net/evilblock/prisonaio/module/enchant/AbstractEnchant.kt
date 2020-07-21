@@ -7,7 +7,8 @@
 
 package net.evilblock.prisonaio.module.enchant
 
-import net.evilblock.cubed.util.bukkit.ColorUtil.toChatColor
+import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.cubed.util.bukkit.ColorUtil
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import org.bukkit.ChatColor
@@ -24,8 +25,9 @@ abstract class AbstractEnchant(val id: String, val enchant: String, val maxLevel
     abstract val iconColor: Color
     abstract val textColor: ChatColor
 
-    val strippedEnchant: String
-        get() = ChatColor.stripColor(enchant)
+    fun getStrippedEnchant(): String {
+        return ChatColor.stripColor(enchant)
+    }
 
     fun readDescription(): String {
         return EnchantsModule.config.getString("$id.description")
@@ -38,7 +40,7 @@ abstract class AbstractEnchant(val id: String, val enchant: String, val maxLevel
     }
 
     fun lorified(): String {
-        return toChatColor(iconColor).toString() + ChatColor.BOLD + VERTICAL_BAR + " " + ChatColor.GRAY + enchant
+        return "${ColorUtil.toChatColor(iconColor)}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}$enchant"
     }
 
     fun canEnchant(item: ItemStack): Boolean {
@@ -142,9 +144,5 @@ abstract class AbstractEnchant(val id: String, val enchant: String, val maxLevel
     abstract fun getCost(level: Int): Long
 
     abstract val menuDisplay: Material?
-
-    companion object {
-        const val VERTICAL_BAR = '❙'
-    }
 
 }

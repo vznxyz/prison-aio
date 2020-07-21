@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.enchant
 
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.type.*
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
@@ -370,7 +371,7 @@ object EnchantsManager : Listener {
         if (lore.isNotEmpty()) {
             for (i in lore.indices) {
                 val lineAt = lore[i]
-                if (ChatColor.stripColor(lineAt).startsWith(Character.toString(AbstractEnchant.VERTICAL_BAR))) {
+                if (ChatColor.stripColor(lineAt).startsWith(Constants.THICK_VERTICAL_LINE)) {
                     val splitLore = lineAt.split(" ").toTypedArray()
                     if (splitLore.size > 1) {
                         val intLevel = splitLore[splitLore.size - 1]
@@ -478,7 +479,7 @@ object EnchantsManager : Listener {
     @JvmStatic
     fun matchEnchant(string: String?): AbstractEnchant? {
         for (enchant in enchants) {
-            if (ChatColor.stripColor(string).equals(enchant.strippedEnchant, ignoreCase = true)) {
+            if (ChatColor.stripColor(string).equals(enchant.getStrippedEnchant(), ignoreCase = true)) {
                 return enchant
             }
         }

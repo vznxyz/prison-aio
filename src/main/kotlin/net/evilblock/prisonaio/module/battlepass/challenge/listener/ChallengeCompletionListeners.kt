@@ -26,12 +26,12 @@ object ChallengeCompletionListeners : Listener {
     fun onPlayerCommandPreprocessEvent(event: PlayerCommandPreprocessEvent) {
         Tasks.async {
             val user = UserHandler.getUser(event.player.uniqueId)
+            if (!user.battlePassData.isPremium()) {
+                return@async
+            }
+
             for (challenge in ChallengeHandler.getChallenges()) {
                 if (challenge.daily) {
-                    continue
-                }
-
-                if (!user.battlePassData.isPremium()) {
                     continue
                 }
 
@@ -51,12 +51,12 @@ object ChallengeCompletionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun onAsyncPlayTimeSyncEvent(event: AsyncPlayTimeSyncEvent) {
+        if (!event.user.battlePassData.isPremium()) {
+            return
+        }
+
         for (challenge in ChallengeHandler.getChallenges()) {
             if (challenge.daily) {
-                continue
-            }
-
-            if (!event.user.battlePassData.isPremium()) {
                 continue
             }
 
@@ -77,12 +77,12 @@ object ChallengeCompletionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun onAsyncPlayerPrestigeEvent(event: AsyncPlayerPrestigeEvent) {
+        if (!event.user.battlePassData.isPremium()) {
+            return
+        }
+
         for (challenge in ChallengeHandler.getChallenges()) {
             if (challenge.daily) {
-                continue
-            }
-
-            if (!event.user.battlePassData.isPremium()) {
                 continue
             }
 
@@ -102,13 +102,12 @@ object ChallengeCompletionListeners : Listener {
     fun onBlockBreakEvent(event: BlockBreakEvent) {
         Tasks.async {
             val user = UserHandler.getUser(event.player.uniqueId)
+            if (!user.battlePassData.isPremium()) {
+                return@async
+            }
 
             for (challenge in ChallengeHandler.getChallenges()) {
                 if (challenge.daily) {
-                    continue
-                }
-
-                if (!user.battlePassData.isPremium()) {
                     continue
                 }
 
@@ -129,13 +128,12 @@ object ChallengeCompletionListeners : Listener {
     fun onMineBlockBreakEvent(event: MineBlockBreakEvent) {
         Tasks.async {
             val user = UserHandler.getUser(event.player.uniqueId)
+            if (!user.battlePassData.isPremium()) {
+                return@async
+            }
 
             for (challenge in ChallengeHandler.getChallenges()) {
                 if (challenge.daily) {
-                    continue
-                }
-
-                if (!user.battlePassData.isPremium()) {
                     continue
                 }
 

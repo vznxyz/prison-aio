@@ -49,7 +49,7 @@ abstract class Challenge(val id: String, internal var daily: Boolean = false) : 
                 user.battlePassData.addUnclaimedReward(nextTier.freeReward!!)
             }
 
-            if (nextTier.premiumReward != null) {
+            if (nextTier.premiumReward != null && user.battlePassData.isPremium()) {
                 newRewards = true
                 user.battlePassData.addUnclaimedReward(nextTier.premiumReward!!)
             }

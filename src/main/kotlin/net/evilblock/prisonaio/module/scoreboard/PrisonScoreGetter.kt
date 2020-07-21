@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.scoreboard
 
 import net.evilblock.cubed.scoreboard.ScoreGetter
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.ProgressBarBuilder
 import net.evilblock.cubed.util.TimeUtil
@@ -19,7 +20,6 @@ import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.*
@@ -68,7 +68,7 @@ object PrisonScoreGetter : ScoreGetter {
 
         scores.add("")
         scores.add("  ${ChatColor.RED}${ChatColor.BOLD}${player.name}")
-        scores.add("  ${ChatColor.RED}${Constants.RANK_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}")
+        scores.add("  ${ChatColor.RED}${Constants.CROSSED_SWORDS_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}")
 
         if (user.getPrestige() == 0) {
             scores.add("  ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Not Prestiged")

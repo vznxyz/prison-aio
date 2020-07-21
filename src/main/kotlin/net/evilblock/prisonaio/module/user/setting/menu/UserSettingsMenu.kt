@@ -10,10 +10,10 @@ package net.evilblock.prisonaio.module.user.setting.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.TextSplitter
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player

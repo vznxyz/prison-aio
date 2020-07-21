@@ -11,12 +11,14 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.HelpButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
+import net.evilblock.cubed.menu.template.menu.EditTemplateLayoutMenu
 import net.evilblock.cubed.util.bukkit.ConversationUtil
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.prisonaio.module.shop.item.ShopItem
+import net.evilblock.prisonaio.module.shop.menu.template.ShopMenuTemplate
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.conversations.ConversationContext
@@ -44,6 +46,7 @@ class EditShopMenu(val shop: Shop) : Menu() {
         buttons[0] = EditNameButton()
         buttons[2] = EditPriorityButton()
         buttons[4] = GuideButton()
+        buttons[6] = EditTemplateButton()
 
         for (i in 9..17) {
             buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 0, " ")
@@ -82,31 +85,6 @@ class EditShopMenu(val shop: Shop) : Menu() {
             PrisonAIO.instance.server.scheduler.runTaskLater(PrisonAIO.instance, {
                 ShopEditorMenu().openMenu(player)
             }, 1L)
-        }
-    }
-
-    private inner class GuideButton : HelpButton() {
-        override fun getName(player: Player): String {
-            return "${ChatColor.YELLOW}${ChatColor.BOLD}The Shop Editor"
-        }
-
-        override fun getDescription(player: Player): List<String> {
-            return listOf(
-                "",
-                "${ChatColor.GRAY}To add a new item to the shop, simply pickup",
-                "${ChatColor.GRAY}and drop the item on an empty inventory slot.",
-                "",
-                "${ChatColor.GRAY}To ${ChatColor.GREEN}${ChatColor.BOLD}edit ${ChatColor.GRAY}the price of an item, ${ChatColor.GREEN}${ChatColor.BOLD}left-click",
-                "${ChatColor.GRAY}the item and follow the procedure in chat.",
-                "",
-                "${ChatColor.GRAY}To ${ChatColor.RED}${ChatColor.BOLD}delete ${ChatColor.GRAY}an item, ${ChatColor.RED}${ChatColor.BOLD}right-click",
-                "${ChatColor.GRAY}the item and complete the confirmation prompt.",
-                "",
-                "${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Shop Permission",
-                "",
-                "${ChatColor.GRAY}To access this shop, the player needs the",
-                "${ChatColor.YELLOW}prisonaio.shops.${shop.id.toLowerCase()} ${ChatColor.GRAY}permission."
-            )
         }
     }
 
@@ -198,6 +176,71 @@ class EditShopMenu(val shop: Shop) : Menu() {
             }
 
             ShopHandler.saveData()
+        }
+    }
+
+    private inner class GuideButton : HelpButton() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.YELLOW}${ChatColor.BOLD}The Shop Editor"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            return listOf(
+                "",
+                "${ChatColor.GRAY}To add a new item to the shop, simply pickup",
+                "${ChatColor.GRAY}and drop the item on an empty inventory slot.",
+                "",
+                "${ChatColor.GRAY}To ${ChatColor.GREEN}${ChatColor.BOLD}edit ${ChatColor.GRAY}the price of an item, ${ChatColor.GREEN}${ChatColor.BOLD}left-click",
+                "${ChatColor.GRAY}the item and follow the procedure in chat.",
+                "",
+                "${ChatColor.GRAY}To ${ChatColor.RED}${ChatColor.BOLD}delete ${ChatColor.GRAY}an item, ${ChatColor.RED}${ChatColor.BOLD}right-click",
+                "${ChatColor.GRAY}the item and complete the confirmation prompt.",
+                "",
+                "${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Shop Permission",
+                "",
+                "${ChatColor.GRAY}To access this shop, the player needs the",
+                "${ChatColor.YELLOW}prisonaio.shops.${shop.id.toLowerCase()} ${ChatColor.GRAY}permission."
+            )
+        }
+    }
+
+    private inner class EditTemplateButton : Button() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.AQUA}${ChatColor.BOLD}Edit Template"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            val description = arrayListOf(
+                "",
+                "${ChatColor.GRAY}Edit this shop's menu template."
+            )
+
+            description.add("")
+
+            if (shop.menuTemplate == null) {
+                description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to create template")
+            } else {
+                description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit template")
+                description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to reset template")
+            }
+
+            return description
+        }
+
+        override fun getMaterial(player: Player): Material {
+            return Material.ITEM_FRAME
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                if (shop.menuTemplate == null) {
+                    shop.menuTemplate = ShopMenuTemplate(shop.id, shop)
+                }
+
+                EditTemplateLayoutMenu(shop.menuTemplate!!).openMenu(player)
+            } else if (clickType.isRightClick) {
+                shop.menuTemplate = null
+            }
         }
     }
 

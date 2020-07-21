@@ -42,7 +42,7 @@ class ConfirmSalvageButton(private val parent: SalvagePickaxeMenu) : Button() {
             .sorted(ENCHANT_COMPARATOR)
             .forEach { entry ->
                 val formattedReturns = NumberFormat.getInstance().format(entry.key.getSalvageReturns(entry.value))
-                description.add("${toChatColor(entry.key.iconColor)}${ChatColor.BOLD}❙ ${ChatColor.GRAY}${entry.key.strippedEnchant} ${entry.value} (${ChatColor.GOLD}$formattedReturns${ChatColor.GRAY})")
+                description.add("${toChatColor(entry.key.iconColor)}${ChatColor.BOLD}❙ ${ChatColor.GRAY}${entry.key.getStrippedEnchant()} ${entry.value} (${ChatColor.GOLD}$formattedReturns${ChatColor.GRAY})")
             }
 
         description.add("")

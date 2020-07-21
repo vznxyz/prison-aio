@@ -8,12 +8,12 @@
 package net.evilblock.prisonaio.module.user.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.rank.event.AsyncPlayerPrestigeEvent
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player

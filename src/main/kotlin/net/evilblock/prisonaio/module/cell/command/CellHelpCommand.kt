@@ -8,8 +8,8 @@
 package net.evilblock.prisonaio.module.cell.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.cell.CellsModule
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 

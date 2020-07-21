@@ -53,7 +53,7 @@ class User(val uuid: UUID) {
     var attachment: PermissionAttachment? = null
 
     /**
-     * The user's current rank.
+     * The user's rank.
      */
     @JsonAdapter(value = RankReferenceSerializer::class)
     private var rank: Rank = RankHandler.getStartingRank()
@@ -124,10 +124,15 @@ class User(val uuid: UUID) {
         perks.user = this
         statistics.user = this
 
+        // fix null rank
+        if (rank == null) {
+            rank = RankHandler.getStartingRank()
+        }
+
+        // fix null battle pass
         if (battlePassData == null) {
             battlePassData = BattlePass(this)
         }
-
         battlePassData.user = this
     }
 

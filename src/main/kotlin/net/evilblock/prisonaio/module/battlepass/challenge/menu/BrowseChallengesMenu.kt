@@ -11,6 +11,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.BackButton
 import net.evilblock.cubed.menu.buttons.TexturedHeadButton
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
@@ -18,7 +19,6 @@ import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.menu.BattlePassMenu
 import net.evilblock.prisonaio.module.user.User
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player

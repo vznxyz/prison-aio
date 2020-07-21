@@ -11,7 +11,6 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import java.text.NumberFormat
 import java.util.*

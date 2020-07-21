@@ -13,7 +13,6 @@ import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
-import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.shop.event.DetermineShopEvent
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
@@ -38,7 +37,7 @@ object ShopHandler: PluginHandler {
     }
 
     override fun getInternalDataFile(): File {
-        return File(File(PrisonAIO.instance.dataFolder, "internal"), "shops.json")
+        return File(File(getModule().getPluginFramework().dataFolder, "internal"), "shops.json")
     }
 
     override fun initialLoad() {
@@ -51,6 +50,7 @@ object ShopHandler: PluginHandler {
                 val list = Cubed.gson.fromJson(reader, listType) as List<Shop>
 
                 for (shop in list) {
+                    shop.init()
                     shopsMap[shop.id.toLowerCase()] = shop
                 }
             }

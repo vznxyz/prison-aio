@@ -12,12 +12,12 @@ import net.evilblock.cubed.menu.buttons.SkullButton
 import net.evilblock.cubed.menu.buttons.TexturedHeadButton
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileCommentsMenu
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileStatisticsMenu
 import net.evilblock.prisonaio.module.user.setting.menu.UserSettingsMenu
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -81,7 +81,7 @@ class ProfileLayout(
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.add("${ChatColor.RED}${Constants.RANK_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}")
+            description.add("${ChatColor.RED}${Constants.CROSSED_SWORDS_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}")
 
             if (user.getPrestige() == 0) {
                 description.add("${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Not Prestiged")

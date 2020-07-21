@@ -8,15 +8,35 @@
 package net.evilblock.prisonaio.module.mechanic.listener
 
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
+import net.evilblock.prisonaio.module.mechanic.event.AnvilPrepareEvent
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.inventory.CraftItemEvent
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 
-object DisableAnvilMechanicsListeners : Listener {
+object AnvilMechanicsListeners : Listener {
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onAnvilPrepare(event: InventoryClickEvent) {
+        if (event.currentItem == null || event.currentItem.type == Material.AIR) {
+            return
+        }
+
+        if (event.inventory.type == InventoryType.ANVIL) {
+            if (event.slotType == InventoryType.SlotType.RESULT) {
+                if (!AnvilPrepareEvent(event.whoClicked as Player, event.currentItem).callEvent()) {
+                    event.isCancelled = true
+                }
+            }
+        }
+    }
 
     @EventHandler(ignoreCancelled = true)
     fun onCraftAnvil(event: CraftItemEvent) {

@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.cell
 import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.entity.EntityManager
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.Reflection
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
@@ -18,16 +19,13 @@ import net.evilblock.cubed.util.nms.MinecraftProtocol
 import net.evilblock.prisonaio.module.cell.entity.JerryNpcEntity
 import net.evilblock.prisonaio.module.cell.permission.CellPermission
 import net.evilblock.prisonaio.module.region.Region
-import net.evilblock.prisonaio.util.Constants
 import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.block.Block
-import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
-import org.bukkit.event.entity.EntityDamageEvent
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet

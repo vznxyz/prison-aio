@@ -9,10 +9,10 @@ package net.evilblock.prisonaio.module.user.command.admin
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender

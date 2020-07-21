@@ -7,15 +7,18 @@
 
 package net.evilblock.prisonaio.module.shop
 
+import net.evilblock.cubed.menu.template.menu.TemplateMenu
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.shop.event.PlayerBuyFromShopEvent
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import net.evilblock.prisonaio.module.shop.item.ShopItem
+import net.evilblock.prisonaio.module.shop.menu.template.ShopMenuTemplate
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -24,6 +27,11 @@ class Shop(val id: String) {
     var name: String = id
     val items: HashSet<ShopItem> = hashSetOf()
     var priority: Int = 0
+    var menuTemplate: ShopMenuTemplate? = null
+
+    fun init() {
+        menuTemplate?.shop = this
+    }
 
     fun hasAccess(player: Player): Boolean {
         return player.hasPermission("prisonaio.shops.${id.toLowerCase()}")
@@ -127,6 +135,20 @@ class Shop(val id: String) {
         }
 
         return shopReceipt
+    }
+
+    fun openMenu(player: Player) {
+        if (menuTemplate == null) {
+            player.sendMessage("${ChatColor.RED}Unable to open the $name ${ChatColor.RED}shop because it has no template!")
+            return
+        }
+
+        if (items.none { it.selling }) {
+            player.sendMessage("${ChatColor.RED}The $name ${ChatColor.RED}shop is not selling any items!")
+            return
+        }
+
+        TemplateMenu(menuTemplate!!).openMenu(player)
     }
 
 }

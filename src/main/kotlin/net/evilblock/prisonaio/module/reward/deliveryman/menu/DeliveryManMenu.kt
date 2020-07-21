@@ -9,11 +9,11 @@ package net.evilblock.prisonaio.module.reward.deliveryman.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.reward.deliveryman.DeliveryManHandler
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
 import net.evilblock.prisonaio.module.user.User
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player

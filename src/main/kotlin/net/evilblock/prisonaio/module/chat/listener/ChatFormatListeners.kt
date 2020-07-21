@@ -9,10 +9,10 @@ package net.evilblock.prisonaio.module.chat.listener
 
 import me.clip.deluxetags.DeluxeTag
 import mkremins.fanciful.FancyMessage
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.Constants
 import org.apache.commons.lang.WordUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor

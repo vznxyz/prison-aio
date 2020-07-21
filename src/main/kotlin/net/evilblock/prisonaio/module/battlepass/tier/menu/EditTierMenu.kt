@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.battlepass.tier.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.menus.ConfirmMenu
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
@@ -17,7 +18,6 @@ import net.evilblock.prisonaio.module.battlepass.tier.Tier
 import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
 import net.evilblock.prisonaio.module.battlepass.tier.reward.Reward
 import net.evilblock.prisonaio.module.battlepass.tier.reward.menu.EditRewardMenu
-import net.evilblock.prisonaio.util.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
