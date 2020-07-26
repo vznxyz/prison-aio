@@ -15,13 +15,14 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
+import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.io.File
-import java.util.concurrent.TimeUnit
 
 object BackpackHandler : PluginHandler {
 
+    private val ID_REGEX = "\\(ID: #([a-zA-Z0-9].*)\\)".toRegex()
     private val backpacks: MutableMap<String, Backpack> = hashMapOf()
 
     override fun getModule(): PluginModule {
@@ -33,7 +34,7 @@ object BackpackHandler : PluginHandler {
     }
 
     override fun getInternalDataFile(): File {
-        return File(File(getModule().getPluginFramework().dataFolder, "internal"), "shops.json")
+        return File(File(getModule().getPluginFramework().dataFolder, "internal"), "backpacks.json")
     }
 
     override fun initialLoad() {
@@ -51,7 +52,7 @@ object BackpackHandler : PluginHandler {
             }
         }
 
-        Tasks.asyncTimer(TimeUnit.MINUTES.toMillis(2L), TimeUnit.MINUTES.toMillis(2L)) {
+        Tasks.asyncTimer(20L * 60L * 2, 20L * 60L * 2) {
             saveData()
         }
     }
@@ -68,11 +69,11 @@ object BackpackHandler : PluginHandler {
                 && itemStack.itemMeta.hasDisplayName()
                 && itemStack.itemMeta.hasLore()
                 && itemStack.lore!!.size > 0
-                && backpacks.containsKey(itemStack.lore!!.first())
+                && ID_REGEX.matches(ChatColor.stripColor(itemStack.lore!!.first()))
     }
 
     fun extractBackpack(itemStack: ItemStack): Backpack? {
-        return getBackpack(itemStack.lore!!.first())
+        return getBackpack(ID_REGEX.find(ChatColor.stripColor(itemStack.lore!!.first()))!!.groupValues[1].toLowerCase())
     }
 
     fun getBackpack(id: String): Backpack? {

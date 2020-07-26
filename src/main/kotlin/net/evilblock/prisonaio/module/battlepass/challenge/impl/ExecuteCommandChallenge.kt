@@ -10,6 +10,8 @@ package net.evilblock.prisonaio.module.battlepass.challenge.impl
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeType
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
+import net.evilblock.prisonaio.module.user.User
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -28,6 +30,14 @@ class ExecuteCommandChallenge(id: String, internal var command: String) : Challe
 
     override fun getAbstractType(): Type {
         return ExecuteCommandChallenge::class.java
+    }
+
+    override fun meetsCompletionRequirements(player: Player, user: User): Boolean {
+        return if (daily) {
+            DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasExecutedCommand(command)
+        } else {
+            user.battlePassProgress.hasExecutedCommand(command)
+        }
     }
 
     object ExecuteCommandChallengeType : ChallengeType {

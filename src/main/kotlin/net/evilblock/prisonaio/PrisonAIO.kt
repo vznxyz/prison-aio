@@ -62,37 +62,35 @@ class PrisonAIO : PluginFramework() {
             builder.registerTypeAdapter(Challenge::class.java, AbstractTypeSerializer<Challenge>())
         }
 
+        enabledModules.addAll(arrayListOf(
+            EnvironmentModule,
+            StorageModule,
+            RegionsModule,
+            MechanicsModule,
+            EnchantsModule,
+            RanksModule,
+//            AchievementsModule,
+            QuestsModule,
+            ShopsModule,
+            MinesModule,
+            CellsModule,
+            PrivateMinesModule,
+            BattlePassModule,
+            UsersModule,
+            ScoreboardModule,
+            ChatModule,
+            RewardsModule,
+            MinigamesModule,
+            LeaderboardsModule,
+            CombatModule
+        ))
+
         super.onEnable()
 
         loadCommands()
     }
 
     override fun getModules(): List<PluginModule> {
-        if (enabledModules.isEmpty()) {
-            enabledModules.addAll(listOf(
-                EnvironmentModule,
-                StorageModule,
-                RegionsModule,
-                MechanicsModule,
-                RewardsModule,
-                EnchantsModule,
-                RanksModule,
-//            AchievementsModule,
-                QuestsModule,
-                ShopsModule,
-                MinesModule,
-                CellsModule,
-                PrivateMinesModule,
-                BattlePassModule,
-                UsersModule,
-                ScoreboardModule,
-                ChatModule,
-                MinigamesModule,
-                LeaderboardsModule,
-                CombatModule
-            ))
-        }
-
         return enabledModules
     }
 

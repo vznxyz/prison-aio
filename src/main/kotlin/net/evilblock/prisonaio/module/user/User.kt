@@ -14,7 +14,7 @@ import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.achievement.Achievement
-import net.evilblock.prisonaio.module.battlepass.progress.BattlePass
+import net.evilblock.prisonaio.module.battlepass.BattlePassProgress
 import net.evilblock.prisonaio.module.quest.Quest
 import net.evilblock.prisonaio.module.quest.QuestHandler
 import net.evilblock.prisonaio.module.quest.progression.QuestProgression
@@ -104,9 +104,9 @@ class User(val uuid: UUID) {
     private val achievements: MutableMap<String, CompletedAchievementActivity> = hashMapOf()
 
     /**
-     * The user's Battle-Pass progress.
+     * The user's BattlePass progress.
      */
-    var battlePassData: BattlePass = BattlePass(this)
+    var battlePassProgress: BattlePassProgress = BattlePassProgress(this)
 
     /**
      * The user's quest progressions.
@@ -130,10 +130,10 @@ class User(val uuid: UUID) {
         }
 
         // fix null battle pass
-        if (battlePassData == null) {
-            battlePassData = BattlePass(this)
+        if (battlePassProgress == null) {
+            battlePassProgress = BattlePassProgress(this)
         }
-        battlePassData.user = this
+        battlePassProgress.user = this
     }
 
     /**

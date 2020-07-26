@@ -10,17 +10,24 @@ package net.evilblock.prisonaio.module.mechanic.backpack.listener
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.event.AnvilPrepareEvent
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 
 object BackpackListeners : Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerInteractEvent(event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
             if (event.hasItem() && BackpackHandler.isBackpackItem(event.item)) {
-                BackpackHandler.extractBackpack(event.item)?.open(event.player)
+                val backpack = BackpackHandler.extractBackpack(event.item)
+                if (backpack != null) {
+                    backpack.updateBackpackItemLore(event.item)
+                    backpack.open(event.player)
+
+                    event.isCancelled = true
+                }
             }
         }
     }

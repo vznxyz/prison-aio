@@ -56,6 +56,14 @@ object MechanicsModule : PluginModule() {
         loadConfig()
     }
 
+    override fun onDisable() {
+        BackpackHandler.saveData()
+    }
+
+    override fun onAutoSave() {
+        BackpackHandler.saveData()
+    }
+
     override fun getListeners(): List<Listener> {
         return listOf(
             CraftingMechanicsListeners,

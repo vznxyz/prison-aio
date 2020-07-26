@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.battlepass.challenge.daily
+package net.evilblock.prisonaio.module.battlepass.daily
 
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
@@ -25,7 +25,7 @@ class DailyChallengeSession(val uuid: UUID = UUID.randomUUID()) {
     private val progress: MutableMap<UUID, DailyChallengesProgress> = hashMapOf()
 
     fun getChallenges(): List<Challenge> {
-        return challenges.toList()
+        return challenges
     }
 
     private fun generateChallenges(): MutableList<Challenge> {

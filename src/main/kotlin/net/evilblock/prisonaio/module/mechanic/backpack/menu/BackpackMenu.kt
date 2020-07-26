@@ -8,8 +8,9 @@
 package net.evilblock.prisonaio.module.mechanic.backpack.menu
 
 import net.evilblock.cubed.menu.Button
-import net.evilblock.cubed.menu.pagination.PaginatedMenu
+import net.evilblock.cubed.menu.Menu
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
+import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.backpack.enchant.menu.BackpackEnchantsMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -19,30 +20,21 @@ import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import kotlin.math.ceil
 
-class BackpackMenu(private val backpack: Backpack) : PaginatedMenu() {
+class BackpackMenu(private val backpack: Backpack) : Menu() {
 
     private var page: Int = 1
+    private var cursor: ItemStack? = null
 
     init {
         updateAfterClick = true
         autoUpdate = true
     }
 
-    override fun getPrePaginatedTitle(player: Player): String {
+    override fun getTitle(player: Player): String {
         return "Backpack"
     }
 
-    override fun getAllPagesButtons(player: Player): Map<Int, Button> {
-        val buttons = hashMapOf<Int, Button>()
-
-        for (slot in backpack.contents) {
-            buttons[slot.key] = ItemSlotButton(slot.key)
-        }
-
-        return buttons
-    }
-
-    override fun getGlobalButtons(player: Player): Map<Int, Button>? {
+    override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
         buttons[0] = PreviousPageButton()
@@ -55,15 +47,85 @@ class BackpackMenu(private val backpack: Backpack) : PaginatedMenu() {
             }
         }
 
+        val range = if (page == 1) {
+            0..44
+        } else {
+            (((page - 1) * 44) + 1)..(page * 44)
+        }
+
+        for (i in range) {
+            if (backpack.contents.containsKey(i)) {
+                buttons[i - ((page - 1) * 45) + 9] = ItemSlotButton(i)
+            }
+        }
+
         return buttons
     }
 
-    override fun getMaxItemsPerPage(player: Player): Int {
-        return 45
+    override fun size(buttons: Map<Int, Button>): Int {
+        return 54
     }
 
     fun getMaxPages(): Int {
-        return ceil(backpack.contents.maxBy { it.key }!!.key / 9.0).toInt()
+        val maxSlot = backpack.contents.maxBy { it.key }?.key ?: return 64
+        return ceil(maxSlot / 44.0).toInt().coerceAtLeast(1)
+    }
+
+    override fun onOpen(player: Player) {
+        if (cursor != null) {
+            player.openInventory.cursor = cursor
+            player.updateInventory()
+        }
+    }
+
+    override fun onClose(player: Player, manualClose: Boolean) {
+        if (!manualClose) {
+            cursor = player.openInventory.cursor
+        }
+    }
+
+    override fun acceptsInsertedItem(player: Player, itemStack: ItemStack, slot: Int): Boolean {
+        if (backpack.contents.containsKey(slot - 9)) {
+            return false
+        }
+
+        if (BackpackHandler.isBackpackItem(itemStack)) {
+            return false
+        }
+
+        backpack.contents[slot - 9] = itemStack
+
+        return true
+    }
+
+    override fun acceptsShiftClickedItem(player: Player, itemStack: ItemStack): Boolean {
+        if (backpack.contents.size >= backpack.getMaxSlots()) {
+            return false
+        }
+
+        if (BackpackHandler.isBackpackItem(itemStack)) {
+            return false
+        }
+
+        return backpack.addItem(itemStack)
+    }
+
+    override fun acceptsDraggedItems(player: Player, items: Map<Int, ItemStack>): Boolean {
+        for (inserted in items) {
+            if (backpack.contents.containsKey(inserted.key - 9)) {
+                return false
+            }
+
+            if (BackpackHandler.isBackpackItem(inserted.value)) {
+                return false
+            }
+        }
+
+        for (inserted in items) {
+            backpack.contents[inserted.key - 9] = inserted.value
+        }
+
+        return true
     }
 
     private inner class PreviousPageButton : Button() {
@@ -118,7 +180,7 @@ class BackpackMenu(private val backpack: Backpack) : PaginatedMenu() {
 
     private inner class InfoButton : Button() {
         override fun getName(player: Player): String {
-            return "${ChatColor.RED}${ChatColor.BOLD}Backpack Info"
+            return "${ChatColor.RED}${ChatColor.BOLD}Your Backpack"
         }
 
         override fun getDescription(player: Player): List<String> {
@@ -138,7 +200,7 @@ class BackpackMenu(private val backpack: Backpack) : PaginatedMenu() {
             }
 
             description.add("")
-            description.add("${ChatColor.RED}Click to enchant")
+            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}CLICK TO BUY ENCHANTS")
 
             return description
         }
@@ -164,25 +226,27 @@ class BackpackMenu(private val backpack: Backpack) : PaginatedMenu() {
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (view.cursor != null) {
+            if (view.cursor != null && view.cursor.type != Material.AIR) {
                 return
             }
 
-            if (!backpack.contents.containsKey(slot)) {
+            val adjustedSlot = ((page - 1) * 45) + slot - 9
+
+            if (!backpack.contents.containsKey(adjustedSlot)) {
                 return
             }
 
             when (clickType) {
                 ClickType.LEFT -> {
-                    backpack.contents.remove(slot)
-                    view.cursor = backpack.contents[slot]!!.clone()
+                    val pickup = backpack.contents.remove(adjustedSlot)!!
+                    view.cursor = pickup.clone()
                     player.updateInventory()
                 }
                 ClickType.RIGHT -> {
-                    val originalItem = backpack.contents[slot]!!
+                    val originalItem = backpack.contents[adjustedSlot]!!
                     if (originalItem.amount == 1) {
                         view.cursor = originalItem
-                        backpack.contents.remove(slot)
+                        backpack.contents.remove(adjustedSlot)
                     } else {
                         val halved = (originalItem.amount / 2.0).toInt()
                         originalItem.amount = originalItem.amount - halved
@@ -201,7 +265,7 @@ class BackpackMenu(private val backpack: Backpack) : PaginatedMenu() {
                         return
                     }
 
-                    val item = backpack.contents.remove(slot)
+                    val item = backpack.contents.remove(adjustedSlot)
                     if (item != null) {
                         player.inventory.addItem(item.clone())
                         player.updateInventory()

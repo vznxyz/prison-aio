@@ -10,7 +10,7 @@ package net.evilblock.prisonaio.module.user.command.admin
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.flag.Flag
 import net.evilblock.cubed.command.data.parameter.Param
-import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler

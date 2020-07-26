@@ -12,7 +12,7 @@ import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.prisonaio.module.battlepass.challenge.menu.ChallengeEditorMenu
-import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.tier.menu.TierEditorMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material

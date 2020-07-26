@@ -12,9 +12,8 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
-import net.evilblock.prisonaio.module.battlepass.challenge.listener.ChallengeCompletionListeners
-import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
-import net.evilblock.prisonaio.module.battlepass.challenge.daily.listener.DailyChallengeCompletionListeners
+import net.evilblock.prisonaio.module.battlepass.challenge.listener.ChallengeListeners
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.command.*
 import org.bukkit.event.Listener
 
@@ -50,14 +49,14 @@ object BattlePassModule : PluginModule() {
             BattlePassEditorCommand.javaClass,
             BattlePassResetCommand.javaClass,
             BattlePassWipeCommand.javaClass,
-            BattlePassSetPremiumCommand.javaClass
+            BattlePassSetPremiumCommand.javaClass,
+            BattlePassSetXPCommand.javaClass
         )
     }
 
     override fun getListeners(): List<Listener> {
         return listOf(
-            ChallengeCompletionListeners,
-            DailyChallengeCompletionListeners
+            ChallengeListeners
         )
     }
 

@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
@@ -75,7 +76,7 @@ object SalvagePreventionHandler : PluginHandler {
 
         var matchingPickaxe: ItemStack? = null
         for (pickaxe in getPickaxes()) {
-            if (isSimilar(pickaxe, itemStack)) {
+            if (ItemUtils.isSimilar(pickaxe, itemStack)) {
                 matchingPickaxe = pickaxe
                 break
             }
@@ -99,32 +100,6 @@ object SalvagePreventionHandler : PluginHandler {
         }
 
         return enchants
-    }
-
-    private fun isSimilar(first: ItemStack, second: ItemStack): Boolean {
-        if (first.type != second.type) {
-            return false
-        }
-
-        if (first.hasItemMeta() != second.hasItemMeta()) {
-            return false
-        }
-
-        if (first.itemMeta.hasDisplayName() != second.itemMeta.hasDisplayName()) {
-            return false
-        }
-
-        if (first.itemMeta.hasDisplayName()) {
-            if (first.itemMeta.displayName != second.itemMeta.displayName) {
-                return false
-            }
-        }
-
-        if (first.itemMeta.hasLore() != second.itemMeta.hasLore()) {
-            return false
-        }
-
-        return true
     }
 
 }

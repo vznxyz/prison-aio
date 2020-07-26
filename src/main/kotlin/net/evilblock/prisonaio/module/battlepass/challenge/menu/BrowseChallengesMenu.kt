@@ -16,7 +16,7 @@ import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeHandler
-import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.menu.BattlePassMenu
 import net.evilblock.prisonaio.module.user.User
 import org.bukkit.ChatColor
@@ -88,7 +88,7 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
                 description.add(challenge.getProgressText(player, user))
             }
 
-            if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassData.hasCompletedChallenge(challenge)) {
+            if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassProgress.hasCompletedChallenge(challenge)) {
                 description.add("")
                 description.add("${ChatColor.GREEN}You've completed this challenge!")
             }
@@ -101,7 +101,7 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
         }
 
         override fun getDamageValue(player: Player): Byte {
-            return if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassData.hasCompletedChallenge(challenge)) {
+            return if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassProgress.hasCompletedChallenge(challenge)) {
                 13.toByte()
             } else {
                 1.toByte()

@@ -5,30 +5,34 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.battlepass.progress
+package net.evilblock.prisonaio.module.battlepass
 
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.prisonaio.module.battlepass.tier.Tier
 import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
-import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.serialize.ChallengeListReferenceSerializer
-import net.evilblock.prisonaio.module.battlepass.challenge.serialize.RewardListReferenceSerializer
+import net.evilblock.prisonaio.module.battlepass.challenge.serialize.TierSetReferenceSerializer
 import net.evilblock.prisonaio.module.battlepass.tier.reward.Reward
 import net.evilblock.prisonaio.module.user.User
 import org.bukkit.entity.Player
 
-class BattlePass(@Transient var user: User) {
+class BattlePassProgress(@Transient var user: User) {
 
     private var premium: Boolean = false
-
     private var experience: Int = 0
+
+    private var commandsExecuted: MutableSet<String> = hashSetOf()
 
     @JsonAdapter(ChallengeListReferenceSerializer::class)
     private val completedChallenges: MutableList<Challenge> = arrayListOf()
 
-    @JsonAdapter(RewardListReferenceSerializer::class)
-    private val unclaimedRewards: MutableList<Reward> = arrayListOf()
+    @JsonAdapter(TierSetReferenceSerializer::class)
+    private val claimedRewardsPremium: MutableSet<Tier> = hashSetOf()
+
+    @JsonAdapter(TierSetReferenceSerializer::class)
+    private val claimedRewardsFree: MutableSet<Tier> = hashSetOf()
 
     fun isPremium(): Boolean {
         return premium
@@ -36,6 +40,11 @@ class BattlePass(@Transient var user: User) {
 
     fun setPremium(premium: Boolean) {
         this.premium = premium
+        user.requiresSave = true
+    }
+
+    fun setExperience(exp: Int) {
+        experience = exp
         user.requiresSave = true
     }
 
@@ -50,6 +59,10 @@ class BattlePass(@Transient var user: User) {
 
     fun isTierUnlocked(tier: Tier): Boolean {
         return experience >= tier.requiredExperience
+    }
+
+    fun getCurrentTier(): Tier? {
+        return TierHandler.getTiers().sortedBy { it.requiredExperience }.firstOrNull() { experience >= it.requiredExperience }
     }
 
     fun getNextTier(): Tier? {
@@ -71,24 +84,30 @@ class BattlePass(@Transient var user: User) {
         user.requiresSave = true
     }
 
-    fun getUnclaimedRewards(): List<Reward> {
-        return unclaimedRewards.toList()
-    }
+    fun claimReward(player: Player, tier: Tier, reward: Reward) {
+        if (reward.isFreeReward()) {
+            claimedRewardsFree.add(tier)
+        } else {
+            claimedRewardsPremium.add(tier)
+        }
 
-    fun hasClaimedReward(reward: Reward): Boolean {
-        return !unclaimedRewards.contains(reward)
-    }
-
-    fun addUnclaimedReward(reward: Reward) {
-        unclaimedRewards.add(reward)
         user.requiresSave = true
     }
 
-    fun claimReward(player: Player, reward: Reward) {
-        unclaimedRewards.remove(reward)
-        user.requiresSave = true
+    fun hasClaimedReward(tier: Tier, reward: Reward): Boolean {
+        return if (reward.isFreeReward()) {
+            claimedRewardsFree.contains(tier)
+        } else {
+            claimedRewardsPremium.contains(tier)
+        }
+    }
 
-        reward.execute(player)
+    fun hasExecutedCommand(command: String): Boolean {
+        return commandsExecuted.contains(command.trim().toLowerCase())
+    }
+
+    fun executedCommand(command: String) {
+        commandsExecuted.add(command.trim().toLowerCase())
     }
 
 }

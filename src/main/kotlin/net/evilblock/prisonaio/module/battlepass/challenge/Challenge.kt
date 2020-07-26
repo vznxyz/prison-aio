@@ -33,29 +33,29 @@ abstract class Challenge(val id: String, internal var daily: Boolean = false) : 
         return ""
     }
 
+    abstract fun meetsCompletionRequirements(player: Player, user: User): Boolean
+
     fun onComplete(player: Player, user: User) {
         val formattedExp = NumberFormat.getInstance().format(rewardXp)
         player.sendMessage("$CHAT_PREFIX You have completed the ${ChatColor.YELLOW}$name ${ChatColor.GRAY}challenge! (${ChatColor.GREEN}+$formattedExp XP${ChatColor.GRAY})")
 
-        val nextTier = user.battlePassData.getNextTier()
+        val nextTier = user.battlePassProgress.getNextTier()
 
-        user.battlePassData.completeChallenge(this)
+        user.battlePassProgress.completeChallenge(this)
 
-        if (user.battlePassData.getNextTier() != nextTier && nextTier != null) {
+        if (user.battlePassProgress.getNextTier() != nextTier && nextTier != null) {
             var newRewards = false
 
             if (nextTier.freeReward != null) {
                 newRewards = true
-                user.battlePassData.addUnclaimedReward(nextTier.freeReward!!)
             }
 
-            if (nextTier.premiumReward != null && user.battlePassData.isPremium()) {
+            if (nextTier.premiumReward != null && user.battlePassProgress.isPremium()) {
                 newRewards = true
-                user.battlePassData.addUnclaimedReward(nextTier.premiumReward!!)
             }
 
             if (newRewards) {
-                player.sendMessage("$CHAT_PREFIX Congratulations! You have reached ${ChatColor.GOLD}${ChatColor.BOLD}Tier ${nextTier.number}${ChatColor.GRAY}! You have new rewards waiting to be collected in the JunkiePass.")
+                player.sendMessage("$CHAT_PREFIX Congratulations! You have reached ${ChatColor.GOLD}${ChatColor.BOLD}Tier ${nextTier.number}${ChatColor.GRAY}! You have new rewards waiting to be collected!")
             } else {
                 player.sendMessage("$CHAT_PREFIX Congratulations! You have reached ${ChatColor.GOLD}${ChatColor.BOLD}Tier ${nextTier.number}${ChatColor.GRAY}!")
             }

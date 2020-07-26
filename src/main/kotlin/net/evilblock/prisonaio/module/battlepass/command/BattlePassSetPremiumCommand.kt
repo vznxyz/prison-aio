@@ -25,7 +25,7 @@ object BattlePassSetPremiumCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player") user: User, @Param(name = "true/false") premium: Boolean) {
-        user.battlePassData.setPremium(premium)
+        user.battlePassProgress.setPremium(premium)
         UserHandler.saveUser(user)
 
         if (premium) {

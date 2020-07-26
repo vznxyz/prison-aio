@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.battlepass.challenge.daily
+package net.evilblock.prisonaio.module.battlepass.daily
 
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
@@ -23,6 +23,7 @@ class DailyChallengesProgress(val uuid: UUID) {
     private var blocksMined: Int = 0
     private var blocksMinedAtMine: MutableMap<String, Int> = hashMapOf()
     private var timesPrestiged: Int = 0
+    private var commandsExecuted: MutableSet<String> = hashSetOf()
 
     @Synchronized
     fun hasCompletedChallenge(challenge: Challenge): Boolean {
@@ -35,7 +36,7 @@ class DailyChallengesProgress(val uuid: UUID) {
     fun completeChallenge(challenge: Challenge) {
         synchronized(completedChallenges) {
             completedChallenges.add(challenge)
-            UserHandler.getUser(uuid).battlePassData.addExperience(challenge.rewardXp)
+            UserHandler.getUser(uuid).battlePassProgress.addExperience(challenge.rewardXp)
         }
     }
 
@@ -76,8 +77,16 @@ class DailyChallengesProgress(val uuid: UUID) {
         return timesPrestiged
     }
 
-    fun addTimePrestiged() {
+    fun incrementTimePrestiged() {
         timesPrestiged++
+    }
+
+    fun hasExecutedCommand(command: String): Boolean {
+        return commandsExecuted.contains(command.trim().toLowerCase())
+    }
+
+    fun executedCommand(command: String) {
+        commandsExecuted.add(command.trim().toLowerCase())
     }
 
 }

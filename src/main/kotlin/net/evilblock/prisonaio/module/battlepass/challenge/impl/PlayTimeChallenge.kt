@@ -13,7 +13,7 @@ import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.prompt.DurationPrompt
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeType
-import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.user.User
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -46,6 +46,14 @@ class PlayTimeChallenge(id: String, internal var duration: Long) : Challenge(id)
         val progressBar = ProgressBarBuilder().build(percentage)
 
         return "${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}($progressColor${DECIMAL_FORMAT.format(percentage)}%${ChatColor.GRAY})"
+    }
+
+    override fun meetsCompletionRequirements(player: Player, user: User): Boolean {
+        return if (daily) {
+            DailyChallengeHandler.getSession().getProgress(player.uniqueId).getPlayTime() >= duration
+        } else {
+            user.statistics.getLivePlayTime() >= duration
+        }
     }
 
     override fun getType(): ChallengeType {

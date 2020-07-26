@@ -13,7 +13,7 @@ import net.evilblock.cubed.util.bukkit.ConversationUtil
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeType
-import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.user.User
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -44,6 +44,14 @@ class PrestigeChallenge(id: String, internal var prestige: Int) : Challenge(id) 
         val progressBar = ProgressBarBuilder().build(percentage)
 
         return "${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}($progressColor${DECIMAL_FORMAT.format(percentage)}%${ChatColor.GRAY})"
+    }
+
+    override fun meetsCompletionRequirements(player: Player, user: User): Boolean {
+        return if (daily) {
+            DailyChallengeHandler.getSession().getProgress(player.uniqueId).getTimesPrestiged() >= prestige
+        } else {
+            user.getPrestige() >= prestige
+        }
     }
 
     override fun getType(): ChallengeType {

@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.battlepass.challenge.daily
+package net.evilblock.prisonaio.module.battlepass.daily
 
 import com.google.common.base.Charsets
 import com.google.common.io.Files

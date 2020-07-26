@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.mechanic.backpack
 
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.mechanic.backpack.enchant.BackpackEnchant
 import net.evilblock.prisonaio.module.mechanic.backpack.menu.BackpackMenu
 import org.bukkit.ChatColor
@@ -19,6 +20,66 @@ class Backpack(val id: String) {
 
     internal val contents: MutableMap<Int, ItemStack> = hashMapOf()
     internal val enchants: MutableMap<BackpackEnchant, Int> = hashMapOf()
+
+    fun addItem(itemStack: ItemStack): Boolean {
+        var remainingAmount = itemStack.amount
+        val insertTo = hashMapOf<Int, Int>()
+
+        for (slot in contents) {
+            if (slot.value.amount >= slot.value.maxStackSize) {
+                continue
+            }
+
+            if (!ItemUtils.isSimilar(slot.value, itemStack) || !ItemUtils.hasSameLore(slot.value, itemStack) || !ItemUtils.hasSameEnchantments(slot.value, itemStack)) {
+                continue
+            }
+
+            val maxInsert = slot.value.maxStackSize - slot.value.amount
+            if (maxInsert <= 0) {
+                continue
+            }
+
+            if (remainingAmount <= maxInsert) {
+                insertTo[slot.key] = remainingAmount
+                remainingAmount = 0
+            } else {
+                insertTo[slot.key] = maxInsert
+                remainingAmount -= maxInsert
+            }
+
+            if (remainingAmount <= 0) {
+                break
+            }
+        }
+
+        if (remainingAmount > 0) {
+            for (i in 0..getMaxSlots()) {
+                if (!contents.containsKey(i)) {
+                    insertTo[i] = remainingAmount
+                    remainingAmount = 0
+                    break
+                }
+            }
+
+            if (remainingAmount > 0) {
+                return false
+            }
+        }
+
+        for (insert in insertTo) {
+            if (contents.containsKey(insert.key)) {
+                val itemAtSlot = contents[insert.key]!!
+                itemAtSlot.amount = itemAtSlot.amount + insert.value
+            } else {
+                val clonedItem = itemStack.clone()
+                clonedItem.amount = insert.value
+
+                contents[insert.key] = clonedItem
+            }
+        }
+
+        return true
+    }
 
     fun hasEnchant(enchant: BackpackEnchant): Boolean {
         return enchants.containsKey(enchant)

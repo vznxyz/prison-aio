@@ -89,11 +89,9 @@ interface Region {
 
         if (victim is ItemFrame) {
             if (attacker is Player) {
-                if (RegionListeners.bypassCheck(attacker, cancellable)) {
-                    return
+                if (!RegionListeners.bypassCheck(attacker, cancellable)) {
+                    cancellable.isCancelled = true
                 }
-
-                cancellable.isCancelled = true
             }
         }
     }

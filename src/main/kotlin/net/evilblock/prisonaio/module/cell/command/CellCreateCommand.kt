@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.cell.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.prisonaio.module.cell.CellHandler
 import net.evilblock.prisonaio.module.cell.CellsModule
 import org.bukkit.ChatColor
@@ -29,6 +30,11 @@ object CellCreateCommand {
                 player.sendMessage("${ChatColor.RED}The name you input contains inappropriate content. Please try a different name.")
                 return
             }
+        }
+
+        if (!name.matches(EzPrompt.IDENTIFIER_REGEX)) {
+            player.sendMessage("${ChatColor.RED}The name you input does not match the regex pattern ${EzPrompt.IDENTIFIER_REGEX.pattern}.")
+            return
         }
 
         if (CellHandler.getOwnedCells(player.uniqueId).isNotEmpty()) {

@@ -165,6 +165,11 @@ object RegionListeners : Listener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    fun onEntityDamageEvent(event: EntityDamageByEntityEvent) {
+        RegionsModule.findRegion(event.damager.location).onEntityDamage(event.damager, event.cause, event)
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onEntityDamageByEntityEvent(event: EntityDamageByEntityEvent) {
         RegionsModule.findRegion(event.damager.location).onEntityDamageEntity(event.damager, event.entity, event.cause, event.finalDamage, event)
     }

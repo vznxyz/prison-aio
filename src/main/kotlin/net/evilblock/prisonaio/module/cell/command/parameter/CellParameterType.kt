@@ -27,12 +27,16 @@ object CellParameterType : ParameterType<Cell> {
             return cell
         }
 
-        val cell = CellHandler.getCellByName(source)
-        if (cell != null) {
-            try {
-                return CellHandler.getCellByUuid(UUID.fromString(source))
-            } catch (e: Exception) { }
-            return cell
+        try {
+            val cell = CellHandler.getCellByUuid(UUID.fromString(source))
+            if (cell != null) {
+                return cell
+            }
+        } catch (e: Exception) {
+            val cell = CellHandler.getCellByName(source)
+            if (cell != null) {
+                return cell
+            }
         }
 
         val playerUuid = Cubed.instance.uuidCache.uuid(source)

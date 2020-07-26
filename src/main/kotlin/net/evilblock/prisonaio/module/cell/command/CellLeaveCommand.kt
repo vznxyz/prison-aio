@@ -35,8 +35,6 @@ object CellLeaveCommand {
             return
         }
 
-        visitingCell.memberLeave(player.uniqueId)
-
         if (visitingCell.isActivePlayer(player)) {
             CellHandler.updateVisitingCell(player, null)
 
@@ -44,6 +42,8 @@ object CellLeaveCommand {
                 player.teleport(Bukkit.getWorlds()[0].spawnLocation)
             }
         }
+
+        visitingCell.memberLeave(player.uniqueId)
 
         val ownerName = Cubed.instance.uuidCache.name(visitingCell.owner)
         player.sendMessage("${ChatColor.GREEN}Successfully left $ownerName's cell.")

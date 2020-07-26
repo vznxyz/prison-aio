@@ -252,7 +252,7 @@ class Cell(
     }
 
     fun isActivePlayer(player: Player): Boolean {
-        return getActivePlayers().contains(player)
+        return members.contains(player.uniqueId) || visitors.contains(player.uniqueId)
     }
 
     fun isOwner(uuid: UUID): Boolean {

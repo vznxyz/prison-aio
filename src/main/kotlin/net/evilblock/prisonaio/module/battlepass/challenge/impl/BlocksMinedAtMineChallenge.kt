@@ -15,7 +15,7 @@ import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeType
-import net.evilblock.prisonaio.module.battlepass.challenge.daily.DailyChallengeHandler
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
 import net.evilblock.prisonaio.module.mine.serialize.MineReferenceSerializer
@@ -55,6 +55,14 @@ class BlocksMinedAtMineChallenge(id: String, @JsonAdapter(MineReferenceSerialize
         val progressBar = ProgressBarBuilder().build(percentage)
 
         return "${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}($progressColor${DECIMAL_FORMAT.format(percentage)}%${ChatColor.GRAY})"
+    }
+
+    override fun meetsCompletionRequirements(player: Player, user: User): Boolean {
+        return if (daily) {
+            DailyChallengeHandler.getSession().getProgress(player.uniqueId).getBlocksMinedAtMine(mine) >= blocksMined
+        } else {
+            user.statistics.getBlocksMinedAtMine(mine) >= blocksMined
+        }
     }
 
     override fun getType(): ChallengeType {
