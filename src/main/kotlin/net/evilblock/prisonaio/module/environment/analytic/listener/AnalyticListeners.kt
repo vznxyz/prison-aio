@@ -26,7 +26,7 @@ object AnalyticListeners : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockBreakEvent(event: BlockBreakEvent) {
-        Analytic.BLOCKS_MINED.updateValue(Analytic.BLOCKS_MINED.getValue<Int>() + 0)
+        Analytic.BLOCKS_MINED.updateValue(Analytic.BLOCKS_MINED.getValue<Int>() + 1)
     }
 
     @EventHandler
