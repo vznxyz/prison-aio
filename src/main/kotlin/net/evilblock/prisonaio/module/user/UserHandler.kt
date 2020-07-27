@@ -14,6 +14,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.storage.StorageModule
 import org.bson.Document
 import org.bson.json.JsonMode
@@ -21,6 +22,7 @@ import org.bson.json.JsonWriterSettings
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 object UserHandler : PluginHandler {
 
@@ -39,9 +41,26 @@ object UserHandler : PluginHandler {
 
     override fun initialLoad() {
         // delay a bit otherwise the method thinks there's no online players
-        getModule().getPluginFramework().server.scheduler.runTaskLater(getModule().getPluginFramework(), {
+        Tasks.delayed(10L) {
             loadOnlinePlayers()
-        }, 10L)
+        }
+
+        Tasks.asyncTimer(20L, 20L) {
+            val toRemove = arrayListOf<User>()
+            for (user in usersMap.values) {
+                if (user.getPlayer() == null && user.cacheExpiry != null && System.currentTimeMillis() >= user.cacheExpiry!!) {
+                    toRemove.add(user)
+                }
+            }
+
+            for (user in toRemove) {
+                usersMap.remove(user.uuid)
+
+                if (user.requiresSave) {
+                    saveUser(user)
+                }
+            }
+        }
     }
 
     override fun saveData() {
@@ -116,10 +135,21 @@ object UserHandler : PluginHandler {
     }
 
     /**
-     * Retrieves a copy of the loaded [User]s.
+     * Gets a copy of the loaded [User]s.
      */
     fun getUsers(): List<User> {
         return usersMap.values.toList()
+    }
+
+    /**
+     * Gets a player's cached user data from memory.
+     */
+    fun getUser(uuid: UUID): User {
+        if (!usersMap.containsKey(uuid)) {
+            throw IllegalStateException("User $uuid is not cached in memory")
+        } else {
+            return usersMap[uuid]!!
+        }
     }
 
     fun isUserLoaded(uuid: UUID): Boolean {
@@ -127,17 +157,20 @@ object UserHandler : PluginHandler {
     }
 
     /**
-     * Retrieves a player's cached user data from memory.
+     * Gets a player's user data from the cache, or by loading and caching.
      */
-    fun getUser(uuid: UUID): User {
-        if (!usersMap.containsKey(uuid)) {
-            throw IllegalStateException("User $uuid is not cached in memory")
+    fun getOrLoadAndCacheUser(uuid: UUID): User {
+        return if (!usersMap.containsKey(uuid)) {
+            val user = loadUser(uuid = uuid, throws = true)
+            user.cacheExpiry = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30L)
+            user
+        } else {
+            getUser(uuid)
         }
-        return usersMap[uuid]!!
     }
 
     /**
-     * Retrieves a player's cached user data, or fetches the user data from the database.
+     * Fetches a user's data from the database.
      */
     fun fetchUser(uuid: UUID, throws: Boolean = false): User {
         if (usersMap.containsKey(uuid)) {

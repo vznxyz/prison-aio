@@ -18,7 +18,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
-object UserCacheListeners : Listener {
+object UserLoadListeners : Listener {
 
     @EventHandler
     fun onPlayerJoinEvent(event: PlayerJoinEvent) {
@@ -28,7 +28,8 @@ object UserCacheListeners : Listener {
     @EventHandler
     fun onAsyncPlayerPreLoginEvent(event: AsyncPlayerPreLoginEvent) {
         try {
-            val user = UserHandler.loadUser(event.uniqueId)
+            val user = UserHandler.getOrLoadAndCacheUser(event.uniqueId)
+            user.cacheExpiry = null
             user.statistics.lastPlayTimeSync = System.currentTimeMillis()
 
             UserHandler.cacheUser(user)

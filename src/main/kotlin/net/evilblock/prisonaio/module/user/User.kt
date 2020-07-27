@@ -40,72 +40,35 @@ import java.util.*
 
 class User(val uuid: UUID) {
 
-    /**
-     * Used to determine if we need to save this user's data to the database the next time our plugin data is saved.
-     */
     @Transient
     internal var requiresSave: Boolean = false
 
-    /**
-     * Used to assign permissions granted by the user's [rank] and [prestige].
-     */
+    @Transient
+    internal var cacheExpiry: Long? = null
+
     @Transient
     var attachment: PermissionAttachment? = null
 
-    /**
-     * The user's rank.
-     */
+    internal var firstSeen: Long = System.currentTimeMillis()
+
     @JsonAdapter(value = RankReferenceSerializer::class)
     private var rank: Rank = RankHandler.getStartingRank()
 
-    /**
-     * The user's prestige.
-     */
     private var prestige: Int = 0
-
-    /**
-     * The user's prestige tokens balance.
-     */
     private var prestigeTokens: Int = 0
 
-    /**
-     * The user's tokens balance.
-     */
     private var tokensBalance: Long = 0L
 
-    /**
-     * The first time the player was seen on the server.
-     */
-    internal var firstSeen: Long = System.currentTimeMillis()
-
-    /**
-     * This user's perks.
-     */
     val perks: UserPerks = UserPerks(this)
 
-    /**
-     * This user's statistics.
-     */
     val statistics: UserStatistics = UserStatistics(this)
 
-    /**
-     * This user's settings.
-     */
     private val settings: MutableMap<UserSetting, UserSettingOption> = EnumMap(UserSetting::class.java)
 
-    /**
-     * The comments left on this user's profile.
-     */
     private val profileComments: MutableList<ProfileComment> = arrayListOf()
 
-    /**
-     * The user's completed achievements.
-     */
     private val achievements: MutableMap<String, CompletedAchievementActivity> = hashMapOf()
 
-    /**
-     * The user's BattlePass progress.
-     */
     var battlePassProgress: BattlePassProgress = BattlePassProgress(this)
 
     /**

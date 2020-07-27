@@ -74,6 +74,10 @@ class UserStatistics(@Transient internal var user: User) {
     }
 
     fun syncPlayTime() {
+        if (user.cacheExpiry != null) {
+            return
+        }
+
         val offset = getLivePlayTime() - playTime
         AsyncPlayTimeSyncEvent(user = user, offset = offset).call()
 

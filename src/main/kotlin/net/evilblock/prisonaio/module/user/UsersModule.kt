@@ -82,7 +82,7 @@ object UsersModule : PluginModule() {
             AutoSellNotification,
             DropPickaxeListeners,
             TokenShopListeners,
-            UserCacheListeners,
+            UserLoadListeners,
             UserPerksListeners,
             UserStatisticsListeners,
             UserSettingsListeners,

@@ -84,7 +84,7 @@ abstract class Currency<T>(internal val amount: T) {
                     throw IllegalStateException("Couldn't give token currency to offline user on primary thread (requires load)")
                 }
 
-                UserHandler.fetchUser(player.uniqueId)
+                UserHandler.getOrLoadAndCacheUser(player.uniqueId)
             }
 
             user.addTokensBalance(amount)
