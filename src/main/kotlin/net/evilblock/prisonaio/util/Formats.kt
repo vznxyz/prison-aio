@@ -7,12 +7,25 @@
 
 package net.evilblock.prisonaio.util
 
+import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.bukkit.Constants
 import org.bukkit.ChatColor
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.text.NumberFormat
+import java.util.*
 
 object Formats {
+
+    @JvmStatic
+    fun formatPlayer(uuid: UUID, prefix: String = "${ChatColor.RESET}"): String {
+        return "$prefix${Cubed.instance.uuidCache.name(uuid)}"
+    }
+
+    @JvmStatic
+    fun formatPlayer(player: Player, prefix: String = "${ChatColor.RESET}"): String {
+        return "$prefix${player.playerListName}"
+    }
 
     @JvmStatic
     fun capitalizeFully(name: String): String {

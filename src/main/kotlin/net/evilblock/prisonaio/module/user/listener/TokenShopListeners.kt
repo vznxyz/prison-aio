@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.user.listener
 
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.util.Cooldown
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.hook.VaultHook
@@ -18,6 +19,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.block.Sign
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -25,8 +27,12 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.SignChangeEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerQuitEvent
+import java.util.*
 
 object TokenShopListeners : Listener {
+
+    private val useCooldown = Cooldown<UUID>(500L)
 
     @JvmStatic
     private val TOKEN_SHOP_TAG = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}TokenShop${ChatColor.GRAY}]"
@@ -37,111 +43,20 @@ object TokenShopListeners : Listener {
             if (event.clickedBlock.type == Material.SIGN || event.clickedBlock.type == Material.SIGN_POST || event.clickedBlock.type == Material.WALL_SIGN) {
                 val sign = event.clickedBlock.state as Sign
                 if (sign.lines[0] == TOKEN_SHOP_TAG) {
+                    event.isCancelled = true
+
+                    val player = event.player
+
+                    if (useCooldown.isOnCooldown(player.uniqueId)) {
+                        return
+                    }
+
+                    useCooldown.putOnCooldown(player.uniqueId)
+
                     try {
-                        val owner = Cubed.instance.uuidCache.uuid(sign.lines[1])
-                        if (owner != null) {
-                            if (event.player.uniqueId == owner) {
-                                event.player.sendMessage("${ChatColor.RED}You can't buy or sell to your own TokenShop!")
-                                event.isCancelled = true
-                                return
-                            }
-
-                            if (sign.lines[2].startsWith("-")) {
-                                event.isCancelled = true
-                                return
-                            }
-
-                            val quantity = NumberUtils.parseInput(sign.lines[2])
-                            assert(quantity.toInt() > 0) { "Quantity must be more than 0." }
-
-                            val priceLineSplit = ChatColor.stripColor(sign.lines[3]).split(" ")
-                            if (priceLineSplit[1].startsWith("-")) {
-                                event.isCancelled = true
-                                return
-                            }
-
-                            val price = NumberUtils.parseInput(priceLineSplit[1])
-                            assert(price.toInt() > 0) { "Price must be more than 0." }
-
-                            Tasks.async {
-                                val owningUser = if (UserHandler.isUserLoaded(owner)) {
-                                    UserHandler.getUser(owner)
-                                } else {
-                                    UserHandler.fetchUser(owner)
-                                }
-
-                                val buying = when {
-                                    priceLineSplit[0].equals("b", ignoreCase = true) -> {
-                                        true
-                                    }
-                                    priceLineSplit[0].equals("s", ignoreCase = true) -> {
-                                        false
-                                    }
-                                    else -> {
-                                        throw IllegalStateException("Couldn't determine if buying or selling")
-                                    }
-                                }
-
-                                if (buying) {
-                                    val buyingPlayer = event.player
-
-                                    if (!owningUser.hasTokensBalance(quantity.toLong())) {
-                                        buyingPlayer.sendMessage("${ChatColor.RED}${owningUser.getUsername()} doesn't have enough tokens to sell you.")
-                                        return@async
-                                    }
-
-                                    if (VaultHook.getBalance(buyingPlayer.uniqueId) < price.toLong()) {
-                                        buyingPlayer.sendMessage("${ChatColor.RED}You don't have enough money to buy tokens from that TokenShop.")
-                                        return@async
-                                    }
-
-                                    VaultHook.useEconomy { economy ->
-                                        economy.withdrawPlayer(buyingPlayer, price.toDouble())
-                                        economy.depositPlayer(Bukkit.getOfflinePlayer(owner), price.toDouble())
-                                    }
-
-                                    val buyingUser = UserHandler.getUser(buyingPlayer.uniqueId)
-                                    buyingUser.addTokensBalance(quantity.toLong())
-                                    UserHandler.saveUser(buyingUser)
-
-                                    owningUser.subtractTokensBalance(quantity.toLong())
-                                    UserHandler.saveUser(owningUser)
-
-                                    buyingPlayer.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
-                                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
-                                } else {
-                                    val sellingPlayer = event.player
-
-                                    val ownerBalance = VaultHook.useEconomyAndReturn { it.getBalance(Bukkit.getOfflinePlayer(owner)) }
-                                    if (ownerBalance < price.toLong()) {
-                                        sellingPlayer.sendMessage("${ChatColor.RED}${owningUser.getUsername()} doesn't have enough money to buy your tokens.")
-                                        return@async
-                                    }
-
-                                    val sellingUser = UserHandler.getUser(sellingPlayer.uniqueId)
-                                    if (!sellingUser.hasTokensBalance(quantity.toLong())) {
-                                        sellingPlayer.sendMessage("${ChatColor.RED}You don't have enough tokens to sell to that TokenShop.")
-                                        return@async
-                                    }
-
-                                    VaultHook.useEconomy { economy ->
-                                        economy.depositPlayer(sellingPlayer, price.toDouble())
-                                        economy.withdrawPlayer(Bukkit.getOfflinePlayer(owner), price.toDouble())
-                                    }
-
-                                    sellingUser.subtractTokensBalance(quantity.toLong())
-                                    UserHandler.saveUser(sellingUser)
-
-                                    owningUser.addTokensBalance(quantity.toLong())
-                                    UserHandler.saveUser(owningUser)
-
-                                    sellingPlayer.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
-                                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
-                                }
-                            }
-                        }
+                        handleTransaction(player, sign)
                     } catch (e: Exception) {
-                        event.player.sendMessage("${ChatColor.RED}Failed to exchange with the TokenShop.")
+                        event.player.sendMessage("${ChatColor.RED}Failed to transact with that TokenShop!")
 
                         if (event.player.isOp) {
                             event.player.sendMessage("${ChatColor.RED}[OP] Error: ${e.message}")
@@ -240,6 +155,106 @@ object TokenShopListeners : Listener {
             if (sign.getLine(1) != event.player.name) {
                 event.isCancelled = true
                 event.player.sendMessage("${ChatColor.RED}You can't destroy that TokenShop because it doesn't belong to you!")
+            }
+        }
+    }
+
+    @EventHandler
+    fun onPlayerQuitEvent(event: PlayerQuitEvent) {
+        useCooldown.removeCooldown(event.player.uniqueId)
+    }
+
+    private fun handleTransaction(player: Player, sign: Sign) {
+        Tasks.async {
+            val owner = Cubed.instance.uuidCache.uuid(sign.lines[1]) ?: throw IllegalStateException("Couldn't determine owner of sign")
+
+            if (player.uniqueId == owner) {
+                player.sendMessage("${ChatColor.RED}You can't buy or sell to your own TokenShop!")
+                return@async
+            }
+
+            if (sign.lines[2].startsWith("-")) {
+                return@async
+            }
+
+            val quantity = NumberUtils.parseInput(sign.lines[2])
+            assert(quantity.toInt() > 0) { "Quantity must be more than 0." }
+
+            val priceLineSplit = ChatColor.stripColor(sign.lines[3]).split(" ")
+            if (priceLineSplit[1].startsWith("-")) {
+                return@async
+            }
+
+            val price = NumberUtils.parseInput(priceLineSplit[1])
+            assert(price.toInt() > 0) { "Price must be more than 0." }
+
+            val owningUser = UserHandler.getOrLoadAndCacheUser(owner)
+
+            Tasks.sync {
+                val buying = when {
+                    priceLineSplit[0].equals("b", ignoreCase = true) -> {
+                        true
+                    }
+                    priceLineSplit[0].equals("s", ignoreCase = true) -> {
+                        false
+                    }
+                    else -> {
+                        throw IllegalStateException("Couldn't determine if buying or selling")
+                    }
+                }
+
+                if (buying) {
+                    if (!owningUser.hasTokensBalance(quantity.toLong())) {
+                        player.sendMessage("${ChatColor.RED}${owningUser.getUsername()} doesn't have enough tokens to sell you.")
+                        return@sync
+                    }
+
+                    if (VaultHook.getBalance(player.uniqueId) < price.toLong()) {
+                        player.sendMessage("${ChatColor.RED}You don't have enough money to buy tokens from that TokenShop.")
+                        return@sync
+                    }
+
+                    VaultHook.useEconomy { economy ->
+                        economy.withdrawPlayer(player, price.toDouble())
+                        economy.depositPlayer(Bukkit.getOfflinePlayer(owner), price.toDouble())
+                    }
+
+                    val buyingUser = UserHandler.getUser(player.uniqueId)
+                    buyingUser.addTokensBalance(quantity.toLong())
+                    UserHandler.saveUser(buyingUser)
+
+                    owningUser.subtractTokensBalance(quantity.toLong())
+                    UserHandler.saveUser(owningUser)
+
+                    player.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
+                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
+                } else {
+                    val ownerBalance = VaultHook.useEconomyAndReturn { it.getBalance(Bukkit.getOfflinePlayer(owner)) }
+                    if (ownerBalance < price.toLong()) {
+                        player.sendMessage("${ChatColor.RED}${owningUser.getUsername()} doesn't have enough money to buy your tokens.")
+                        return@sync
+                    }
+
+                    val sellingUser = UserHandler.getUser(player.uniqueId)
+                    if (!sellingUser.hasTokensBalance(quantity.toLong())) {
+                        player.sendMessage("${ChatColor.RED}You don't have enough tokens to sell to that TokenShop.")
+                        return@sync
+                    }
+
+                    VaultHook.useEconomy { economy ->
+                        economy.depositPlayer(player, price.toDouble())
+                        economy.withdrawPlayer(Bukkit.getOfflinePlayer(owner), price.toDouble())
+                    }
+
+                    sellingUser.subtractTokensBalance(quantity.toLong())
+                    sellingUser.requiresSave()
+
+                    owningUser.addTokensBalance(quantity.toLong())
+                    owningUser.requiresSave()
+
+                    player.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
+                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
+                }
             }
         }
     }
