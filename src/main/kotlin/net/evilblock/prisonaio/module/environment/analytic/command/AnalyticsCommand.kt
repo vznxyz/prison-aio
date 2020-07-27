@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.environment.analytic.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.prisonaio.module.environment.analytic.menu.AnalyticsMenu
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.entity.Player
 
@@ -20,7 +21,7 @@ object AnalyticsCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-
+        AnalyticsMenu().openMenu(player)
     }
 
 }
