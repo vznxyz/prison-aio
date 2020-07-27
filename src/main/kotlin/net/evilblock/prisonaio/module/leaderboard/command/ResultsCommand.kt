@@ -10,11 +10,16 @@ package net.evilblock.prisonaio.module.leaderboard.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
+import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import org.bukkit.command.CommandSender
 
 object ResultsCommand {
 
-    @Command(names = ["leaderboards", "leaderboard", "lb"])
+    @Command(
+        names = ["leaderboards results", "leaderboard results", "lb results"],
+        description = "Displays the results of a specific leaderboard",
+        async = true
+    )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "leaderboard") leaderboard: Leaderboard) {
         for (line in leaderboard.getDisplayLines()) {

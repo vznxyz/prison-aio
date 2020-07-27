@@ -23,7 +23,7 @@ object PrestigeLeaderboard : Leaderboard("prestige", "Top Prestige") {
         for (document in UserHandler.getCollection().find()) {
             val uuid = UUID.fromString(document.getString("uuid"))
 
-            val currentPrestige = document.getInteger("currentPrestige")
+            val currentPrestige = document.getInteger("prestige")
             entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), currentPrestige))
         }
 

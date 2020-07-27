@@ -24,4 +24,7 @@ object Permissions {
     const val PERK_AUTO_SELL = "user.perks.autosell"
     const val PERK_FLY = "user.perks.fly"
 
+    const val LEADERBOARDS_REFRESH = "prisonaio.leaderboards.refresh"
+    const val LEADERBOARDS_SPAWN = "prisonaio.leaderboards.spawn"
+
 }

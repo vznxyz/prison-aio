@@ -14,6 +14,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.leaderboard.command.RefreshCommand
+import net.evilblock.prisonaio.module.leaderboard.command.IndexCommand
 import net.evilblock.prisonaio.module.leaderboard.command.ResultsCommand
 import net.evilblock.prisonaio.module.leaderboard.command.SpawnCommand
 import net.evilblock.prisonaio.module.leaderboard.impl.*
@@ -54,6 +55,7 @@ object LeaderboardsModule : PluginModule() {
 	override fun getCommands(): List<Class<*>> {
 		return listOf(
 			RefreshCommand.javaClass,
+			IndexCommand.javaClass,
 			ResultsCommand.javaClass,
 			SpawnCommand.javaClass
 		)
