@@ -14,7 +14,8 @@ import org.bukkit.entity.Player
 
 object OpenShopCommand {
 
-    @Command(names = ["shop", "shop open", "openshop"], description = "Opens a Shop Menu by ID")
+    @Command(names = ["prison shop open", "prison openshop"], description = "Opens a Shop Menu by ID")
+//    @Command(names = ["shop", "shop open", "openshop"], description = "Opens a Shop Menu by ID")
     @JvmStatic
     fun execute(player: Player, @Param(name = "shop") shop: Shop) {
         shop.openMenu(player)
