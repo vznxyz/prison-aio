@@ -102,7 +102,7 @@ class BattlePassMenu(private val user: User) : Menu() {
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.add("${ChatColor.GRAY}Current Tier: ${ChatColor.GOLD}${user.battlePassProgress.getCurrentTier()?.number ?: 50}")
+            description.add("${ChatColor.GRAY}Current Tier: ${ChatColor.GOLD}${user.battlePassProgress.getCurrentTier()?.number ?: 0}")
             description.add("${ChatColor.GRAY}Current XP: ${ChatColor.GOLD}${NumberUtils.format(user.battlePassProgress.getExperience())}")
 
             if (!user.battlePassProgress.isPremium()) {

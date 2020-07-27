@@ -62,7 +62,7 @@ class BattlePassProgress(@Transient var user: User) {
     }
 
     fun getCurrentTier(): Tier? {
-        return TierHandler.getTiers().sortedBy { it.requiredExperience }.firstOrNull() { experience >= it.requiredExperience }
+        return TierHandler.getTiers().sortedBy { it.requiredExperience }.lastOrNull() { experience >= it.requiredExperience }
     }
 
     fun getNextTier(): Tier? {
