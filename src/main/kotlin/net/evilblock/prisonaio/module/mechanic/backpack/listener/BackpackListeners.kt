@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.mechanic.backpack.listener
 
+import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.event.AnvilPrepareEvent
 import org.bukkit.event.EventHandler
@@ -14,8 +15,21 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerJoinEvent
+import java.util.*
 
 object BackpackListeners : Listener {
+
+    @EventHandler
+    fun onPlayerJoinEvent(event: PlayerJoinEvent) {
+        if (!event.player.hasPlayedBefore()) {
+            val backpack = Backpack()
+            BackpackHandler.trackBackpack(backpack)
+
+            event.player.inventory.addItem(backpack.toBackpackItem())
+            event.player.updateInventory()
+        }
+    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerInteractEvent(event: PlayerInteractEvent) {

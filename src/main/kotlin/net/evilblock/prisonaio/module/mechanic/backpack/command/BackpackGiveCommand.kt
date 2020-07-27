@@ -14,7 +14,6 @@ import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import java.util.*
 
 object BackpackGiveCommand {
 
@@ -25,8 +24,7 @@ object BackpackGiveCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player") player: Player) {
-        val backpack = Backpack(UUID.randomUUID().toString().replace("-", "").substring(0, 13))
-
+        val backpack = Backpack()
         BackpackHandler.trackBackpack(backpack)
 
         player.inventory.addItem(backpack.toBackpackItem())

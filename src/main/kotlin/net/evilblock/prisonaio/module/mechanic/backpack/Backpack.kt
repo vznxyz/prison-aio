@@ -15,35 +15,35 @@ import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.*
 
-class Backpack(val id: String) {
+class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").substring(0, 13)) {
 
     internal val contents: MutableMap<Int, ItemStack> = hashMapOf()
     internal val enchants: MutableMap<BackpackEnchant, Int> = hashMapOf()
 
-    fun addItem(itemStack: ItemStack): Boolean {
+    fun addItem(itemStack: ItemStack): ItemStack? {
         var remainingAmount = itemStack.amount
-        val insertTo = hashMapOf<Int, Int>()
 
-        for (slot in contents) {
-            if (slot.value.amount >= slot.value.maxStackSize) {
+        for ((slot, slotItem) in contents) {
+            if (slotItem.amount >= slotItem.maxStackSize) {
                 continue
             }
 
-            if (!ItemUtils.isSimilar(slot.value, itemStack) || !ItemUtils.hasSameLore(slot.value, itemStack) || !ItemUtils.hasSameEnchantments(slot.value, itemStack)) {
+            if (!ItemUtils.isSimilar(slotItem, itemStack) || !ItemUtils.hasSameLore(slotItem, itemStack) || !ItemUtils.hasSameEnchantments(slotItem, itemStack)) {
                 continue
             }
 
-            val maxInsert = slot.value.maxStackSize - slot.value.amount
+            val maxInsert = slotItem.maxStackSize - slotItem.amount
             if (maxInsert <= 0) {
                 continue
             }
 
             if (remainingAmount <= maxInsert) {
-                insertTo[slot.key] = remainingAmount
+                slotItem.amount = slotItem.amount + remainingAmount
                 remainingAmount = 0
             } else {
-                insertTo[slot.key] = maxInsert
+                slotItem.amount = maxInsert
                 remainingAmount -= maxInsert
             }
 
@@ -55,30 +55,17 @@ class Backpack(val id: String) {
         if (remainingAmount > 0) {
             for (i in 0..getMaxSlots()) {
                 if (!contents.containsKey(i)) {
-                    insertTo[i] = remainingAmount
-                    remainingAmount = 0
-                    break
+                    contents[i] = ItemBuilder.copyOf(itemStack).amount(remainingAmount.coerceAtMost(itemStack.type.maxStackSize)).build()
+                    remainingAmount -= remainingAmount.coerceAtMost(itemStack.type.maxStackSize)
                 }
             }
-
-            if (remainingAmount > 0) {
-                return false
-            }
         }
 
-        for (insert in insertTo) {
-            if (contents.containsKey(insert.key)) {
-                val itemAtSlot = contents[insert.key]!!
-                itemAtSlot.amount = itemAtSlot.amount + insert.value
-            } else {
-                val clonedItem = itemStack.clone()
-                clonedItem.amount = insert.value
-
-                contents[insert.key] = clonedItem
-            }
+        return if (remainingAmount > 0) {
+            return ItemBuilder.copyOf(itemStack).amount(remainingAmount).build()
+        } else {
+            null
         }
-
-        return true
     }
 
     fun hasEnchant(enchant: BackpackEnchant): Boolean {
@@ -123,8 +110,8 @@ class Backpack(val id: String) {
 
         lore.add("")
         lore.add("${ChatColor.GRAY}Right-click while holding this")
-        lore.add("${ChatColor.GRAY}backpack in your hand to open")
-        lore.add("${ChatColor.GRAY}its items!")
+        lore.add("${ChatColor.GRAY}backpack in your hand to access")
+        lore.add("${ChatColor.GRAY}its contents!")
 
         itemStack.lore = lore
     }

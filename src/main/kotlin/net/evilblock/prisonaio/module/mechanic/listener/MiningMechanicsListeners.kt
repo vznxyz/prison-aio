@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.mechanic.listener
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
+import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.ShopHandler
@@ -72,7 +73,32 @@ object MiningMechanicsListeners : Listener {
                     event.player.updateInventory()
                 }
             } else {
-                drops.forEach { drop -> event.player.inventory.addItem(drop) }
+                val backpacks = BackpackHandler.findBackpacksInInventory(event.player)
+
+                drops.forEach { drop ->
+                    val notInserted = event.player.inventory.addItem(drop)
+                    if (notInserted.isNotEmpty() && backpacks.isNotEmpty()) {
+                        for (backpack in backpacks) {
+                            val backpackMods = hashMapOf<Int, ItemStack?>()
+                            for ((key, item) in notInserted) {
+                                backpackMods[key] = backpack.addItem(item)
+                            }
+
+                            for ((key, item) in backpackMods) {
+                                if (item == null) {
+                                    notInserted.remove(key)
+                                } else {
+                                    notInserted[key] = item
+                                }
+                            }
+
+                            if (notInserted.isEmpty()) {
+                                break
+                            }
+                        }
+                    }
+                }
+
                 event.player.updateInventory()
             }
         }

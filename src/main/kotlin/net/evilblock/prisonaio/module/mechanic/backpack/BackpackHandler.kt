@@ -17,6 +17,7 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import org.bukkit.ChatColor
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.io.File
 
@@ -82,6 +83,19 @@ object BackpackHandler : PluginHandler {
 
     fun trackBackpack(backpack: Backpack) {
         backpacks[backpack.id.toLowerCase()] = backpack
+    }
+
+    fun findBackpacksInInventory(player: Player): List<Backpack> {
+        val found = arrayListOf<Backpack>()
+        for (item in player.inventory.storageContents) {
+            if (item != null && isBackpackItem(item)) {
+                val backpack = extractBackpack(item)
+                if (backpack != null) {
+                    found.add(backpack)
+                }
+            }
+        }
+        return found
     }
 
 }

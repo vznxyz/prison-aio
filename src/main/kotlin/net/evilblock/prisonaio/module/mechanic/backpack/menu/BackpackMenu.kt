@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.mechanic.backpack.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.util.bukkit.InventoryUtils
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.backpack.enchant.menu.BackpackEnchantsMenu
@@ -107,7 +108,12 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
             return false
         }
 
-        return backpack.addItem(itemStack)
+        val notInserted = backpack.addItem(itemStack)
+        if (notInserted != null) {
+            InventoryUtils.addAmountToInventory(player.inventory, itemStack, itemStack.amount)
+        }
+
+        return true
     }
 
     override fun acceptsDraggedItems(player: Player, items: Map<Int, ItemStack>): Boolean {
