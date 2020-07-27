@@ -17,6 +17,7 @@ import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.prisonaio.command.GKitzCommand
 import net.evilblock.prisonaio.command.ReloadCommand
 import net.evilblock.prisonaio.command.SaveCommand
+import net.evilblock.prisonaio.command.HealthCommand
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.cell.CellsModule
@@ -99,6 +100,7 @@ class PrisonAIO : PluginFramework() {
         CommandHandler.registerClass(GKitzCommand::class.java)
         CommandHandler.registerClass(ReloadCommand::class.java)
         CommandHandler.registerClass(SaveCommand::class.java)
+        CommandHandler.registerClass(HealthCommand::class.java)
     }
 
     override fun getDefaultWorldGenerator(worldName: String?, id: String?): ChunkGenerator {
