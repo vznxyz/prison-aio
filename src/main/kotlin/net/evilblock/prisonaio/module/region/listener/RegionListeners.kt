@@ -30,10 +30,7 @@ object RegionListeners : Listener {
     fun bypassCheck(player: Player, cancellable: Cancellable): Boolean {
         if (player.gameMode == GameMode.CREATIVE && (player.hasPermission(Permissions.REGION_BYPASS) || player.isOp)) {
             return if (RegionBypass.hasBypass(player)) {
-                if (!RegionBypass.hasReceivedNotification(player)) {
-                    RegionBypass.sendNotification(player)
-                }
-
+                RegionBypass.attemptNotify(player)
                 cancellable.isCancelled = false
                 true
             } else {

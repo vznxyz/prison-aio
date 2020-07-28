@@ -259,12 +259,8 @@ object CellHandler : PluginHandler {
     }
 
     fun attemptJoinSession(player: Player, cell: Cell) {
-        val hasBypass = hasBypass(player)
-        if (hasBypass) {
-            if (!RegionBypass.hasReceivedNotification(player)) {
-                RegionBypass.sendNotification(player)
-            }
-
+        if (hasBypass(player)) {
+            RegionBypass.attemptNotify(player)
             successfulJoinSession(player, cell)
         } else {
             if (cell.owner != player.uniqueId) {

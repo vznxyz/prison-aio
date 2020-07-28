@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.mechanic.listener
 
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
@@ -18,6 +19,11 @@ object PreventDropsInSpawnListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onPlayerDropItemEvent(event: PlayerDropItemEvent) {
         if (event.player.location.world == Bukkit.getWorlds()[0]) {
+            if (RegionBypass.hasBypass(event.player)) {
+                RegionBypass.attemptNotify(event.player)
+                return
+            }
+
             val spawnPoint = Bukkit.getWorlds()[0].spawnLocation
             val x = spawnPoint.x - 100.0 .. spawnPoint.x + 100.0
             val z = spawnPoint.z - 100.0 .. spawnPoint.z + 100.0

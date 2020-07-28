@@ -23,9 +23,7 @@ object DisableSpawnMobEggsListeners : Listener {
             if (!event.player.isOp || !RegionBypass.hasBypass(event.player)) {
                 event.isCancelled = true
             } else {
-                if (!RegionBypass.hasReceivedNotification(event.player)) {
-                    RegionBypass.sendNotification(event.player)
-                }
+                RegionBypass.attemptNotify(event.player)
             }
         }
     }

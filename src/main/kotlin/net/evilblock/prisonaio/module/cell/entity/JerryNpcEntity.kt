@@ -25,10 +25,7 @@ class JerryNpcEntity(location: Location) : NpcEntity(listOf(""), location) {
         var canOpen = false
         if (player.isOp && player.gameMode == GameMode.CREATIVE && RegionBypass.hasBypass(player)) {
             canOpen = true
-
-            if (!RegionBypass.hasReceivedNotification(player)) {
-                RegionBypass.sendNotification(player)
-            }
+            RegionBypass.attemptNotify(player)
         }
 
         if (!canOpen) {

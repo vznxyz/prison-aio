@@ -7,11 +7,16 @@
 
 package net.evilblock.prisonaio.module.region.bypass
 
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
@@ -38,14 +43,27 @@ object RegionBypass : Listener {
     }
 
     @JvmStatic
-    fun hasReceivedNotification(player: Player): Boolean {
-        return noticeSent.contains(player.uniqueId)
-    }
+    fun attemptNotify(player: Player) {
+        if (noticeSent.contains(player.uniqueId)) {
+            return
+        }
 
-    @JvmStatic
-    fun sendNotification(player: Player) {
         noticeSent.add(player.uniqueId)
         player.sendMessage("${ChatColor.RED}${ChatColor.BOLD}WARNING: ${ChatColor.GRAY}Region bypass is currently enabled.")
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onPlayerJoinEvent(event: PlayerJoinEvent) {
+        Tasks.delayed(10L) {
+            if (event.player.hasPermission(Permissions.REGION_BYPASS)) {
+                setBypass(event.player, true)
+                attemptNotify(event.player)
+
+                if (event.player.gameMode != GameMode.CREATIVE) {
+                    event.player.gameMode = GameMode.CREATIVE
+                }
+            }
+        }
     }
 
     /**
