@@ -123,12 +123,28 @@ class BattlePassMenu(private val user: User) : Menu() {
             return "${ChatColor.GOLD}${ChatColor.BOLD}${if (daily) "Daily" else "Premium"} Challenges"
         }
 
+        override fun getDescription(player: Player): List<String> {
+            val description = arrayListOf<String>()
+
+            if (!daily && !user.battlePassProgress.isPremium()) {
+                description.add("")
+                description.addAll(TextSplitter.split(length = 40, text = "You don't have access to the Premium JunkiePass challenges! Purchase on our store at store.minejunkie.com.", linePrefix = "${ChatColor.RED}"))
+            }
+
+            return description
+        }
+
         override fun getMaterial(player: Player): Material {
             return Material.BOOK
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
+                if (!daily && !user.battlePassProgress.isPremium()) {
+                    player.sendMessage("${ChatColor.RED}You don't have access to the Premium JunkiePass challenges! Purchase on our store at store.minejunkie.com.")
+                    return
+                }
+
                 BrowseChallengesMenu(user, daily).openMenu(player)
             }
         }
