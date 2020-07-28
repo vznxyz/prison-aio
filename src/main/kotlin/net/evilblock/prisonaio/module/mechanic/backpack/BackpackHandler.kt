@@ -77,6 +77,10 @@ object BackpackHandler : PluginHandler {
         return getBackpack(ID_REGEX.find(ChatColor.stripColor(itemStack.lore!!.first()))!!.groupValues[1].toLowerCase())
     }
 
+    fun getBackpacks(): Collection<Backpack> {
+        return backpacks.values
+    }
+
     fun getBackpack(id: String): Backpack? {
         return backpacks[id]
     }
@@ -96,6 +100,10 @@ object BackpackHandler : PluginHandler {
             }
         }
         return found
+    }
+
+    fun wipeBackpacks() {
+        backpacks.clear()
     }
 
 }

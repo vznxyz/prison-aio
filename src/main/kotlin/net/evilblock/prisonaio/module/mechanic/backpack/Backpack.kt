@@ -25,7 +25,7 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
     fun addItem(itemStack: ItemStack): ItemStack? {
         var remainingAmount = itemStack.amount
 
-        for ((slot, slotItem) in contents) {
+        for (slotItem in contents.values) {
             if (slotItem.amount >= slotItem.maxStackSize) {
                 continue
             }
@@ -43,7 +43,7 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
                 slotItem.amount = slotItem.amount + remainingAmount
                 remainingAmount = 0
             } else {
-                slotItem.amount = maxInsert
+                slotItem.amount = slotItem.amount + maxInsert
                 remainingAmount -= maxInsert
             }
 
@@ -57,6 +57,7 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
                 if (!contents.containsKey(i)) {
                     contents[i] = ItemBuilder.copyOf(itemStack).amount(remainingAmount.coerceAtMost(itemStack.type.maxStackSize)).build()
                     remainingAmount -= remainingAmount.coerceAtMost(itemStack.type.maxStackSize)
+                    break
                 }
             }
         }

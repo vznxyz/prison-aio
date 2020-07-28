@@ -10,8 +10,9 @@ package net.evilblock.prisonaio.module.mechanic.backpack.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
+import net.evilblock.prisonaio.module.mechanic.backpack.menu.BackpackMenu
 import org.bukkit.ChatColor
-import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 object BackpackViewCommand {
 
@@ -21,8 +22,9 @@ object BackpackViewCommand {
         permission = "backpack.view"
     )
     @JvmStatic
-    fun execute(sender: CommandSender, @Param(name = "backpack") backpack: Backpack) {
-        sender.sendMessage("${ChatColor.GOLD}Opening backpack with ID ${backpack.id}...")
+    fun execute(player: Player, @Param(name = "id") backpack: Backpack) {
+        BackpackMenu(backpack).openMenu(player)
+        player.sendMessage("${ChatColor.GOLD}Opening backpack with ID ${backpack.id}...")
     }
 
 }

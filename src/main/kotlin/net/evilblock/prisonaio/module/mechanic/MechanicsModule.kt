@@ -13,8 +13,10 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
+import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackDebugCommand
 import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackGiveCommand
 import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackViewCommand
+import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackWipeCommand
 import net.evilblock.prisonaio.module.mechanic.backpack.command.parameter.BackpackParameterType
 import net.evilblock.prisonaio.module.mechanic.backpack.listener.BackpackListeners
 import net.evilblock.prisonaio.module.mechanic.command.HotFixCommands
@@ -88,8 +90,10 @@ object MechanicsModule : PluginModule() {
             HotFixCommands.javaClass,
             HelpCommand.javaClass,
             SpawnCommand.javaClass,
+            BackpackDebugCommand.javaClass,
             BackpackGiveCommand.javaClass,
-            BackpackViewCommand.javaClass
+            BackpackViewCommand.javaClass,
+            BackpackWipeCommand.javaClass
         )
     }
 

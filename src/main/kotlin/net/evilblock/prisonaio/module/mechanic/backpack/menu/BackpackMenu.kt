@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.mechanic.backpack.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.InventoryUtils
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
@@ -86,6 +87,10 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
     }
 
     override fun acceptsInsertedItem(player: Player, itemStack: ItemStack, slot: Int): Boolean {
+        if (slot < 9) {
+            return false
+        }
+
         if (backpack.contents.containsKey(slot - 9)) {
             return false
         }
@@ -118,6 +123,10 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
 
     override fun acceptsDraggedItems(player: Player, items: Map<Int, ItemStack>): Boolean {
         for (inserted in items) {
+            if (inserted.key < 9) {
+                return false
+            }
+
             if (backpack.contents.containsKey(inserted.key - 9)) {
                 return false
             }
@@ -194,8 +203,8 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
 
             description.add("${ChatColor.GRAY}(ID: #${backpack.id})")
             description.add("")
-            description.add("${ChatColor.GRAY}Slots: ${ChatColor.RED}${ChatColor.BOLD}${backpack.contents.size}${ChatColor.GRAY}/${ChatColor.RED}${backpack.getMaxSlots()}")
-            description.add("${ChatColor.GRAY}Items: ${ChatColor.RED}${backpack.getItemsSize()}")
+            description.add("${ChatColor.GRAY}Slots: ${ChatColor.RED}${ChatColor.BOLD}${NumberUtils.format(backpack.contents.size)}${ChatColor.GRAY}/${ChatColor.RED}${NumberUtils.format(backpack.getMaxSlots())}")
+            description.add("${ChatColor.GRAY}Items: ${ChatColor.RED}${NumberUtils.format(backpack.getItemsSize())}")
             description.add("")
             description.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
 
