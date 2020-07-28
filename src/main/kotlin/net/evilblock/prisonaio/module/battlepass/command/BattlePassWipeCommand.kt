@@ -17,7 +17,7 @@ import org.bukkit.command.CommandSender
 object BattlePassWipeCommand {
 
     @Command(
-        names = ["battlepass wipe", "bp wipe", "junkiepass wipe", "jp wipe"],
+        names = ["battlepass wipe", "junkiepass wipe", "jp wipe"],
         description = "Reset all user's BattlePass progress",
         permission = Permissions.BATTLE_PASS_ADMIN,
         async = true
