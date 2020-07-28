@@ -12,6 +12,7 @@ import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.text.NumberFormat
@@ -21,7 +22,7 @@ data class ShopReceipt(
     val result: TransactionResult,
     val uuid: UUID = UUID.randomUUID(),
     val shop: Shop,
-    val type: ShopReceiptType,
+    val receiptType: ShopReceiptType,
     val items: List<ShopReceiptItem> = emptyList(),
     val multiplier: Double = 1.0,
     val finalCost: Double = 0.0
@@ -29,18 +30,24 @@ data class ShopReceipt(
 
     val createdAt: Long = System.currentTimeMillis()
 
-    fun sendCompact(player: Player) {
-        player.sendMessage("")
-        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Items ${type.displayName} ${type.context} ${shop.name}")
+    fun sendCompact(player: Player, firstOfChain: Boolean = true) {
+        if (firstOfChain) {
+            player.sendMessage("")
+        }
+
+        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Items ${receiptType.displayName} ${receiptType.context} ${shop.name}")
 
         val formattedItemsSold = NumberFormat.getInstance().format(items.sumBy { it.item.amount })
-        val formattedFinalCost = NumberUtils.format(finalCost)
+
+        val details = StringBuilder(" ${ChatColor.GRAY}You ${receiptType.displayName.toLowerCase()} ${ChatColor.GREEN}${ChatColor.BOLD}$formattedItemsSold ${ChatColor.GRAY}items for a total of ${Formats.formatMoney(finalCost)}")
 
         if (multiplier != 1.0) {
-            player.sendMessage(" ${ChatColor.GRAY}You ${type.displayName.toLowerCase()} ${ChatColor.GREEN}$formattedItemsSold ${ChatColor.GRAY}items for a total of ${ChatColor.AQUA}$${ChatColor.GREEN}$formattedFinalCost ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}$multiplier MULTI${ChatColor.GRAY}).")
+            details.append(" ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}$multiplier MULTI${ChatColor.GRAY}).")
         } else {
-            player.sendMessage(" ${ChatColor.GRAY}You ${type.displayName.toLowerCase()} ${ChatColor.GREEN}$formattedItemsSold ${ChatColor.GRAY}items for a total of ${ChatColor.AQUA}$${ChatColor.GREEN}$formattedFinalCost${ChatColor.GRAY}.")
+            details.append("${ChatColor.GRAY}.")
         }
+
+        player.sendMessage(details.toString())
 
         FancyMessage(" ")
             .then("${ChatColor.GRAY}[${ChatColor.YELLOW}${ChatColor.BOLD}VIEW RECEIPT${ChatColor.GRAY}]")
@@ -56,7 +63,7 @@ data class ShopReceipt(
         player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Listing receipt items... ${ChatColor.GRAY}(${shop.name} Shop${ChatColor.GRAY})")
         player.sendMessage("")
 
-        val transactionContext = if (type == ShopReceiptType.SELL) {
+        val transactionContext = if (receiptType == ShopReceiptType.SELL) {
             "${ChatColor.GREEN}${ChatColor.BOLD}SOLD FOR"
         } else {
             "${ChatColor.RED}${ChatColor.BOLD}BOUGHT FOR"

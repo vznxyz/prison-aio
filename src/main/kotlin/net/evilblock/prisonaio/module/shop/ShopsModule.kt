@@ -8,7 +8,6 @@
 package net.evilblock.prisonaio.module.shop
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.cubed.menu.template.MenuTemplateHandler
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -17,7 +16,6 @@ import net.evilblock.prisonaio.module.shop.command.*
 import net.evilblock.prisonaio.module.shop.command.parameter.ShopParameterType
 import net.evilblock.prisonaio.module.shop.command.parameter.ShopReceiptParameterType
 import net.evilblock.prisonaio.module.shop.listener.ShopReceiptListeners
-import net.evilblock.prisonaio.module.shop.menu.template.ShopMenuTemplate
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
 import net.evilblock.prisonaio.module.shop.receipt.task.ShopReceiptExpireTask
 import org.bukkit.event.Listener

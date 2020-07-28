@@ -10,15 +10,20 @@ package net.evilblock.prisonaio.module.shop.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.shop.Shop
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
 object OpenShopCommand {
 
-    @Command(names = ["prison shop open", "prison openshop"], description = "Opens a Shop Menu by ID")
+    @Command(names = ["prison shop open", "prison openshop"], description = "Opens a shop")
 //    @Command(names = ["shop", "shop open", "openshop"], description = "Opens a Shop Menu by ID")
     @JvmStatic
     fun execute(player: Player, @Param(name = "shop") shop: Shop) {
-        shop.openMenu(player)
+        if (shop.hasAccess(player)) {
+            shop.openMenu(player)
+        } else {
+            player.sendMessage("${ChatColor.RED}You don't have access to the ${shop.name}${ChatColor.RED} shop.")
+        }
     }
 
 }

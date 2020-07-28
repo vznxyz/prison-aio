@@ -68,8 +68,8 @@ class ShopMenuTemplate(id: String, @JsonAdapter(ShopReferenceSerializer::class) 
 
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to buy x1 for ${Formats.formatMoney(shopItem.sellPricePerUnit)}")
-            description.add("${ChatColor.GREEN}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.GREEN}to buy x64 for ${Formats.formatMoney(shopItem.sellPricePerUnit * 64)}")
-            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}SHIFT-CLICK ${ChatColor.YELLOW}to buy custom amount")
+            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.GREEN}to buy x64 for ${Formats.formatMoney(shopItem.sellPricePerUnit * 64)}")
+            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}SHIFT LEFT-CLICK ${ChatColor.YELLOW}to buy custom amount")
 
             return description
         }

@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.shop.event.DetermineShopEvent
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
@@ -71,6 +72,7 @@ object ShopHandler: PluginHandler {
             val receipt = determineShopEvent.shop!!.sellItems(player, items, true)
             if (receipt.result == TransactionResult.SUCCESS) {
                 items.removeAll(receipt.items.map { it.item })
+                receipt.sendCompact(player, true)
                 return items
             }
         }
@@ -81,10 +83,14 @@ object ShopHandler: PluginHandler {
             return emptyList()
         }
 
+        var firstOfChain = true
         for (shop in accessibleShops) {
             val receipt = shop.sellItems(player, items, true)
             if (receipt.result == TransactionResult.SUCCESS) {
                 items.removeAll(receipt.items.map { it.item })
+
+                receipt.sendCompact(player, firstOfChain)
+                firstOfChain = false
 
                 if (items.isEmpty()) {
                     break
@@ -100,6 +106,11 @@ object ShopHandler: PluginHandler {
         determineShopEvent.call()
 
         val items = player.inventory.storageContents.filterNotNull().toMutableList()
+
+//        for (backpack in BackpackHandler.findBackpacksInInventory(player)) {
+//            items.addAll(backpack.contents.values)
+//        }
+
         if (items.isEmpty()) {
             player.sendMessage("${ChatColor.RED}${TransactionResult.NO_ITEMS.defaultMessage}!")
             return
@@ -113,6 +124,8 @@ object ShopHandler: PluginHandler {
                 }
 
                 player.updateInventory()
+
+                receipt.sendCompact(player, true)
                 return
             }
         }
@@ -123,6 +136,7 @@ object ShopHandler: PluginHandler {
             return
         }
 
+        var firstOfChain = true
         for (shop in accessibleShops) {
             val receipt = shop.sellItems(player, items, autoSell)
             if (receipt.result == TransactionResult.SUCCESS) {
@@ -131,6 +145,9 @@ object ShopHandler: PluginHandler {
                 for (receiptItem in receipt.items) {
                     player.inventory.remove(receiptItem.item)
                 }
+
+                receipt.sendCompact(player, firstOfChain)
+                firstOfChain = false
 
                 if (items.isEmpty()) {
                     break

@@ -39,12 +39,12 @@ class Shop(val id: String) {
 
     fun buyItems(player: Player, items: Set<ShopReceiptItem>): ShopReceipt {
         if (this.items.isEmpty()) {
-            return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, type = ShopReceiptType.BUY)
+            return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
         val itemsBought = items.filter { this.items.contains(it.itemType) }
         if (itemsBought.isEmpty()) {
-            return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, type = ShopReceiptType.BUY)
+            return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
         val buyEvent = PlayerBuyFromShopEvent(
@@ -56,23 +56,22 @@ class Shop(val id: String) {
         Bukkit.getPluginManager().callEvent(buyEvent)
 
         if (buyEvent.isCancelled) {
-            return ShopReceipt(result = TransactionResult.CANCELLED_PLUGIN, shop = this, type = ShopReceiptType.BUY)
+            return ShopReceipt(result = TransactionResult.CANCELLED_PLUGIN, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
         if (buyEvent.items.isEmpty()) {
-            return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, type = ShopReceiptType.BUY)
+            return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
         val shopReceipt = ShopReceipt(
             result = TransactionResult.SUCCESS,
             shop = this,
             items = buyEvent.items,
-            type = ShopReceiptType.BUY,
+            receiptType = ShopReceiptType.BUY,
             multiplier = 1.0,
             finalCost = buyEvent.items.sumByDouble { it.getBuyCost() }
         )
 
-        shopReceipt.sendCompact(player)
         ShopHandler.trackReceipt(player, shopReceipt)
 
         return shopReceipt
@@ -80,7 +79,7 @@ class Shop(val id: String) {
 
     fun sellItems(player: Player, selling: List<ItemStack>, autoSell: Boolean = false): ShopReceipt {
         if (items.isEmpty()) {
-            return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, type = ShopReceiptType.SELL)
+            return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
         val itemsSold = arrayListOf<ShopReceiptItem>()
@@ -102,20 +101,20 @@ class Shop(val id: String) {
         Bukkit.getPluginManager().callEvent(sellEvent)
 
         if (sellEvent.isCancelled) {
-            return ShopReceipt(result = TransactionResult.CANCELLED_PLUGIN, shop = this, type = ShopReceiptType.SELL)
+            return ShopReceipt(result = TransactionResult.CANCELLED_PLUGIN, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
         if (sellEvent.items.isEmpty()) {
-            return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, type = ShopReceiptType.SELL)
+            return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
         if (itemsSold.isEmpty()) {
-            return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, type = ShopReceiptType.SELL)
+            return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
         val finalCost = itemsSold.sumByDouble { it.getSellCost() } * sellEvent.multiplier
         if (finalCost <= 0) {
-            return ShopReceipt(result = TransactionResult.FREE_SELL, shop = this, type = ShopReceiptType.SELL)
+            return ShopReceipt(result = TransactionResult.FREE_SELL, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
         VaultHook.useEconomyAndReturn { economy -> economy.depositPlayer(player, finalCost) }
@@ -123,14 +122,13 @@ class Shop(val id: String) {
         val shopReceipt = ShopReceipt(
             result = TransactionResult.SUCCESS,
             shop = this,
-            type = ShopReceiptType.SELL,
+            receiptType = ShopReceiptType.SELL,
             items = itemsSold,
             multiplier = sellEvent.multiplier,
             finalCost = finalCost
         )
 
         if (!autoSell) {
-            shopReceipt.sendCompact(player)
             ShopHandler.trackReceipt(player, shopReceipt)
         }
 
