@@ -29,9 +29,11 @@ object HealthCommand {
         val onlinePlayers = Bukkit.getOnlinePlayers().size
         val offlineCachedUsers = UserHandler.getUsers().filter { it.cacheExpiry != null }.size
 
+        sender.sendMessage("")
         sender.sendMessage("${ChatColor.RED}${ChatColor.BOLD}PRISON HEALTH")
         sender.sendMessage("${ChatColor.GRAY}TPS: ${ChatColor.RED}${ChatColor.BOLD}${TPS_FORMAT.format(MinecraftReflection.getTPS())} ${ChatColor.DARK_GRAY}/ ${ChatColor.GRAY}Memory: ${ChatColor.RED}${ChatColor.BOLD}${getMemoryUsage()} ${ChatColor.GRAY}used of ${ChatColor.RED}${ChatColor.BOLD}${getTotalMemory()}")
         sender.sendMessage("${ChatColor.GRAY}Online: ${ChatColor.RED}${ChatColor.BOLD}${onlinePlayers} ${ChatColor.DARK_GRAY}/ ${ChatColor.GRAY}Cached: ${ChatColor.RED}${ChatColor.BOLD}$offlineCachedUsers")
+        sender.sendMessage("")
     }
 
     private fun getTotalMemory(): String {
