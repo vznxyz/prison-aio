@@ -161,7 +161,7 @@ object UserHandler : PluginHandler {
      */
     fun getOrLoadAndCacheUser(uuid: UUID): User {
         return if (!usersMap.containsKey(uuid)) {
-            val user = loadUser(uuid = uuid, throws = true)
+            val user = loadUser(uuid = uuid)
             user.cacheExpiry = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30L)
             user
         } else {
