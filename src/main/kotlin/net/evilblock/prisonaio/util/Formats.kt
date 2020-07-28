@@ -57,7 +57,7 @@ object Formats {
     @JvmStatic
     fun formatMoney(amount: Double): String {
         val formatted = NumberFormat.getInstance().format(amount)
-        return "${ChatColor.AQUA}${Constants.MONEY_SYMBOL}${ChatColor.GREEN}${ChatColor.BOLD}$formatted"
+        return "${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}$formatted"
     }
 
     @JvmStatic
