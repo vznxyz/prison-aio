@@ -77,7 +77,7 @@ class Shop(val id: String) {
         return shopReceipt
     }
 
-    fun sellItems(player: Player, selling: List<ItemStack>, autoSell: Boolean = false): ShopReceipt {
+    fun sellItems(player: Player, selling: Collection<ItemStack>, autoSell: Boolean = false): ShopReceipt {
         if (items.isEmpty()) {
             return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, receiptType = ShopReceiptType.SELL)
         }

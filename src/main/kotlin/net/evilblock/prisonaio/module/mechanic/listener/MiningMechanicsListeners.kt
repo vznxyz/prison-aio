@@ -66,41 +66,41 @@ object MiningMechanicsListeners : Listener {
         val region = RegionsModule.findRegion(event.block.location)
 
         Tasks.async {
+            val backpacks = BackpackHandler.findBackpacksInInventory(event.player)
+
             if (region.supportsAutoSell() && user.perks.isAutoSellEnabled(event.player)) {
-                val itemsNotSold = ShopHandler.sellItems(event.player, drops)
-                if (itemsNotSold.isNotEmpty()) {
-                    itemsNotSold.forEach { drop -> event.player.inventory.addItem(drop) }
-                    event.player.updateInventory()
+                ShopHandler.sellItems(event.player, drops, true)
+
+                for (backpack in backpacks) {
+                    ShopHandler.sellItems(event.player, backpack.contents.values, true)
                 }
-            } else {
-                val backpacks = BackpackHandler.findBackpacksInInventory(event.player)
+            }
 
-                drops.forEach { drop ->
-                    val notInserted = event.player.inventory.addItem(drop)
-                    if (notInserted.isNotEmpty() && backpacks.isNotEmpty()) {
-                        for (backpack in backpacks) {
-                            val backpackMods = hashMapOf<Int, ItemStack?>()
-                            for ((key, item) in notInserted) {
-                                backpackMods[key] = backpack.addItem(item)
-                            }
+            drops.forEach { drop ->
+                val notInserted = event.player.inventory.addItem(drop)
+                if (notInserted.isNotEmpty() && backpacks.isNotEmpty()) {
+                    for (backpack in backpacks) {
+                        val backpackMods = hashMapOf<Int, ItemStack?>()
+                        for ((key, item) in notInserted) {
+                            backpackMods[key] = backpack.addItem(item)
+                        }
 
-                            for ((key, item) in backpackMods) {
-                                if (item == null) {
-                                    notInserted.remove(key)
-                                } else {
-                                    notInserted[key] = item
-                                }
+                        for ((key, item) in backpackMods) {
+                            if (item == null) {
+                                notInserted.remove(key)
+                            } else {
+                                notInserted[key] = item
                             }
+                        }
 
-                            if (notInserted.isEmpty()) {
-                                break
-                            }
+                        if (notInserted.isEmpty()) {
+                            break
                         }
                     }
                 }
-
-                event.player.updateInventory()
             }
+
+            event.player.updateInventory()
         }
     }
 
@@ -132,21 +132,40 @@ object MiningMechanicsListeners : Listener {
             block.state.update()
         }
 
+        val backpacks = BackpackHandler.findBackpacksInInventory(event.player)
+
         val region = RegionsModule.findRegion(event.block.location)
+        if (region.supportsAutoSell() && user.perks.isAutoSellEnabled(event.player)) {
+            ShopHandler.sellItems(event.player, drops, true)
+
+            for (backpack in backpacks) {
+                ShopHandler.sellItems(event.player, backpack.contents.values, true)
+            }
+        }
 
         Tasks.async {
-            if (region.supportsAutoSell() && user.perks.isAutoSellEnabled(event.player)) {
-                try {
-                    val itemsNotSold = ShopHandler.sellItems(event.player, drops)
-                    if (itemsNotSold.isNotEmpty()) {
-                        itemsNotSold.forEach { drop -> event.player.inventory.addItem(drop) }
-                        event.player.updateInventory()
+            drops.forEach { drop ->
+                val notInserted = event.player.inventory.addItem(drop)
+                if (notInserted.isNotEmpty() && backpacks.isNotEmpty()) {
+                    for (backpack in backpacks) {
+                        val backpackMods = hashMapOf<Int, ItemStack?>()
+                        for ((key, item) in notInserted) {
+                            backpackMods[key] = backpack.addItem(item)
+                        }
+
+                        for ((key, item) in backpackMods) {
+                            if (item == null) {
+                                notInserted.remove(key)
+                            } else {
+                                notInserted[key] = item
+                            }
+                        }
+
+                        if (notInserted.isEmpty()) {
+                            break
+                        }
                     }
-                } catch (e: IllegalStateException) {
                 }
-            } else {
-                drops.forEach { drop -> event.player.inventory.addItem(drop) }
-                event.player.updateInventory()
             }
         }
     }

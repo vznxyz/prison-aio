@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.shop.event.DetermineShopEvent
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
@@ -64,33 +65,31 @@ object ShopHandler: PluginHandler {
         Files.write(Cubed.gson.toJson(shopsMap.values), getInternalDataFile(), Charsets.UTF_8)
     }
 
-    fun sellItems(player: Player, items: MutableList<ItemStack>): List<ItemStack> {
+    fun sellItems(player: Player, items: MutableCollection<ItemStack>, autoSell: Boolean): Collection<ItemStack> {
         val determineShopEvent = DetermineShopEvent(player)
         determineShopEvent.call()
 
         if (determineShopEvent.shop != null) {
-            val receipt = determineShopEvent.shop!!.sellItems(player, items, true)
+            val receipt = determineShopEvent.shop!!.sellItems(player, items, autoSell)
             if (receipt.result == TransactionResult.SUCCESS) {
                 items.removeAll(receipt.items.map { it.item })
-                receipt.sendCompact(player, true)
                 return items
             }
         }
 
         val accessibleShops = shopsMap.values.filter { it.hasAccess(player) }.sortedBy { it.priority }
         if (accessibleShops.isEmpty()) {
-            player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
+            if (!autoSell) {
+                player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
+            }
+
             return emptyList()
         }
 
-        var firstOfChain = true
         for (shop in accessibleShops) {
             val receipt = shop.sellItems(player, items, true)
             if (receipt.result == TransactionResult.SUCCESS) {
                 items.removeAll(receipt.items.map { it.item })
-
-                receipt.sendCompact(player, firstOfChain)
-                firstOfChain = false
 
                 if (items.isEmpty()) {
                     break
@@ -102,19 +101,14 @@ object ShopHandler: PluginHandler {
     }
 
     fun sellInventory(player: Player, autoSell: Boolean) {
+        val items = player.inventory.storageContents.filterNotNull().toMutableList()
+        val backpacks = BackpackHandler.findBackpacksInInventory(player)
+        val accessibleShops = shopsMap.values.filter { it.hasAccess(player) }.sortedBy { it.priority }
+        var soldAnything = false
+        var firstOfChain = true
+
         val determineShopEvent = DetermineShopEvent(player)
         determineShopEvent.call()
-
-        val items = player.inventory.storageContents.filterNotNull().toMutableList()
-
-//        for (backpack in BackpackHandler.findBackpacksInInventory(player)) {
-//            items.addAll(backpack.contents.values)
-//        }
-
-        if (items.isEmpty()) {
-            player.sendMessage("${ChatColor.RED}${TransactionResult.NO_ITEMS.defaultMessage}!")
-            return
-        }
 
         if (determineShopEvent.shop != null) {
             val receipt = determineShopEvent.shop!!.sellItems(player, items, false)
@@ -126,20 +120,26 @@ object ShopHandler: PluginHandler {
                 player.updateInventory()
 
                 receipt.sendCompact(player, true)
+                sellBackpacksInInventory(player, backpacks, accessibleShops, false)
                 return
             }
         }
 
-        val accessibleShops = shopsMap.values.filter { it.hasAccess(player) }.sortedBy { it.priority }
         if (accessibleShops.isEmpty()) {
             player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
             return
         }
 
-        var firstOfChain = true
+        if (sellBackpacksInInventory(player, backpacks, accessibleShops, firstOfChain)) {
+            soldAnything = true
+            firstOfChain = false
+        }
+
         for (shop in accessibleShops) {
             val receipt = shop.sellItems(player, items, autoSell)
             if (receipt.result == TransactionResult.SUCCESS) {
+                soldAnything = true
+
                 items.removeAll(receipt.items.map { it.item })
 
                 for (receiptItem in receipt.items) {
@@ -155,7 +155,34 @@ object ShopHandler: PluginHandler {
             }
         }
 
-        player.updateInventory()
+        if (soldAnything) {
+            player.updateInventory()
+        } else {
+            player.sendMessage("${ChatColor.RED}${TransactionResult.NO_ITEMS.defaultMessage}!")
+        }
+    }
+
+    private fun sellBackpacksInInventory(player: Player, backpacks: List<Backpack>, shops: List<Shop>, _firstOfChain: Boolean): Boolean {
+        var soldAnything = false
+        var firstOfChain = _firstOfChain
+
+        for (shop in shops) {
+            for (backpack in backpacks) {
+                val receipt = shop.sellItems(player, backpack.contents.values, false)
+                if (receipt.result == TransactionResult.SUCCESS) {
+                    soldAnything = true
+
+                    for (soldItem in receipt.items) {
+                        backpack.removeItem(soldItem.item)
+                    }
+
+                    receipt.sendCompact(player, firstOfChain)
+                    firstOfChain = false
+                }
+            }
+        }
+
+        return soldAnything
     }
 
     fun getShopById(id: String): Optional<Shop> {

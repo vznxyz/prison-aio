@@ -69,6 +69,42 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
         }
     }
 
+    fun removeItem(itemStack: ItemStack) {
+        var remainingAmount = itemStack.amount
+
+        val toRemove = arrayListOf<Int>()
+        for ((slot, slotItem) in contents) {
+            if (slotItem.amount <= 0) {
+                continue
+            }
+
+            if (!ItemUtils.isSimilar(slotItem, itemStack) || !ItemUtils.hasSameLore(slotItem, itemStack) || !ItemUtils.hasSameEnchantments(slotItem, itemStack)) {
+                continue
+            }
+
+            val maxTake = slotItem.amount.coerceAtMost(remainingAmount)
+            if (maxTake <= 0) {
+                continue
+            }
+
+            if (remainingAmount >= maxTake) {
+                toRemove.add(slot)
+                remainingAmount -= maxTake
+            } else {
+                slotItem.amount = slotItem.amount - maxTake
+                remainingAmount = 0
+            }
+
+            if (remainingAmount <= 0) {
+                break
+            }
+        }
+
+        for (i in toRemove) {
+            contents.remove(i)
+        }
+    }
+
     fun hasEnchant(enchant: BackpackEnchant): Boolean {
         return enchants.containsKey(enchant)
     }

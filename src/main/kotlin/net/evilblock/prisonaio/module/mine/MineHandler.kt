@@ -51,7 +51,7 @@ object MineHandler : PluginHandler {
             }
         }
 
-        Tasks.async {
+        Tasks.asyncDelayed(20L * 3) {
             for (mine in minesMap.values) {
                 RegionsModule.updateBlockCache(mine)
 
