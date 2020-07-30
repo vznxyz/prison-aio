@@ -27,17 +27,13 @@ class DailyChallengesProgress(val uuid: UUID) {
 
     @Synchronized
     fun hasCompletedChallenge(challenge: Challenge): Boolean {
-        synchronized(completedChallenges) {
-            return completedChallenges.contains(challenge)
-        }
+        return completedChallenges.contains(challenge)
     }
 
     @Synchronized
     fun completeChallenge(challenge: Challenge) {
-        synchronized(completedChallenges) {
-            completedChallenges.add(challenge)
-            UserHandler.getUser(uuid).battlePassProgress.addExperience(challenge.rewardXp)
-        }
+        completedChallenges.add(challenge)
+        UserHandler.getUser(uuid).battlePassProgress.addExperience(challenge.rewardXp)
     }
 
     fun addBlocksMined(amount: Int) {

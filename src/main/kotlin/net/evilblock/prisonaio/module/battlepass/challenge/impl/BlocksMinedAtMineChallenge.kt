@@ -73,6 +73,10 @@ class BlocksMinedAtMineChallenge(id: String, @JsonAdapter(MineReferenceSerialize
         return BlocksMinedAtMineChallenge::class.java
     }
 
+    override fun isSetup(): Boolean {
+        return mine != null
+    }
+
     object BlocksMinedAtMineChallengeType : ChallengeType {
         override fun getName(): String {
             return "Blocks Mined At Mine"

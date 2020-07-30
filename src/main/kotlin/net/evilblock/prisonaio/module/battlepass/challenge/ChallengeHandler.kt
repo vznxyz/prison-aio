@@ -57,7 +57,9 @@ object ChallengeHandler : PluginHandler {
                 val list = Cubed.gson.fromJson(reader, DATA_TYPE) as List<Challenge>
 
                 for (challenge in list) {
-                    challenges[challenge.id.toLowerCase()] = challenge
+                    if (challenge.isSetup()) {
+                        trackChallenge(challenge)
+                    }
                 }
             }
         }

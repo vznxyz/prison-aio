@@ -17,6 +17,15 @@ import java.text.NumberFormat
 
 abstract class Challenge(val id: String, internal var daily: Boolean = false) : AbstractTypeSerializable {
 
+    companion object {
+        private val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}JunkiePass${ChatColor.GRAY}]"
+        internal val DECIMAL_FORMAT = DecimalFormat("#.##")
+
+        init {
+            DECIMAL_FORMAT.roundingMode = RoundingMode.HALF_UP
+        }
+    }
+
     var name: String = "Default name"
 
     internal var rewardXp: Int = 0
@@ -62,13 +71,8 @@ abstract class Challenge(val id: String, internal var daily: Boolean = false) : 
         }
     }
 
-    companion object {
-        private val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}JunkiePass${ChatColor.GRAY}]"
-        internal val DECIMAL_FORMAT = DecimalFormat("#.##")
-
-        init {
-            DECIMAL_FORMAT.roundingMode = RoundingMode.HALF_UP
-        }
+    open fun isSetup(): Boolean {
+        return true
     }
 
 }
