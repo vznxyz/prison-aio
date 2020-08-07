@@ -72,6 +72,10 @@ object ShopHandler: PluginHandler {
             .reversed()
     }
 
+    fun getDefaultShop(): Optional<Shop> {
+        return getShopById(getModule().config.getString("default-shop", "main"))
+    }
+
     fun sellItems(player: Player, items: MutableCollection<ItemStack>, autoSell: Boolean): Collection<ItemStack> {
         val determineShopEvent = DetermineShopEvent(player)
         determineShopEvent.call()

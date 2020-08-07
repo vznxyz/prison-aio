@@ -1,0 +1,2 @@
+# The shop that is opened when a player uses the /shop command and doesn't specify a shop
+default-shop: "main"

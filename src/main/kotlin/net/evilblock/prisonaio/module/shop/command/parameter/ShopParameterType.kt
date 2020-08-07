@@ -17,13 +17,21 @@ import org.bukkit.entity.Player
 object ShopParameterType : ParameterType<Shop?> {
 
     override fun transform(sender: CommandSender, source: String): Shop? {
-        val optionalShop = ShopHandler.getShopById(source)
-        if (!optionalShop.isPresent) {
-            sender.sendMessage("${ChatColor.RED}Couldn't find a shop by the name `${ChatColor.WHITE}$source${ChatColor.RED}`.")
-            return null
+        if (source.equals("__default__", ignoreCase = true)) {
+            val defaultShop = ShopHandler.getDefaultShop()
+            if (!defaultShop.isPresent) {
+                sender.sendMessage("${ChatColor.RED}Couldn't find the default shop.")
+            }
+
+            return defaultShop.orElse(null)
         }
 
-        return optionalShop.get()
+        val shop = ShopHandler.getShopById(source)
+        if (!shop.isPresent) {
+            sender.sendMessage("${ChatColor.RED}Couldn't find a shop by the name `${ChatColor.WHITE}$source${ChatColor.RED}`.")
+        }
+
+        return shop.orElse(null)
     }
 
     override fun tabComplete(player: Player, flags: Set<String>, source: String): List<String> {
