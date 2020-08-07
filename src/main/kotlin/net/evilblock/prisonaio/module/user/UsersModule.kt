@@ -103,6 +103,7 @@ object UsersModule : PluginModule() {
             FlyCommand.javaClass,
             PingCommand.javaClass,
             PrestigeCommand.javaClass,
+            PrestigeTokensCommand.javaClass,
             ProfileCommand.javaClass,
             RankupAllCommand.javaClass,
             RankupCommand.javaClass,
