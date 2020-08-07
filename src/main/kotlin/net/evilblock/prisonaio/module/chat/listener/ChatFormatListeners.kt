@@ -46,21 +46,16 @@ object ChatFormatListeners : Listener {
 
         val tooltipLines = arrayListOf<FancyMessage>()
         tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}${event.player.name}"))
-        tooltipLines.add(FancyMessage(" ${ChatColor.RED}⚔ ${ChatColor.GRAY}Rank ${user.getRank().displayName}"))
+        tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.CROSSED_SWORDS_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}"))
 
         if (user.getPrestige() == 0) {
-            tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}⭑ ${ChatColor.GRAY}Not Prestiged"))
+            tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Not Prestiged"))
         } else {
-            tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}⭑ ${ChatColor.GRAY}Prestige ${user.getPrestige()}"))
+            tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Prestige ${user.getPrestige()}"))
         }
 
-        val moneyBalance = user.getMoneyBalance()
-        val formattedMoneyBalance = NumberUtils.format(moneyBalance)
-        tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}$ ${ChatColor.GRAY}$formattedMoneyBalance"))
-
-        val formattedTokensBalance = NumberUtils.format(user.getTokenBalance())
-        tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}⏣ ${ChatColor.GRAY}$formattedTokensBalance"))
-
+        tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.MONEY_SYMBOL} ${ChatColor.GRAY}${NumberUtils.format(user.getMoneyBalance())}"))
+        tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}${NumberUtils.format(user.getTokenBalance())}"))
         tooltipLines.add(FancyMessage(""))
         tooltipLines.add(FancyMessage("${ChatColor.YELLOW}Click to view ${event.player.name}'s profile"))
 
@@ -107,10 +102,19 @@ object ChatFormatListeners : Listener {
             // add last part
             if (!event.message.endsWith(ITEM_PLACEHOLDER, ignoreCase = true)) {
                 val lastPart = event.message.substring(placeholderIndex + 6)
-                fancyMessage.then(ChatColor.getLastColors(firstPart) + lastPart)
+                fancyMessage.then(lastPart)
+
+                val firstPartColors = ChatColor.getLastColors(firstPart)
+                if (firstPartColors.isNotEmpty()) {
+                    fancyMessage.color(ChatColor.getByChar(firstPartColors.toCharArray()[1]))
+                }
             }
         } else {
-            fancyMessage.then(lastColors + event.message)
+            fancyMessage.then(event.message)
+
+            if (lastColors.isNotEmpty()) {
+                fancyMessage.color(ChatColor.getByChar(lastColors.toCharArray()[1]))
+            }
         }
 
         for (player in event.recipients) {
