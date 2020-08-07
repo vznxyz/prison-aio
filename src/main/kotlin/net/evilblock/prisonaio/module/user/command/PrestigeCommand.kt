@@ -14,6 +14,7 @@ import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.rank.event.AsyncPlayerPrestigeEvent
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -73,6 +74,8 @@ object PrestigeCommand {
         player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Entered Next Prestige")
         player.sendMessage(" ${ChatColor.GRAY}Congratulations on entering the next prestige! Your")
         player.sendMessage(" ${ChatColor.GRAY}rank has been reset to ${RankHandler.getStartingRank().displayName} ${ChatColor.GRAY}for you to rankup again.")
+        player.sendMessage("")
+        player.sendMessage(" ${ChatColor.GRAY}You've been given ${Formats.formatPrestigeTokens(1)} ${ChatColor.GRAY}to spend at the ${ChatColor.RED}${ChatColor.BOLD}Prestige Token ${ChatColor.GRAY}shop.")
         player.sendMessage("")
 
         if (prestigeEvent.to != RanksModule.getMaxPrestige()) {
