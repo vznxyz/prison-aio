@@ -102,6 +102,7 @@ object UsersModule : PluginModule() {
             DropCommand.javaClass,
             FlyCommand.javaClass,
             PingCommand.javaClass,
+            PlayTimeCommand.javaClass,
             PrestigeCommand.javaClass,
             PrestigeTokensCommand.javaClass,
             ProfileCommand.javaClass,
