@@ -13,6 +13,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.mine.command.*
 import net.evilblock.prisonaio.module.mine.command.parameter.MineParameterType
+import net.evilblock.prisonaio.module.mine.listener.MineChunkListeners
 import net.evilblock.prisonaio.module.mine.listener.MineInventoryListeners
 import net.evilblock.prisonaio.module.mine.task.MineEffectsTask
 import net.evilblock.prisonaio.module.mine.task.MineResetTask
@@ -68,6 +69,7 @@ object MinesModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
+            MineChunkListeners,
             MineInventoryListeners
         )
     }

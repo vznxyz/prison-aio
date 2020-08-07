@@ -70,7 +70,13 @@ data class ShopReceipt(
         }
 
         for (receiptItem in items) {
-            val msgBuilder = StringBuilder().append(" ${ChatColor.GRAY}- x${receiptItem.item.amount} ${ItemUtils.getName(receiptItem.item)} $transactionContext ${ChatColor.AQUA}\$${ChatColor.GREEN}${NumberUtils.format(receiptItem.getSellCost())}")
+            val itemCost = if (receiptType == ShopReceiptType.BUY) {
+                receiptItem.getBuyCost()
+            } else {
+                receiptItem.getSellCost()
+            }
+
+            val msgBuilder = StringBuilder().append(" ${ChatColor.GRAY}- x${receiptItem.item.amount} ${ItemUtils.getName(receiptItem.item)} $transactionContext ${Formats.formatMoney(itemCost)}")
 
             if (receiptItem.multiplier != 1.0) {
                 msgBuilder.append(" ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}${receiptItem.multiplier} MULTI${ChatColor.GRAY})")
@@ -82,9 +88,9 @@ data class ShopReceipt(
         player.sendMessage("")
 
         if (multiplier != 1.0) {
-            player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Total: ${ChatColor.AQUA}$${ChatColor.GREEN}${NumberUtils.format(finalCost)} ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}${multiplier} MULTI${ChatColor.GRAY})")
+            player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Total: ${Formats.formatMoney(finalCost)} ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}${multiplier} MULTI${ChatColor.GRAY})")
         } else {
-            player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Total: ${ChatColor.AQUA}$${ChatColor.GREEN}${NumberUtils.format(finalCost)}")
+            player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Total: ${Formats.formatMoney(finalCost)}")
         }
 
         player.sendMessage("")

@@ -14,12 +14,14 @@ object Permissions {
     const val REGION_BYPASS = "prisonaio.regions.bypass"
 
     const val USERS_ADMIN = "prisonaio.users.admin"
-    const val CELLS_ADMIN = "prisonaio.cells.admin"
+    const val GANGS_ADMIN = "prisonaio.gangs.admin"
     const val QUESTS_ADMIN = "prisonaio.quests.admin"
-    const val CRATES_ADMIN = "prisonaio.crates.admin"
     const val BANK_NOTES_ADMIN = "prisonaio.banknotes.admin"
     const val TOKENS_ADMIN = "prisonaio.tokens.admin"
     const val BATTLE_PASS_ADMIN = "prisonaio.battlepass.admin"
+
+    const val SALVAGE_PREVENTION_EDITOR = "prisonaio.enchants.salvage.editor"
+    const val PICKAXE_PRESTIGE_EDITOR = "prisonaio.enchants.prestige.editor"
 
     const val PERK_AUTO_SELL = "user.perks.autosell"
     const val PERK_FLY = "user.perks.fly"

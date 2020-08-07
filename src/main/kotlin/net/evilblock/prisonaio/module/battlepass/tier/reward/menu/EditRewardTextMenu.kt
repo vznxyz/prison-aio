@@ -17,7 +17,7 @@ import org.bukkit.entity.Player
 
 class EditRewardTextMenu(private val reward: Reward) : TextEditorMenu(reward.textLines) {
 
-    override fun getPromptBuilder(player: Player): EzPrompt.Builder {
+    override fun getPromptBuilder(player: Player, index: Int): EzPrompt.Builder {
         return EzPrompt.Builder()
             .promptText("${ChatColor.GREEN}Please enter the new text.")
             .charLimit(100)

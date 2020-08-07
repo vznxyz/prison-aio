@@ -20,7 +20,7 @@ import net.evilblock.prisonaio.command.SaveCommand
 import net.evilblock.prisonaio.command.HealthCommand
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
-import net.evilblock.prisonaio.module.cell.CellsModule
+import net.evilblock.prisonaio.module.gang.GangModule
 import net.evilblock.prisonaio.module.chat.ChatModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
@@ -74,7 +74,7 @@ class PrisonAIO : PluginFramework() {
             QuestsModule,
             ShopsModule,
             MinesModule,
-            CellsModule,
+            GangModule,
             PrivateMinesModule,
             BattlePassModule,
             UsersModule,

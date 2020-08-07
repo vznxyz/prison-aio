@@ -80,7 +80,7 @@ object PrisonScoreGetter : ScoreGetter {
         val formattedMoneyBalance = NumberUtils.format(moneyBalance)
         scores.add("  ${ChatColor.RED}${Constants.MONEY_SYMBOL} ${ChatColor.GRAY}$formattedMoneyBalance")
 
-        val formattedTokensBalance = NumberUtils.format(user.getTokensBalance())
+        val formattedTokensBalance = NumberUtils.format(user.getTokenBalance())
         scores.add("  ${ChatColor.RED}${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}$formattedTokensBalance")
 
         scores.add("")

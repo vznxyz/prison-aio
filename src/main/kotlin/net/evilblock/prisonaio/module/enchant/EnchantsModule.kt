@@ -14,8 +14,10 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.command.*
 import net.evilblock.prisonaio.module.enchant.command.parameter.AbstractEnchantParameterType
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
+import net.evilblock.prisonaio.module.enchant.pickaxe.prestige.PickaxePrestigeHandler
+import net.evilblock.prisonaio.module.enchant.pickaxe.prestige.command.PrestigeEditorCommand
 import net.evilblock.prisonaio.module.enchant.salvage.SalvagePreventionHandler
-import net.evilblock.prisonaio.module.enchant.salvage.command.SalvagePreventionCommand
+import net.evilblock.prisonaio.module.enchant.salvage.command.SalvagePreventionEditorCommand
 import org.bukkit.event.Listener
 
 object EnchantsModule : PluginModule() {
@@ -34,6 +36,7 @@ object EnchantsModule : PluginModule() {
 
     override fun onEnable() {
         PickaxeHandler.initialLoad()
+        PickaxePrestigeHandler.initialLoad()
         SalvagePreventionHandler.initialLoad()
     }
 
@@ -43,11 +46,13 @@ object EnchantsModule : PluginModule() {
 
     override fun onDisable() {
         PickaxeHandler.saveData()
+        PickaxePrestigeHandler.saveData()
         SalvagePreventionHandler.saveData()
     }
 
     override fun onAutoSave() {
         PickaxeHandler.saveData()
+        PickaxePrestigeHandler.saveData()
         SalvagePreventionHandler.saveData()
     }
 
@@ -63,8 +68,10 @@ object EnchantsModule : PluginModule() {
             EnchantCommand.javaClass,
             PickaxeCommand.javaClass,
             RemoveEnchantCommand.javaClass,
+            SalvageCommand.javaClass,
             ToggleEnchantsMessagesCommand.javaClass,
-            SalvagePreventionCommand.javaClass
+            SalvagePreventionEditorCommand.javaClass,
+            PrestigeEditorCommand.javaClass
         )
     }
 
@@ -72,6 +79,10 @@ object EnchantsModule : PluginModule() {
         return mapOf(
             AbstractEnchant::class.java to AbstractEnchantParameterType
         )
+    }
+
+    fun readTokenShopCommand(): String {
+        return config.getString("token-shop-command", "openshop tokens")
     }
 
 }

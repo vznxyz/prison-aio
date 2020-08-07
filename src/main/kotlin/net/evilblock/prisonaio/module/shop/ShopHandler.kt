@@ -65,6 +65,13 @@ object ShopHandler: PluginHandler {
         Files.write(Cubed.gson.toJson(shopsMap.values), getInternalDataFile(), Charsets.UTF_8)
     }
 
+    fun getAccessibleShops(player: Player): List<Shop> {
+        return shopsMap.values
+            .filter { it.hasAccess(player) }
+            .sortedBy { it.priority }
+            .reversed()
+    }
+
     fun sellItems(player: Player, items: MutableCollection<ItemStack>, autoSell: Boolean): Collection<ItemStack> {
         val determineShopEvent = DetermineShopEvent(player)
         determineShopEvent.call()
@@ -77,7 +84,7 @@ object ShopHandler: PluginHandler {
             }
         }
 
-        val accessibleShops = shopsMap.values.filter { it.hasAccess(player) }.sortedBy { it.priority }
+        val accessibleShops = getAccessibleShops(player)
         if (accessibleShops.isEmpty()) {
             if (!autoSell) {
                 player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
@@ -103,7 +110,7 @@ object ShopHandler: PluginHandler {
     fun sellInventory(player: Player, autoSell: Boolean) {
         val items = player.inventory.storageContents.filterNotNull().toMutableList()
         val backpacks = BackpackHandler.findBackpacksInInventory(player)
-        val accessibleShops = shopsMap.values.filter { it.hasAccess(player) }.sortedBy { it.priority }
+        val accessibleShops = getAccessibleShops(player)
         var soldAnything = false
         var firstOfChain = true
 
@@ -192,8 +199,8 @@ object ShopHandler: PluginHandler {
         return Optional.empty()
     }
 
-    fun getShops(): List<Shop> {
-        return ArrayList(shopsMap.values)
+    fun getShops(): Collection<Shop> {
+        return shopsMap.values
     }
 
     fun trackShop(shop: Shop) {

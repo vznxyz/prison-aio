@@ -109,6 +109,7 @@ abstract class AbstractEnchant(val id: String, val enchant: String, val maxLevel
         if (!isEnchantItem(item)) {
             return false
         }
+
         val split = item.itemMeta.lore[0].split(" ").toTypedArray()
         return split[split.size - 1].startsWith("+")
     }

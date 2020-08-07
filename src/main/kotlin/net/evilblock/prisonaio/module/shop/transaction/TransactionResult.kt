@@ -11,7 +11,8 @@ enum class TransactionResult(val defaultMessage: String) {
     SUCCESS("Successful transaction"),
     CANCELLED_PLUGIN("Cancelled by a plugin"),
     SHOP_EMPTY("Shop has no items"),
-    NO_ITEMS("You didn't have any items to sell"),
-    FREE_BUY("Can't buy for free or negative amount"),
-    FREE_SELL("Can't sell for free or negative amount")
+    NO_ITEMS("You didn't have any items to transact"),
+    CANNOT_AFFORD("You can't afford to purchase those items"),
+    FREE_BUY("You can't buy for free or negative amount"),
+    FREE_SELL("You can't sell for free or negative amount")
 }

@@ -204,7 +204,7 @@ object TokenShopListeners : Listener {
                 }
 
                 if (buying) {
-                    if (!owningUser.hasTokensBalance(quantity.toLong())) {
+                    if (!owningUser.hasTokenBalance(quantity.toLong())) {
                         player.sendMessage("${ChatColor.RED}${owningUser.getUsername()} doesn't have enough tokens to sell you.")
                         return@sync
                     }
@@ -236,7 +236,7 @@ object TokenShopListeners : Listener {
                     }
 
                     val sellingUser = UserHandler.getUser(player.uniqueId)
-                    if (!sellingUser.hasTokensBalance(quantity.toLong())) {
+                    if (!sellingUser.hasTokenBalance(quantity.toLong())) {
                         player.sendMessage("${ChatColor.RED}You don't have enough tokens to sell to that TokenShop.")
                         return@sync
                     }

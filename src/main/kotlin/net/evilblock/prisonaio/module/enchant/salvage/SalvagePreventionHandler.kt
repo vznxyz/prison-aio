@@ -18,6 +18,7 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
+import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
 import org.bukkit.inventory.ItemStack
 import java.io.File
 
@@ -68,8 +69,8 @@ object SalvagePreventionHandler : PluginHandler {
         pickaxes.remove(itemStack)
     }
 
-    fun getSalvageableLevels(itemStack: ItemStack): Map<AbstractEnchant, Int> {
-        val enchants = EnchantsManager.readEnchantsFromLore(itemStack).toMutableMap()
+    fun getSalvageableLevels(itemStack: ItemStack, pickaxeData: PickaxeData): Map<AbstractEnchant, Int> {
+        val enchants = pickaxeData.enchants.toMutableMap()
         if (enchants.isEmpty()) {
             return emptyMap()
         }

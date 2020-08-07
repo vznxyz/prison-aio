@@ -15,8 +15,9 @@ import org.bukkit.entity.Player
 object ShopReceiptCommand {
 
     @Command(
-        names = ["receipt"],
-        description = "Display a receipt"
+        names = ["receipt", "shop receipt"],
+        description = "Display a receipt",
+        async = true
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "receipt") receipt: ShopReceipt) {

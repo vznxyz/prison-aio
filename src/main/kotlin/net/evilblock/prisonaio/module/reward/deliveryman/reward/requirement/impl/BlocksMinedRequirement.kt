@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.reward.deliveryman.reward.requirement.impl
 
 import net.evilblock.cubed.util.bukkit.ConversationUtil
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.reward.deliveryman.DeliveryManHandler
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
@@ -50,10 +51,13 @@ class BlocksMinedRequirement(private var blocksMined: Int) : DeliveryManRewardRe
 
         override fun startSetupProcedure(player: Player, reward: DeliveryManReward) {
             ConversationUtil.startConversation(player, NumberPrompt { number ->
-                assert(number > 0)
+                assert(number.toInt() > 0)
 
-                reward.requirements.add(BlocksMinedRequirement(number))
-                DeliveryManHandler.saveData()
+                reward.requirements.add(BlocksMinedRequirement(number.toInt()))
+
+                Tasks.async {
+                    DeliveryManHandler.saveData()
+                }
 
                 player.sendMessage("${ChatColor.GREEN}Successfully added requirement.")
 

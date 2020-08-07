@@ -11,6 +11,7 @@ import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -28,7 +29,9 @@ object RemoveEnchantCommand {
             return
         }
 
-        EnchantsManager.removeEnchant(player.inventory.itemInMainHand, enchant)
+        val pickaxeData = PickaxeHandler.getPickaxeData(player.inventory.itemInMainHand) ?: return
+        EnchantsManager.removeEnchant(pickaxeData, player.inventory.itemInMainHand, enchant)
+
         player.updateInventory()
         player.sendMessage("${ChatColor.GREEN}Removed enchant!")
     }

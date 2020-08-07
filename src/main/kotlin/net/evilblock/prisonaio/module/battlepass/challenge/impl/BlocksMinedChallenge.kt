@@ -82,8 +82,8 @@ class BlocksMinedChallenge(id: String, internal var blocksMined: Int) : Challeng
 
         override fun startSetupPrompt(player: Player, id: String, lambda: (Challenge) -> Unit) {
             NumberPrompt { number ->
-                assert(number > 0)
-                lambda.invoke(BlocksMinedChallenge(id, number))
+                assert(number.toInt() > 0)
+                lambda.invoke(BlocksMinedChallenge(id, number.toInt()))
             }.start(player)
         }
     }

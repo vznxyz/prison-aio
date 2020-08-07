@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.rank.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.NumberUtils
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.cubed.util.bukkit.prompt.PricePrompt
 import net.evilblock.prisonaio.PrisonAIO
@@ -130,7 +131,9 @@ class EditRankMenu(val rank: Rank) : Menu() {
                 rank.sortOrder = 0.coerceAtLeast(rank.sortOrder - mod)
             }
 
-            RankHandler.saveData()
+            Tasks.async {
+                RankHandler.saveData()
+            }
         }
     }
 

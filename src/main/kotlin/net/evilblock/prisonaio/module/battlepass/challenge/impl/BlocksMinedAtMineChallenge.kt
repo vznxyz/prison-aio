@@ -102,9 +102,9 @@ class BlocksMinedAtMineChallenge(id: String, @JsonAdapter(MineReferenceSerialize
 
                     Tasks.delayed(1L) {
                         NumberPrompt { number ->
-                            assert(number > 0)
+                            assert(number.toInt() > 0)
 
-                            lambda.invoke(BlocksMinedAtMineChallenge(id, mine.get(), number))
+                            lambda.invoke(BlocksMinedAtMineChallenge(id, mine.get(), number.toInt()))
                         }.start(player)
                     }
                 }

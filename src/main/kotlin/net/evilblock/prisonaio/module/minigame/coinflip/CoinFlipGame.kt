@@ -18,7 +18,8 @@ import kotlin.math.round
 class CoinFlipGame(
     val creator: User,
     var opponent: User? = null,
-    val value: Currency<*>
+    val currencyAmount: Number,
+    val currency: Currency
 ) {
 
     val uuid: UUID = UUID.randomUUID()
@@ -35,17 +36,11 @@ class CoinFlipGame(
     }
 
     fun isHighlighted(): Boolean {
-        if (value.isMoney()) {
-            if (value.double() >= CoinFlipHandler.getHighlightedGameThresholdMoney()) {
-                return true
-            }
-        } else if (value.isTokens()) {
-            if (value.long() >= CoinFlipHandler.getHighlightedGameThresholdTokens()) {
-                return true
-            }
+        return if (currency == Currency.Type.MONEY) {
+            currencyAmount.toDouble() >= CoinFlipHandler.getHighlightedGameThresholdMoney()
+        } else {
+            currencyAmount.toLong() >= CoinFlipHandler.getHighlightedGameThresholdTokens()
         }
-
-        return false
     }
 
     fun getColorInvertAnimationSwitch(): Boolean {
@@ -66,10 +61,10 @@ class CoinFlipGame(
 
     fun finishGame() {
         if (winner == null) {
-            value.give(Bukkit.getOfflinePlayer(creator.uuid))
+            currency.give(Bukkit.getOfflinePlayer(creator.uuid), currencyAmount)
         } else {
-            value.give(Bukkit.getOfflinePlayer(winner!!.uuid))
-            value.give(Bukkit.getOfflinePlayer(winner!!.uuid))
+            currency.give(Bukkit.getOfflinePlayer(winner!!.uuid), currencyAmount)
+            currency.give(Bukkit.getOfflinePlayer(winner!!.uuid), currencyAmount)
         }
 
         CoinFlipHandler.forgetGame(this)

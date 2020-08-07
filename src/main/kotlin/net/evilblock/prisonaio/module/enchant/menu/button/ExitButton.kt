@@ -8,7 +8,7 @@
 package net.evilblock.prisonaio.module.enchant.menu.button
 
 import net.evilblock.cubed.menu.Button
-import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.util.bukkit.Constants
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -18,7 +18,7 @@ import org.bukkit.inventory.InventoryView
 class ExitButton : Button() {
 
     override fun getName(player: Player): String {
-        return ChatColor.GRAY.toString() + "» " + ChatColor.RED + ChatColor.BOLD + "Exit" + ChatColor.GRAY + " «"
+        return "${ChatColor.GRAY}${Constants.DOUBLE_ARROW_RIGHT} ${ChatColor.RED}${ChatColor.BOLD}Exit ${ChatColor.GRAY}${Constants.DOUBLE_ARROW_LEFT}"
     }
 
     override fun getDescription(player: Player): List<String> {
@@ -30,11 +30,6 @@ class ExitButton : Button() {
     }
 
     override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-        val currentlyOpened: Menu? = Menu.currentlyOpenedMenus[player.uniqueId]
-        if (currentlyOpened != null) {
-            currentlyOpened.manualClose = true
-        }
-
         player.closeInventory()
     }
 

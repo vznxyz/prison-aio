@@ -24,7 +24,7 @@ object TokensResetCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player") user: User) {
-        user.updateTokensBalance(0)
+        user.updateTokenBalance(0)
         UserHandler.saveUser(user)
 
         sender.sendMessage("${ChatColor.GREEN}You reset ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s tokens balance.")

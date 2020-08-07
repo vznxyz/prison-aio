@@ -12,22 +12,22 @@ import org.bukkit.inventory.ItemStack
 
 data class ShopReceiptItem(val itemType: ShopItem, val item: ItemStack) {
 
-    var buyPricePerUnit = itemType.buyPricePerUnit
-    var sellPricePerUnit = itemType.sellPricePerUnit
+    var buyPricePerUnit = itemType.sellPricePerUnit
+    var sellPricePerUnit = itemType.buyPricePerUnit
     var multiplier: Double = 1.0
 
     /**
-     * The amount that the player sells this shop item for.
+     * The amount the player is selling for.
      */
     fun getSellCost(): Double {
-        return (item.amount * buyPricePerUnit) * multiplier
+        return (item.amount * sellPricePerUnit) * multiplier
     }
 
     /**
-     * The amount it costs the player to buy this shop item.
+     * The amount the player is buying for.
      */
     fun getBuyCost(): Double {
-        return (item.amount * sellPricePerUnit) * multiplier
+        return (item.amount * buyPricePerUnit) * multiplier
     }
 
 }

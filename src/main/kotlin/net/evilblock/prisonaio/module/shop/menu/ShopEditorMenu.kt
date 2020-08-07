@@ -104,7 +104,7 @@ class ShopEditorMenu : PaginatedMenu() {
 
     private inner class ShopButton(private val shop: Shop) : Button() {
         override fun getName(player: Player): String {
-            return "${ChatColor.RED}${ChatColor.BOLD}${shop.name}"
+            return "${ChatColor.YELLOW}${ChatColor.BOLD}${shop.name}"
         }
 
         override fun getDescription(player: Player): List<String> {

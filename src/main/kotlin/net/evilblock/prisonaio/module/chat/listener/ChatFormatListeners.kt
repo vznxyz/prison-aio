@@ -58,7 +58,7 @@ object ChatFormatListeners : Listener {
         val formattedMoneyBalance = NumberUtils.format(moneyBalance)
         tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}$ ${ChatColor.GRAY}$formattedMoneyBalance"))
 
-        val formattedTokensBalance = NumberUtils.format(user.getTokensBalance())
+        val formattedTokensBalance = NumberUtils.format(user.getTokenBalance())
         tooltipLines.add(FancyMessage(" ${ChatColor.RED}${ChatColor.BOLD}⏣ ${ChatColor.GRAY}$formattedTokensBalance"))
 
         tooltipLines.add(FancyMessage(""))

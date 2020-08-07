@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager.upgradeEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
+import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.ChatColor
 import org.bukkit.Color
@@ -34,6 +35,8 @@ object Scavenger : AbstractEnchant("scavenger", "Scavenger", 1) {
     }
 
     override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
+        val pickaxeData = PickaxeHandler.getPickaxeData(enchantedItem) ?: return
+
         if (Chance.percent(readChance())) {
             val enchant: AbstractEnchant = if (Chance.random()) {
                 Efficiency
@@ -41,7 +44,7 @@ object Scavenger : AbstractEnchant("scavenger", "Scavenger", 1) {
                 Fortune
             }
 
-            val result = upgradeEnchant(enchantedItem!!, enchant, 1, false)
+            val result = upgradeEnchant(event.player, pickaxeData, enchantedItem!!, enchant, 1, false)
             if (result) {
                 sendMessage(event.player, "You found " + aOrAn(enchant.enchant) + " level while mining! It has been applied to your pickaxe.")
             }

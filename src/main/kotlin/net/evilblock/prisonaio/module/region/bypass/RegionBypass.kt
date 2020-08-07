@@ -55,23 +55,19 @@ object RegionBypass : Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerJoinEvent(event: PlayerJoinEvent) {
         Tasks.delayed(10L) {
-            if (event.player.hasPermission(Permissions.REGION_BYPASS)) {
-                setBypass(event.player, true)
-                attemptNotify(event.player)
+            if (hasBypass(event.player)) {
+                if (!event.player.hasPermission(Permissions.REGION_BYPASS)) {
+                    setBypass(event.player, false)
+                } else {
+                    setBypass(event.player, true)
+                    attemptNotify(event.player)
 
-                if (event.player.gameMode != GameMode.CREATIVE) {
-                    event.player.gameMode = GameMode.CREATIVE
+                    if (event.player.gameMode != GameMode.CREATIVE) {
+                        event.player.gameMode = GameMode.CREATIVE
+                    }
                 }
             }
         }
-    }
-
-    /**
-     * Removes the player from the [noticeSent] map when the player logs out.
-     */
-    @EventHandler
-    fun onPlayerQuitEvent(event: PlayerQuitEvent) {
-        setBypass(event.player, false)
     }
 
 }

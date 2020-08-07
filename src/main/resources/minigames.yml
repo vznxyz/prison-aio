@@ -1,6 +1,4 @@
 coinflip:
-  money-format: "&b&l$&a&l{amount}"
-  token-format: "&c&l⏣&6&l{amount} Tokens"
   menu-title: "&b&lCOIN&e&lFLIP BROWSER&7"
   guide-title: "&b&lCOIN&e&lFLIP HELP"
   games:

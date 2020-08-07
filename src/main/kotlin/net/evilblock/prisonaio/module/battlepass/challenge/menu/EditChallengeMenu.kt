@@ -116,10 +116,13 @@ class EditChallengeMenu(private val challenge: Challenge) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                NumberPrompt { numberInput ->
-                    assert(numberInput > 0) { "Number must be above 0" }
-                    challenge.rewardXp = numberInput
-                    ChallengeHandler.saveData()
+                NumberPrompt { number ->
+                    assert(number.toInt() > 0) { "Number must be above 0" }
+                    challenge.rewardXp = number.toInt()
+
+                    Tasks.async {
+                        ChallengeHandler.saveData()
+                    }
 
                     openMenu(player)
                 }.start(player)

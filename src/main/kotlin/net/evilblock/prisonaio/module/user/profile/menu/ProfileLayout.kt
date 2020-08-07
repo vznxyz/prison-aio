@@ -92,7 +92,7 @@ class ProfileLayout(
             val formattedMoneyBalance = NumberUtils.format(user.getMoneyBalance())
             description.add("${ChatColor.RED}${Constants.MONEY_SYMBOL} ${ChatColor.GRAY}$formattedMoneyBalance")
 
-            val formattedTokensBalance = NumberUtils.format(user.getTokensBalance())
+            val formattedTokensBalance = NumberUtils.format(user.getTokenBalance())
             description.add("${ChatColor.RED}${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}$formattedTokensBalance")
 
             return description

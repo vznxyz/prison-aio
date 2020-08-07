@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.shop
 
 import net.evilblock.cubed.menu.template.menu.TemplateMenu
+import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.shop.event.PlayerBuyFromShopEvent
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
@@ -17,6 +18,8 @@ import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
+import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.util.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -28,24 +31,34 @@ class Shop(val id: String) {
     val items: HashSet<ShopItem> = hashSetOf()
     var priority: Int = 0
     var menuTemplate: ShopMenuTemplate? = null
+    var currency: Currency.Type = Currency.Type.MONEY
 
     fun init() {
         menuTemplate?.shop = this
+
+        // fix null currency (field is new)
+        if (currency == null) {
+            currency = Currency.Type.MONEY
+        }
     }
 
     fun hasAccess(player: Player): Boolean {
         return player.hasPermission("prisonaio.shops.${id.toLowerCase()}")
     }
 
-    fun buyItems(player: Player, items: Set<ShopReceiptItem>): ShopReceipt {
-        if (this.items.isEmpty()) {
+    fun syncItemsOrder() {
+        val items = items.sortedBy { it.order }
+        for ((index, item) in items.withIndex()) {
+            item.order = index
+        }
+    }
+
+    fun buyItems(player: Player, buying: Set<ShopReceiptItem>): ShopReceipt {
+        if (this.items.none { it.isSelling() }) {
             return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
-        val itemsBought = items.filter { this.items.contains(it.itemType) }
-        if (itemsBought.isEmpty()) {
-            return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, receiptType = ShopReceiptType.BUY)
-        }
+        val itemsBought = buying.filter { this.items.contains(it.itemType) }
 
         val buyEvent = PlayerBuyFromShopEvent(
             player = player,
@@ -59,32 +72,68 @@ class Shop(val id: String) {
             return ShopReceipt(result = TransactionResult.CANCELLED_PLUGIN, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
-        if (buyEvent.items.isEmpty()) {
+        if (itemsBought.isEmpty()) {
             return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, receiptType = ShopReceiptType.BUY)
+        }
+
+        val finalCost = itemsBought.sumByDouble { it.getBuyCost() }
+        if (finalCost <= 0) {
+            return ShopReceipt(result = TransactionResult.FREE_BUY, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
         val shopReceipt = ShopReceipt(
             result = TransactionResult.SUCCESS,
             shop = this,
-            items = buyEvent.items,
+            items = itemsBought,
             receiptType = ShopReceiptType.BUY,
             multiplier = 1.0,
-            finalCost = buyEvent.items.sumByDouble { it.getBuyCost() }
+            finalCost = finalCost
         )
 
+        val balance = Economy.getBalance(player.uniqueId)
+        if (balance < shopReceipt.finalCost.toLong()) {
+            return ShopReceipt(result = TransactionResult.CANNOT_AFFORD, shop = this, receiptType = ShopReceiptType.BUY)
+        }
+
+        Economy.takeBalance(player.uniqueId, shopReceipt.finalCost)
+
+        val splitItems = arrayListOf<ItemStack>()
+        for (item in shopReceipt.items) {
+            if (item.item.amount > item.item.type.maxStackSize) {
+                var remaining = item.item.amount
+                while (remaining > item.item.type.maxStackSize) {
+                    remaining -= item.item.type.maxStackSize
+                    splitItems.add(ItemBuilder.copyOf(item.item).amount(item.item.type.maxStackSize).build())
+                }
+
+                if (remaining > 0) {
+                    splitItems.add(ItemBuilder.copyOf(item.item).amount(remaining).build())
+                }
+            } else {
+                splitItems.add(item.item)
+            }
+        }
+
+        for (item in player.inventory.addItem(*splitItems.toTypedArray())) {
+            player.location.world.dropItem(player.location, item.value)
+        }
+
+        player.updateInventory()
+
         ShopHandler.trackReceipt(player, shopReceipt)
+        shopReceipt.sendCompact(player)
 
         return shopReceipt
     }
 
     fun sellItems(player: Player, selling: Collection<ItemStack>, autoSell: Boolean = false): ShopReceipt {
-        if (items.isEmpty()) {
+        if (items.none { it.isBuying() }) {
             return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
         val itemsSold = arrayListOf<ShopReceiptItem>()
         for (item in selling) {
-            val matchingShopItem = items.filter { it.buying }.firstOrNull { item.isSimilar(it.itemStack) }
+            val matchingShopItem = items.filter { it.isBuying() }.firstOrNull { item.isSimilar(it.itemStack) }
             if (matchingShopItem != null) {
                 itemsSold.add(ShopReceiptItem(matchingShopItem, item))
             }
@@ -102,10 +151,6 @@ class Shop(val id: String) {
 
         if (sellEvent.isCancelled) {
             return ShopReceipt(result = TransactionResult.CANCELLED_PLUGIN, shop = this, receiptType = ShopReceiptType.SELL)
-        }
-
-        if (sellEvent.items.isEmpty()) {
-            return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
         if (itemsSold.isEmpty()) {
@@ -141,7 +186,7 @@ class Shop(val id: String) {
             return
         }
 
-        if (items.none { it.selling }) {
+        if (items.none { it.isSelling() }) {
             player.sendMessage("${ChatColor.RED}The $name ${ChatColor.RED}shop is not selling any items!")
             return
         }

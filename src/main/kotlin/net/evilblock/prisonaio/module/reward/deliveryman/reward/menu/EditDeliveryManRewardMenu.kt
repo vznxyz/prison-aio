@@ -11,6 +11,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.NumberButton
 import net.evilblock.cubed.util.TextSplitter
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.reward.deliveryman.DeliveryManHandler
 import net.evilblock.prisonaio.module.reward.deliveryman.menu.DeliveryManEditorMenu
@@ -111,7 +112,10 @@ class EditDeliveryManRewardMenu(private val reward: DeliveryManReward) : Menu() 
 
         override fun onChange(number: Int) {
             reward.order = number
-            DeliveryManHandler.saveData()
+
+            Tasks.async {
+                DeliveryManHandler.saveData()
+            }
         }
     }
 

@@ -41,8 +41,8 @@ object CombatTimerListeners : Listener {
     val BLOCKED_COMMANDS = arrayListOf(
         "/spawn",
         "/prisonaio:spawn",
-        "/cell",
-        "/prisonaio:cell",
+        "/gang",
+        "/prisonaio:gang",
         "/p h",
         "/p home",
         "/plot h",

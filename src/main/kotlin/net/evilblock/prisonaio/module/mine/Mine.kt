@@ -22,6 +22,7 @@ import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.minecraft.server.v1_12_R1.IBlockData
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.Chunk
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -31,47 +32,34 @@ import org.jetbrains.annotations.Nullable
 
 class Mine(val id: String) : Region {
 
-    /**
-     * The location players spawn at when teleporting to this mine
-     */
     @Nullable
     var spawnPoint: Location? = null
 
-    /**
-     * The region that forms the mining area
-     */
     @Nullable
     var region: Cuboid? = null
 
-    /**
-     * This mine's blocks configuration
-     */
     @NotNull
     val blocksConfig: MineBlocksConfig = MineBlocksConfig()
 
-    /**
-     * This mine's reset configuration
-     */
     @NotNull
     val resetConfig: MineResetConfig = MineResetConfig()
 
-    /**
-     * This mine's effects configuration
-     */
     @NotNull
     val effectsConfig: MineEffectsConfig = MineEffectsConfig()
+
+    var permission: String? = null
 
     @Transient
     var lastResetCheck: Long = System.currentTimeMillis()
 
-    /**
-     * The permission required to break inside this mine
-     */
-    var permission: String? = null
+    @Transient
+    var cachedChunks: MutableSet<Chunk> = hashSetOf()
 
-    /**
-     * The name of this mining region
-     */
+    fun cacheChunks() {
+        cachedChunks = hashSetOf()
+        region?.getChunks()?.forEach { chunk -> cachedChunks.add(chunk) }
+    }
+
     override fun getRegionName(): String {
         return "Mine $id"
     }

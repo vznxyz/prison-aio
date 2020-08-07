@@ -47,7 +47,10 @@ object MineHandler : PluginHandler {
                 val mapType = object : TypeToken<Map<String, Mine>>() {}.type
                 val map = Cubed.gson.fromJson(reader, mapType) as Map<String, Mine>
 
-                minesMap.putAll(map)
+                for (mine in map.values) {
+                    mine.cacheChunks()
+                    minesMap[mine.id.toLowerCase()] = mine
+                }
             }
         }
 
@@ -83,7 +86,7 @@ object MineHandler : PluginHandler {
     }
 
     fun deleteMine(id: String) {
-        minesMap.remove(id)
+        minesMap.remove(id.toLowerCase())
     }
 
     fun deleteMine(mine: Mine) {

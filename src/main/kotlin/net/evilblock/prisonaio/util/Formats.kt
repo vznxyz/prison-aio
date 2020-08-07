@@ -66,4 +66,10 @@ object Formats {
         return "${ChatColor.RED}${Constants.TOKENS_SYMBOL}${ChatColor.YELLOW}${ChatColor.BOLD}$formatted"
     }
 
+    @JvmStatic
+    fun formatPrestigeTokens(amount: Int): String {
+        val formatted = NumberFormat.getInstance().format(amount)
+        return "${ChatColor.RED}${Constants.ALT_TOKENS_SYMBOL}${ChatColor.GOLD}${ChatColor.BOLD}$formatted"
+    }
+
 }

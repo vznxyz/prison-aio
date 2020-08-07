@@ -25,11 +25,11 @@ object TokensSetCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player") user: User, @Param(name = "newBalance") newBalance: Long) {
-        user.updateTokensBalance(newBalance)
+        user.updateTokenBalance(newBalance)
         UserHandler.saveUser(user)
 
         val formattedBalance = NumberFormat.getInstance().format(newBalance)
-        sender.sendMessage("${ChatColor.GREEN}You set ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s balance to ${ChatColor.YELLOW}$formattedBalance ${ChatColor.GREEN}tokens.")
+        sender.sendMessage("${ChatColor.GREEN}You set ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s balance to ${ChatColor.WHITE}$formattedBalance ${ChatColor.GREEN}tokens.")
     }
 
 }

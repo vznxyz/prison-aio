@@ -7,7 +7,7 @@
 
 package net.evilblock.prisonaio.module.enchant
 
-import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.type.*
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
@@ -17,6 +17,7 @@ import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -124,7 +125,7 @@ object EnchantsManager : Listener {
             return
         }
 
-        update(event.whoClicked as Player, event.currentItem)
+        update(event.currentItem)
 
         if (event.clickedInventory.type == InventoryType.PLAYER && event.whoClicked.inventory.heldItemSlot == event.slot) {
             handleItemSwitch(event.whoClicked as Player, event.cursor, event)
@@ -151,8 +152,9 @@ object EnchantsManager : Listener {
             return
         }
 
+        val pickaxeData = PickaxeHandler.getPickaxeData(event.currentItem) ?: return
+        val itemLevel: Int = pickaxeData.enchants.getOrDefault(enchant, 0)
         val bookLevel = enchant.getItemLevel(event.cursor)
-        val itemLevel: Int = readEnchantsFromLore(event.currentItem).getOrDefault(enchant, 0)
         val level = bookLevel + itemLevel
         val vanilla = enchant is VanillaOverride
 
@@ -161,7 +163,13 @@ object EnchantsManager : Listener {
                 return
             }
 
-            if (upgradeEnchant(event.currentItem, enchant, bookLevel, vanilla)) {
+            val enchantLimit = pickaxeData.getEnchantLimit(enchant)
+            if (level > enchantLimit) {
+                event.whoClicked.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to upgrade the ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}enchantment any further.")
+                return
+            }
+
+            if (upgradeEnchant(event.whoClicked as Player, pickaxeData, event.currentItem, enchant, bookLevel, vanilla)) {
                 event.cursor = null
                 event.isCancelled = true
             }
@@ -170,7 +178,7 @@ object EnchantsManager : Listener {
                 return
             }
 
-            if (upgradeEnchant(event.currentItem, enchant, bookLevel - itemLevel, vanilla)) {
+            if (upgradeEnchant(event.whoClicked as Player, pickaxeData, event.currentItem, enchant, bookLevel - itemLevel, vanilla)) {
                 event.cursor = null
                 event.isCancelled = true
             }
@@ -195,7 +203,7 @@ object EnchantsManager : Listener {
     }
 
     @JvmStatic
-    fun update(player: Player, newItem: ItemStack?) {
+    fun update(newItem: ItemStack?) {
         if (newItem != null && newItem.type.toString().endsWith("_PICKAXE")) {
             if (newItem.hasItemMeta() && !newItem.itemMeta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
                 val im = newItem.itemMeta
@@ -207,18 +215,19 @@ object EnchantsManager : Listener {
 
     @JvmStatic
     fun handleItemSwitch(player: Player, newItem: ItemStack?, event: Event?): Map<AbstractEnchant, Int> {
-        update(player, newItem)
+        update(newItem)
 
         var pickaxeData = PickaxeHandler.getPickaxeData(newItem)
         var newItem = newItem
         if (newItem != null) {
             if (pickaxeData == null && MechanicsModule.isTool(newItem)) {
-                pickaxeData = PickaxeData(UUID.randomUUID())
+                pickaxeData = PickaxeData()
                 pickaxeData.sync(newItem)
+                pickaxeData.applyLore(newItem)
 
                 PickaxeHandler.trackPickaxeData(pickaxeData)
 
-                newItem = pickaxeData.applyIdNbt(newItem)
+                newItem = pickaxeData.applyNBT(newItem)
 
                 for ((enchant, level) in pickaxeData.enchants) {
                     if (enchant is VanillaOverride) {
@@ -261,10 +270,10 @@ object EnchantsManager : Listener {
             if (pickaxeData != null) {
                 val cubedLevel = pickaxeData.enchants.getOrDefault(Cubed, 0)
                 if (cubedLevel > 3) {
-                    removeEnchant(newItem, Cubed)
-                    addEnchant(newItem, Cubed, 3, false)
+                    removeEnchant(pickaxeData, newItem, Cubed)
+                    addEnchant(player, pickaxeData, newItem, Cubed, 3, false)
 
-                    pickaxeData.setLevel(Cubed, 3)
+                    player.updateInventory()
 
                     PrisonAIO.instance.systemLog("Removed Cubed $cubedLevel from ${player.name}'s pickaxe")
                 }
@@ -302,19 +311,24 @@ object EnchantsManager : Listener {
     }
 
     @JvmStatic
-    fun upgradeEnchant(item: ItemStack, enchant: AbstractEnchant, levels: Int, force: Boolean): Boolean {
+    fun upgradeEnchant(player: Player, pickaxeData: PickaxeData, item: ItemStack, enchant: AbstractEnchant, levels: Int, force: Boolean): Boolean {
         if (!enchant.canMaterialBeEnchanted(item.type)) {
             return false
         }
 
-        val enchants = readEnchantsFromLore(item)
-        if (!enchants.containsKey(enchant)) {
-            return addEnchant(item, enchant, levels, force)
+        if (!pickaxeData.enchants.containsKey(enchant)) {
+            return addEnchant(player, pickaxeData, item, enchant, levels, force)
         }
 
-        var level = enchants[enchant]!! + levels
+        var level = pickaxeData.enchants[enchant]!! + levels
         if (!force && level > enchant.maxLevel) {
             level = enchant.maxLevel
+        }
+
+        val enchantLimit = pickaxeData.getEnchantLimit(enchant)
+        if (enchantLimit != -1 && level > enchantLimit) {
+            player.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to upgrade the ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}enchantment any further.")
+            return false
         }
 
         if (level > 32000) {
@@ -325,26 +339,14 @@ object EnchantsManager : Listener {
             item.addUnsafeEnchantment((enchant as VanillaOverride).override, level)
         }
 
-        val lore = item.itemMeta.lore
-
-        lore.replaceAll { line: String ->
-            if (line.contains(enchant.lorified())) {
-                return@replaceAll "${enchant.lorified()} $level"
-            }
-            line
-        }
-
-        val im = item.itemMeta
-        im.lore = lore
-        item.itemMeta = im
-
-        PickaxeHandler.getPickaxeData(item)?.setLevel(enchant, level)
+        pickaxeData.setLevel(enchant, level)
+        pickaxeData.applyLore(item)
 
         return true
     }
 
     @JvmStatic
-    fun addEnchant(item: ItemStack, enchant: AbstractEnchant?, level: Int, force: Boolean): Boolean {
+    fun addEnchant(player: Player, pickaxeData: PickaxeData, item: ItemStack, enchant: AbstractEnchant?, level: Int, force: Boolean): Boolean {
         var level = level
         if (!enchant!!.canEnchant(item)) {
             return false
@@ -354,81 +356,30 @@ object EnchantsManager : Listener {
             level = enchant.maxLevel
         }
 
-        if (level > 32000) {
-            level = 32000
+        val enchantLimit = pickaxeData.getEnchantLimit(enchant)
+        if (enchantLimit != -1 && level > enchantLimit) {
+            player.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to upgrade the ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}enchantment any further.")
+            return false
         }
 
-        var lore = item.itemMeta.lore
-        if (lore == null) {
-            lore = ArrayList()
+        if (level > 32000) {
+            level = 32000
         }
 
         if (enchant is VanillaOverride) {
             item.addUnsafeEnchantment((enchant as VanillaOverride).override, level)
         }
 
-        var insertAt = -1
-        if (lore.isNotEmpty()) {
-            for (i in lore.indices) {
-                val lineAt = lore[i]
-                if (ChatColor.stripColor(lineAt).startsWith(Constants.THICK_VERTICAL_LINE)) {
-                    val splitLore = lineAt.split(" ").toTypedArray()
-                    if (splitLore.size > 1) {
-                        val intLevel = splitLore[splitLore.size - 1]
-                        if (isInt(intLevel)) {
-                            val loreEnchant = matchEnchant(splitLore[splitLore.size - 2])
-                            if (loreEnchant != null && loreEnchant.iconColor === enchant.iconColor) {
-                                insertAt = i
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (insertAt == -1) {
-            lore.add(enchant.lorified() + " " + level)
-        } else {
-            lore.add(insertAt, enchant.lorified() + " " + level)
-        }
-
-        val im = item.itemMeta
-        im.lore = lore
-        item.itemMeta = im
-
-        PickaxeHandler.getPickaxeData(item)?.setLevel(enchant, level)
+        pickaxeData.setLevel(enchant, level)
+        pickaxeData.applyLore(item)
 
         return true
     }
 
     @JvmStatic
-    fun removeEnchant(item: ItemStack, enchant: AbstractEnchant): Boolean {
-        if (!item.itemMeta.hasLore()) {
-            return false
-        }
-
-        var found = false
-        val lore = item.itemMeta.lore
-
-        val loreIterator = lore.iterator()
-        while (loreIterator.hasNext()) {
-            val line = loreIterator.next()
-            if (line.contains(enchant.lorified())) {
-                loreIterator.remove()
-                found = true
-            }
-        }
-
-        if (!found) {
-            return false
-        }
-
-        val im = item.itemMeta
-        im.lore = lore
-        item.itemMeta = im
-
-        PickaxeHandler.getPickaxeData(item)?.removeEnchant(enchant)
-
+    fun removeEnchant(pickaxeData: PickaxeData, item: ItemStack, enchant: AbstractEnchant): Boolean {
+        pickaxeData.removeEnchant(enchant)
+        pickaxeData.applyLore(item)
         return true
     }
 
@@ -446,7 +397,7 @@ object EnchantsManager : Listener {
                         val splitLore = lore.split(" ").toTypedArray()
                         if (splitLore.size > 1) {
                             val intLevel = splitLore[splitLore.size - 1]
-                            if (isInt(intLevel)) {
+                            if (NumberUtils.isInt(intLevel)) {
                                 map[enchant] = Integer.valueOf(intLevel)
                                 break
                             }
@@ -501,13 +452,25 @@ object EnchantsManager : Listener {
         return enchants.first { it.id.equals(id, ignoreCase = true) }
     }
 
-    @JvmStatic
-    private fun isInt(numString: String): Boolean {
-        return try {
-            numString.toInt()
-            true
-        } catch (e: Exception) {
-            false
+    private val enchantColorOrder = mapOf<Color, Int>(
+        Color.GREEN to 1,
+        Color.AQUA to 2,
+        Color.ORANGE to 3
+    )
+
+    val ENCHANT_COMPARATOR = Comparator<Map.Entry<AbstractEnchant, Int>> { o1, o2 ->
+        val o1Order = enchantColorOrder.getOrDefault(o1.key.iconColor, 4)
+        val o2Order = enchantColorOrder.getOrDefault(o2.key.iconColor, 4)
+        when {
+            o1Order == o2Order -> {
+                return@Comparator 0
+            }
+            o1Order > o2Order -> {
+                return@Comparator 1
+            }
+            else -> {
+                return@Comparator -1
+            }
         }
     }
 

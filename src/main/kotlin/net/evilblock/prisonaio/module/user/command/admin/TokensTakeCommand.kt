@@ -29,7 +29,7 @@ object TokensTakeCommand {
         UserHandler.saveUser(user)
 
         val formattedAmount = NumberFormat.getInstance().format(amount)
-        sender.sendMessage("${ChatColor.GREEN}You've taken ${ChatColor.YELLOW}$formattedAmount ${ChatColor.GREEN}tokens from ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s balance.")
+        sender.sendMessage("${ChatColor.GREEN}You've taken ${ChatColor.WHITE}$formattedAmount ${ChatColor.GREEN}tokens from ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s balance.")
     }
 
 }

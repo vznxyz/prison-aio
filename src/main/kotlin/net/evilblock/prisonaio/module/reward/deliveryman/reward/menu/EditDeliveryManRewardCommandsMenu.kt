@@ -32,7 +32,7 @@ class EditDeliveryManRewardCommandsMenu(private val reward: DeliveryManReward) :
         }
     }
 
-    override fun getPromptBuilder(player: Player): EzPrompt.Builder {
+    override fun getPromptBuilder(player: Player, index: Int): EzPrompt.Builder {
         return EzPrompt.Builder()
             .promptText("${ChatColor.GREEN}Please enter the new command.")
             .charLimit(100)

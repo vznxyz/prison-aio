@@ -24,9 +24,9 @@ object LeaderboardsModule : PluginModule() {
 
 	private val leaderboards: List<Leaderboard> = listOf(
 		BlocksMinedLeaderboard,
-		CellTopLeaderboard,
+		GangTopLeaderboard,
 		MoneyBalanceLeaderboard,
-		TokensBalanceLeaderboard,
+		TopTokensLeaderboard,
 		PrestigeLeaderboard
 	)
 
@@ -71,7 +71,9 @@ object LeaderboardsModule : PluginModule() {
 		for (leaderboard in leaderboards) {
 			try {
 				leaderboard.refresh()
-			} catch (ignore: Exception) {}
+			} catch (e: Exception) {
+				e.printStackTrace()
+			}
 		}
 	}
 

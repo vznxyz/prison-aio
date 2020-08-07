@@ -160,6 +160,8 @@ object UserHandler : PluginHandler {
      * Gets a player's user data from the cache, or by loading and caching.
      */
     fun getOrLoadAndCacheUser(uuid: UUID): User {
+        assert(!Bukkit.isPrimaryThread()) { "Cannot load user on primary thread" }
+
         return if (!usersMap.containsKey(uuid)) {
             val user = loadUser(uuid = uuid)
             user.cacheExpiry = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30L)

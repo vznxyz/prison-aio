@@ -107,7 +107,10 @@ class ChallengeEditorMenu : PaginatedMenu() {
                         SelectChallengeTypeMenu { challengeType ->
                             challengeType.startSetupPrompt(player, input.toLowerCase()) { challenge ->
                                 ChallengeHandler.trackChallenge(challenge)
-                                ChallengeHandler.saveData()
+
+                                Tasks.async {
+                                    ChallengeHandler.saveData()
+                                }
 
                                 player.sendMessage("${ChatColor.GREEN}Successfully created a new challenge.")
 

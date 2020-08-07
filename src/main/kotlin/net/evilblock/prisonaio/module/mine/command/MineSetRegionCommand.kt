@@ -37,6 +37,7 @@ object MineSetRegionCommand {
 
         // update the mine's region to the player's selection
         mine.region = RegionSelection.getSelection(player)
+        mine.cacheChunks()
 
         // make changes to block cache
         RegionsModule.updateBlockCache(mine)

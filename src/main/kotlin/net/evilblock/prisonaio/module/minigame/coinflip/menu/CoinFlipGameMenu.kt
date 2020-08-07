@@ -20,6 +20,7 @@ import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipGame
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipHandler
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -42,11 +43,7 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
     }
 
     override fun getTitle(player: Player): String {
-        val formattedValue = if (game.value.isMoney()) {
-            CoinFlipHandler.formatMoney(game.value.double())
-        } else {
-            CoinFlipHandler.formatTokens(game.value.long())
-        }
+        val formattedValue = game.currency.format(game.currencyAmount)
 
         return when (game.stage) {
             CoinFlipGame.Stage.WAITING_FOR_OPPONENT -> {
@@ -226,7 +223,7 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
                     return
                 }
 
-                if (!game.value.has(player)) {
+                if (!game.currency.has(player, game.currencyAmount)) {
                     player.sendMessage("${ChatColor.RED}You don't have enough money to match the game's bet.")
                     return
                 }
@@ -234,7 +231,7 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
                 ConfirmMenu("${ChatColor.GREEN}${ChatColor.BOLD}ENTER GAME?") { confirmed ->
                     if (game.isWaitingForOpponent()) {
                         if (confirmed) {
-                            game.value.take(player)
+                            game.currency.take(player, game.currencyAmount)
                             game.opponent = UserHandler.getUser(player.uniqueId)
                         }
                     }
@@ -247,12 +244,7 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
 
     private inner class ValueButton : Button() {
         override fun getName(player: Player): String {
-            val formattedValue = if (game.value.isMoney()) {
-                CoinFlipHandler.formatMoney(game.value.double())
-            } else {
-                CoinFlipHandler.formatTokens(game.value.long())
-            }
-
+            val formattedValue = game.currency.format(game.currencyAmount)
             return "$formattedValue ${ChatColor.GRAY}${ChatColor.BOLD}POT"
         }
 
@@ -279,7 +271,7 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
         }
 
         override fun getMaterial(player: Player): Material {
-            return if (game.value.isMoney()) {
+            return if (game.currency == Currency.Type.MONEY) {
                 Material.DOUBLE_PLANT
             } else {
                 Material.MAGMA_CREAM

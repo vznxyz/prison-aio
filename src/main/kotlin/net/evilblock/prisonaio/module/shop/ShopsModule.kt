@@ -52,7 +52,8 @@ object ShopsModule : PluginModule() {
             OpenShopCommand.javaClass,
             SellAllCommand.javaClass,
             ShopEditorCommand.javaClass,
-            ShopReceiptCommand.javaClass
+            ShopReceiptCommand.javaClass,
+            ShopResetPrioritiesCommand.javaClass
         )
     }
 

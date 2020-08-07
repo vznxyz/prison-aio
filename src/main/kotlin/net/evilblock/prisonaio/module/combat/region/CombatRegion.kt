@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.combat.region
 
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import net.evilblock.prisonaio.module.cell.CellHandler
+import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.combat.timer.CombatTimer
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
@@ -79,10 +79,10 @@ class CombatRegion(val id: String, private var cuboid: Cuboid) : Region {
                 return
             }
 
-            val attackerCell = CellHandler.getAssumedCell(attacker.uniqueId)
-            val victimCell = CellHandler.getAssumedCell(victim.uniqueId)
+            val attackerGang = GangHandler.getAssumedGang(attacker.uniqueId)
+            val victimGang = GangHandler.getAssumedGang(victim.uniqueId)
 
-            if (attackerCell != null && attackerCell == victimCell) {
+            if (attackerGang != null && attackerGang == victimGang) {
                 cancellable.isCancelled = true
                 attacker.sendMessage("${ChatColor.YELLOW}You can't attack ${ChatColor.DARK_GREEN}${attacker.name}${ChatColor.YELLOW}!")
                 return

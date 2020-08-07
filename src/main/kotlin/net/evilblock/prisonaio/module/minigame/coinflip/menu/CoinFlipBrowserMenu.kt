@@ -17,7 +17,7 @@ import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
-import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
+import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipGame
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipHandler
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -28,7 +28,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
-import java.text.NumberFormat
 
 class CoinFlipBrowserMenu : PaginatedMenu() {
 
@@ -100,67 +99,43 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                SelectCurrencyMenu { useMoney ->
-                    val prompt = EzPrompt.Builder()
-
-                    if (useMoney) {
-                        prompt.promptText("${ChatColor.GREEN}Please insert the amount of money you would like to bet.")
-                            .regex("[0-9]*(\\.?[0-9]*)?".toRegex())
-                            .acceptInput { player, input ->
-                                val amount = input.toDouble()
-                                if (amount < CoinFlipHandler.getMinBetMoney().coerceAtLeast(1.0)) {
-                                    player.sendMessage("${ChatColor.RED}You must bet at least $${NumberFormat.getInstance().format(CoinFlipHandler.getMinBetMoney())}.")
-                                    return@acceptInput
-                                }
-
-                                val currency = Currency.Money(amount)
-                                if (!currency.has(player)) {
-                                    player.sendMessage("${ChatColor.RED}You don't have that much money to bet.")
-                                    return@acceptInput
-                                }
-
-                                currency.take(player)
-
-                                val game = CoinFlipGame(
-                                    creator = UserHandler.getUser(player.uniqueId),
-                                    value = currency
-                                )
-
-                                CoinFlipHandler.trackGame(game)
-                                CoinFlipGameMenu(game).openMenu(player)
-
-                                player.sendMessage("${ChatColor.GREEN}You've created a Coinflip game for ${CoinFlipHandler.formatMoney(game.value.double())}${ChatColor.GREEN}.")
-                            }
+                SelectCurrencyMenu { currency ->
+                    val prompt = if (currency == Currency.Type.MONEY) {
+                        "${ChatColor.GREEN}Please input the amount of money you would like to bet."
                     } else {
-                        prompt.promptText("${ChatColor.GREEN}Please insert the amount of tokens you would like to bet.")
-                            .acceptInput { player, input ->
-                                val amount = input.toLong()
-                                if (amount < CoinFlipHandler.getMinBetTokens().coerceAtLeast(1L)) {
-                                    player.sendMessage("${ChatColor.RED}You must bet at least ${NumberFormat.getInstance().format(CoinFlipHandler.getMinBetMoney())} tokens.")
-                                    return@acceptInput
-                                }
-
-                                val currency = Currency.Tokens(amount)
-                                if (!currency.has(player)) {
-                                    player.sendMessage("${ChatColor.RED}You don't have that many tokens to bet.")
-                                    return@acceptInput
-                                }
-
-                                currency.take(player)
-
-                                val game = CoinFlipGame(
-                                    creator = UserHandler.getUser(player.uniqueId),
-                                    value = currency
-                                )
-
-                                CoinFlipHandler.trackGame(game)
-                                CoinFlipGameMenu(game).openMenu(player)
-
-                                player.sendMessage("${ChatColor.GREEN}You've created a Coinflip game for ${CoinFlipHandler.formatTokens(game.value.long())}${ChatColor.GREEN}.")
-                            }
+                        "${ChatColor.GREEN}Please input the amount of tokens you would like to bet."
                     }
 
-                    prompt.build().start(player)
+                    NumberPrompt(prompt) { input ->
+                        val minAmount: Number = if (currency == Currency.Type.MONEY) {
+                            CoinFlipHandler.getMinBetMoney()
+                        } else {
+                            CoinFlipHandler.getMinBetTokens()
+                        }
+
+                        if ((minAmount is Double && minAmount.toDouble() > input.toDouble())) {
+                            player.sendMessage("${ChatColor.RED}You must bet at least ${currency.format(minAmount)}${ChatColor.RED}.")
+                            return@NumberPrompt
+                        }
+
+                        if (!currency.has(player, input)) {
+                            player.sendMessage("${ChatColor.RED}You don't have enough ${currency.getName()}${ChatColor.RED} to bet ${currency.format(input)}${ChatColor.RED}.")
+                            return@NumberPrompt
+                        }
+
+                        currency.take(player, input)
+
+                        val game = CoinFlipGame(
+                            creator = UserHandler.getUser(player.uniqueId),
+                            currencyAmount = input,
+                            currency = currency
+                        )
+
+                        CoinFlipHandler.trackGame(game)
+                        CoinFlipGameMenu(game).openMenu(player)
+
+                        player.sendMessage("${ChatColor.GREEN}You've created a Coinflip game for ${currency.format(input)}${ChatColor.GREEN}.")
+                    }
                 }.openMenu(player)
             }
         }
@@ -171,11 +146,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
             val title = StringBuilder().append("${CoinFlipHandler.PRIMARY_COLOR}${ChatColor.BOLD}${game.creator.getUsername()}")
 
             if (game.isWaitingForOpponent()) {
-                if (game.value.isMoney()) {
-                    title.append(" ${CoinFlipHandler.formatMoney(game.value.double())}")
-                } else {
-                    title.append(" ${CoinFlipHandler.formatTokens(game.value.long())}")
-                }
+                title.append(" ${game.currency.format(game.currencyAmount)}")
             } else {
                 title.append("${ChatColor.GRAY} vs ${CoinFlipHandler.SECONDARY_COLOR}${ChatColor.BOLD}${game.opponent!!.getUsername()}")
             }
@@ -258,7 +229,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
         }
     }
 
-    private inner class SelectCurrencyMenu(private val lambda: (Boolean) -> Unit) : Menu() {
+    private inner class SelectCurrencyMenu(private val lambda: (Currency) -> Unit) : Menu() {
         init {
             placeholder = true
         }
@@ -291,7 +262,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
 
                 override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
                     player.closeInventory()
-                    lambda.invoke(true)
+                    lambda.invoke(Currency.Type.MONEY)
                 }
             }
 
@@ -310,7 +281,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
 
                 override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
                     player.closeInventory()
-                    lambda.invoke(false)
+                    lambda.invoke(Currency.Type.TOKENS)
                 }
             }
 

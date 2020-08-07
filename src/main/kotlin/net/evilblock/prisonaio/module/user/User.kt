@@ -40,14 +40,9 @@ import java.util.*
 
 class User(val uuid: UUID) {
 
-    @Transient
-    internal var requiresSave: Boolean = false
-
-    @Transient
-    internal var cacheExpiry: Long? = null
-
-    @Transient
-    var attachment: PermissionAttachment? = null
+    @Transient internal var requiresSave: Boolean = false
+    @Transient internal var cacheExpiry: Long? = null
+    @Transient var attachment: PermissionAttachment? = null
 
     internal var firstSeen: Long = System.currentTimeMillis()
 
@@ -57,29 +52,21 @@ class User(val uuid: UUID) {
     private var prestige: Int = 0
     private var prestigeTokens: Int = 0
 
-    private var tokensBalance: Long = 0L
+    private var tokenBalance: Long = 0L
 
     val perks: UserPerks = UserPerks(this)
-
     val statistics: UserStatistics = UserStatistics(this)
 
     private val settings: MutableMap<UserSetting, UserSettingOption> = EnumMap(UserSetting::class.java)
 
     private val profileComments: MutableList<ProfileComment> = arrayListOf()
-
     private val achievements: MutableMap<String, CompletedAchievementActivity> = hashMapOf()
 
     var battlePassProgress: BattlePassProgress = BattlePassProgress(this)
 
-    /**
-     * The user's quest progressions.
-     */
     @JsonAdapter(UserQuestProgressionSerializer::class)
     private val questProgression: MutableMap<Quest<*>, QuestProgression> = hashMapOf()
 
-    /**
-     * The timestamps of when the user last claimed Delivery Man rewards.
-     */
     @JsonAdapter(UserClaimedRewardsSerializer::class)
     private val claimedRewards: MutableMap<DeliveryManReward, Long> = hashMapOf()
 
@@ -235,15 +222,39 @@ class User(val uuid: UUID) {
      * Gets the user's [prestigeTokens].
      */
     fun getPrestigeTokens(): Int {
-        return this.prestigeTokens
+        return prestigeTokens
     }
 
     /**
-     * Sets the user's [prestigeTokens] to the given [tokens].
+     * If the user's [prestigeTokens] is more than or equal to the given [amount].
      */
-    fun setPrestigeTokens(tokens: Int) {
-        this.prestigeTokens = tokens
+    fun hasPrestigeTokens(amount: Int): Boolean {
+        return prestigeTokens >= amount
+    }
+
+    /**
+     * Updates the user's [prestigeTokens] to the given [newTokens].
+     */
+    fun updatePrestigeTokens(newTokens: Int) {
+        prestigeTokens = newTokens.coerceAtLeast(0)
         requiresSave = true
+    }
+
+    /**
+     * Adds the given [amount] to the user's [prestigeTokens].
+     */
+    fun addPrestigeTokens(amount: Int) {
+        assert(amount > 0) { "Amount must be more than 0" }
+        updatePrestigeTokens(prestigeTokens + amount)
+    }
+
+    /**
+     * Subtracts the given [amount] from the users [prestigeTokens].
+     */
+    fun subtractPrestigeTokens(amount: Int) {
+        assert(amount > 0) { "Amount must be more than 0" }
+        assert(prestigeTokens - amount > 0) { "Can't subtract tokens to make balance negative" }
+        updatePrestigeTokens(prestigeTokens - amount)
     }
 
     /**
@@ -261,24 +272,24 @@ class User(val uuid: UUID) {
     }
 
     /**
-     * Gets the user's current [tokensBalance].
+     * Gets the user's current [tokenBalance].
      */
-    fun getTokensBalance(): Long {
-        return tokensBalance
+    fun getTokenBalance(): Long {
+        return tokenBalance
     }
 
     /**
      * If the user's balance is more than or equal to the given [amount].
      */
-    fun hasTokensBalance(amount: Long): Boolean {
-        return tokensBalance >= amount
+    fun hasTokenBalance(amount: Long): Boolean {
+        return tokenBalance >= amount
     }
 
     /**
-     * Updates the user's tokens balance to the given [newBalance].
+     * Updates the user's token balance to the given [newBalance].
      */
-    fun updateTokensBalance(newBalance: Long) {
-        tokensBalance = if (newBalance < 0) { 0 } else { newBalance }
+    fun updateTokenBalance(newBalance: Long) {
+        tokenBalance = if (newBalance < 0) { 0 } else { newBalance }
         requiresSave = true
     }
 
@@ -287,16 +298,16 @@ class User(val uuid: UUID) {
      */
     fun addTokensBalance(amount: Long) {
         assert(amount > 0) { "Amount must be more than 0" }
-        updateTokensBalance(tokensBalance + amount)
+        updateTokenBalance(tokenBalance + amount)
     }
 
     /**
-     * Subtracts the given [amount] from the users [tokensBalance].
+     * Subtracts the given [amount] from the users [tokenBalance].
      */
     fun subtractTokensBalance(amount: Long) {
         assert(amount > 0) { "Amount must be more than 0" }
-        assert(tokensBalance - amount > 0) { "Can't subtract tokens to make balance negative" }
-        updateTokensBalance(tokensBalance - amount)
+        assert(tokenBalance - amount > 0) { "Can't subtract tokens to make balance negative" }
+        updateTokenBalance(tokenBalance - amount)
     }
 
     /**
