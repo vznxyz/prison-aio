@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.privatemine.listener
 
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.privatemine.PrivateMineHandler
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -24,7 +25,9 @@ object PrivateMineWorldListeners : Listener {
     @EventHandler
     fun onWorldSaveEvent(event: WorldSaveEvent) {
         if (event.world == PrivateMineHandler.getGridWorld()) {
-            PrivateMineHandler.saveGrid()
+            Tasks.async {
+                PrivateMineHandler.saveGrid()
+            }
         }
     }
 

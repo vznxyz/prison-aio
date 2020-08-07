@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.gang.listener
 
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.gang.GangHandler
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
@@ -24,7 +25,9 @@ object GangWorldListeners : Listener {
     @EventHandler
     fun onWorldSaveEvent(event: WorldSaveEvent) {
         if (event.world == GangHandler.getGridWorld()) {
-            GangHandler.saveGrid()
+            Tasks.async {
+                GangHandler.saveGrid()
+            }
         }
     }
 
