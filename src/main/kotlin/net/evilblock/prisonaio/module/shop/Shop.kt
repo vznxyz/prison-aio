@@ -76,7 +76,7 @@ class Shop(val id: String) {
             return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
-        val finalCost = itemsBought.sumByDouble { it.getBuyCost() }
+        val finalCost = itemsBought.sumByDouble { it.getBuyCost().toDouble() }
         if (finalCost <= 0) {
             return ShopReceipt(result = TransactionResult.FREE_BUY, shop = this, receiptType = ShopReceiptType.BUY)
         }
@@ -90,12 +90,11 @@ class Shop(val id: String) {
             finalCost = finalCost
         )
 
-        val balance = Economy.getBalance(player.uniqueId)
-        if (balance < shopReceipt.finalCost.toLong()) {
+        if (!shopReceipt.currency.has(player, shopReceipt.finalCost)) {
             return ShopReceipt(result = TransactionResult.CANNOT_AFFORD, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
-        Economy.takeBalance(player.uniqueId, shopReceipt.finalCost)
+        currency.take(player, finalCost)
 
         val splitItems = arrayListOf<ItemStack>()
         for (item in shopReceipt.items) {
@@ -120,7 +119,6 @@ class Shop(val id: String) {
 
         player.updateInventory()
 
-        ShopHandler.trackReceipt(player, shopReceipt)
         shopReceipt.sendCompact(player)
 
         return shopReceipt
@@ -157,7 +155,7 @@ class Shop(val id: String) {
             return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
-        val finalCost = itemsSold.sumByDouble { it.getSellCost() } * sellEvent.multiplier
+        val finalCost = itemsSold.sumByDouble { it.getSellCost().toDouble() } * sellEvent.multiplier
         if (finalCost <= 0) {
             return ShopReceipt(result = TransactionResult.FREE_SELL, shop = this, receiptType = ShopReceiptType.SELL)
         }

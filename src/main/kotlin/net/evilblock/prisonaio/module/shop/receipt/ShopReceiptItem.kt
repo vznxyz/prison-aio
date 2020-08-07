@@ -19,14 +19,14 @@ data class ShopReceiptItem(val itemType: ShopItem, val item: ItemStack) {
     /**
      * The amount the player is selling for.
      */
-    fun getSellCost(): Double {
+    fun getSellCost(): Number {
         return (item.amount * sellPricePerUnit) * multiplier
     }
 
     /**
      * The amount the player is buying for.
      */
-    fun getBuyCost(): Double {
+    fun getBuyCost(): Number {
         return (item.amount * buyPricePerUnit) * multiplier
     }
 

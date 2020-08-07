@@ -37,8 +37,8 @@ class PlayerSellToShopEvent(
         }
     }
 
-    fun getSellCost(): Double {
-        return items.sumByDouble { it.getSellCost() }
+    fun getSellCost(): Number {
+        return items.sumByDouble { it.getSellCost().toDouble() }
     }
 
 }

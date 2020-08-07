@@ -29,8 +29,8 @@ class PlayerBuyFromShopEvent(
         this.cancelled = cancelled
     }
 
-    fun getBuyCost(): Double {
-        return items.sumByDouble { it.getBuyCost() }
+    fun getBuyCost(): Number {
+        return items.sumByDouble { it.getBuyCost().toDouble() }
     }
 
 }
