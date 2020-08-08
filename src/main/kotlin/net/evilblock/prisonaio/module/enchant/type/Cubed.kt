@@ -64,7 +64,7 @@ object Cubed : AbstractEnchant("cubed", "Cubed", 3) {
         return Long.MAX_VALUE
     }
 
-    override fun getSalvageReturns(level: Int): Long {
+    override fun getRefundTokens(level: Int): Long {
         return 0
     }
 

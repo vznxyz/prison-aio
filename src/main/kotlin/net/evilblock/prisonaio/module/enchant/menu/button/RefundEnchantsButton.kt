@@ -9,14 +9,19 @@ package net.evilblock.prisonaio.module.enchant.menu.button
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.prisonaio.module.enchant.menu.RefundEnchantsMenu
+import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemFlag
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
-class RefundsButton : Button() {
+class RefundEnchantsButton(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Button() {
 
     override fun getName(player: Player): String {
         return "${ChatColor.GRAY}${Constants.DOUBLE_ARROW_RIGHT} ${ChatColor.RED}${ChatColor.BOLD}Refund Enchants ${ChatColor.GRAY}${Constants.DOUBLE_ARROW_LEFT}"
@@ -34,6 +39,12 @@ class RefundsButton : Button() {
         itemMeta.addEnchant(Enchantment.DURABILITY, 1, true)
         itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
         return itemMeta
+    }
+
+    override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+        if (clickType.isLeftClick) {
+            RefundEnchantsMenu(pickaxeItem, pickaxeData).openMenu(player)
+        }
     }
 
 }

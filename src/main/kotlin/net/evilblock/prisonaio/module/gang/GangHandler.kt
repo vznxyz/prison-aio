@@ -20,6 +20,7 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.cubed.util.hook.WorldEditUtils
+import net.evilblock.prisonaio.module.gang.booster.task.GangBoosterExpirationTask
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
@@ -70,11 +71,7 @@ object GangHandler : PluginHandler {
         loadWorld()
         loadGrid()
 
-        Tasks.asyncTimer(20L * 60L, 20L * 60L) {
-            for (gang in grid.values) {
-                gang.updateCachedCellValue()
-            }
-        }
+        Tasks.asyncTimer(GangBoosterExpirationTask, 20L, 20L)
     }
 
     private fun loadWorld() {
@@ -241,10 +238,10 @@ object GangHandler : PluginHandler {
     fun attemptJoinSession(player: Player, gang: Gang) {
         if (hasBypass(player)) {
             RegionBypass.attemptNotify(player)
-            successfulJoinSession(player, gang)
+            gang.joinSession(player)
         } else {
             if (gang.owner != player.uniqueId) {
-                if (gang.getActivePlayers().size >= 50) {
+                if (gang.visitors.size >= 50) {
                     player.sendMessage("${ChatColor.RED}There are too many players visiting that gang right now to join.")
                     return
                 }
@@ -254,19 +251,8 @@ object GangHandler : PluginHandler {
                 return
             }
 
-            successfulJoinSession(player, gang)
+            gang.joinSession(player)
         }
-    }
-
-    private fun successfulJoinSession(player: Player, gang: Gang) {
-        updateVisitingGang(player, gang)
-
-        player.teleport(gang.homeLocation)
-        player.allowFlight = true
-        player.isFlying = true
-
-        gang.joinSession(player)
-        gang.sendBorderUpdate(player)
     }
 
     private fun synchronizeCaches(gang: Gang) {
@@ -299,7 +285,7 @@ object GangHandler : PluginHandler {
     fun createNewGang(owner: UUID, name: String, onFinish: (Gang) -> Unit) {
         assert(!Bukkit.isPrimaryThread()) { "Cannot generate new gang on primary thread" }
 
-        val schematicFile = GangModule.getCellSchematicFile()
+        val schematicFile = GangModule.getIslandSchematicFile()
         if (!schematicFile.exists()) {
             throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
         }
@@ -350,7 +336,7 @@ object GangHandler : PluginHandler {
     fun resetGang(gang: Gang, onFinish: () -> Unit) {
         assert(!Bukkit.isPrimaryThread()) { "Cannot reset cell on primary thread" }
 
-        val schematicFile = GangModule.getCellSchematicFile()
+        val schematicFile = GangModule.getIslandSchematicFile()
         if (!schematicFile.exists()) {
             throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
         }
@@ -389,7 +375,7 @@ object GangHandler : PluginHandler {
 
     @Throws(IllegalStateException::class)
     fun pasteSchematic(schematicData: GridSchematicData, onFinish: (Boolean) -> Unit) {
-        val schematicFile = GangModule.getCellSchematicFile()
+        val schematicFile = GangModule.getIslandSchematicFile()
         if (!schematicFile.exists()) {
             throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
         }
@@ -461,7 +447,7 @@ object GangHandler : PluginHandler {
      * Finds the spawn points for a given location.
      */
     private fun startSchematicScan(start: Location): SchematicScanResults {
-        val schematicSize = WorldEditUtils.readSchematicSize(GangModule.getCellSchematicFile())
+        val schematicSize = WorldEditUtils.readSchematicSize(GangModule.getIslandSchematicFile())
 
         val minPoint = start.clone()
         val maxPoint = start.clone().add(schematicSize.x, schematicSize.y, schematicSize.z)

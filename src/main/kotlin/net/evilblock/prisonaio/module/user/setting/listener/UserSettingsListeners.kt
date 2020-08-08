@@ -7,6 +7,11 @@
 
 package net.evilblock.prisonaio.module.user.setting.listener
 
+import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.prisonaio.module.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.enchant.menu.PurchaseEnchantsMenu
+import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
+import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.module.user.setting.option.PrivateMessageSoundsOption
@@ -15,8 +20,28 @@ import net.evilblock.source.messaging.event.ToggleMessagesEvent
 import net.evilblock.source.messaging.event.ToggleSoundsEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerInteractEvent
 
 object UserSettingsListeners : Listener {
+
+    @EventHandler
+    fun onPlayerInteractEvent(event: PlayerInteractEvent) {
+        if (event.action == Action.RIGHT_CLICK_AIR || (event.action == Action.RIGHT_CLICK_BLOCK && !Constants.CONTAINER_TYPES.contains(event.clickedBlock.type))) {
+            val itemInHand = event.player.inventory.itemInMainHand
+            if (MechanicsModule.isPickaxe(itemInHand)) {
+                val user = UserHandler.getUser(event.player.uniqueId)
+                if (user.getSettingOption(UserSetting.QUICK_ACCESS_ENCHANTS).getValue()) {
+                    EnchantsManager.handleItemSwitch(event.player, itemInHand, event)
+
+                    val pickaxeData = PickaxeHandler.getPickaxeData(itemInHand)
+                    if (pickaxeData != null) {
+                        PurchaseEnchantsMenu(itemInHand, pickaxeData).openMenu(event.player)
+                    }
+                }
+            }
+        }
+    }
 
     @EventHandler
     fun onToggleMessagesEvent(event: ToggleMessagesEvent) {

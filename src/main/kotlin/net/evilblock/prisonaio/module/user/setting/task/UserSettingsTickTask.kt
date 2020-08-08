@@ -19,7 +19,7 @@ object UserSettingsTickTask : Runnable {
             }
 
             val player = user.getPlayer() ?: continue
-            user.purchaseMaxRankups(player, true)
+            user.purchaseMaxRankups(player, manual = false)
         }
     }
 

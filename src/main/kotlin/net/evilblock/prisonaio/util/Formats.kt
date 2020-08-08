@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.util
 
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.util.TextUtil
 import net.evilblock.cubed.util.bukkit.Constants
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -69,7 +70,7 @@ object Formats {
     @JvmStatic
     fun formatPrestigeTokens(amount: Int): String {
         val formatted = NumberFormat.getInstance().format(amount)
-        return "${ChatColor.RED}${Constants.ALT_TOKENS_SYMBOL}${ChatColor.GOLD}${ChatColor.BOLD}$formatted"
+        return "${ChatColor.RED}${ChatColor.BOLD}$formatted ${TextUtil.pluralize(amount, "Prestige Token", "Prestige Tokens")}"
     }
 
 }

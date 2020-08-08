@@ -12,11 +12,11 @@ import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.gang.booster.GangBooster
+import net.evilblock.prisonaio.module.gang.command.GangBoostersCommand
 import net.evilblock.prisonaio.module.gang.command.*
-import net.evilblock.prisonaio.module.gang.command.admin.GangForceDisbandCommand
-import net.evilblock.prisonaio.module.gang.command.admin.GangForceKickCommand
-import net.evilblock.prisonaio.module.gang.command.admin.GangForceLeaderCommand
-import net.evilblock.prisonaio.module.gang.command.admin.GangRefreshValueCommand
+import net.evilblock.prisonaio.module.gang.command.admin.*
+import net.evilblock.prisonaio.module.gang.command.parameter.GangBoosterParameterType
 import net.evilblock.prisonaio.module.gang.command.parameter.GangParameterType
 import net.evilblock.prisonaio.module.gang.listener.*
 import org.bukkit.ChatColor
@@ -54,16 +54,19 @@ object GangModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
+            GangBoostersListeners,
             GangChatListeners,
             GangEntityListeners,
             GangJerryListeners,
             GangSessionListeners,
+            GangTrophiesListeners,
             GangWorldListeners
         )
     }
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
+            GangBoostersCommand.javaClass,
             GangCreateCommand.javaClass,
             GangDisbandCommand.javaClass,
             GangHelpCommand.javaClass,
@@ -83,13 +86,18 @@ object GangModule : PluginModule() {
             GangForceDisbandCommand.javaClass,
             GangForceKickCommand.javaClass,
             GangForceLeaderCommand.javaClass,
-            GangRefreshValueCommand.javaClass
+            GangForceResetCommand.javaClass,
+            GangTrophiesGiveCommand.javaClass,
+            GangTrophiesSetCommand.javaClass,
+            GangTrophiesTakeCommand.javaClass,
+            GangBoostersGrantCommand.javaClass
         )
     }
 
     override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
         return mapOf(
-            Gang::class.java to GangParameterType
+            Gang::class.java to GangParameterType,
+            GangBooster.BoosterType::class.java to GangBoosterParameterType
         )
     }
 
@@ -105,7 +113,7 @@ object GangModule : PluginModule() {
         return config.getInt("grid.gutter-width")
     }
 
-    fun getCellSchematicFile(): File {
+    fun getIslandSchematicFile(): File {
         val schematicsFolder = File(JavaPlugin.getPlugin(WorldEditPlugin::class.java).dataFolder, "schematics")
         return File(schematicsFolder, config.getString("gang.schematic-file"))
     }
@@ -118,7 +126,7 @@ object GangModule : PluginModule() {
         return config.getInt("gang.max-name-length", 16)
     }
 
-    fun getMaxCellsPerPlayer(): Int {
+    fun getMaxGangsPerPlayer(): Int {
         return config.getInt("gang.max-gangs-per-player", 1)
     }
 
@@ -136,6 +144,30 @@ object GangModule : PluginModule() {
 
     fun getJerryTextureSignature(): String {
         return config.getString("gang.jerry.texture-signature")
+    }
+
+    fun readTrophyBlockBreakChance(): Double {
+        return config.getDouble("trophies.block-break.chance", 0.05)
+    }
+
+    fun readTrophyBlockBreakMinAmount(): Int {
+        return config.getInt("trophies.block-break.min-amount", 1)
+    }
+
+    fun readTrophyBlockBreakMaxAmount(): Int {
+        return config.getInt("trophies.block-break.max-amount", 1)
+    }
+
+    fun readIncreasedTrophiesChanceMod(): Double {
+        return config.getDouble("boosters.increased-trophies.chance-mod", 0.1)
+    }
+
+    fun readIncreasedMineCratesChanceMod(): Double {
+        return config.getDouble("boosters.increased-mine-crates.chance-mod", 5.0)
+    }
+
+    fun readSalesMultiplierMod(): Double {
+        return config.getDouble("boosters.sales-multiplier.multiplier-mod")
     }
 
 }

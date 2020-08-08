@@ -19,16 +19,15 @@ import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
 import net.evilblock.prisonaio.util.economy.Currency
-import net.evilblock.prisonaio.util.economy.Economy
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-class Shop(val id: String) {
+class Shop(var id: String) {
 
     var name: String = id
-    val items: HashSet<ShopItem> = hashSetOf()
+    val items: MutableList<ShopItem> = arrayListOf()
     var priority: Int = 0
     var menuTemplate: ShopMenuTemplate? = null
     var currency: Currency.Type = Currency.Type.MONEY

@@ -36,7 +36,7 @@ object TokenPouch : AbstractEnchant("token-pouch", "Token Pouch", 1000) {
     override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
         val user = UserHandler.getUser(event.player.uniqueId)
 
-        if (Chance.percent(0.01 * level)) {
+        if (Chance.percent(0.0025 * level)) {
             val tokenAmount = Chance.pick(2200, floor(2200 + level * 1.1).toInt())
             user.addTokensBalance(tokenAmount.toLong())
 

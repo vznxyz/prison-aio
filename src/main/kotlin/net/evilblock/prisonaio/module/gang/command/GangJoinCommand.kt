@@ -26,7 +26,7 @@ object GangJoinCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "gang") gang: Gang) {
-        val maxGangs = GangModule.getMaxCellsPerPlayer()
+        val maxGangs = GangModule.getMaxGangsPerPlayer()
         if (GangHandler.getAccessibleGangs(player.uniqueId).size >= maxGangs) {
             player.sendMessage("${ChatColor.RED}You can only join $maxGangs ${TextUtil.pluralize(maxGangs, "gang", "gangs")} at once.")
             return

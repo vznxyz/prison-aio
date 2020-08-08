@@ -10,7 +10,6 @@ package net.evilblock.prisonaio.module.enchant.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.TextSplitter
-import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.menu.button.*
@@ -31,7 +30,7 @@ import org.bukkit.inventory.meta.ItemMeta
 import java.text.NumberFormat
 import java.util.*
 
-class PurchaseEnchantMenu(val pickaxeItem: ItemStack, val pickaxeData: PickaxeData) : Menu() {
+class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Menu() {
 
     init {
         updateAfterClick = true
@@ -49,8 +48,8 @@ class PurchaseEnchantMenu(val pickaxeItem: ItemStack, val pickaxeData: PickaxeDa
         buttons[0] = TokenShopButton()
         buttons[2] = TokenBalanceButton()
         buttons[4] = PickaxeButton(pickaxeItem.clone(), pickaxeData) { this.openMenu(player) }
-        buttons[6] = SalvagePickaxeButton()
-        buttons[8] = RefundsButton()
+        buttons[6] = SalvagePickaxeButton(pickaxeItem, pickaxeData)
+        buttons[8] = RefundEnchantsButton(pickaxeItem, pickaxeData)
 
         // footer buttons
         buttons[49] = ExitButton()
@@ -81,33 +80,6 @@ class PurchaseEnchantMenu(val pickaxeItem: ItemStack, val pickaxeData: PickaxeDa
         buttons[42] = PurchaseEnchantmentButton(Laser)
 
         return buttons
-    }
-
-    private inner class SalvagePickaxeButton : Button() {
-        override fun getName(player: Player): String {
-            return "${ChatColor.GRAY}${Constants.DOUBLE_ARROW_RIGHT} ${ChatColor.RED}${ChatColor.BOLD}Salvage Pickaxe ${ChatColor.GRAY}${Constants.DOUBLE_ARROW_LEFT}"
-        }
-
-        override fun getDescription(player: Player): List<String> {
-            return listOf("${ChatColor.GRAY}Click here to salvage your pickaxe")
-        }
-
-        override fun getMaterial(player: Player): Material {
-            return Material.ANVIL
-        }
-
-        override fun applyMetadata(player: Player, itemMeta: ItemMeta): ItemMeta? {
-            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true)
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
-            return itemMeta
-        }
-
-        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (clickType == ClickType.LEFT) {
-                player.closeInventory()
-                SalvagePickaxeMenu(pickaxeItem, pickaxeData).openMenu(player)
-            }
-        }
     }
 
     private inner class PurchaseEnchantmentButton(private val enchant: AbstractEnchant) : Button() {

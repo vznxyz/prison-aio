@@ -39,7 +39,7 @@ object ChatFormatListeners : Listener {
             (user.getPrestige()).toString()
         }
 
-        val formattedMessage = String.format(event.format, event.player.displayName, "")
+        val formattedMessage = String.format(event.format, user.getFormattedUsername(event.player), "")
             .replace("{prisonRank}", user.getRank().displayName)
             .replace("{prisonPrestige}", prestigeTag)
             .replace("{tagPrefix}", tagPrefix)

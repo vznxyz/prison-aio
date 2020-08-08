@@ -77,6 +77,7 @@ object MechanicsModule : PluginModule() {
             DisableSpawnMobEggsListeners,
             MiningMechanicsListeners,
             MobMechanicsListeners,
+            PlayerDeathListeners,
             PreventDropsInSpawnListeners,
             StreamListeners,
             VanillaMechanicsListeners,
@@ -196,9 +197,21 @@ object MechanicsModule : PluginModule() {
     }
 
     fun isTool(itemStack: ItemStack?): Boolean {
-        return itemStack != null && itemStack.type != Material.AIR && TOOL_IDS.contains(itemStack.type.ordinal)
+        return itemStack != null && itemStack.type != Material.AIR && TOOL_IDS.contains(itemStack.type.id)
     }
 
-    private val TOOL_IDS = arrayListOf(255, 256, 257, 260, 268, 269, 270, 272, 274, 276, 277, 278, 283, 284, 285, 358)
+    fun isPickaxe(itemStack: ItemStack?): Boolean {
+        return itemStack != null && itemStack.type != Material.AIR && PICK_IDS.contains(itemStack.type.id)
+    }
+
+    private val TOOL_IDS = arrayListOf(
+        276, 277, 278, //diamond tools
+        283, 284, 285, // gold tools
+        256, 257, 267, // iron tools
+        272, 273, 274, // stone tools
+        268, 269, 270 // wood tools
+    )
+
+    private val PICK_IDS = arrayListOf(270, 274, 257, 285, 278)
 
 }

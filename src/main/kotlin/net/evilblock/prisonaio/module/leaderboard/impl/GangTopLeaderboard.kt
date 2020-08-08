@@ -16,17 +16,17 @@ import org.bukkit.ChatColor
 object GangTopLeaderboard : Leaderboard("gang-top", "Gang Top") {
 
     override fun fetchEntries(): List<LeaderboardEntry<*>> {
-        val entries = arrayListOf<LeaderboardEntry<Long>>()
+        val entries = arrayListOf<LeaderboardEntry<Int>>()
 
-        for (cell in GangHandler.getAllGangs()) {
-            entries.add(LeaderboardEntry(0, cell.name, cell.cachedValue))
+        for (gang in GangHandler.getAllGangs()) {
+            entries.add(LeaderboardEntry(0, gang.name, gang.getTrophies()))
         }
 
         return entries.sortedByDescending { it.value }.take(5)
     }
 
     override fun formatEntry(entry: LeaderboardEntry<*>): String {
-        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.AQUA}${ChatColor.BOLD}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(entry.value as Long)}"
+        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.GOLD}${ChatColor.BOLD}${NumberUtils.format(entry.value as Int)} Trophies"
     }
 
 }

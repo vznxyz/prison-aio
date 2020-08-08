@@ -9,6 +9,8 @@ package net.evilblock.prisonaio.module.user.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.util.TimeUtil
+import net.evilblock.prisonaio.module.gang.GangHandler
+import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.perk.Perk
@@ -32,19 +34,27 @@ object SalesMultiplierCommand {
             }
         }
 
-        if (!user.perks.hasPerk(player, Perk.SALES_BOOST)) {
+        if (user.perks.hasPerk(player, Perk.SALES_BOOST)) {
+            val activePerk = user.perks.getActivePerkGrant(Perk.SALES_BOOST)!!
+            val perkMultiplier = user.perks.getSalesMultiplier(player)
+
+            if (activePerk.isPermanent()) {
+                player.sendMessage("${ChatColor.GRAY}You have a granted sales multiplier of ${ChatColor.RED}${ChatColor.BOLD}$perkMultiplier ${ChatColor.GRAY}for a period of ${ChatColor.RED}forever${ChatColor.GRAY}.")
+            } else {
+                val formattedDuration = TimeUtil.formatIntoDetailedString((activePerk.getRemainingTime() / 1000.0).toInt())
+                player.sendMessage("${ChatColor.GRAY}You have a granted sales multiplier of ${ChatColor.RED}${ChatColor.BOLD}$perkMultiplier ${ChatColor.GRAY}for a period of ${ChatColor.RED}$formattedDuration${ChatColor.GRAY}.")
+            }
+        } else {
             player.sendMessage("${ChatColor.RED}You don't have any granted sales multipliers.")
-            return
         }
 
-        val activeGrant = user.perks.getActivePerkGrant(Perk.SALES_BOOST)!!
-        val formattedMultiplier = user.perks.getSalesMultiplier(player)
-
-        if (activeGrant.isPermanent()) {
-            player.sendMessage("${ChatColor.GRAY}You have a granted sales multiplier of ${ChatColor.RED}${ChatColor.BOLD}$formattedMultiplier ${ChatColor.GRAY}for a period of ${ChatColor.RED}forever${ChatColor.GRAY}.")
+        val assumedGang = GangHandler.getAssumedGang(player.uniqueId)
+        if (assumedGang != null && assumedGang.hasBooster(GangBooster.BoosterType.SALES_MULTIPLIER)) {
+            val booster = assumedGang.getBooster(GangBooster.BoosterType.SALES_MULTIPLIER)!!
+            val formattedDuration = TimeUtil.formatIntoDetailedString((booster.getRemainingTime() / 1000.0).toInt())
+            player.sendMessage("${ChatColor.GRAY}You have a Gang Booster sales multiplier of ${ChatColor.RED}${ChatColor.BOLD}${5.0} ${ChatColor.GRAY}for a period of ${ChatColor.RED}$formattedDuration${ChatColor.GRAY}.")
         } else {
-            val formattedDuration = TimeUtil.formatIntoDetailedString((activeGrant.getRemainingTime() / 1000.0).toInt())
-            player.sendMessage("${ChatColor.GRAY}You have a granted sales multiplier of ${ChatColor.RED}${ChatColor.BOLD}$formattedMultiplier ${ChatColor.GRAY}for a period of ${ChatColor.RED}$formattedDuration${ChatColor.GRAY}.")
+            player.sendMessage("${ChatColor.RED}You don't have any gang booster sales multipliers.")
         }
     }
 

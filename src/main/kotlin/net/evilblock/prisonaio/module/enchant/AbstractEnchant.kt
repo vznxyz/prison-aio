@@ -134,12 +134,12 @@ abstract class AbstractEnchant(val id: String, val enchant: String, val maxLevel
 
     }
 
-    open fun getSalvageReturns(level: Int): Long {
-        var salvageFor = 0.0
+    open fun getRefundTokens(level: Int): Long {
+        var refundTokens = 0.0
         for (i in level downTo 1) {
-            salvageFor += getCost(i) / 4L
+            refundTokens += getCost(i) / 4L
         }
-        return salvageFor.toLong()
+        return refundTokens.toLong()
     }
 
     abstract fun getCost(level: Int): Long

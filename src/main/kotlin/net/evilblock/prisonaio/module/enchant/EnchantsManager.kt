@@ -220,7 +220,7 @@ object EnchantsManager : Listener {
         var pickaxeData = PickaxeHandler.getPickaxeData(newItem)
         var newItem = newItem
         if (newItem != null) {
-            if (pickaxeData == null && MechanicsModule.isTool(newItem)) {
+            if (pickaxeData == null && MechanicsModule.isPickaxe(newItem)) {
                 pickaxeData = PickaxeData()
                 pickaxeData.sync(newItem)
                 pickaxeData.applyLore(newItem)

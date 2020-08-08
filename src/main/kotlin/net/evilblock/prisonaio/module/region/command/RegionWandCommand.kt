@@ -15,7 +15,7 @@ import org.bukkit.entity.Player
 object RegionWandCommand {
 
     @Command(
-        names = ["region wand"],
+        names = ["region wand", "rg wand"],
         description = "Give yourself the region selection wand",
         permission = "training.mines.wand"
     )

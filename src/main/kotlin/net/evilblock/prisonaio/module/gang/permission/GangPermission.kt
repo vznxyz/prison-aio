@@ -49,6 +49,14 @@ enum class GangPermission(
         Material.LEVER,
         PermissionValue.MEMBERS,
         emptySet()
+    ),
+    SPEND_TROPHIES(
+        "Spend Trophies",
+        "This setting controls who can spend trophies in the Gang Shop.",
+        "You don't have permission to spend the gang's trophies.",
+        Material.GOLD_INGOT,
+        PermissionValue.OWNER,
+        setOf(PermissionValue.MEMBERS, PermissionValue.VISITORS)
     );
 
     fun getDefaultValue(): PermissionValue {
@@ -75,6 +83,7 @@ enum class GangPermission(
 
     enum class PermissionValue(val detailedName: String) {
         OWNER("Owner only"),
+        CAPTAINS("Captains only"),
         MEMBERS("Members only"),
         VISITORS("Visitors and members")
     }

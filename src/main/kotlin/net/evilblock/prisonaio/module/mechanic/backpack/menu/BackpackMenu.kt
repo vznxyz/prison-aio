@@ -29,7 +29,6 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
 
     init {
         updateAfterClick = true
-        autoUpdate = true
     }
 
     override fun getTitle(player: Player): String {
@@ -69,8 +68,7 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
     }
 
     fun getMaxPages(): Int {
-        val maxSlot = backpack.contents.maxBy { it.key }?.key ?: return 64
-        return ceil(maxSlot / 44.0).toInt().coerceAtLeast(1)
+        return ceil(backpack.getMaxSlots() / 44.0).toInt().coerceAtLeast(1)
     }
 
     override fun onOpen(player: Player) {

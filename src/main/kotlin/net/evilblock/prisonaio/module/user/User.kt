@@ -36,6 +36,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.permissions.PermissionAttachment
+import java.lang.StringBuilder
 import java.util.*
 
 class User(val uuid: UUID) {
@@ -45,6 +46,10 @@ class User(val uuid: UUID) {
     @Transient var attachment: PermissionAttachment? = null
 
     internal var firstSeen: Long = System.currentTimeMillis()
+
+    internal var nicknameColors: MutableSet<ChatColor> = hashSetOf()
+    internal var nicknameColor: ChatColor? = null
+    internal var nicknameStyle: ChatColor? = null
 
     @JsonAdapter(value = RankReferenceSerializer::class)
     private var rank: Rank = RankHandler.getStartingRank()
@@ -74,16 +79,19 @@ class User(val uuid: UUID) {
         perks.user = this
         statistics.user = this
 
-        // fix null rank
+        if (nicknameColors == null) {
+            nicknameColors = hashSetOf()
+        }
+
         if (rank == null) {
             rank = RankHandler.getStartingRank()
         }
 
-        // fix null battle pass
         if (battlePassProgress == null) {
             battlePassProgress = BattlePassProgress(this)
+        } else {
+            battlePassProgress.user = this
         }
-        battlePassProgress.user = this
     }
 
     /**
@@ -91,6 +99,36 @@ class User(val uuid: UUID) {
      */
     fun getUsername(): String {
         return Cubed.instance.uuidCache.name(uuid)
+    }
+
+    fun hasNicknameColor(color: ChatColor): Boolean {
+        return nicknameColors.contains(color)
+    }
+
+    fun hasNicknameColor(color: ChatColor, player: Player): Boolean {
+        return nicknameColors.contains(color)
+                || player.hasPermission("prisonaio.users.nickname.color.*")
+                || player.hasPermission("prisonaio.users.nickname.color.${color.name.toLowerCase()}")
+    }
+
+    fun getFormattedUsername(player: Player): String {
+        if (nicknameColor == null && nicknameStyle == null) {
+            return player.displayName
+        }
+
+        val builder = StringBuilder()
+
+        if (nicknameColor != null) {
+            builder.append(nicknameColor)
+        } else {
+            builder.append(ChatColor.getLastColors(player.displayName))
+        }
+
+        if (nicknameStyle != null) {
+            builder.append(nicknameStyle)
+        }
+
+        return builder.append(player.name).toString()
     }
 
     /**
@@ -190,6 +228,7 @@ class User(val uuid: UUID) {
                 player.sendMessage(" ${ChatColor.GRAY}You don't have enough money to purchase any rankups.")
                 player.sendMessage("")
             }
+
             return
         }
 

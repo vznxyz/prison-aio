@@ -21,18 +21,19 @@ object GangSetAnnouncementCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "announcement", wildcard = true) announcement: String) {
-        val visitingCell = GangHandler.getVisitingGang(player)
-        if (visitingCell == null) {
+        val gang = GangHandler.getVisitingGang(player)
+        if (gang == null) {
             player.sendMessage("${ChatColor.RED}You must be inside a gang to update its announcement.")
             return
         }
 
-        if (visitingCell.owner != player.uniqueId) {
+        if (gang.owner != player.uniqueId) {
             player.sendMessage("${ChatColor.RED}Only the owner can update the gang's announcement.")
             return
         }
 
-        visitingCell.updateAnnouncement(sender = player, announcement = announcement)
+        gang.announcement = announcement
+        gang.sendMessagesToMembers("${ChatColor.YELLOW}${player.name} has updated the gang's announcement.")
 
         player.sendMessage("${ChatColor.GREEN}Successfully updated the gang's announcement!")
     }

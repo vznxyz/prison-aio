@@ -26,7 +26,7 @@ object RankupAllCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        UserHandler.getUser(player.uniqueId).purchaseMaxRankups(player)
+        UserHandler.getUser(player.uniqueId).purchaseMaxRankups(player, manual = true)
     }
 
 }

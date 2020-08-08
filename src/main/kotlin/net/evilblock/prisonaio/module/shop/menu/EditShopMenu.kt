@@ -22,8 +22,6 @@ import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.prisonaio.module.shop.item.ShopItem
 import net.evilblock.prisonaio.module.shop.menu.template.ShopMenuTemplate
-import net.evilblock.prisonaio.util.Formats
-import net.evilblock.prisonaio.util.economy.Currency
 import net.evilblock.prisonaio.util.economy.menu.SelectCurrencyMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -74,12 +72,13 @@ class EditShopMenu(val shop: Shop) : Menu() {
     override fun acceptsShiftClickedItem(player: Player, itemStack: ItemStack): Boolean {
         if (itemStack.type != Material.AIR) {
             val shopItemStack = itemStack.clone()
-            if (!shop.items.add(ShopItem(shopItemStack, shopItemStack.amount))) {
-                player.sendMessage("${ChatColor.RED}The shop already has that item listed.")
-                return false
+            shop.items.add(ShopItem(shopItemStack, shopItemStack.amount))
+
+            Tasks.async {
+                shop.syncItemsOrder()
+                ShopHandler.saveData()
             }
 
-            ShopHandler.saveData()
             player.updateInventory()
             return true
         }
@@ -315,10 +314,10 @@ class EditShopMenu(val shop: Shop) : Menu() {
         override fun getButtonItem(player: Player): ItemStack {
             val description = arrayListOf<String>()
             description.add("")
-            description.add("${ChatColor.GRAY}Buying Price: ${Formats.formatMoney(item.buyPricePerUnit)}")
+            description.add("${ChatColor.GRAY}Buying Price: ${shop.currency.format(item.buyPricePerUnit)}")
             description.add("${ChatColor.GRAY}(Price that the shop buys for)")
             description.add("")
-            description.add("${ChatColor.GRAY}Selling Price: ${Formats.formatMoney(item.sellPricePerUnit)}")
+            description.add("${ChatColor.GRAY}Selling Price: ${shop.currency.format(item.sellPricePerUnit)}")
             description.add("${ChatColor.GRAY}(Price that the shop sells for)")
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to set buy price")
@@ -428,14 +427,14 @@ class EditShopMenu(val shop: Shop) : Menu() {
             if (view.cursor != null && view.cursor.type != Material.AIR) {
                 val shopItemStack = view.cursor.clone()
 
-                if (shop.items.add(ShopItem(shopItemStack, shopItemStack.amount))) {
+                shop.items.add(ShopItem(shopItemStack, shopItemStack.amount))
+
+                Tasks.async {
+                    shop.syncItemsOrder()
                     ShopHandler.saveData()
-                    view.cursor = null
-                } else {
-                    view.cursor = shopItemStack
-                    player.sendMessage("${ChatColor.RED}The shop already has that item listed!")
                 }
 
+                view.cursor = null
                 player.updateInventory()
             }
         }

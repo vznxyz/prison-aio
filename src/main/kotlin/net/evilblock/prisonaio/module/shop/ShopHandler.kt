@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.shop.event.DetermineShopEvent
@@ -23,7 +24,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 object ShopHandler: PluginHandler {
 
@@ -113,63 +113,70 @@ object ShopHandler: PluginHandler {
 
     fun sellInventory(player: Player, autoSell: Boolean) {
         val items = player.inventory.storageContents.filterNotNull().toMutableList()
-        val backpacks = BackpackHandler.findBackpacksInInventory(player)
-        val accessibleShops = getAccessibleShops(player)
-        var soldAnything = false
-        var firstOfChain = true
 
-        val determineShopEvent = DetermineShopEvent(player)
-        determineShopEvent.call()
+        Tasks.async {
+            val backpacks = BackpackHandler.findBackpacksInInventory(player)
+            val accessibleShops = getAccessibleShops(player)
+            var soldAnything = false
+            var firstOfChain = true
 
-        if (determineShopEvent.shop != null) {
-            val receipt = determineShopEvent.shop!!.sellItems(player, items, false)
-            if (receipt.result == TransactionResult.SUCCESS) {
-                for (receiptItem in receipt.items) {
-                    player.inventory.remove(receiptItem.item)
+            val determineShopEvent = DetermineShopEvent(player)
+            determineShopEvent.call()
+
+            if (determineShopEvent.shop != null) {
+                val receipt = determineShopEvent.shop!!.sellItems(player, items, false)
+                if (receipt.result == TransactionResult.SUCCESS) {
+                    Tasks.sync {
+                        for (receiptItem in receipt.items) {
+                            player.inventory.remove(receiptItem.item)
+                        }
+
+                        player.updateInventory()
+                    }
+
+                    receipt.sendCompact(player, true)
+                    sellBackpacksInInventory(player, backpacks, accessibleShops, false)
+                    return@async
                 }
-
-                player.updateInventory()
-
-                receipt.sendCompact(player, true)
-                sellBackpacksInInventory(player, backpacks, accessibleShops, false)
-                return
             }
-        }
 
-        if (accessibleShops.isEmpty()) {
-            player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
-            return
-        }
+            if (accessibleShops.isEmpty()) {
+                player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
+                return@async
+            }
 
-        if (sellBackpacksInInventory(player, backpacks, accessibleShops, firstOfChain)) {
-            soldAnything = true
-            firstOfChain = false
-        }
-
-        for (shop in accessibleShops) {
-            val receipt = shop.sellItems(player, items, autoSell)
-            if (receipt.result == TransactionResult.SUCCESS) {
+            if (sellBackpacksInInventory(player, backpacks, accessibleShops, firstOfChain)) {
                 soldAnything = true
-
-                items.removeAll(receipt.items.map { it.item })
-
-                for (receiptItem in receipt.items) {
-                    player.inventory.remove(receiptItem.item)
-                }
-
-                receipt.sendCompact(player, firstOfChain)
                 firstOfChain = false
+            }
 
-                if (items.isEmpty()) {
-                    break
+            for (shop in accessibleShops) {
+                val receipt = shop.sellItems(player, items, autoSell)
+                if (receipt.result == TransactionResult.SUCCESS) {
+                    soldAnything = true
+
+                    items.removeAll(receipt.items.map { it.item })
+
+                    Tasks.sync {
+                        for (receiptItem in receipt.items) {
+                            player.inventory.remove(receiptItem.item)
+                        }
+                    }
+
+                    receipt.sendCompact(player, firstOfChain)
+                    firstOfChain = false
+
+                    if (items.isEmpty()) {
+                        break
+                    }
                 }
             }
-        }
 
-        if (soldAnything) {
-            player.updateInventory()
-        } else {
-            player.sendMessage("${ChatColor.RED}${TransactionResult.NO_ITEMS.defaultMessage}!")
+            if (soldAnything) {
+                player.updateInventory()
+            } else {
+                player.sendMessage("${ChatColor.RED}${TransactionResult.NO_ITEMS.defaultMessage}!")
+            }
         }
     }
 

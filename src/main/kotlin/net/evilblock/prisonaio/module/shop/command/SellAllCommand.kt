@@ -13,7 +13,10 @@ import org.bukkit.entity.Player
 
 object SellAllCommand {
 
-    @Command(names = ["sell", "sellall"], description = "Sell your inventory")
+    @Command(
+        names = ["sell", "sellall"],
+        description = "Sell your inventory"
+    )
     @JvmStatic
     fun execute(player: Player) {
         ShopHandler.sellInventory(player, false)

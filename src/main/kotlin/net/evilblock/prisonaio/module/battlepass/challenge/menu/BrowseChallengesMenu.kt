@@ -21,9 +21,12 @@ import net.evilblock.prisonaio.module.battlepass.menu.BattlePassMenu
 import net.evilblock.prisonaio.module.user.User
 import org.bukkit.ChatColor
 import org.bukkit.Material
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
+import org.bukkit.inventory.ItemFlag
+import org.bukkit.inventory.meta.ItemMeta
 
 class BrowseChallengesMenu(private val user: User, private val daily: Boolean) : Menu() {
 
@@ -96,16 +99,17 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
             return description
         }
 
-        override fun getMaterial(player: Player): Material {
-            return Material.STAINED_GLASS_PANE
+        override fun applyMetadata(player: Player, itemMeta: ItemMeta): ItemMeta? {
+            if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassProgress.hasCompletedChallenge(challenge)) {
+                itemMeta.addEnchant(Enchantment.DURABILITY, 1, true)
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+            }
+
+            return itemMeta
         }
 
-        override fun getDamageValue(player: Player): Byte {
-            return if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassProgress.hasCompletedChallenge(challenge)) {
-                13.toByte()
-            } else {
-                1.toByte()
-            }
+        override fun getMaterial(player: Player): Material {
+            return Material.BOOK
         }
     }
 

@@ -14,7 +14,7 @@ import net.evilblock.prisonaio.module.user.perk.menu.GrantedPerksMenu
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.entity.Player
 
-object PerkGrantsCommand {
+object PerksGrantsCommand {
 
     @Command(
         names = ["user perks grants"],

@@ -15,7 +15,7 @@ import org.bukkit.entity.Player
 object RegionDebugCommand {
 
     @Command(
-        names = ["region debug"],
+        names = ["region debug", "rg debug"],
         description = "Prints debug information about Regions",
         permission = Permissions.SYSTEM_ADMIN,
         async = true

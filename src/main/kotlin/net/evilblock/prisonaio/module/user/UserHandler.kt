@@ -26,6 +26,27 @@ import java.util.concurrent.TimeUnit
 
 object UserHandler : PluginHandler {
 
+    val NICKNAME_COLORS: List<ChatColor> = listOf(
+        ChatColor.RED,
+        ChatColor.GOLD,
+        ChatColor.YELLOW,
+        ChatColor.GREEN,
+        ChatColor.DARK_GREEN,
+        ChatColor.AQUA,
+        ChatColor.DARK_AQUA,
+        ChatColor.BLUE,
+        ChatColor.DARK_PURPLE,
+        ChatColor.LIGHT_PURPLE,
+        ChatColor.WHITE,
+        ChatColor.GRAY
+    )
+
+    val NICKNAME_STYLES: List<ChatColor> = listOf(
+        ChatColor.BOLD,
+        ChatColor.ITALIC,
+        ChatColor.UNDERLINE
+    )
+
     private val JSON_WRITER_SETTINGS = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()
 
     private val usersCollection: MongoCollection<Document> = StorageModule.database.getCollection("users")

@@ -92,13 +92,14 @@ class ManageSettingsMenu(private val gang: Gang) : Menu() {
             when (permission) {
                 GangPermission.ALLOW_VISITORS -> {
                     if (gang.getPermissionValue(permission) != GangPermission.PermissionValue.VISITORS) {
+                        gang.sendMessagesToAll("${ChatColor.YELLOW}${player.name} is no longer allowing visitors at their gang headquarters.")
                         gang.kickVisitors()
                     }
                 }
                 GangPermission.ACCESS_CONTAINERS -> {
-                    for (activePlayer in gang.getActivePlayers()) {
-                        if (!gang.testPermission(activePlayer, GangPermission.ACCESS_CONTAINERS)) {
-                            activePlayer.closeInventory()
+                    for (visitor in gang.getVisitingPlayers()) {
+                        if (!gang.testPermission(visitor, GangPermission.ACCESS_CONTAINERS)) {
+                            visitor.closeInventory()
                         }
                     }
                 }

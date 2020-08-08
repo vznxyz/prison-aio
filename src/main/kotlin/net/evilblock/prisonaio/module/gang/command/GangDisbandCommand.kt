@@ -35,19 +35,13 @@ object GangDisbandCommand {
             return
         }
 
-        gang.sendMessagesToAll("${ChatColor.YELLOW}The gang has been disbanded by the owner.")
+        gang.sendMessagesToMembers("${ChatColor.YELLOW}The gang has been disbanded by the owner.")
 
         for (member in gang.getMembers()) {
             GangHandler.updateGangAccess(member, gang, false)
         }
 
-        for (activePlayer in gang.getActivePlayers()) {
-            GangHandler.updateVisitingGang(activePlayer, null)
-
-            Tasks.sync {
-                activePlayer.teleport(Bukkit.getWorlds()[0].spawnLocation)
-            }
-        }
+        gang.kickVisitors(force = true)
 
         GangHandler.forgetGang(gang)
         RegionsModule.clearBlockCache(gang)

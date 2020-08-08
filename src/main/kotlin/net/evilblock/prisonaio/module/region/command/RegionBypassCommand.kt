@@ -17,7 +17,7 @@ import org.bukkit.entity.Player
 object RegionBypassCommand {
 
     @Command(
-        names = ["region bypass"],
+        names = ["region bypass", "rg bypass"],
         description = "Grants bypass for interactions in regions owned by others",
         permission = Permissions.REGION_BYPASS,
         async = true

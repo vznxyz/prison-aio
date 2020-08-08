@@ -44,10 +44,10 @@ class HomesMenu : Menu() {
             description.add("")
             description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Current Session")
 
-            if (gang.getActiveMembers().isEmpty()) {
+            if (gang.getOnlineMembers().isEmpty()) {
                 description.add("${ChatColor.GRAY}Nobody is playing right now")
             } else {
-                for (activePlayer in gang.getActiveMembers()) {
+                for (activePlayer in gang.getOnlineMembers()) {
                     description.add(" ${ChatColor.RESET}${activePlayer.name}")
                 }
             }

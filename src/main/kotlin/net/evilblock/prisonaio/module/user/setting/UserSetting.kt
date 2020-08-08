@@ -8,15 +8,9 @@
 package net.evilblock.prisonaio.module.user.setting
 
 import net.evilblock.prisonaio.module.user.User
-import net.evilblock.prisonaio.module.user.setting.option.ChatModeOption
+import net.evilblock.prisonaio.module.user.setting.option.*
 import net.evilblock.prisonaio.module.user.setting.option.ChatModeOption.ChatMode
-import net.evilblock.prisonaio.module.user.setting.option.CommentsRestrictionOption
 import net.evilblock.prisonaio.module.user.setting.option.CommentsRestrictionOption.RestrictionOptionValue
-import net.evilblock.prisonaio.module.user.setting.option.PrivateMessagesOption
-import net.evilblock.prisonaio.module.user.setting.option.PrivateMessageSoundsOption
-import net.evilblock.prisonaio.module.user.setting.option.ScoreboardVisibilityOption
-import net.evilblock.prisonaio.module.user.setting.option.SneakToTeleportOption
-import net.evilblock.prisonaio.module.user.setting.option.AutoRankupOption
 import net.evilblock.source.messaging.MessagingManager
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -56,7 +50,7 @@ enum class UserSetting(
         }
     ),
     PRIVATE_MESSAGES(
-        displayName = "Receive Private Messages",
+        displayName = "Private Messages",
         description = "This setting controls if other players can you send private messages.",
         icon = ItemStack(Material.BOOK_AND_QUILL),
         defaultOption = { PrivateMessagesOption(PrivateMessagesOption.OptionValue.RECEIVE_ALL) },
@@ -82,7 +76,7 @@ enum class UserSetting(
         }
     ),
     PRIVATE_MESSAGE_SOUNDS(
-        displayName = "Play Private Message Sounds",
+        displayName = "Private Message Sounds",
         description = "This setting controls if sounds will play when you receive private messages.",
         icon = ItemStack(Material.NOTE_BLOCK),
         defaultOption = { PrivateMessageSoundsOption(true) },
@@ -133,6 +127,30 @@ enum class UserSetting(
             arrayListOf(
                 AutoRankupOption(true),
                 AutoRankupOption(false)
+            )
+        }
+    ),
+    QUICK_ACCESS_ENCHANTS(
+        displayName = "Quick Access Enchants",
+        description = "This setting controls if the enchant menu should open when right-clicking with a pickaxe in hand.",
+        icon = ItemStack(Material.LEVER),
+        defaultOption = { QuickAccessEnchantsOption(true) },
+        options = {
+            arrayListOf(
+                QuickAccessEnchantsOption(true),
+                QuickAccessEnchantsOption(false)
+            )
+        }
+    ),
+    REWARD_MESSAGES(
+        displayName = "Reward Messages",
+        description = "This setting controls if you will receive messages in chat related to rewards, such as: MineCrates, Gang Trophies, etc;",
+        icon = ItemStack(Material.GOLD_INGOT),
+        defaultOption = { RewardMessagesOption(true) },
+        options = {
+            arrayListOf(
+                RewardMessagesOption(true),
+                RewardMessagesOption(false)
             )
         }
     );

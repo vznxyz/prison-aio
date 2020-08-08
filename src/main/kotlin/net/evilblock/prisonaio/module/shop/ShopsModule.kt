@@ -53,6 +53,7 @@ object ShopsModule : PluginModule() {
             SellAllCommand.javaClass,
             ShopEditorCommand.javaClass,
             ShopReceiptCommand.javaClass,
+            ShopRenameIdCommand.javaClass,
             ShopResetPrioritiesCommand.javaClass
         )
     }

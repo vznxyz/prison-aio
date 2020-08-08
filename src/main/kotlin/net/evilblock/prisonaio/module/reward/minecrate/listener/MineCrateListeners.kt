@@ -8,12 +8,19 @@
 package net.evilblock.prisonaio.module.reward.minecrate.listener
 
 import net.evilblock.cubed.util.Chance
-import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.prisonaio.module.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.enchant.type.Luck
+import net.evilblock.prisonaio.module.gang.GangHandler
+import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrate
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.setting.UserSetting
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -48,8 +55,13 @@ object MineCrateListeners : Listener {
             spawnedCrate.destroy()
             MineCrateHandler.forgetSpawnedCrate(spawnedCrate)
 
+            val sendMessages = UserHandler.getUser(event.player.uniqueId).getSettingOption(UserSetting.REWARD_MESSAGES).getValue<Boolean>()
+
             for (reward in spawnedCrate.rewardSet.pickRewards()) {
-                event.player.sendMessage("${RewardsModule.getChatPrefix()}You received ${reward.name} ${ChatColor.GRAY}from the MineCrate!")
+                if (sendMessages) {
+                    event.player.sendMessage("${RewardsModule.getChatPrefix()}You received ${reward.name} ${ChatColor.GRAY}from the MineCrate!")
+                }
+
                 reward.execute(event.player)
             }
         }
@@ -64,18 +76,41 @@ object MineCrateListeners : Listener {
             return
         }
 
+        var chanceModifier = 0.0
+
+        // apply luck multiplier
+        if (event.region.supportsPassiveEnchants()) {
+            val map = EnchantsManager.handleItemSwitch(event.player, event.player.itemInHand, event)
+            if (map.isNotEmpty() && map.containsKey(Luck)) {
+                val luckLevel = map.getValue(Luck)
+                chanceModifier += (luckLevel * 2)
+            }
+        }
+
+        // apply gang booster multiplier
+        val assumedGang = GangHandler.getAssumedGang(event.player.uniqueId)
+        if (assumedGang != null && assumedGang.hasBooster(GangBooster.BoosterType.INCREASED_MINE_CRATES)) {
+            chanceModifier += GangModule.readIncreasedMineCratesChanceMod()
+        }
+
         if (!MineCrateHandler.isOnCooldown(event.player)) {
             for (rewardSet in MineCrateHandler.getRewardSets().shuffled()) {
                 if (Chance.percent(rewardSet.chance)) {
                     MineCrateHandler.resetCooldown(event.player)
 
                     // wait a tick before updating the block
-                    PrisonAIO.instance.server.scheduler.runTaskLater(PrisonAIO.instance, {
+                    Tasks.delayed(1L) {
                         val mineCrate = MineCrate(event.block.location, event.player.uniqueId, rewardSet)
                         MineCrateHandler.trackSpawnedCrate(mineCrate)
-                    }, 1L)
 
-                    event.player.sendMessage("${RewardsModule.getChatPrefix()}You just found a MineCrate!")
+                        mineCrate.hologram.spawn(event.player)
+                    }
+
+                    val user = UserHandler.getUser(event.player.uniqueId)
+                    if (user.getSettingOption(UserSetting.REWARD_MESSAGES).getValue()) {
+                        event.player.sendMessage("${RewardsModule.getChatPrefix()}You just found a MineCrate!")
+                    }
+
                     return
                 }
             }

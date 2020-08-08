@@ -21,7 +21,7 @@ import java.util.*
 class MineCrate(val location: Location, val owner: UUID, val rewardSet: MineCrateRewardSet) {
 
     val spawnedAt = System.currentTimeMillis()
-    private val hologram: HologramEntity = HologramEntity(text = "", location = location.clone().add(0.5, 0.0, 0.5))
+    val hologram: HologramEntity = HologramEntity(text = "", location = location.clone().add(0.5, 0.0, 0.5))
 
     init {
         val ownerName = Cubed.instance.uuidCache.name(owner)

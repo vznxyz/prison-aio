@@ -11,6 +11,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.buttons.AddButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
@@ -89,12 +90,14 @@ class ShopEditorMenu : PaginatedMenu() {
 
                         val shop = Shop(input)
 
-                        ShopHandler.trackShop(shop)
-                        ShopHandler.saveData()
+                        Tasks.async {
+                            ShopHandler.trackShop(shop)
+                            ShopHandler.saveData()
+                        }
 
                         player.sendMessage("${ChatColor.GREEN}Successfully created a new shop.")
 
-                        openMenu(player)
+                        EditShopMenu(shop).openMenu(player)
                     }
                     .build()
                     .start(player)
@@ -109,16 +112,13 @@ class ShopEditorMenu : PaginatedMenu() {
 
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
+            description.add("${ChatColor.GRAY}(ID: ${shop.id})")
             description.add("")
-
-            val formattedItemsListed = NumberFormat.getInstance().format(shop.items.size.toLong())
-            description.add("${ChatColor.GRAY}Items Listed: ${ChatColor.GREEN}${formattedItemsListed}")
-
+            description.add("${ChatColor.GRAY}Items Listed: ${ChatColor.GREEN}${NumberFormat.getInstance().format(shop.items.size.toLong())}")
             description.add("${ChatColor.GRAY}Priority: ${ChatColor.GREEN}${shop.priority}")
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit shop")
             description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to delete shop")
-
             return description
         }
 

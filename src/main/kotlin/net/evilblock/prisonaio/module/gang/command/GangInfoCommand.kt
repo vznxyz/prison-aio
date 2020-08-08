@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.gang.command
 
+import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
@@ -27,8 +28,15 @@ object GangInfoCommand {
     fun execute(sender: Player, @Param(name = "gang", defaultValue = "self") gang: Gang) {
         sender.sendMessage("${ChatColor.GRAY}${Constants.LONG_LINE}")
 
-        val playersOnline = "${ChatColor.GREEN}${gang.getActiveMembers().size}${ChatColor.GRAY}/${gang.getMembers().size}"
-        sender.sendMessage("${ChatColor.RED}${ChatColor.BOLD}${gang.name} ${ChatColor.GRAY}[$playersOnline]")
+        val playersOnline = "${ChatColor.GREEN}${ChatColor.BOLD}${gang.getOnlineMembers().size}${ChatColor.GRAY}/${gang.getMembers().size}"
+
+        FancyMessage("${ChatColor.RED}${ChatColor.BOLD}${gang.name} ${ChatColor.GRAY}[${playersOnline}${ChatColor.GRAY}]")
+            .then(" ${ChatColor.GRAY}- [")
+            .then("${ChatColor.DARK_AQUA}${ChatColor.BOLD}VISIT HQ")
+            .command("/gang visit ${gang.name}")
+            .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to visit this gang's headquarters"))
+            .then("${ChatColor.GRAY}]")
+            .send(sender)
 
         val memberNames = gang.getMembers().map { uuid ->
             val username = Cubed.instance.uuidCache.name(uuid)
@@ -46,10 +54,9 @@ object GangInfoCommand {
             }
         }
 
-        sender.sendMessage("${ChatColor.GRAY} Announcement: ${ChatColor.LIGHT_PURPLE}${gang.announcement}")
-        sender.sendMessage("${ChatColor.GRAY} Members: ${ChatColor.WHITE}${memberNames.joinToString(separator = "${ChatColor.WHITE}, ")}")
-        sender.sendMessage("${ChatColor.GRAY} Value: ${ChatColor.RED}${NumberUtils.format(gang.cachedValue)}")
-
+        sender.sendMessage("${ChatColor.GRAY} Announcement: ${ChatColor.RED}${gang.announcement}")
+        sender.sendMessage("${ChatColor.GRAY} Members: ${ChatColor.WHITE}${memberNames.joinToString(separator = "${ChatColor.GRAY}, ")}")
+        sender.sendMessage("${ChatColor.GRAY} Trophies: ${ChatColor.RED}${NumberUtils.format(gang.getTrophies())}")
         sender.sendMessage("${ChatColor.GRAY}${Constants.LONG_LINE}")
     }
 

@@ -12,31 +12,28 @@ import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.ColorUtil
-import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.menu.button.*
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
+import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.enchant.salvage.SalvagePreventionHandler
 import net.evilblock.prisonaio.module.enchant.type.Cubed
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
-import java.text.NumberFormat
 import java.util.*
 
-class SalvagePickaxeMenu(internal val pickaxeItem: ItemStack, internal val pickaxeData: PickaxeData) : Menu() {
+class SalvagePickaxeMenu(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Menu() {
 
     init {
-        this.updateAfterClick = true
-        this.placeholder = true
-        this.keepBottomMechanics = false
+        updateAfterClick = true
+        placeholder = true
+        keepBottomMechanics = false
     }
 
     override fun getTitle(player: Player): String {
@@ -50,8 +47,8 @@ class SalvagePickaxeMenu(internal val pickaxeItem: ItemStack, internal val picka
         buttons[0] = TokenShopButton()
         buttons[2] = TokenBalanceButton()
         buttons[4] = PickaxeButton(pickaxeItem.clone(), pickaxeData) { this.openMenu(player) }
-        buttons[6] = PurchaseEnchantsMenuButton()
-        buttons[8] = RefundsButton()
+        buttons[6] = PurchaseEnchantsButton(pickaxeItem, pickaxeData)
+        buttons[8] = RefundEnchantsButton(pickaxeItem, pickaxeData)
 
         // footer buttons
         buttons[49] = ExitButton()
@@ -62,35 +59,9 @@ class SalvagePickaxeMenu(internal val pickaxeItem: ItemStack, internal val picka
         return buttons
     }
 
-    private inner class PurchaseEnchantsMenuButton : Button() {
-        override fun getName(player: Player): String {
-            return "${ChatColor.GRAY}${Constants.DOUBLE_ARROW_RIGHT} ${ChatColor.RED}${ChatColor.BOLD}Purchase Enchants ${ChatColor.GRAY}${Constants.DOUBLE_ARROW_LEFT}"
-        }
-
-        override fun getDescription(player: Player): List<String> {
-            return listOf("${ChatColor.GRAY}Click here to purchase enchants")
-        }
-
-        override fun getMaterial(player: Player): Material {
-            return Material.EXP_BOTTLE
-        }
-
-        override fun applyMetadata(player: Player, itemMeta: ItemMeta): ItemMeta? {
-            itemMeta.addEnchant(Enchantment.DURABILITY, 1, true)
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
-            return itemMeta
-        }
-
-        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (clickType == ClickType.LEFT) {
-                PurchaseEnchantMenu(pickaxeItem, pickaxeData).openMenu(player)
-            }
-        }
-    }
-
     private inner class ConfirmSalvageButton : Button() {
         override fun getName(player: Player): String {
-            return "${ChatColor.RED}${ChatColor.BOLD}Salvage Returns Preview"
+            return "${ChatColor.RED}${ChatColor.BOLD}Salvage Returns"
         }
 
         override fun getDescription(player: Player): List<String> {
@@ -101,21 +72,21 @@ class SalvagePickaxeMenu(internal val pickaxeItem: ItemStack, internal val picka
                 .filter { entry -> entry.key !is Cubed }
                 .sortedWith(EnchantsManager.ENCHANT_COMPARATOR)
                 .forEach { entry ->
-                    val formattedReturns = NumberFormat.getInstance().format(entry.key.getSalvageReturns(entry.value))
-                    description.add("${ColorUtil.toChatColor(entry.key.iconColor)}${ChatColor.BOLD}❙ ${ChatColor.GRAY}${entry.key.getStrippedEnchant()} ${entry.value} (${ChatColor.GOLD}$formattedReturns${ChatColor.GRAY})")
+                    description.add("${ColorUtil.toChatColor(entry.key.iconColor)}${ChatColor.BOLD}❙ ${ChatColor.GRAY}${entry.key.getStrippedEnchant()} ${entry.value} (${ChatColor.GOLD}${Formats.formatTokens(entry.key.getRefundTokens(entry.value))}${ChatColor.GRAY})")
                 }
 
             description.add("")
 
             val totalReturns = enchants.entries.stream()
                 .filter { entry -> entry.key !is Cubed }
-                .mapToLong { entry -> entry.key.getSalvageReturns(entry.value) }
+                .mapToLong { entry -> entry.key.getRefundTokens(entry.value) }
                 .sum()
 
-            val formattedTotalReturns = NumberFormat.getInstance().format(totalReturns)
-
-            val returnsText = "You will receive ${ChatColor.GOLD}${ChatColor.BOLD}$formattedTotalReturns ${ChatColor.GRAY}tokens from salvaging your pickaxe."
-            description.addAll(TextSplitter.split(34, returnsText, ChatColor.GRAY.toString(), " "))
+            description.addAll(TextSplitter.split(
+                length = 40,
+                text = "You will receive ${ChatColor.GOLD}${ChatColor.BOLD}${Formats.formatTokens(totalReturns)} ${ChatColor.GRAY}from salvaging your pickaxe.",
+                linePrefix = ChatColor.GRAY.toString()
+            ))
 
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}CLICK TO ACCEPT SALVAGE")
@@ -144,17 +115,14 @@ class SalvagePickaxeMenu(internal val pickaxeItem: ItemStack, internal val picka
                     return
                 }
 
-                player.closeInventory()
-
-                ConfirmMenu("Accept salvage?") { confirmed: Boolean ->
+                ConfirmMenu("Accept Salvage?") { confirmed: Boolean ->
                     if (confirmed) {
                         val totalReturns = enchants.entries.stream()
                             .filter { entry -> entry.key !is Cubed }
-                            .mapToLong { entry -> entry.key.getSalvageReturns(entry.value) }
+                            .mapToLong { entry -> entry.key.getRefundTokens(entry.value) }
                             .sum()
 
-                        val formattedTotalReturns = NumberFormat.getInstance().format(totalReturns)
-                        player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.GRAY}You have salvaged your pickaxe for ${ChatColor.GOLD}$formattedTotalReturns ${ChatColor.GRAY}tokens. It is now gone forever.")
+                        player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have salvaged your pickaxe for ${Formats.formatTokens(totalReturns)}${ChatColor.GRAY}. It is now gone forever...")
 
                         val indexOfItem = player.inventory.first(pickaxeItem)
                         if (indexOfItem == -1) {
@@ -166,10 +134,13 @@ class SalvagePickaxeMenu(internal val pickaxeItem: ItemStack, internal val picka
 
                         val user = UserHandler.getUser(player.uniqueId)
                         user.addTokensBalance(totalReturns)
+
+                        PickaxeHandler.forgetPickaxeData(pickaxeData)
                     } else {
-                        openMenu(player)
                         player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted salvage!")
                     }
+
+                    this@SalvagePickaxeMenu.openMenu(player)
                 }.openMenu(player)
             }
         }

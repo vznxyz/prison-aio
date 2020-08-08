@@ -43,7 +43,7 @@ object LeaderboardsModule : PluginModule() {
 	}
 
 	override fun onEnable() {
-		Tasks.async {
+		Tasks.asyncDelayed(60L) {
 			refreshLeaderboards()
 		}
 
