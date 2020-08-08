@@ -22,7 +22,7 @@ object PingCommand {
     )
     @JvmStatic
     fun execute(sender: Player, @Param(name = "player", defaultValue = "self") target: Player) {
-        val ping = Reflection.getDeclaredFieldValue(MinecraftReflection.getHandle(target)!!, "ping") as Int
+        val ping = Reflection.getDeclaredFieldValue(MinecraftReflection.getHandle(target), "ping") as Int
 
         val color = when {
             ping > 200 -> ChatColor.DARK_RED

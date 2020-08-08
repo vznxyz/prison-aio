@@ -12,13 +12,15 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.Reflection
+import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.nms.MinecraftProtocol
+import net.evilblock.prisonaio.module.gang.booster.GangBooster
+import net.evilblock.prisonaio.module.gang.challenge.GangChallenges
 import net.evilblock.prisonaio.module.gang.entity.JerryNpcEntity
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
 import net.evilblock.prisonaio.module.region.Region
-import net.evilblock.prisonaio.util.economy.Economy
 import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -43,15 +45,19 @@ class Gang(
     val uuid: UUID = UUID.randomUUID()
     var announcement: String = "This is the default announcement."
 
+    private val captains: HashSet<UUID> = hashSetOf()
     private val members: HashSet<UUID> = hashSetOf(owner)
     private val invited: HashMap<UUID, Long> = hashMapOf()
     private var permissions = hashMapOf<GangPermission, GangPermission.PermissionValue>()
 
-    @Transient
-    private var visitors: HashSet<UUID> = hashSetOf()
+    var challenges: GangChallenges = GangChallenges(this)
+    private var trophies: Int = 0
+    private var boosters: MutableSet<GangBooster> = hashSetOf()
 
     internal var guideNpc: JerryNpcEntity = JerryNpcEntity(guideLocation)
-    internal var cachedValue: Long = 0L
+
+    @Transient
+    internal var visitors: HashSet<UUID> = hashSetOf()
 
     override fun getRegionName(): String {
         return "${getOwnerUsername()}'s Gang"
@@ -90,6 +96,16 @@ class Gang(
     }
 
     fun initializeData() {
+        if (challenges == null) {
+            challenges = GangChallenges(this)
+        } else {
+            challenges.gang = this
+        }
+
+        if (boosters == null) {
+            boosters = hashSetOf()
+        }
+
         visitors = hashSetOf()
 
         guideNpc.initializeData()
@@ -106,56 +122,6 @@ class Gang(
         EntityManager.trackEntity(guideNpc)
     }
 
-    override fun onRightClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
-        if (Constants.CONTAINER_TYPES.contains(clickedBlock.type)) {
-            if (!testPermission(player, GangPermission.ACCESS_CONTAINERS)) {
-                cancellable.isCancelled = true
-            }
-        }
-
-        if (Constants.INTERACTIVE_TYPES.contains(clickedBlock.type)) {
-            if (!testPermission(player, GangPermission.INTERACT_WITH_BLOCKS)) {
-                cancellable.isCancelled = true
-            }
-        }
-    }
-
-    override fun onBlockBreak(player: Player, block: Block, cancellable: Cancellable) {
-        handleBuild(player, block, cancellable)
-    }
-
-    override fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
-        handleBuild(player, block, cancellable)
-    }
-
-    override fun onBucketEmpty(player: Player, emptiedAt: Block, cancellable: Cancellable) {
-        handleBuild(player, emptiedAt, cancellable)
-    }
-
-    override fun onBucketFill(player: Player, filledFrom: Block, cancellable: Cancellable) {
-        handleBuild(player, filledFrom, cancellable)
-    }
-
-    private fun handleBuild(player: Player, block: Block, cancellable: Cancellable) {
-        cancellable.isCancelled = true
-
-        if (!isActivePlayer(player)) {
-            player.sendMessage("${ChatColor.RED}You aren't allowed to build or break inside of ${this.getRegionName()}.")
-            return
-        }
-
-        if (!testPermission(player, GangPermission.BUILD_AND_BREAK)) {
-            return
-        }
-
-        if (!cuboid.contains(block.location)) {
-            player.sendMessage("${ChatColor.RED}You can't build or break outside of the gang's headquarters.")
-            return
-        }
-
-        cancellable.isCancelled = false
-    }
-
     fun getOwnerUsername(): String {
         return Cubed.instance.uuidCache.name(owner)
     }
@@ -167,8 +133,8 @@ class Gang(
         return string.replace("{owner}", getOwnerUsername())
             .replace("{announcement}", announcement)
             .replace("{memberCount}", members.size.toString())
-            .replace("{onlineMemberCount}", getActiveMembers().size.toString())
-            .replace("{visitorCount}", getActiveVisitors().size.toString())
+            .replace("{onlineMemberCount}", getOnlineMembers().size.toString())
+            .replace("{visitorCount}", getVisitingPlayers().size.toString())
     }
 
     fun getPermissionValue(permission: GangPermission): GangPermission.PermissionValue {
@@ -183,6 +149,15 @@ class Gang(
         when (getPermissionValue(permission)) {
             GangPermission.PermissionValue.OWNER -> {
                 if (player.uniqueId != owner) {
+                    if (sendMessage) {
+                        player.sendMessage("${ChatColor.RED}${permission.error}.")
+                    }
+
+                    return false
+                }
+            }
+            GangPermission.PermissionValue.CAPTAINS -> {
+                if (player.uniqueId != owner || !captains.contains(player.uniqueId)) {
                     if (sendMessage) {
                         player.sendMessage("${ChatColor.RED}${permission.error}.")
                     }
@@ -207,22 +182,18 @@ class Gang(
         return true
     }
 
-    fun getActiveMembers(): Set<Player> {
-        return members.mapNotNull { Bukkit.getPlayer(it) }.filter { GangHandler.getVisitingGang(it) == this }.toSet()
+    fun getOnlineMembers(): Set<Player> {
+        return members.mapNotNull { Bukkit.getPlayer(it) }.toSet()
     }
 
-    fun isActiveMember(player: Player): Boolean {
-        return getActiveMembers().contains(player)
-    }
-
-    fun getActiveVisitors(): Set<Player> {
-        return visitors.mapNotNull { Bukkit.getPlayer(it) }.filter { GangHandler.getVisitingGang(it) == this }.toSet()
+    fun getVisitingPlayers(): Set<Player> {
+        return visitors.mapNotNull { Bukkit.getPlayer(it) }.toSet()
     }
 
     fun getActivePlayers(): Set<Player> {
         val players = hashSetOf<Player>()
-        players.addAll(getActiveMembers())
-        players.addAll(getActiveVisitors())
+        players.addAll(getOnlineMembers())
+        players.addAll(getVisitingPlayers())
         return players
     }
 
@@ -238,7 +209,7 @@ class Gang(
         this.owner = owner
 
         val newOwnerUsername = Cubed.instance.uuidCache.name(owner)
-        for (player in getActiveMembers()) {
+        for (player in getOnlineMembers()) {
             player.sendMessage("${ChatColor.YELLOW}The ownership of the gang has been relinquished to $newOwnerUsername.")
         }
     }
@@ -321,10 +292,7 @@ class Gang(
 
         val player = Bukkit.getPlayer(uuid)
         if (player != null) {
-            // teleport player out of the mine
-            if (isActiveMember(player)) {
-                player.teleport(Bukkit.getWorlds()[0].spawnLocation)
-            }
+            leaveSession(player)
         }
 
         GangHandler.updateGangAccess(uuid = uuid, gang = this, joinable = false)
@@ -337,14 +305,7 @@ class Gang(
 
             val player = Bukkit.getPlayer(uuid)
             if (player != null) {
-                if (isActiveMember(player)) {
-                    GangHandler.updateVisitingGang(player, null)
-
-                    Tasks.sync {
-                        player.teleport(Bukkit.getWorlds()[0].spawnLocation)
-                    }
-                }
-
+                leaveSession(player)
                 player.sendMessage("${ChatColor.YELLOW}You've been kicked from ${getOwnerUsername()}'s gang.")
             }
         }
@@ -352,45 +313,102 @@ class Gang(
         GangHandler.updateGangAccess(uuid = uuid, gang = this, joinable = false)
     }
 
-    fun kickVisitors() {
-        for (activePlayer in getActivePlayers()) {
-            if (!testPermission(activePlayer, GangPermission.ALLOW_VISITORS, false)) {
-                activePlayer.teleport(Bukkit.getWorlds()[0].spawnLocation)
-                activePlayer.sendMessage("${ChatColor.YELLOW}${getOwnerUsername()}'s is no longer allowing visitors at their gang headquarters.")
+    fun kickVisitors(force: Boolean = false) {
+        for (visitor in getVisitingPlayers()) {
+            if (force || !testPermission(visitor, GangPermission.ALLOW_VISITORS, false)) {
+                leaveSession(visitor)
             }
         }
     }
 
     fun joinSession(player: Player) {
-        if (!members.contains(player.uniqueId)) {
+        if (!visitors.contains(player.uniqueId)) {
             visitors.add(player.uniqueId)
-        }
 
-        // send message AFTER player is added
-        sendMessagesToAll("${ChatColor.YELLOW}${player.name} has entered the gang headquarters.")
+            GangHandler.updateVisitingGang(player, this)
+
+            Tasks.sync {
+                player.allowFlight = true
+                player.isFlying = true
+                player.teleport(homeLocation)
+            }
+
+            sendMessagesToAll("${ChatColor.YELLOW}${player.name} has entered the gang headquarters.")
+        }
     }
 
     fun leaveSession(player: Player) {
-        // send message BEFORE player is removed
-        sendMessagesToAll("${ChatColor.YELLOW}${player.name} has left the gang headquarters.")
+        if (visitors.contains(player.uniqueId)) {
+            visitors.remove(player.uniqueId)
 
-        visitors.remove(player.uniqueId)
+            sendBorderUpdate(player)
+
+            GangHandler.updateVisitingGang(player, null)
+
+            Tasks.sync {
+                player.allowFlight = false
+                player.isFlying = false
+                player.teleport(Bukkit.getWorlds()[0].spawnLocation)
+            }
+
+            sendMessagesToAll("${ChatColor.YELLOW}${player.name} has left the gang headquarters.")
+        }
     }
 
-    fun updateName(sender: Player, name: String) {
-        this.name = name
-
-        sendMessagesToMembers("${ChatColor.YELLOW}${sender.name} has updated the gang's name.")
+    fun getTrophies(): Int {
+        return trophies
     }
 
-    fun updateAnnouncement(sender: Player, announcement: String) {
-        this.announcement = announcement
+    fun hasTrophies(amount: Int): Boolean {
+        return trophies >= amount
+    }
 
-        sendMessagesToMembers("${ChatColor.YELLOW}${sender.name} has updated the gang's announcement.")
+    fun setTrophies(amount: Int) {
+        trophies = amount.coerceAtLeast(0)
+    }
+
+    fun giveTrophies(amount: Int) {
+        trophies += amount
+    }
+
+    fun takeTrophies(amount: Int) {
+        trophies = (trophies - amount).coerceAtLeast(0)
+    }
+
+    fun getBoosters(): MutableSet<GangBooster> {
+        return boosters
+    }
+
+    fun hasBooster(boosterType: GangBooster.BoosterType): Boolean {
+        return boosters.any { it.boosterType == boosterType && System.currentTimeMillis() < it.expiration }
+    }
+
+    fun getBooster(boosterType: GangBooster.BoosterType): GangBooster? {
+        return boosters.first { it.boosterType == boosterType }
+    }
+
+    fun grantBooster(booster: GangBooster) {
+        boosters.add(booster)
+
+        val messages = arrayListOf<String>()
+        messages.add("")
+        messages.add(" ${ChatColor.GOLD}${ChatColor.BOLD}${booster.boosterType.rendered} Booster Activated")
+        messages.add(" ${ChatColor.GRAY}(Purchased by ${Cubed.instance.uuidCache.name(booster.purchasedBy)})")
+        messages.add("")
+        messages.addAll(TextSplitter.split(length = 60, text = booster.boosterType.description, linePrefix = ChatColor.GRAY.toString() + " "))
+        messages.add("")
+        messages.add(" ${ChatColor.GRAY}The booster will last for ${ChatColor.YELLOW}${ChatColor.BOLD}${booster.boosterType.getFormattedDuration()}${ChatColor.GRAY}.")
+        messages.add("")
+
+        sendMessagesToAll(*messages.toTypedArray())
+    }
+
+    fun removeBooster(booster: GangBooster) {
+        boosters.remove(booster)
     }
 
     fun sendMessagesToMembers(vararg messages: String) {
-        for (player in getActiveMembers()) {
+        for (player in getOnlineMembers()) {
             for (message in messages) {
                 player.sendMessage(message)
             }
@@ -405,7 +423,7 @@ class Gang(
         }
     }
 
-    fun sendBorderUpdate(player: Player) {
+    private fun sendBorderUpdate(player: Player) {
         val worldBorderPacket = PacketPlayOutWorldBorder()
 
         Reflection.setDeclaredFieldValue(worldBorderPacket, "a", PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE)
@@ -424,18 +442,54 @@ class Gang(
         MinecraftProtocol.send(player, worldBorderPacket)
     }
 
-    fun updateCachedCellValue() {
-        var totalBalance = 0L
-
-        for (member in members) {
-            try {
-                totalBalance += Economy.getBalance(member)
-            } catch (e: Exception) {
-
+    override fun onRightClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
+        if (Constants.CONTAINER_TYPES.contains(clickedBlock.type)) {
+            if (!testPermission(player, GangPermission.ACCESS_CONTAINERS)) {
+                cancellable.isCancelled = true
             }
         }
 
-        cachedValue = totalBalance
+        if (Constants.INTERACTIVE_TYPES.contains(clickedBlock.type)) {
+            if (!testPermission(player, GangPermission.INTERACT_WITH_BLOCKS)) {
+                cancellable.isCancelled = true
+            }
+        }
+    }
+
+    override fun onBlockBreak(player: Player, block: Block, cancellable: Cancellable) {
+        handleBuild(player, block, cancellable)
+    }
+
+    override fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
+        handleBuild(player, block, cancellable)
+    }
+
+    override fun onBucketEmpty(player: Player, emptiedAt: Block, cancellable: Cancellable) {
+        handleBuild(player, emptiedAt, cancellable)
+    }
+
+    override fun onBucketFill(player: Player, filledFrom: Block, cancellable: Cancellable) {
+        handleBuild(player, filledFrom, cancellable)
+    }
+
+    private fun handleBuild(player: Player, block: Block, cancellable: Cancellable) {
+        cancellable.isCancelled = true
+
+        if (!members.contains(player.uniqueId) && !visitors.contains(player.uniqueId)) {
+            player.sendMessage("${ChatColor.RED}You aren't allowed to build or break inside of ${this.getRegionName()}.")
+            return
+        }
+
+        if (!testPermission(player, GangPermission.BUILD_AND_BREAK)) {
+            return
+        }
+
+        if (!cuboid.contains(block.location)) {
+            player.sendMessage("${ChatColor.RED}You can't build or break outside of the gang's headquarters.")
+            return
+        }
+
+        cancellable.isCancelled = false
     }
 
 }
