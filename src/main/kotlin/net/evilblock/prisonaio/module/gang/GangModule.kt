@@ -13,6 +13,8 @@ import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
+import net.evilblock.prisonaio.module.gang.challenge.GangChallengeHandler
+import net.evilblock.prisonaio.module.gang.challenge.listener.GangChallengeListeners
 import net.evilblock.prisonaio.module.gang.command.GangBoostersCommand
 import net.evilblock.prisonaio.module.gang.command.*
 import net.evilblock.prisonaio.module.gang.command.admin.*
@@ -39,6 +41,7 @@ object GangModule : PluginModule() {
     }
 
     override fun onEnable() {
+        GangChallengeHandler.initialLoad()
         GangHandler.initialLoad()
 
         getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), {
@@ -56,6 +59,7 @@ object GangModule : PluginModule() {
         return listOf(
             GangBoostersListeners,
             GangChatListeners,
+            GangChallengeListeners,
             GangEntityListeners,
             GangJerryListeners,
             GangSessionListeners,
@@ -67,6 +71,7 @@ object GangModule : PluginModule() {
     override fun getCommands(): List<Class<*>> {
         return listOf(
             GangBoostersCommand.javaClass,
+            GangChallengesCommand.javaClass,
             GangCreateCommand.javaClass,
             GangDisbandCommand.javaClass,
             GangHelpCommand.javaClass,

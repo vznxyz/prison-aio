@@ -49,7 +49,7 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
             if (firstLine != null && firstLine.contains("Prestige")) {
                 val splitLore = firstLine.split(" ").toTypedArray()
                 if (splitLore.size > 1) {
-                    val intString = splitLore[splitLore.size - 1]
+                    val intString = splitLore[splitLore.size - 1].replace(",", "")
                     if (NumberUtils.isInt(intString)) {
                         prestige = intString.toInt()
                     }
@@ -78,11 +78,11 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
         val lore = arrayListOf<String>()
 
         if (prestige > 0) {
-            lore.add("${ChatColor.RED}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige $prestige")
+            lore.add("${ChatColor.DARK_RED}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige ${NumberUtils.format(prestige)}")
         }
 
         for ((enchant, level) in enchants.entries.sortedWith(EnchantsManager.ENCHANT_COMPARATOR)) {
-            lore.add("${enchant.lorified()} $level")
+            lore.add("${enchant.lorified()} ${NumberUtils.format(level)}")
         }
 
         if (itemStack.itemMeta != null) {
@@ -93,11 +93,34 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
         }
     }
 
+    /**
+     * Finds the enchantment limit for this pickaxe.
+     */
     fun getEnchantLimit(enchant: AbstractEnchant): Int {
-        val pickaxePrestige = PickaxePrestigeHandler.getNextPrestige(prestige)
-        if (pickaxePrestige != null && pickaxePrestige.enchantLimits.containsKey(enchant)) {
-            return pickaxePrestige.enchantLimits[enchant]!!
+        val nextPrestige = PickaxePrestigeHandler.getNextPrestige(prestige)
+        if (nextPrestige != null) {
+            if (nextPrestige.enchantLimits.containsKey(enchant)) {
+                return nextPrestige.enchantLimits[enchant]!!
+            }
+        } else {
+            val maxPrestige = PickaxePrestigeHandler.getMaxPrestige()
+            if (maxPrestige != null) {
+                if (prestige >= maxPrestige.number) {
+                    for (prestige in PickaxePrestigeHandler.getPrestigeSet().filter { it.number < maxPrestige.number }.sortedBy { it.number }.reversed()) {
+                        if (prestige.enchantLimits.containsKey(enchant)) {
+                            return prestige.enchantLimits[enchant]!!
+                        }
+                    }
+                }
+            }
         }
+
+        for (prestige in PickaxePrestigeHandler.getPrestigeSet().filter { it.number < prestige }.sortedBy { it.number }.reversed()) {
+            if (prestige.enchantLimits.containsKey(enchant)) {
+                return prestige.enchantLimits[enchant]!!
+            }
+        }
+
         return -1
     }
 

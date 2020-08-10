@@ -9,12 +9,15 @@ package net.evilblock.prisonaio.module.enchant.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.menu.button.*
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
+import net.evilblock.prisonaio.module.enchant.salvage.SalvagePreventionHandler
 import net.evilblock.prisonaio.module.enchant.type.*
 import net.evilblock.prisonaio.util.Formats
 import net.evilblock.prisonaio.util.economy.Currency
@@ -32,9 +35,19 @@ import java.util.*
 
 class RefundEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Menu() {
 
+    companion object {
+        private val BLACK_SLOTS = listOf(
+            0, 1, 2, 3, 4, 5, 6, 7, 8,
+            9, 17,
+            18, 26,
+            27, 35,
+            36, 44,
+            45, 46, 47, 48, 49, 50, 51, 52, 53
+        )
+    }
+
     init {
         updateAfterClick = true
-        placeholder = true
     }
 
     override fun getTitle(player: Player): String {
@@ -54,30 +67,35 @@ class RefundEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxe
         // footer buttons
         buttons[49] = ExitButton()
 
-        // left column
-        buttons[10] = RefundEnchantmentButton(MineBomb)
-        buttons[11] = RefundEnchantmentButton(Explosive)
-        buttons[19] = RefundEnchantmentButton(Efficiency)
-        buttons[20] = RefundEnchantmentButton(Unbreaking)
-        buttons[28] = RefundEnchantmentButton(Speed)
-        buttons[29] = RefundEnchantmentButton(Luck)
-        buttons[37] = RefundEnchantmentButton(Jump)
-        buttons[38] = RefundEnchantmentButton(Haste)
+        buttons[10] = RefundEnchantmentButton(Nuke)
+        buttons[11] = RefundEnchantmentButton(JackHammer)
+        buttons[12] = RefundEnchantmentButton(Explosive)
+        buttons[13] = RefundEnchantmentButton(MineBomb)
+        buttons[14] = RefundEnchantmentButton(Laser)
+        buttons[15] = RefundEnchantmentButton(Cubed)
 
-        // middle column
-        buttons[13] = RefundEnchantmentButton(JackHammer)
-        buttons[22] = RefundEnchantmentButton(Exporter)
-        buttons[31] = RefundEnchantmentButton(Fortune)
-        buttons[40] = RefundEnchantmentButton(Nuke)
+        buttons[19] = RefundEnchantmentButton(Exporter)
+        buttons[20] = RefundEnchantmentButton(Greed)
+        buttons[21] = RefundEnchantmentButton(Luck)
+        buttons[22] = RefundEnchantmentButton(LuckyMoney)
+        buttons[23] = RefundEnchantmentButton(TokenPouch)
 
-        // right column
-        buttons[15] = RefundEnchantmentButton(Tokenator)
-        buttons[16] = RefundEnchantmentButton(Locksmith)
-        buttons[24] = RefundEnchantmentButton(TokenPouch)
-        buttons[25] = RefundEnchantmentButton(LuckyMoney)
-        buttons[33] = RefundEnchantmentButton(Greed)
-        buttons[34] = RefundEnchantmentButton(Scavenger)
-        buttons[42] = RefundEnchantmentButton(Laser)
+        buttons[28] = RefundEnchantmentButton(Efficiency)
+        buttons[29] = RefundEnchantmentButton(Unbreaking)
+        buttons[30] = RefundEnchantmentButton(Speed)
+        buttons[31] = RefundEnchantmentButton(Jump)
+        buttons[32] = RefundEnchantmentButton(Haste)
+
+        buttons[37] = RefundEnchantmentButton(Fortune)
+        buttons[38] = RefundEnchantmentButton(Tokenator)
+        buttons[39] = RefundEnchantmentButton(Locksmith)
+        buttons[40] = RefundEnchantmentButton(Scavenger)
+
+        for (i in BLACK_SLOTS) {
+            if (!buttons.containsKey(i)) {
+                buttons[i] = GlassButton(15)
+            }
+        }
 
         return buttons
     }
@@ -85,14 +103,15 @@ class RefundEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxe
     private inner class RefundEnchantmentButton(private val enchant: AbstractEnchant) : Button() {
         override fun getName(player: Player): String {
             return if (pickaxeData.enchants.containsKey(enchant)) {
-                "${enchant.textColor}${ChatColor.BOLD}${enchant.enchant} ${ChatColor.GRAY}(Lvl ${pickaxeData.enchants[enchant]!!})"
+                val enchantLevels = pickaxeData.enchants.getValue(enchant)
+                "${enchant.textColor}${ChatColor.BOLD}${enchant.enchant} ${ChatColor.GRAY}(Lvl ${NumberUtils.format(enchantLevels)})"
             } else {
                 "${ChatColor.GRAY}${ChatColor.BOLD}${enchant.enchant}"
             }
         }
 
         override fun getDescription(player: Player): List<String> {
-            val description: MutableList<String> = ArrayList()
+            val description = arrayListOf<String>()
 
             if (enchant == Cubed) {
                 description.add("")
@@ -102,18 +121,39 @@ class RefundEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxe
                     linePrefix = ChatColor.GRAY.toString()
                 ))
 
-                description.add("")
-                description.add("${ChatColor.GREEN}${ChatColor.BOLD}CLICK TO DISCARD ENCHANT")
+                if (pickaxeData.enchants.containsKey(enchant)) {
+                    description.add("")
+                    description.add("${ChatColor.GREEN}${ChatColor.BOLD}CLICK TO DISCARD ENCHANT")
+                }
             } else if (pickaxeData.enchants.containsKey(enchant)) {
                 description.add("")
 
-                description.addAll(TextSplitter.split(
-                    text = "You will receive ${Formats.formatTokens(enchant.getRefundTokens(pickaxeData.enchants[enchant]!!))} ${ChatColor.GRAY}for refunding this enchantment.",
-                    linePrefix = ChatColor.GRAY.toString()
-                ))
+                val refundableEnchants = SalvagePreventionHandler.getRefundableEnchants(pickaxeItem, pickaxeData)
+                if (refundableEnchants.containsKey(enchant) && refundableEnchants.getValue(enchant) > 0) {
+                    val enchantLevels = pickaxeData.enchants.getValue(enchant)
+                    val refundableLevels = refundableEnchants.getValue(enchant)
 
-                description.add("")
-                description.add("${ChatColor.GREEN}${ChatColor.BOLD}CLICK TO ACCEPT REFUND")
+                    description.addAll(TextSplitter.split(
+                        text = "You will receive ${Formats.formatTokens(enchant.getRefundTokens(refundableLevels))} ${ChatColor.GRAY}(1/4th original cost) for refunding this enchantment.",
+                        linePrefix = ChatColor.GRAY.toString()
+                    ))
+
+                    if (enchantLevels != refundableLevels) {
+                        description.add("")
+                        description.addAll(TextSplitter.split(
+                            text = "You can only refund ${ChatColor.BOLD}${NumberUtils.format(refundableLevels)} ${ChatColor.RED}of the ${ChatColor.BOLD}${NumberUtils.format(enchantLevels)} ${ChatColor.RED}${enchant.enchant} levels, because some are soulbound to the pickaxe.",
+                            linePrefix = ChatColor.RED.toString()
+                        ))
+                    }
+
+                    description.add("")
+                    description.add("${ChatColor.GREEN}${ChatColor.BOLD}CLICK TO ACCEPT REFUND")
+                } else {
+                    description.addAll(TextSplitter.split(
+                        text = "You can't refund any of your ${enchant.enchant} levels because they are all soulbound to the pickaxe.",
+                        linePrefix = ChatColor.RED.toString()
+                    ))
+                }
             }
 
             return description
@@ -143,44 +183,51 @@ class RefundEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxe
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 if (enchant == Cubed) {
-                    ConfirmMenu("Discard Cubed?") { confirmed ->
-                        if (confirmed) {
-                            val level = pickaxeData.enchants[enchant]!!
+                    if (pickaxeData.enchants.containsKey(Cubed)) {
+                        ConfirmMenu("Discard Cubed?") { confirmed ->
+                            if (confirmed) {
+                                val level = pickaxeData.enchants[enchant]!!
 
-                            player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have discard your pickaxe's ${enchant.textColor}${ChatColor.BOLD}Level $level ${enchant.enchant} ${ChatColor.GRAY}enchant.")
-                            player.updateInventory()
+                                player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have discarded your pickaxe's ${enchant.textColor}${ChatColor.BOLD}Level $level ${enchant.enchant} ${ChatColor.GRAY}enchant.")
+                                player.updateInventory()
 
-                            pickaxeData.removeEnchant(enchant)
-                            pickaxeData.applyLore(pickaxeItem)
-                        } else {
-                            player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted discarding of Cubed enchantment!")
-                        }
+                                pickaxeData.removeEnchant(enchant)
+                                pickaxeData.applyLore(pickaxeItem)
+                            } else {
+                                player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted discarding of Cubed enchantment!")
+                            }
 
-                        this@RefundEnchantsMenu.openMenu(player)
-                    }.openMenu(player)
+                            this@RefundEnchantsMenu.openMenu(player)
+                        }.openMenu(player)
+                    }
 
                     return
                 }
 
                 if (pickaxeData.enchants.containsKey(enchant)) {
-                    ConfirmMenu("Accept Refund?") { confirmed ->
-                        if (confirmed) {
-                            val level = pickaxeData.enchants[enchant]!!
-                            val returns = enchant.getRefundTokens(level)
+                    val refundableEnchants = SalvagePreventionHandler.getRefundableEnchants(pickaxeItem, pickaxeData)
+                    if (refundableEnchants.containsKey(enchant) && refundableEnchants.getValue(enchant) > 0) {
+                        ConfirmMenu("Accept Refund?") { confirmed ->
+                            if (confirmed) {
+                                val refundableLevels = refundableEnchants.getValue(enchant)
+                                val refundedTokens = enchant.getRefundTokens(refundableLevels)
 
-                            player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have refunded your pickaxe's ${enchant.textColor}${ChatColor.BOLD}Level $level ${enchant.enchant} ${ChatColor.GRAY}enchant for ${Formats.formatTokens(returns)}${ChatColor.GRAY}.")
-                            player.updateInventory()
+                                player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have refunded your pickaxe's ${enchant.textColor}${ChatColor.BOLD}Level $refundableLevels ${enchant.enchant} ${ChatColor.GRAY}enchant for ${Formats.formatTokens(refundedTokens)}${ChatColor.GRAY}.")
+                                player.updateInventory()
 
-                            Currency.Type.TOKENS.give(player, returns)
+                                Currency.Type.TOKENS.give(player, refundedTokens)
 
-                            pickaxeData.removeEnchant(enchant)
-                            pickaxeData.applyLore(pickaxeItem)
-                        } else {
-                            player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted refund!")
-                        }
+                                pickaxeData.removeEnchant(enchant)
+                                pickaxeData.applyLore(pickaxeItem)
+                            } else {
+                                player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted refund!")
+                            }
 
-                        this@RefundEnchantsMenu.openMenu(player)
-                    }.openMenu(player)
+                            this@RefundEnchantsMenu.openMenu(player)
+                        }.openMenu(player)
+                    } else {
+                        player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe doesn't have any refundable ${enchant.textColor}${ChatColor.BOLD}${enchant.enchant} ${ChatColor.RED}levels.")
+                    }
                 }
             }
         }

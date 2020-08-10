@@ -9,11 +9,12 @@ package net.evilblock.prisonaio.module.enchant.menu.button
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.menus.ConfirmMenu
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.enchant.pickaxe.prestige.PickaxePrestigeHandler
-import net.evilblock.prisonaio.util.economy.Economy
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -54,12 +55,33 @@ class PickaxeButton(
     }
 
     override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-        val nextPrestige = PickaxePrestigeHandler.getNextPrestige(pickaxeData.prestige)
-        if (nextPrestige != null) {
-            if (nextPrestige.meetsRequirements(player)) {
+        val prestigeTo = PickaxePrestigeHandler.getNextPrestige(pickaxeData.prestige)
+        if (prestigeTo != null) {
+            if (prestigeTo.meetsRequirements(player)) {
                 ConfirmMenu { confirmed ->
                     if (confirmed) {
-                        nextPrestige.purchase(player, pickaxeItem, pickaxeData)
+                        prestigeTo.purchase(player, pickaxeItem, pickaxeData)
+
+                        val newNextPrestige = PickaxePrestigeHandler.getNextPrestige(pickaxeData.prestige)
+
+                        player.sendMessage("")
+                        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Acquired Pickaxe Prestige ${pickaxeData.prestige}")
+                        player.sendMessage(" ${ChatColor.GRAY}Your pickaxe has reached the next prestige!")
+
+                        if (newNextPrestige != null) {
+                            if (newNextPrestige.enchantLimits.isNotEmpty()) {
+                                player.sendMessage("")
+                                player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}NEW ENCHANT LIMITS")
+
+                                for ((enchant, level) in newNextPrestige.enchantLimits.entries.sortedWith(EnchantsManager.ENCHANT_COMPARATOR)) {
+                                    if (!prestigeTo.enchantLimits.containsKey(enchant) || prestigeTo.enchantLimits.getValue(enchant) != level) {
+                                        player.sendMessage(" ${enchant.lorified()} ${ChatColor.GRAY}${NumberUtils.format(level)}")
+                                    }
+                                }
+                            }
+                        }
+
+                        player.sendMessage("")
                     }
 
                     returnFunc.invoke(player)

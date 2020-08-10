@@ -9,13 +9,17 @@ package net.evilblock.prisonaio.module.enchant.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.buttons.GlassButton
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.menu.button.*
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
+import net.evilblock.prisonaio.module.enchant.pickaxe.prestige.PickaxePrestigeHandler
 import net.evilblock.prisonaio.module.enchant.type.*
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.FireworkEffect
 import org.bukkit.Material
@@ -27,14 +31,24 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.FireworkEffectMeta
 import org.bukkit.inventory.meta.ItemMeta
-import java.text.NumberFormat
 import java.util.*
+import kotlin.math.max
 
 class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Menu() {
 
+    companion object {
+        private val BLACK_SLOTS = listOf(
+            0, 1, 2, 3, 4, 5, 6, 7, 8,
+            9, 17,
+            18, 26,
+            27, 35,
+            36, 44,
+            45, 46, 47, 48, 49, 50, 51, 52, 53
+        )
+    }
+
     init {
         updateAfterClick = true
-        placeholder = true
     }
 
     override fun getTitle(player: Player): String {
@@ -54,30 +68,35 @@ class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val picka
         // footer buttons
         buttons[49] = ExitButton()
 
-        // left column
-        buttons[10] = PurchaseEnchantmentButton(MineBomb)
-        buttons[11] = PurchaseEnchantmentButton(Explosive)
-        buttons[19] = PurchaseEnchantmentButton(Efficiency)
-        buttons[20] = PurchaseEnchantmentButton(Unbreaking)
-        buttons[28] = PurchaseEnchantmentButton(Speed)
-        buttons[29] = PurchaseEnchantmentButton(Luck)
-        buttons[37] = PurchaseEnchantmentButton(Jump)
-        buttons[38] = PurchaseEnchantmentButton(Haste)
+        buttons[10] = PurchaseEnchantmentButton(Nuke)
+        buttons[11] = PurchaseEnchantmentButton(JackHammer)
+        buttons[12] = PurchaseEnchantmentButton(Explosive)
+        buttons[13] = PurchaseEnchantmentButton(MineBomb)
+        buttons[14] = PurchaseEnchantmentButton(Laser)
+        buttons[15] = PurchaseEnchantmentButton(Cubed)
 
-        // middle column
-        buttons[13] = PurchaseEnchantmentButton(JackHammer)
-        buttons[22] = PurchaseEnchantmentButton(Exporter)
-        buttons[31] = PurchaseEnchantmentButton(Fortune)
-        buttons[40] = PurchaseEnchantmentButton(Nuke)
+        buttons[19] = PurchaseEnchantmentButton(Exporter)
+        buttons[20] = PurchaseEnchantmentButton(Greed)
+        buttons[21] = PurchaseEnchantmentButton(Luck)
+        buttons[22] = PurchaseEnchantmentButton(LuckyMoney)
+        buttons[23] = PurchaseEnchantmentButton(TokenPouch)
 
-        // right column
-        buttons[15] = PurchaseEnchantmentButton(Tokenator)
-        buttons[16] = PurchaseEnchantmentButton(Locksmith)
-        buttons[24] = PurchaseEnchantmentButton(TokenPouch)
-        buttons[25] = PurchaseEnchantmentButton(LuckyMoney)
-        buttons[33] = PurchaseEnchantmentButton(Greed)
-        buttons[34] = PurchaseEnchantmentButton(Scavenger)
-        buttons[42] = PurchaseEnchantmentButton(Laser)
+        buttons[28] = PurchaseEnchantmentButton(Efficiency)
+        buttons[29] = PurchaseEnchantmentButton(Unbreaking)
+        buttons[30] = PurchaseEnchantmentButton(Speed)
+        buttons[31] = PurchaseEnchantmentButton(Jump)
+        buttons[32] = PurchaseEnchantmentButton(Haste)
+
+        buttons[37] = PurchaseEnchantmentButton(Fortune)
+        buttons[38] = PurchaseEnchantmentButton(Tokenator)
+        buttons[39] = PurchaseEnchantmentButton(Locksmith)
+        buttons[40] = PurchaseEnchantmentButton(Scavenger)
+
+        for (i in BLACK_SLOTS) {
+            if (!buttons.containsKey(i)) {
+                buttons[i] = GlassButton(15)
+            }
+        }
 
         return buttons
     }
@@ -85,11 +104,16 @@ class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val picka
     private inner class PurchaseEnchantmentButton(private val enchant: AbstractEnchant) : Button() {
         override fun getName(player: Player): String {
             val currentLevel = pickaxeData.enchants[enchant] ?: 0
+
+            if (enchant == Cubed) {
+                return "${enchant.textColor}${ChatColor.BOLD}${enchant.enchant} ${ChatColor.GRAY}(Lvl ${NumberUtils.format(currentLevel)})"
+            }
+
             return if (currentLevel >= enchant.maxLevel) {
                 "${enchant.textColor}${ChatColor.BOLD}${enchant.enchant}"
             } else {
                 val nextLevel = currentLevel + 1
-                "${enchant.textColor}${ChatColor.BOLD}${enchant.enchant} ${ChatColor.GRAY}(Lvl $currentLevel -> $nextLevel)"
+                "${enchant.textColor}${ChatColor.BOLD}${enchant.enchant} ${ChatColor.GRAY}(Lvl ${NumberUtils.format(currentLevel)} -> ${NumberUtils.format(nextLevel)})"
             }
         }
 
@@ -109,12 +133,22 @@ class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val picka
             ))
 
             description.add("")
-            description.add("${ChatColor.GRAY}Price: ${ChatColor.GREEN}${ChatColor.BOLD}${NumberFormat.getInstance().format(enchant.getCost(nextLevel))} Tokens")
-            description.add("${ChatColor.GRAY}Max Level: ${ChatColor.GOLD}${ChatColor.BOLD}${NumberFormat.getInstance().format(enchant.maxLevel.toLong())}")
+
+            if (enchant != Cubed) {
+                description.add("${ChatColor.GRAY}Price: ${ChatColor.GREEN}${ChatColor.BOLD}${Formats.formatTokens(enchant.getCost(nextLevel))}")
+            }
+
+            description.add("${ChatColor.GRAY}Max Level: ${ChatColor.GOLD}${ChatColor.BOLD}${NumberUtils.format(enchant.maxLevel.toLong())}")
 
             val isMaxed = currentLevel >= enchant.maxLevel
             if (isMaxed) {
                 description.add("${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Maxed")
+            }
+
+            if (enchant == Cubed) {
+                description.add("")
+                description.addAll(TextSplitter.split(text = "Cubed can't be purchased and can only be applied through Enchanted Books.", linePrefix = ChatColor.RED.toString()))
+                return description
             }
 
             if (user.hasTokenBalance(enchant.getCost(nextLevel))) {
@@ -158,7 +192,9 @@ class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val picka
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            val user = UserHandler.getUser(player.uniqueId)
+            if (enchant == Cubed) {
+                return
+            }
 
             val currentLevel = pickaxeData.enchants[enchant] ?: 0
             val nextLevel = currentLevel + 1
@@ -170,10 +206,17 @@ class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val picka
 
             val enchantLimit = pickaxeData.getEnchantLimit(enchant)
             if (enchantLimit != -1 && currentLevel >= enchantLimit) {
-                player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}You must prestige your pickaxe to upgrade the ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}enchantment any further.")
+                val maxPrestige = PickaxePrestigeHandler.getMaxPrestige()
+                if (maxPrestige != null && pickaxeData.prestige >= maxPrestige.number) {
+                    player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}You've completely maxed your pickaxe prestige and can't purchase anymore ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}levels.")
+                } else {
+                    player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}You must prestige your pickaxe to purchase anymore ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}levels.")
+                }
+
                 return
             }
 
+            val user = UserHandler.getUser(player.uniqueId)
             // left click and drop click are purchase actions, so we can check a few conditions collectively
             if (clickType == ClickType.LEFT || clickType == ClickType.DROP) {
                 if (user.getTokenBalance() < enchant.getCost(nextLevel)) {
@@ -182,14 +225,17 @@ class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val picka
                 }
             }
 
-            if (clickType == ClickType.LEFT) { // purchase level
-                player.sendMessage("${EnchantsManager.CHAT_PREFIX}Upgraded ${ChatColor.RED}${enchant.getStrippedEnchant()} ${ChatColor.GRAY}by ${ChatColor.RED}1 ${ChatColor.GRAY}level.")
-                user.subtractTokensBalance(enchant.getCost(nextLevel))
+            if (clickType == ClickType.LEFT) {
+                val cost = enchant.getCost(nextLevel)
+
+                player.sendMessage("${EnchantsManager.CHAT_PREFIX}You purchased ${enchant.textColor}${ChatColor.BOLD}1 ${enchant.enchant} ${ChatColor.GRAY}level for ${Formats.formatTokens(cost)}${ChatColor.GRAY}.")
+
+                user.subtractTokensBalance(cost)
 
                 EnchantsManager.upgradeEnchant(player, pickaxeData, pickaxeItem, enchant, 1, false)
             } else if (clickType == ClickType.DROP) { // purchase max levels
                 var levelsPurchased = 0
-                var levelsCost = 0.0
+                var levelsCost = 0L
 
                 val maxLevel = if (enchantLimit == -1) {
                     enchant.maxLevel
@@ -212,9 +258,9 @@ class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val picka
                     return
                 }
 
-                player.sendMessage("${EnchantsManager.CHAT_PREFIX}Upgraded ${ChatColor.RED}${enchant.getStrippedEnchant()} ${ChatColor.GRAY}by ${ChatColor.RED}$levelsPurchased ${ChatColor.GRAY}level${pluralize(levelsPurchased)}.")
+                player.sendMessage("${EnchantsManager.CHAT_PREFIX}You purchased ${enchant.textColor}${ChatColor.BOLD}${NumberUtils.format(levelsPurchased)} ${enchant.enchant} ${ChatColor.GRAY}level${pluralize(levelsPurchased)} for ${Formats.formatTokens(levelsCost)}${ChatColor.GRAY}.")
 
-                user.subtractTokensBalance(levelsCost.toLong())
+                user.subtractTokensBalance(levelsCost)
 
                 EnchantsManager.upgradeEnchant(player, pickaxeData, pickaxeItem, enchant, levelsPurchased, false)
             }

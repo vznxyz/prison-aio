@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
@@ -24,7 +25,7 @@ object TokenPouch : AbstractEnchant("token-pouch", "Token Pouch", 1000) {
         get() = Color.YELLOW
 
     override val textColor: ChatColor
-        get() = ChatColor.GOLD
+        get() = ChatColor.YELLOW
 
     override val menuDisplay: Material
         get() = Material.MAGMA_CREAM
@@ -40,7 +41,7 @@ object TokenPouch : AbstractEnchant("token-pouch", "Token Pouch", 1000) {
             val tokenAmount = Chance.pick(2200, floor(2200 + level * 1.1).toInt())
             user.addTokensBalance(tokenAmount.toLong())
 
-            sendMessage(event.player, "You found a pouch with ${ChatColor.GOLD}$tokenAmount ${ChatColor.GRAY}tokens in it!")
+            sendMessage(event.player, "You found a pouch with ${Formats.formatTokens(tokenAmount.toLong())} ${ChatColor.GRAY}tokens in it!")
         }
     }
 

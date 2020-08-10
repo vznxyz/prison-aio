@@ -69,7 +69,7 @@ object SalvagePreventionHandler : PluginHandler {
         pickaxes.remove(itemStack)
     }
 
-    fun getSalvageableLevels(itemStack: ItemStack, pickaxeData: PickaxeData): Map<AbstractEnchant, Int> {
+    fun getRefundableEnchants(itemStack: ItemStack, pickaxeData: PickaxeData): Map<AbstractEnchant, Int> {
         val enchants = pickaxeData.enchants.toMutableMap()
         if (enchants.isEmpty()) {
             return emptyMap()

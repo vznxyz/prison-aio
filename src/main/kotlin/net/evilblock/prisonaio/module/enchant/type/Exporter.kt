@@ -13,6 +13,7 @@ import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
@@ -30,10 +31,10 @@ object Exporter : AbstractEnchant("exporter", "Exporter", 3) {
     private val useCooldown: MutableMap<UUID, Long> = HashMap()
 
     override val iconColor: Color
-        get() = Color.AQUA
+        get() = Color.YELLOW
 
     override val textColor: ChatColor
-        get() = ChatColor.GREEN
+        get() = ChatColor.YELLOW
 
     override val menuDisplay: Material
         get() = Material.DIAMOND_PICKAXE
@@ -48,7 +49,7 @@ object Exporter : AbstractEnchant("exporter", "Exporter", 3) {
     override fun onSellAll(player: Player, enchantedItem: ItemStack?, level: Int, event: PlayerSellToShopEvent) {
         if (event.player.hasMetadata("PENDING_EXPORT_FEEDBACK")) {
             event.player.removeMetadata("PENDING_EXPORT_FEEDBACK", PrisonAIO.instance)
-            sendMessage(event.player, "You have exported your inventory for a profit of ${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${event.getSellCost()}${ChatColor.GRAY}!")
+            sendMessage(event.player, "You have exported your inventory for a profit of ${Formats.formatMoney(event.getSellCost().toDouble())}${ChatColor.GRAY}!")
         }
     }
 

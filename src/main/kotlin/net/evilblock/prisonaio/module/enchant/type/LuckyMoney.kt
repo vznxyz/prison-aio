@@ -11,12 +11,12 @@ import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
-import java.text.NumberFormat
 
 object LuckyMoney : AbstractEnchant("lucky-money", "Lucky Money", 3) {
 
@@ -24,7 +24,7 @@ object LuckyMoney : AbstractEnchant("lucky-money", "Lucky Money", 3) {
         get() = Color.YELLOW
 
     override val textColor: ChatColor
-        get() = ChatColor.GOLD
+        get() = ChatColor.YELLOW
 
     override val menuDisplay: Material
         get() = Material.GOLD_INGOT
@@ -45,11 +45,9 @@ object LuckyMoney : AbstractEnchant("lucky-money", "Lucky Money", 3) {
                 else -> 500_000.0
             }
 
-            // payout the money to the player
             VaultHook.useEconomyAndReturn { economy -> economy.depositPlayer(event.player, money) }
 
-            // send notification
-            sendMessage(event.player, "You found ${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberFormat.getInstance().format(money)} ${ChatColor.GREEN}while mining!")
+            sendMessage(event.player, "You found ${Formats.formatMoney(money)} ${ChatColor.GRAY}while mining!")
         }
     }
 

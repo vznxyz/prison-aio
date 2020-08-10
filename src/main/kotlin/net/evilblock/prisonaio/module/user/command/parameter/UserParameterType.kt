@@ -40,9 +40,14 @@ object UserParameterType : ParameterType<User?> {
         }
 
         return try {
-            UserHandler.fetchUser(uuid, true)
+            if (UserHandler.isUserLoaded(uuid)) {
+                UserHandler.getUser(uuid)
+            } else {
+                sender.sendMessage("${ChatColor.GRAY}(Fetching user info)")
+                return UserHandler.getOrLoadAndCacheUser(uuid, true)
+            }
         } catch (e: IllegalStateException) {
-            sender.sendMessage("${ChatColor.RED}Couldn't find a player by the name or ID '$source'.")
+            sender.sendMessage("${ChatColor.RED}Failed to fetch user '$source'.")
             null
         }
     }

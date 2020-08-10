@@ -23,7 +23,7 @@ object Cubed : AbstractEnchant("cubed", "Cubed", 3) {
         get() = Color.ORANGE
 
     override val textColor: ChatColor
-        get() = ChatColor.RED
+        get() = ChatColor.GOLD
 
     override val menuDisplay: Material
         get() = Material.BEACON

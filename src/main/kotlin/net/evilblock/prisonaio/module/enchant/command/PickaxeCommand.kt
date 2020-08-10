@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.enchant.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
+import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
@@ -18,7 +19,6 @@ import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 
 object PickaxeCommand {
 
@@ -35,19 +35,17 @@ object PickaxeCommand {
         @Param(name = "fortuneLevel", defaultValue = "0") fortuneLevel: Int,
         @Param(name = "name", wildcard = true) name: String
     ) {
-        val pickaxe = ItemStack(Material.DIAMOND_PICKAXE)
+        val pickaxe = ItemBuilder.of(Material.DIAMOND_PICKAXE).also {
+            if (!name.equals("none", ignoreCase = true)) {
+                it.name(name)
+            }
+        }.build()
 
         val pickaxeData = PickaxeData()
         pickaxeData.applyNBT(pickaxe)
         pickaxeData.applyLore(pickaxe)
 
         PickaxeHandler.trackPickaxeData(pickaxeData)
-
-        if (!name.equals("none", ignoreCase = true)) {
-            val itemMeta = pickaxe.itemMeta
-            itemMeta.displayName = ChatColor.translateAlternateColorCodes('&', name)
-            pickaxe.itemMeta = itemMeta
-        }
 
         if (efficiencyLevel > 0) {
             EnchantsManager.addEnchant(target, pickaxeData, pickaxe, Efficiency, efficiencyLevel, true)

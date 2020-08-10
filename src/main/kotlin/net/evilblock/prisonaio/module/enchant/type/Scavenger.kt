@@ -22,10 +22,10 @@ import org.bukkit.inventory.ItemStack
 object Scavenger : AbstractEnchant("scavenger", "Scavenger", 1) {
 
     override val iconColor: Color
-        get() = Color.YELLOW
+        get() = Color.AQUA
 
     override val textColor: ChatColor
-        get() = ChatColor.BLUE
+        get() = ChatColor.AQUA
 
     override val menuDisplay: Material
         get() = Material.GOLD_NUGGET

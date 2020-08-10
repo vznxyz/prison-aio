@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.shop
 
 import net.evilblock.cubed.menu.template.menu.TemplateMenu
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.shop.event.PlayerBuyFromShopEvent
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
@@ -112,8 +113,10 @@ class Shop(var id: String) {
             }
         }
 
-        for (item in player.inventory.addItem(*splitItems.toTypedArray())) {
-            player.location.world.dropItem(player.location, item.value)
+        Tasks.sync {
+            for (item in player.inventory.addItem(*splitItems.toTypedArray())) {
+                player.location.world.dropItem(player.location, item.value)
+            }
         }
 
         player.updateInventory()

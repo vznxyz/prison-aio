@@ -165,7 +165,7 @@ object EnchantsManager : Listener {
 
             val enchantLimit = pickaxeData.getEnchantLimit(enchant)
             if (level > enchantLimit) {
-                event.whoClicked.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to upgrade the ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}enchantment any further.")
+                event.whoClicked.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to purchase anymore ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}levels.")
                 return
             }
 
@@ -327,7 +327,7 @@ object EnchantsManager : Listener {
 
         val enchantLimit = pickaxeData.getEnchantLimit(enchant)
         if (enchantLimit != -1 && level > enchantLimit) {
-            player.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to upgrade the ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}enchantment any further.")
+            player.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to purchase anymore ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}levels.")
             return false
         }
 
@@ -341,6 +341,8 @@ object EnchantsManager : Listener {
 
         pickaxeData.setLevel(enchant, level)
         pickaxeData.applyLore(item)
+
+        player.updateInventory()
 
         return true
     }
@@ -358,7 +360,7 @@ object EnchantsManager : Listener {
 
         val enchantLimit = pickaxeData.getEnchantLimit(enchant)
         if (enchantLimit != -1 && level > enchantLimit) {
-            player.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to upgrade the ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}enchantment any further.")
+            player.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to purchase anymore ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}levels.")
             return false
         }
 
@@ -453,9 +455,11 @@ object EnchantsManager : Listener {
     }
 
     private val enchantColorOrder = mapOf<Color, Int>(
-        Color.GREEN to 1,
-        Color.AQUA to 2,
-        Color.ORANGE to 3
+        Color.RED to 1,
+        Color.ORANGE to 2,
+        Color.YELLOW to 3,
+        Color.LIME to 4,
+        Color.AQUA to 5
     )
 
     val ENCHANT_COMPARATOR = Comparator<Map.Entry<AbstractEnchant, Int>> { o1, o2 ->

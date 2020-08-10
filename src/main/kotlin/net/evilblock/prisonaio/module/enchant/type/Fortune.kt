@@ -19,7 +19,7 @@ object Fortune : AbstractEnchant("fortune", "Fortune", 10000), VanillaOverride {
         get() = Color.AQUA
 
     override val textColor: ChatColor
-        get() = ChatColor.GOLD
+        get() = ChatColor.AQUA
 
     override val override: Enchantment
         get() = Enchantment.LOOT_BONUS_BLOCKS

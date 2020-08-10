@@ -17,7 +17,7 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.nms.MinecraftProtocol
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
-import net.evilblock.prisonaio.module.gang.challenge.GangChallenges
+import net.evilblock.prisonaio.module.gang.challenge.GangChallengesData
 import net.evilblock.prisonaio.module.gang.entity.JerryNpcEntity
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
 import net.evilblock.prisonaio.module.region.Region
@@ -50,7 +50,7 @@ class Gang(
     private val invited: HashMap<UUID, Long> = hashMapOf()
     private var permissions = hashMapOf<GangPermission, GangPermission.PermissionValue>()
 
-    var challenges: GangChallenges = GangChallenges(this)
+    var challengesData: GangChallengesData = GangChallengesData(this)
     private var trophies: Int = 0
     private var boosters: MutableSet<GangBooster> = hashSetOf()
 
@@ -96,10 +96,10 @@ class Gang(
     }
 
     fun initializeData() {
-        if (challenges == null) {
-            challenges = GangChallenges(this)
+        if (challengesData == null) {
+            challengesData = GangChallengesData(this)
         } else {
-            challenges.gang = this
+            challengesData.gang = this
         }
 
         if (boosters == null) {

@@ -27,7 +27,7 @@ object Greed : AbstractEnchant("greed", "Greed", 3) {
         get() = Color.YELLOW
 
     override val textColor: ChatColor
-        get() = ChatColor.GREEN
+        get() = ChatColor.YELLOW
 
     override fun getCost(level: Int): Long {
         return (12000 + (level - 1) * 4000).toLong()

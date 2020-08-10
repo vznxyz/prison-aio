@@ -8,9 +8,11 @@
 package net.evilblock.prisonaio.module.gang.listener
 
 import net.evilblock.cubed.util.Chance
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.gang.GangModule
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
+import net.evilblock.prisonaio.module.gang.challenge.GangChallengeHandler
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -40,6 +42,10 @@ object GangTrophiesListeners : Listener {
                 val user = UserHandler.getUser(event.player.uniqueId)
                 if (user.getSettingOption(UserSetting.REWARD_MESSAGES).getValue()) {
                     event.player.sendMessage("${RewardsModule.getChatPrefix()}You found ${ChatColor.GOLD}${ChatColor.BOLD}$amount ${ChatColor.GOLD}Trophies ${ChatColor.GRAY}for your gang while mining!")
+                }
+
+                Tasks.async {
+                    GangChallengeHandler.checkCompletions(assumedGang)
                 }
             }
         }

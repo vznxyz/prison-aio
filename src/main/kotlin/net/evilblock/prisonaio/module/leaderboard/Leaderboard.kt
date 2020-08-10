@@ -14,7 +14,7 @@ import org.bukkit.entity.Player
 
 abstract class Leaderboard(val id: String, val name: String) {
 
-    private var entries: List<LeaderboardEntry<*>> = arrayListOf()
+    internal var entries: List<LeaderboardEntry<*>> = arrayListOf()
 
     abstract fun fetchEntries(): List<LeaderboardEntry<*>>
 

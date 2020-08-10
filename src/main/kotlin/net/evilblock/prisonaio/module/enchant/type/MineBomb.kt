@@ -43,7 +43,7 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
     }
 
     override val iconColor: Color
-        get() = Color.LIME
+        get() = Color.RED
 
     override val textColor: ChatColor
         get() = ChatColor.RED

@@ -15,10 +15,10 @@ import org.bukkit.Material
 object Luck : AbstractEnchant("luck", "Luck", 4) {
 
     override val iconColor: Color
-        get() = Color.LIME
+        get() = Color.YELLOW
 
     override val textColor: ChatColor
-        get() = ChatColor.GREEN
+        get() = ChatColor.YELLOW
 
     override val menuDisplay: Material
         get() = Material.RABBIT_FOOT

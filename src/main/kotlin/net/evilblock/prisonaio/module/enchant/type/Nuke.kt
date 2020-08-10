@@ -28,7 +28,7 @@ object Nuke : AbstractEnchant("nuke", "Nuke", 2) {
 	val random = SplittableRandom()
 
 	override val iconColor: Color
-		get() = Color.AQUA
+		get() = Color.RED
 
 	override val textColor: ChatColor
 		get() = ChatColor.RED

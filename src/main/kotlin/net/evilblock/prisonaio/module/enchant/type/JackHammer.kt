@@ -24,10 +24,10 @@ import java.util.*
 object JackHammer : AbstractEnchant("jack-hammer", "Jack Hammer", 5000) {
 
     override val iconColor: Color
-        get() = Color.AQUA
+        get() = Color.RED
 
     override val textColor: ChatColor
-        get() = ChatColor.YELLOW
+        get() = ChatColor.RED
 
     override val menuDisplay: Material
         get() = Material.STONE_SLAB2

@@ -21,10 +21,10 @@ import kotlin.math.roundToInt
 object Tokenator : AbstractEnchant("tokenator", "Tokenator", 100) {
 
     override val iconColor: Color
-        get() = Color.YELLOW
+        get() = Color.AQUA
 
     override val textColor: ChatColor
-        get() = ChatColor.GOLD
+        get() = ChatColor.AQUA
 
     override val menuDisplay: Material
         get() = Material.MAGMA_CREAM

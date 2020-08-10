@@ -37,7 +37,7 @@ object TokenShopListeners : Listener {
     @JvmStatic
     private val TOKEN_SHOP_TAG = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}TokenShop${ChatColor.GRAY}]"
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH)
     fun onPlayerInteractEvent(event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_BLOCK) {
             if (event.clickedBlock.type == Material.SIGN || event.clickedBlock.type == Material.SIGN_POST || event.clickedBlock.type == Material.WALL_SIGN) {
@@ -226,7 +226,7 @@ object TokenShopListeners : Listener {
                     owningUser.subtractTokensBalance(quantity.toLong())
                     UserHandler.saveUser(owningUser)
 
-                    player.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
+                    player.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}from ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
                     owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
                 } else {
                     val ownerBalance = VaultHook.useEconomyAndReturn { it.getBalance(Bukkit.getOfflinePlayer(owner)) }

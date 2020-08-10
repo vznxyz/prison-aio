@@ -66,7 +66,7 @@ class SalvagePickaxeMenu(private val pickaxeItem: ItemStack, private val pickaxe
 
         override fun getDescription(player: Player): List<String> {
             val description: MutableList<String> = ArrayList()
-            val enchants = SalvagePreventionHandler.getSalvageableLevels(pickaxeItem, pickaxeData)
+            val enchants = SalvagePreventionHandler.getRefundableEnchants(pickaxeItem, pickaxeData)
 
             enchants.entries
                 .filter { entry -> entry.key !is Cubed }
@@ -82,11 +82,21 @@ class SalvagePickaxeMenu(private val pickaxeItem: ItemStack, private val pickaxe
                 .mapToLong { entry -> entry.key.getRefundTokens(entry.value) }
                 .sum()
 
-            description.addAll(TextSplitter.split(
-                length = 40,
-                text = "You will receive ${ChatColor.GOLD}${ChatColor.BOLD}${Formats.formatTokens(totalReturns)} ${ChatColor.GRAY}from salvaging your pickaxe.",
-                linePrefix = ChatColor.GRAY.toString()
-            ))
+            if (totalReturns > 0) {
+                description.addAll(
+                    TextSplitter.split(
+                        text = "You will receive ${ChatColor.GOLD}${ChatColor.BOLD}${Formats.formatTokens(totalReturns)} ${ChatColor.GRAY}(1/4th original cost) from salvaging your pickaxe.",
+                        linePrefix = ChatColor.GRAY.toString()
+                    )
+                )
+            } else {
+                description.addAll(
+                    TextSplitter.split(
+                        text = "You don't have any salvagable enchantments on your pickaxe.",
+                        linePrefix = ChatColor.GRAY.toString()
+                    )
+                )
+            }
 
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}CLICK TO ACCEPT SALVAGE")
@@ -104,9 +114,9 @@ class SalvagePickaxeMenu(private val pickaxeItem: ItemStack, private val pickaxe
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType == ClickType.LEFT) { // item has no enchants on it, so it cannot be salvaged
-                val enchants = SalvagePreventionHandler.getSalvageableLevels(pickaxeItem, pickaxeData)
+                val enchants = SalvagePreventionHandler.getRefundableEnchants(pickaxeItem, pickaxeData)
                 if (enchants.isEmpty()) {
-                    player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe doesn't have any enchantments, therefore it cannot be salvaged.")
+                    player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe doesn't have any salvagable enchantments, therefore it cannot be salvaged.")
                     return
                 }
 

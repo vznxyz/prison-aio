@@ -14,6 +14,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.store.bukkit.UUIDCache
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.storage.StorageModule
 import org.bson.Document
@@ -140,6 +141,16 @@ object UserHandler : PluginHandler {
             return user
         }
 
+        val fetch = UUIDCache.fetchFromMojang(uuid)
+        if (fetch.isPresent) {
+            val user = User(uuid)
+            user.init()
+
+            usersCollection.insertOne(Document.parse(Cubed.gson.toJson(user)))
+
+            return user
+        }
+
         if (throws) {
             throw IllegalStateException("User does not exist in database")
         }
@@ -180,26 +191,16 @@ object UserHandler : PluginHandler {
     /**
      * Gets a player's user data from the cache, or by loading and caching.
      */
-    fun getOrLoadAndCacheUser(uuid: UUID): User {
+    fun getOrLoadAndCacheUser(uuid: UUID, throws: Boolean = false): User {
         assert(!Bukkit.isPrimaryThread()) { "Cannot load user on primary thread" }
 
         return if (!usersMap.containsKey(uuid)) {
-            val user = loadUser(uuid = uuid)
+            val user = loadUser(uuid = uuid, throws = throws)
             user.cacheExpiry = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30L)
             user
         } else {
             getUser(uuid)
         }
-    }
-
-    /**
-     * Fetches a user's data from the database.
-     */
-    fun fetchUser(uuid: UUID, throws: Boolean = false): User {
-        if (usersMap.containsKey(uuid)) {
-            return usersMap[uuid]!!
-        }
-        return loadUser(uuid, throws)
     }
 
     /**

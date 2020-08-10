@@ -40,6 +40,8 @@ import kotlin.collections.set
  */
 object GangHandler : PluginHandler {
 
+    val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}Gangs${ChatColor.GRAY}] "
+
     private var gridIndex = 0
     private val grid: HashMap<Int, Gang> = hashMapOf()
 

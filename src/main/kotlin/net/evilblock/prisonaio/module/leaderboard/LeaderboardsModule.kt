@@ -17,6 +17,7 @@ import net.evilblock.prisonaio.module.leaderboard.command.RefreshCommand
 import net.evilblock.prisonaio.module.leaderboard.command.IndexCommand
 import net.evilblock.prisonaio.module.leaderboard.command.ResultsCommand
 import net.evilblock.prisonaio.module.leaderboard.command.SpawnCommand
+import net.evilblock.prisonaio.module.leaderboard.event.LeaderboardsRefreshedEvent
 import net.evilblock.prisonaio.module.leaderboard.impl.*
 import net.evilblock.prisonaio.module.leaderboard.npc.LeaderboardNpcEntity
 
@@ -75,6 +76,8 @@ object LeaderboardsModule : PluginModule() {
 				e.printStackTrace()
 			}
 		}
+
+		LeaderboardsRefreshedEvent().call()
 	}
 
 	fun getLeaderboards(): List<Leaderboard> {

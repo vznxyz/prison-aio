@@ -21,10 +21,10 @@ import org.bukkit.inventory.ItemStack
 object Locksmith : AbstractEnchant("locksmith", "Locksmith", 5) {
 
     override val iconColor: Color
-        get() = Color.YELLOW
+        get() = Color.AQUA
 
     override val textColor: ChatColor
-        get() = ChatColor.RED
+        get() = ChatColor.AQUA
 
     override val menuDisplay: Material
         get() = Material.TRIPWIRE_HOOK

@@ -7,8 +7,22 @@
 
 package net.evilblock.prisonaio.module.gang.challenge
 
-class GangChallenge {
+import net.evilblock.prisonaio.module.gang.Gang
 
+abstract class GangChallenge(val id: String, val reward: Int) {
 
+    abstract fun getRenderedName(): String
+
+    abstract fun renderGoal(): List<String>
+
+    open fun isProgressive(): Boolean {
+        return false
+    }
+
+    open fun renderProgress(gang: Gang): String {
+        return ""
+    }
+
+    abstract fun meetsCompletionRequirements(gang: Gang): Boolean
 
 }

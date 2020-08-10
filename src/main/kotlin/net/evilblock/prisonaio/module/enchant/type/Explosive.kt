@@ -21,7 +21,7 @@ object Explosive : AbstractEnchant("explosive", "Explosive", 50) {
     private val random = Random()
 
     override val iconColor: Color
-        get() = Color.LIME
+        get() = Color.RED
 
     override val textColor: ChatColor
         get() = ChatColor.RED

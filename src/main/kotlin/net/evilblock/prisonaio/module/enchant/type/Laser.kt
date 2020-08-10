@@ -29,10 +29,10 @@ object Laser : AbstractEnchant("laser", "Laser", 1) {
     private val cooldown: MutableMap<UUID, Long?> = HashMap()
 
     override val iconColor: Color
-        get() = Color.YELLOW
+        get() = Color.RED
 
     override val textColor: ChatColor
-        get() = ChatColor.LIGHT_PURPLE
+        get() = ChatColor.RED
 
     override val menuDisplay: Material
         get() = Material.GOLD_INGOT
