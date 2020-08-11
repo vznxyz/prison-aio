@@ -89,7 +89,7 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (!gang.isOwner(player.uniqueId)) {
-                player.sendMessage("${ChatColor.RED}You must be the owner of the cell to invite other players.")
+                player.sendMessage("${ChatColor.RED}You must be the owner of the gang to invite other players.")
                 return
             }
 
@@ -97,19 +97,19 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
 
             ConversationUtil.startConversation(player, PlayerPrompt() { invitedPlayer ->
                 if (gang.isMember(invitedPlayer)) {
-                    player.sendMessage("${ChatColor.RED}That player is already a member of the cell.")
+                    player.sendMessage("${ChatColor.RED}That player is already a member of the gang.")
                     return@PlayerPrompt
                 }
 
                 if (gang.isInvited(invitedPlayer)) {
-                    player.sendMessage("${ChatColor.RED}That player has already been invited to the cell.")
+                    player.sendMessage("${ChatColor.RED}That player has already been invited to the gang.")
                     return@PlayerPrompt
                 }
 
                 gang.invitePlayer(invitedPlayer, player.uniqueId)
 
                 val playerInvitedName = Cubed.instance.uuidCache.name(invitedPlayer)
-                player.sendMessage("${ChatColor.GREEN}Successfully invited $playerInvitedName to the cell.")
+                player.sendMessage("${ChatColor.GREEN}Successfully invited $playerInvitedName to the gang.")
             })
         }
     }
@@ -154,17 +154,17 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isRightClick) {
                 if (!gang.isOwner(player.uniqueId)) {
-                    player.sendMessage("${ChatColor.RED}You must be the owner of the cell to kick members.")
+                    player.sendMessage("${ChatColor.RED}You must be the owner of the gang to kick members.")
                     return
                 }
 
                 if (player.uniqueId == member) {
-                    player.sendMessage("${ChatColor.RED}You can't kick yourself from the cell.")
+                    player.sendMessage("${ChatColor.RED}You can't kick yourself from the gang.")
                     return
                 }
 
                 if (gang.isOwner(member)) {
-                    player.sendMessage("${ChatColor.RED}You can't kick the owner from their own cell.")
+                    player.sendMessage("${ChatColor.RED}You can't kick the owner from their own gang.")
                     return
                 }
 

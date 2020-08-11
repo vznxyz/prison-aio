@@ -113,7 +113,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                             CoinFlipHandler.getMinBetTokens()
                         }
 
-                        if ((minAmount is Double && minAmount.toDouble() > input.toDouble())) {
+                        if ((minAmount is Double && minAmount.toDouble() > input.toDouble()) || minAmount.toLong() > input.toLong()) {
                             player.sendMessage("${ChatColor.RED}You must bet at least ${currency.format(minAmount)}${ChatColor.RED}.")
                             return@NumberPrompt
                         }
@@ -135,7 +135,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                         CoinFlipGameMenu(game).openMenu(player)
 
                         player.sendMessage("${ChatColor.GREEN}You've created a Coinflip game for ${currency.format(input)}${ChatColor.GREEN}.")
-                    }
+                    }.start(player)
                 }.openMenu(player)
             }
         }

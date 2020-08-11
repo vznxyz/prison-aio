@@ -132,25 +132,30 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
     }
 
     fun updateBackpackItemLore(itemStack: ItemStack) {
-        val lore = arrayListOf<String>()
-        lore.add("${ChatColor.GRAY}(ID: #$id)")
-        lore.add("")
-        lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
+        if (itemStack.hasItemMeta()) {
+            val lore = arrayListOf<String>()
+            lore.add("${ChatColor.GRAY}(ID: #$id)")
+            lore.add("")
+            lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
 
-        if (enchants.isEmpty()) {
-            lore.add("${ChatColor.GRAY}None")
-        } else {
-            for (enchant in enchants) {
-                lore.add("${enchant.key.lorified()} ${enchant.value}")
+            if (enchants.isEmpty()) {
+                lore.add("${ChatColor.GRAY}None")
+            } else {
+                for (enchant in enchants) {
+                    lore.add("${enchant.key.lorified()} ${enchant.value}")
+                }
             }
+
+            lore.add("")
+            lore.add("${ChatColor.GRAY}Right-click while holding this")
+            lore.add("${ChatColor.GRAY}backpack in your hand to access")
+            lore.add("${ChatColor.GRAY}its contents!")
+
+            val meta = itemStack.itemMeta
+            meta.lore = lore
+
+            itemStack.itemMeta = meta
         }
-
-        lore.add("")
-        lore.add("${ChatColor.GRAY}Right-click while holding this")
-        lore.add("${ChatColor.GRAY}backpack in your hand to access")
-        lore.add("${ChatColor.GRAY}its contents!")
-
-        itemStack.lore = lore
     }
 
 }

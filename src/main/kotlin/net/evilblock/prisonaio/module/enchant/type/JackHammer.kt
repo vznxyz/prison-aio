@@ -12,10 +12,8 @@ import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.Region
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.Color
-import org.bukkit.Material
+import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
+import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
@@ -48,6 +46,16 @@ object JackHammer : AbstractEnchant("jack-hammer", "Jack Hammer", 5000) {
             // get all blocks in mine region that are on the same y as the original block broken
             for (x in region.getBreakableCuboid()!!.lowerX..region.getBreakableCuboid()!!.upperX) {
                 for (z in region.getBreakableCuboid()!!.lowerZ..region.getBreakableCuboid()!!.upperZ) {
+                    val location = Location(region.getBreakableCuboid()!!.world, x.toDouble(), event.block.location.blockY.toDouble(), z.toDouble())
+                    if (MineCrateHandler.isAttached(location)) {
+                        val mineCrate = MineCrateHandler.getSpawnedCrate(location)
+                        if (mineCrate.owner == event.player.uniqueId) {
+                            mineCrate.destroy(true)
+                        }
+
+                        continue // skip adding block to block list
+                    }
+
                     blocks.add(region.getBreakableCuboid()!!.world.getBlockAt(x, event.block.location.blockY, z))
                 }
             }

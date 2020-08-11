@@ -59,7 +59,7 @@ class PickaxePrestige(val number: Int) {
         Economy.takeBalance(player.uniqueId, moneyRequired.toDouble())
 
         pickaxeData.prestige++
-        pickaxeData.applyLore(pickaxeItem)
+        pickaxeData.applyMeta(pickaxeItem)
     }
 
 }

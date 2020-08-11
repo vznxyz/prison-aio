@@ -31,6 +31,7 @@ import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
+import java.lang.StringBuilder
 import java.util.*
 
 object EnchantsManager : Listener {
@@ -222,10 +223,10 @@ object EnchantsManager : Listener {
         if (newItem != null) {
             if (pickaxeData == null && MechanicsModule.isPickaxe(newItem)) {
                 pickaxeData = PickaxeData()
-                pickaxeData.sync(newItem)
-                pickaxeData.applyLore(newItem)
-
                 PickaxeHandler.trackPickaxeData(pickaxeData)
+
+                pickaxeData.sync(newItem)
+                pickaxeData.applyMeta(newItem)
 
                 newItem = pickaxeData.applyNBT(newItem)
 
@@ -340,7 +341,7 @@ object EnchantsManager : Listener {
         }
 
         pickaxeData.setLevel(enchant, level)
-        pickaxeData.applyLore(item)
+        pickaxeData.applyMeta(item)
 
         player.updateInventory()
 
@@ -350,7 +351,7 @@ object EnchantsManager : Listener {
     @JvmStatic
     fun addEnchant(player: Player, pickaxeData: PickaxeData, item: ItemStack, enchant: AbstractEnchant?, level: Int, force: Boolean): Boolean {
         var level = level
-        if (!enchant!!.canEnchant(item)) {
+        if (!enchant!!.canMaterialBeEnchanted(item.type)) {
             return false
         }
 
@@ -373,7 +374,7 @@ object EnchantsManager : Listener {
         }
 
         pickaxeData.setLevel(enchant, level)
-        pickaxeData.applyLore(item)
+        pickaxeData.applyMeta(item)
 
         return true
     }
@@ -381,7 +382,12 @@ object EnchantsManager : Listener {
     @JvmStatic
     fun removeEnchant(pickaxeData: PickaxeData, item: ItemStack, enchant: AbstractEnchant): Boolean {
         pickaxeData.removeEnchant(enchant)
-        pickaxeData.applyLore(item)
+        pickaxeData.applyMeta(item)
+
+        if (enchant is VanillaOverride) {
+            item.removeEnchantment((enchant as VanillaOverride).override)
+        }
+
         return true
     }
 
@@ -392,19 +398,34 @@ object EnchantsManager : Listener {
             return map
         }
 
-        for (enchant in enchants) {
-            if (enchant.canMaterialBeEnchanted(item.type)) {
-                for (lore in item.itemMeta.lore) {
-                    if (lore.contains(enchant.lorified())) {
-                        val splitLore = lore.split(" ").toTypedArray()
-                        if (splitLore.size > 1) {
-                            val intLevel = splitLore[splitLore.size - 1]
-                            if (NumberUtils.isInt(intLevel)) {
-                                map[enchant] = Integer.valueOf(intLevel)
-                                break
-                            }
-                        }
-                    }
+        for (loreLine in item.itemMeta.lore) {
+            val splitLoreLine = ChatColor.stripColor(loreLine).split(" ")
+            if (splitLoreLine.size <= 1) {
+                continue
+            }
+
+            val enchantName = if (splitLoreLine.size > 3) {
+                val builder = StringBuilder()
+
+                for (i in 1 until splitLoreLine.size) {
+                    builder.append(splitLoreLine[i])
+                }
+
+                builder.toString()
+            } else {
+                splitLoreLine[1]
+            }
+
+            val enchant = getEnchantByName(enchantName)
+            if (enchant != null) {
+                if (!enchant.canMaterialBeEnchanted(item.type)) {
+                    continue
+                }
+
+                val intLevel = splitLoreLine[splitLoreLine.size - 1]
+                if (NumberUtils.isInt(intLevel)) {
+                    map[enchant] = Integer.valueOf(intLevel)
+                    break
                 }
             }
         }
@@ -452,6 +473,11 @@ object EnchantsManager : Listener {
     @JvmStatic
     fun getEnchantById(id: String): AbstractEnchant? {
         return enchants.first { it.id.equals(id, ignoreCase = true) }
+    }
+
+    @JvmStatic
+    fun getEnchantByName(name: String): AbstractEnchant? {
+        return enchants.first { it.enchant.equals(name, ignoreCase = true) }
     }
 
     private val enchantColorOrder = mapOf<Color, Int>(

@@ -12,6 +12,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.template.MenuTemplate
 import net.evilblock.cubed.menu.template.MenuTemplateButtonFactory
+import net.evilblock.cubed.util.bukkit.InventoryUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -80,11 +81,19 @@ class ShopMenuTemplate(id: String, @JsonAdapter(ShopReferenceSerializer::class) 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick && clickType.isShiftClick && shop.currency == Currency.Type.MONEY) {
                 NumberPrompt("${ChatColor.GREEN}Please input a quantity.") { quantity ->
-                    assert(quantity.toInt() > 0) { "Quantity must be more than 0" }
-                    assert(quantity.toInt() <= 2881) { "Quantity must be less than 2881" }
+                    if (quantity.toInt() < 0) {
+                        player.sendMessage("${ChatColor.RED}Quantity must be more than 0.")
+                        return@NumberPrompt
+                    }
 
                     ConfirmMenu("Purchase x${quantity}?") { confirmed ->
                         if (confirmed) {
+                            val maxItemsSize = InventoryUtils.getMaxItemsSize(player, shopItem.itemStack)
+                            if (quantity.toInt() >= maxItemsSize) {
+                                player.sendMessage("${ChatColor.RED}You don't have enough space in your inventory to purchase that many items.")
+                                return@ConfirmMenu
+                            }
+
                             val receipt = shop.buyItems(player, setOf(ShopReceiptItem(shopItem, ItemBuilder.copyOf(shopItem.itemStack).amount(quantity.toInt()).build())))
                             if (receipt.result != TransactionResult.SUCCESS) {
                                 player.sendMessage("${ChatColor.RED}${receipt.result.defaultMessage}!")

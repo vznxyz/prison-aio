@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.gang.challenge.impl
 
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.ProgressBarBuilder
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.gang.Gang
 import net.evilblock.prisonaio.module.gang.challenge.GangChallenge
 import org.bukkit.ChatColor
@@ -26,9 +27,11 @@ class BlocksMinedGangChallenge(id: String, reward: Int, private val amount: Long
         )
     }
 
-    override fun renderProgress(gang: Gang): String {
+    override fun renderProgress(gang: Gang): List<String> {
         val percentage = ProgressBarBuilder.percentage(gang.challengesData.blocksMined.toInt(), amount.toInt())
-        return ProgressBarBuilder(char = '⬛').build(percentage)
+        val progressColor = ProgressBarBuilder.colorPercentage(percentage)
+        val progressBar = ProgressBarBuilder(char = '⬛').build(percentage)
+        return listOf("${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ($progressColor${percentage.toInt()}%${ChatColor.GRAY})")
     }
 
     override fun meetsCompletionRequirements(gang: Gang): Boolean {

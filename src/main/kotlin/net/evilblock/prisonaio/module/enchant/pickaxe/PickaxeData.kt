@@ -17,6 +17,7 @@ import net.evilblock.prisonaio.module.enchant.serialize.EnchantsMapReferenceSeri
 import net.minecraft.server.v1_12_R1.NBTTagCompound
 import org.bukkit.ChatColor
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
@@ -74,7 +75,7 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
         return CraftItemStack.asBukkitCopy(nmsItemStack)
     }
 
-    fun applyLore(itemStack: ItemStack) {
+    fun applyMeta(itemStack: ItemStack) {
         val lore = arrayListOf<String>()
 
         if (prestige > 0) {
@@ -88,6 +89,8 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
         if (itemStack.itemMeta != null) {
             val meta = itemStack.itemMeta
             meta.lore = lore
+
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
 
             itemStack.itemMeta = meta
         }

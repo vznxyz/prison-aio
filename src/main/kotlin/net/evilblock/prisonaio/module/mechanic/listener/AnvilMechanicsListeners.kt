@@ -9,6 +9,8 @@ package net.evilblock.prisonaio.module.mechanic.listener
 
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mechanic.event.AnvilPrepareEvent
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -50,6 +52,11 @@ object AnvilMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onInteractAnvil(event: PlayerInteractEvent) {
         if (MechanicsModule.areAnvilMechanicsDisabled()) {
+            if (RegionBypass.hasBypass(event.player) && event.player.gameMode == GameMode.CREATIVE) {
+                RegionBypass.attemptNotify(event.player)
+                return
+            }
+
             if (event.action != Action.RIGHT_CLICK_BLOCK) {
                 return
             }
@@ -63,6 +70,11 @@ object AnvilMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onPlaceAnvil(event: BlockPlaceEvent) {
         if (MechanicsModule.areAnvilMechanicsDisabled()) {
+            if (RegionBypass.hasBypass(event.player) && event.player.gameMode == GameMode.CREATIVE) {
+                RegionBypass.attemptNotify(event.player)
+                return
+            }
+
             if (event.block.type == Material.ANVIL) {
                 event.isCancelled = true
             }

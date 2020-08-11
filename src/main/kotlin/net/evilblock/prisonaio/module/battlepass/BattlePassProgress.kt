@@ -74,14 +74,14 @@ class BattlePassProgress(@Transient var user: User) {
     }
 
     fun completeChallenge(challenge: Challenge) {
+        experience += challenge.rewardXp
+
         if (challenge.daily) {
             DailyChallengeHandler.getSession().getProgress(user.uuid).completeChallenge(challenge)
-            return
+        } else {
+            completedChallenges.add(challenge)
+            user.requiresSave = true
         }
-
-        completedChallenges.add(challenge)
-        experience += challenge.rewardXp
-        user.requiresSave = true
     }
 
     fun claimReward(player: Player, tier: Tier, reward: Reward) {

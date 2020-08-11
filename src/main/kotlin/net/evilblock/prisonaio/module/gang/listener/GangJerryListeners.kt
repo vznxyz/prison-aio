@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerTeleportEvent
 object GangJerryListeners : Listener {
 
     /**
-     * Prevents players from placing Jerry outside of their cell with the move tool.
+     * Prevents players from placing Jerry outside of their gang with the move tool.
      */
     @EventHandler
     fun onEntityMovedEvent(event: EntityMoveTool.EntityMovedEvent) {

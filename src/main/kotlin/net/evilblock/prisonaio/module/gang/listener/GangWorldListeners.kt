@@ -64,11 +64,11 @@ object GangWorldListeners : Listener {
     @EventHandler
     fun onPlayerMoveEvent(event: PlayerMoveEvent) {
         if (event.player.world == GangHandler.getGridWorld() && event.to.y <= -20) {
-            val visitingCell = GangHandler.getVisitingGang(event.player)
-            if (visitingCell == null) {
+            val visitingGang = GangHandler.getVisitingGang(event.player)
+            if (visitingGang == null) {
                 event.player.teleport(Bukkit.getWorlds()[0].spawnLocation)
             } else {
-                event.player.teleport(visitingCell.homeLocation)
+                event.player.teleport(visitingGang.homeLocation)
             }
         }
     }

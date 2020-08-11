@@ -192,7 +192,7 @@ class RefundEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxe
                                 player.updateInventory()
 
                                 pickaxeData.removeEnchant(enchant)
-                                pickaxeData.applyLore(pickaxeItem)
+                                pickaxeData.applyMeta(pickaxeItem)
                             } else {
                                 player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted discarding of Cubed enchantment!")
                             }
@@ -218,7 +218,7 @@ class RefundEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxe
                                 Currency.Type.TOKENS.give(player, refundedTokens)
 
                                 pickaxeData.removeEnchant(enchant)
-                                pickaxeData.applyLore(pickaxeItem)
+                                pickaxeData.applyMeta(pickaxeItem)
                             } else {
                                 player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted refund!")
                             }

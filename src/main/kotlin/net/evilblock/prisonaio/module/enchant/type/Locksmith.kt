@@ -36,7 +36,7 @@ object Locksmith : AbstractEnchant("locksmith", "Locksmith", 5) {
 
     override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
         for ((key, value) in readKeyPercentMap()) {
-            if (Chance.percent(value)) {
+            if (Chance.percent(value * (1.0 + (level / 10)))) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "crate givekey to " + event.player.name + " " + key + " 1")
                 sendMessage(event.player, "You have found a " + ChatColor.RED + ChatColor.BOLD + key + " Key" + ChatColor.GRAY + "!")
                 break
@@ -46,7 +46,7 @@ object Locksmith : AbstractEnchant("locksmith", "Locksmith", 5) {
 
     private fun readKeyPercentMap(): Map<String, Double> {
         val section = EnchantsModule.config.getConfigurationSection("locksmith.key-percentages")
-        return section.getKeys(false).shuffled().map { it to section.getDouble(it) }.toMap()
+        return section.getKeys(false).map { it to section.getDouble(it) }.sortedBy { it.second }.shuffled().toMap()
     }
 
 }

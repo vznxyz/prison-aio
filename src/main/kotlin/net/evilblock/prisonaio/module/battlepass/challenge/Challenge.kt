@@ -75,4 +75,14 @@ abstract class Challenge(val id: String, internal var daily: Boolean = false) : 
         return true
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is Challenge && other.id == this.id && other.daily == this.daily
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + daily.hashCode()
+        return result
+    }
+
 }

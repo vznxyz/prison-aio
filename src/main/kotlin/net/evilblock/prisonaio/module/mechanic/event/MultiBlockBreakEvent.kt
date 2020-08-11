@@ -15,7 +15,8 @@ import org.bukkit.event.Cancellable
 class MultiBlockBreakEvent(val player: Player,
                            val block: Block,
                            val blockList: MutableList<Block>,
-                           yield: Float) : PluginEvent(), Cancellable {
+                           yield: Float,
+                           val skipBlockUpdates: Boolean = false) : PluginEvent(), Cancellable {
 
     var yield: Float = 100F.coerceAtMost(0F.coerceAtLeast(`yield`))
     private var cancelled: Boolean = false

@@ -26,14 +26,14 @@ class HomesMenu : Menu() {
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        for (cell in GangHandler.getAccessibleGangs(player.uniqueId).sortedBy { if (it.owner == player.uniqueId) 0 else 1 }) {
-            buttons[buttons.size] = CellButton(cell)
+        for (gang in GangHandler.getAccessibleGangs(player.uniqueId).sortedBy { if (it.owner == player.uniqueId) 0 else 1 }) {
+            buttons[buttons.size] = GangButton(gang)
         }
 
         return buttons
     }
 
-    private inner class CellButton(private val gang: Gang) : Button() {
+    private inner class GangButton(private val gang: Gang) : Button() {
         override fun getName(player: Player): String {
             return "${ChatColor.GREEN}${ChatColor.BOLD}${gang.name}"
         }

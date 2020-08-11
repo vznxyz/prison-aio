@@ -14,6 +14,7 @@ import net.evilblock.cubed.util.bukkit.HiddenLore
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.challenge.menu.GangChallengesMenu
 import net.evilblock.prisonaio.module.gang.entity.JerryNpcEntity
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -26,6 +27,11 @@ import org.bukkit.inventory.meta.SkullMeta
 
 class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
 
+    init {
+        updateAfterClick = true
+        placeholder = true
+    }
+
     override fun getTitle(player: Player): String {
         return "Jerry The Prison Guard"
     }
@@ -34,11 +40,12 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
         val buttons = hashMapOf<Int, Button>()
 
         buttons[10] = AnnouncementButton()
-        buttons[13] = AchievementsButton()
-        buttons[16] = MoveLocationButton()
+        buttons[13] = ChallengesButton()
+        buttons[16] = AchievementsButton()
 
         buttons[28] = SettingsButton()
         buttons[31] = MembersButton()
+        buttons[34] = MoveLocationButton()
 
         return buttons
     }
@@ -49,7 +56,7 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
 
     private inner class AnnouncementButton : Button() {
         override fun getName(player: Player): String {
-            return "${ChatColor.YELLOW}${ChatColor.BOLD}Cell Announcement"
+            return "${ChatColor.YELLOW}${ChatColor.BOLD}Gang Announcement"
         }
 
         override fun getDescription(player: Player): List<String> {
@@ -71,13 +78,41 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
         }
     }
 
-    private inner class AchievementsButton : Button() {
+    private inner class ChallengesButton : Button() {
         override fun getName(player: Player): String {
-            return "${ChatColor.YELLOW}${ChatColor.BOLD}Cell Achievements"
+            return "${ChatColor.YELLOW}${ChatColor.BOLD}Gang Challenges"
         }
 
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
+
+            description.add("")
+            description.addAll(TextSplitter.split(text = "Complete challenges with your gang members to earn your gang trophies.", linePrefix = ChatColor.GRAY.toString()))
+            description.add("")
+            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to view challenges")
+
+            return description
+        }
+
+        override fun getMaterial(player: Player): Material {
+            return Material.BOOK
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                GangChallengesMenu(jerry.gang).openMenu(player)
+            }
+        }
+    }
+
+    private inner class AchievementsButton : Button() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.YELLOW}${ChatColor.BOLD}Gang Achievements"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            val description = arrayListOf<String>()
+
             description.add("")
             description.add("${ChatColor.GRAY}Coming soon!")
 
@@ -95,13 +130,14 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            return listOf(
-                "",
-                "${ChatColor.GRAY}Move Jerry's location by",
-                "${ChatColor.GRAY}using the Mover Tool.",
-                "",
-                "${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to move Jerry"
-            )
+            val description = arrayListOf<String>()
+
+            description.add("")
+            description.addAll(TextSplitter.split(text = "Move Jerry's location by using the Mover Tool.", linePrefix = ChatColor.GRAY.toString()))
+            description.add("")
+            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to move Jerry")
+
+            return description
         }
 
         override fun getMaterial(player: Player): Material {

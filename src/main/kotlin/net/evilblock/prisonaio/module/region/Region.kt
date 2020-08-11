@@ -15,6 +15,7 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.block.BlockIgniteEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.projectiles.ProjectileSource
 
 interface Region {
 
@@ -94,6 +95,10 @@ interface Region {
                 }
             }
         }
+    }
+
+    fun onProjectileLaunch(projectile: Projectile, source: ProjectileSource, cancellable: Cancellable) {
+
     }
 
     fun onFoodLevelChange(cancellable: Cancellable) {

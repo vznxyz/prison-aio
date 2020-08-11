@@ -1,7 +1,7 @@
 help-messages:
   - "{LONG_LINE}"
   - "&7&lMine&c&lJunkie &78- &7&lHelpful Information"
-  - "&eUse `/cell create` to create a new cell."
+  - "&eUse `/gang create` to create a new cell."
   - "{LONG_LINE}"
 
 vanilla-mechanics:

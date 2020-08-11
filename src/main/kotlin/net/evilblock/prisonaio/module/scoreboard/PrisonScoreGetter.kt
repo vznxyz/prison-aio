@@ -76,7 +76,12 @@ object PrisonScoreGetter : ScoreGetter {
             scores.add("  ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Prestige ${user.getPrestige()}")
         }
 
-        val moneyBalance = user.getMoneyBalance()
+        val moneyBalance = try {
+            user.getMoneyBalance()
+        } catch (e: Exception) {
+            0.0
+        }
+
         val formattedMoneyBalance = NumberUtils.format(moneyBalance)
         scores.add("  ${ChatColor.RED}${Constants.MONEY_SYMBOL} ${ChatColor.GRAY}$formattedMoneyBalance")
 

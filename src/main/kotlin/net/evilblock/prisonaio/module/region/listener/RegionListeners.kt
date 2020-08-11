@@ -23,6 +23,7 @@ import org.bukkit.event.block.*
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.*
 
 object RegionListeners : Listener {
@@ -169,6 +170,13 @@ object RegionListeners : Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onEntityDamageByEntityEvent(event: EntityDamageByEntityEvent) {
         RegionsModule.findRegion(event.damager.location).onEntityDamageEntity(event.damager, event.entity, event.cause, event.finalDamage, event)
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    fun onProjectileLaunchEvent(event: ProjectileLaunchEvent) {
+        if (event.entity.shooter != null) {
+            RegionsModule.findRegion(event.entity.location).onProjectileLaunch(event.entity, event.entity.shooter, event)
+        }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)

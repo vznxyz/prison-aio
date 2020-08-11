@@ -21,7 +21,7 @@ enum class GangPermission(
     ALLOW_VISITORS(
         "Allow Visitors",
         "This setting controls whether or not players can visit your cell.",
-        "The owner of that cell isn't accepting visitors right now.",
+        "The owner of that gang isn't accepting visitors right now.",
         Material.WOOD_DOOR,
         PermissionValue.MEMBERS,
         setOf(PermissionValue.OWNER)

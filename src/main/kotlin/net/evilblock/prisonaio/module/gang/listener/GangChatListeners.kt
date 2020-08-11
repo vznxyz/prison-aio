@@ -19,15 +19,15 @@ object GangChatListeners : Listener {
     @EventHandler
     fun onAsyncPlayerChatEvent(event: AsyncPlayerChatEvent) {
         if (event.message.startsWith("@")) {
-            val joinableCells = GangHandler.getAccessibleGangs(event.player.uniqueId)
-            if (joinableCells.size == 1) {
-                handleMessage(event, joinableCells.first())
+            val accessibleGangs = GangHandler.getAccessibleGangs(event.player.uniqueId)
+            if (accessibleGangs.size == 1) {
+                handleMessage(event, accessibleGangs.first())
                 return
             }
 
-            val visitingCell = GangHandler.getVisitingGang(event.player)
-            if (visitingCell != null) {
-                handleMessage(event, visitingCell)
+            val visitingGang = GangHandler.getVisitingGang(event.player)
+            if (visitingGang != null) {
+                handleMessage(event, visitingGang)
             }
         }
     }

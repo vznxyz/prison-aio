@@ -157,7 +157,7 @@ class Gang(
                 }
             }
             GangPermission.PermissionValue.CAPTAINS -> {
-                if (player.uniqueId != owner || !captains.contains(player.uniqueId)) {
+                if (player.uniqueId != owner && !captains.contains(player.uniqueId)) {
                     if (sendMessage) {
                         player.sendMessage("${ChatColor.RED}${permission.error}.")
                     }

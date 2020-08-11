@@ -19,8 +19,8 @@ abstract class GangChallenge(val id: String, val reward: Int) {
         return false
     }
 
-    open fun renderProgress(gang: Gang): String {
-        return ""
+    open fun renderProgress(gang: Gang): List<String> {
+        return emptyList()
     }
 
     abstract fun meetsCompletionRequirements(gang: Gang): Boolean

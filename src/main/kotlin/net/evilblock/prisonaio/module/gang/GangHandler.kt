@@ -336,7 +336,7 @@ object GangHandler : PluginHandler {
      */
     @Throws(IllegalStateException::class)
     fun resetGang(gang: Gang, onFinish: () -> Unit) {
-        assert(!Bukkit.isPrimaryThread()) { "Cannot reset cell on primary thread" }
+        assert(!Bukkit.isPrimaryThread()) { "Cannot reset gang on primary thread" }
 
         val schematicFile = GangModule.getIslandSchematicFile()
         if (!schematicFile.exists()) {

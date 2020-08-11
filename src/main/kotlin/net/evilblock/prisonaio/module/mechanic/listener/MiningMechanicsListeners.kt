@@ -127,9 +127,11 @@ object MiningMechanicsListeners : Listener {
         }
 
         // simulate block breaking
-        for (block in validBlocks) {
-            block.type = Material.AIR
-            block.state.update()
+        if (!event.skipBlockUpdates) {
+            for (block in validBlocks) {
+                block.type = Material.AIR
+                block.state.update()
+            }
         }
 
         val backpacks = BackpackHandler.findBackpacksInInventory(event.player)

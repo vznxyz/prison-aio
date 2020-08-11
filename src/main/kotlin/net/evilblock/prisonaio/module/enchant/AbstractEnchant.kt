@@ -43,18 +43,7 @@ abstract class AbstractEnchant(val id: String, val enchant: String, val maxLevel
         return "${ColorUtil.toChatColor(iconColor)}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}$enchant"
     }
 
-    fun canEnchant(item: ItemStack): Boolean {
-        if (item.itemMeta.hasLore()) {
-            for (lore in item.itemMeta.lore) {
-                if (lore.contains(lorified())) {
-                    return false
-                }
-            }
-        }
-        return canMaterialBeEnchanted(item.type)
-    }
-
-    fun canMaterialBeEnchanted(material: Material?): Boolean {
+    fun canMaterialBeEnchanted(material: Material): Boolean {
         return material == Material.DIAMOND_PICKAXE ||
                 material == Material.IRON_PICKAXE ||
                 material == Material.GOLD_PICKAXE ||

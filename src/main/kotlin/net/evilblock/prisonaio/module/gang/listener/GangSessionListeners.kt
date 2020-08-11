@@ -63,10 +63,10 @@ object GangSessionListeners : Listener {
      */
     @EventHandler
     fun onPlayerQuitEvent(event: PlayerQuitEvent) {
-        val currentCell = GangHandler.getVisitingGang(event.player)
-        currentCell?.leaveSession(event.player)
+        val visitingGang = GangHandler.getVisitingGang(event.player)
+        visitingGang?.leaveSession(event.player)
 
-        GangHandler.updatePreviousGang(event.player.uniqueId, currentCell)
+        GangHandler.updatePreviousGang(event.player.uniqueId, visitingGang)
         GangHandler.updateVisitingGang(event.player, null)
 
         event.player.isFlying = false

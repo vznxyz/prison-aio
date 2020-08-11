@@ -11,7 +11,6 @@ import com.google.gson.annotations.JsonAdapter
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.serialize.ChallengeListReferenceSerializer
 import net.evilblock.prisonaio.module.mine.Mine
-import net.evilblock.prisonaio.module.user.UserHandler
 import java.util.*
 
 class DailyChallengesProgress(val uuid: UUID) {
@@ -25,15 +24,12 @@ class DailyChallengesProgress(val uuid: UUID) {
     private var timesPrestiged: Int = 0
     private var commandsExecuted: MutableSet<String> = hashSetOf()
 
-    @Synchronized
     fun hasCompletedChallenge(challenge: Challenge): Boolean {
         return completedChallenges.contains(challenge)
     }
 
-    @Synchronized
     fun completeChallenge(challenge: Challenge) {
         completedChallenges.add(challenge)
-        UserHandler.getUser(uuid).battlePassProgress.addExperience(challenge.rewardXp)
     }
 
     fun addBlocksMined(amount: Int) {

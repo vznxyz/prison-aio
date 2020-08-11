@@ -14,14 +14,14 @@ import org.bukkit.ChatColor
 class LeaderboardsPlacementGangChallenge(id: String, reward: Int) : GangChallenge(id, reward) {
 
     override fun getRenderedName(): String {
-        return "Get Gang Top Leaderboards Placement"
+        return "Gang Top Leaderboards Placement"
     }
 
     override fun renderGoal(): List<String> {
         return listOf(
             "${ChatColor.GRAY}You and your gang members need to",
-            "${ChatColor.GRAY}acquire trophies and place on the",
-            "${ChatColor.GRAY}Gang Top leaderboards."
+            "${ChatColor.GRAY}acquire trophies and secure a position",
+            "${ChatColor.GRAY}on the Gang Top leaderboards."
         )
     }
 

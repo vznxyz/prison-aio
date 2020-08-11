@@ -98,6 +98,10 @@ object ChallengeHandler : PluginHandler {
         val user = UserHandler.getUser(player.uniqueId)
         if (user.battlePassProgress.isPremium()) {
             for (challenge in challenges.values) {
+                if (challenge.daily) {
+                    continue
+                }
+
                 if (user.battlePassProgress.hasCompletedChallenge(challenge)) {
                     continue
                 }

@@ -16,7 +16,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
-import java.util.*
 
 object BackpackListeners : Listener {
 
@@ -37,10 +36,10 @@ object BackpackListeners : Listener {
             if (event.hasItem() && BackpackHandler.isBackpackItem(event.item)) {
                 val backpack = BackpackHandler.extractBackpack(event.item)
                 if (backpack != null) {
+                    event.isCancelled = true
+
                     backpack.updateBackpackItemLore(event.item)
                     backpack.open(event.player)
-
-                    event.isCancelled = true
                 }
             }
         }

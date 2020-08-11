@@ -55,38 +55,41 @@ class PickaxeButton(
     }
 
     override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-        val prestigeTo = PickaxePrestigeHandler.getNextPrestige(pickaxeData.prestige)
-        if (prestigeTo != null) {
-            if (prestigeTo.meetsRequirements(player)) {
-                ConfirmMenu { confirmed ->
-                    if (confirmed) {
-                        prestigeTo.purchase(player, pickaxeItem, pickaxeData)
+        val nextPrestige = PickaxePrestigeHandler.getNextPrestige(pickaxeData.prestige)
+        if (nextPrestige != null) {
+            if (!nextPrestige.meetsRequirements(player)) {
+                player.sendMessage("${ChatColor.RED}You don't meet the requirements to prestige your pickaxe!")
+                return
+            }
 
-                        val newNextPrestige = PickaxePrestigeHandler.getNextPrestige(pickaxeData.prestige)
+            ConfirmMenu { confirmed ->
+                if (confirmed) {
+                    nextPrestige.purchase(player, pickaxeItem, pickaxeData)
 
-                        player.sendMessage("")
-                        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Acquired Pickaxe Prestige ${pickaxeData.prestige}")
-                        player.sendMessage(" ${ChatColor.GRAY}Your pickaxe has reached the next prestige!")
+                    val newNextPrestige = PickaxePrestigeHandler.getNextPrestige(pickaxeData.prestige)
 
-                        if (newNextPrestige != null) {
-                            if (newNextPrestige.enchantLimits.isNotEmpty()) {
-                                player.sendMessage("")
-                                player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}NEW ENCHANT LIMITS")
+                    player.sendMessage("")
+                    player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Acquired Pickaxe Prestige ${pickaxeData.prestige}")
+                    player.sendMessage(" ${ChatColor.GRAY}Your pickaxe has reached the next prestige!")
 
-                                for ((enchant, level) in newNextPrestige.enchantLimits.entries.sortedWith(EnchantsManager.ENCHANT_COMPARATOR)) {
-                                    if (!prestigeTo.enchantLimits.containsKey(enchant) || prestigeTo.enchantLimits.getValue(enchant) != level) {
-                                        player.sendMessage(" ${enchant.lorified()} ${ChatColor.GRAY}${NumberUtils.format(level)}")
-                                    }
+                    if (newNextPrestige != null) {
+                        if (newNextPrestige.enchantLimits.isNotEmpty()) {
+                            player.sendMessage("")
+                            player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}NEW ENCHANT LIMITS")
+
+                            for ((enchant, level) in newNextPrestige.enchantLimits.entries.sortedWith(EnchantsManager.ENCHANT_COMPARATOR)) {
+                                if (!nextPrestige.enchantLimits.containsKey(enchant) || nextPrestige.enchantLimits.getValue(enchant) != level) {
+                                    player.sendMessage(" ${enchant.lorified()} ${ChatColor.GRAY}${NumberUtils.format(level)}")
                                 }
                             }
                         }
-
-                        player.sendMessage("")
                     }
 
-                    returnFunc.invoke(player)
-                }.openMenu(player)
-            }
+                    player.sendMessage("")
+                }
+
+                returnFunc.invoke(player)
+            }.openMenu(player)
         } else {
             player.sendMessage("${ChatColor.RED}It appears you've maxed your pickaxe prestige.")
         }
