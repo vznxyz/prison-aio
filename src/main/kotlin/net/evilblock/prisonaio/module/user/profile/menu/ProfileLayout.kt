@@ -8,16 +8,22 @@
 package net.evilblock.prisonaio.module.user.profile.menu
 
 import net.evilblock.cubed.menu.Button
+import net.evilblock.cubed.menu.buttons.AddButton
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.buttons.SkullButton
 import net.evilblock.cubed.menu.buttons.TexturedHeadButton
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
+import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.prisonaio.module.user.User
+import net.evilblock.prisonaio.module.user.profile.ProfileComment
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileCommentsMenu
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileStatisticsMenu
+import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.module.user.setting.menu.UserSettingsMenu
+import net.evilblock.prisonaio.module.user.setting.option.CommentsRestrictionOption
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -43,11 +49,11 @@ class ProfileLayout(
         val buttons = hashMapOf<Int, Button>()
 
         for (i in GREY_SLOTS) {
-            buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 7, " ")
+            buttons[i] = GlassButton(7)
         }
 
         for (i in RED_SLOTS) {
-            buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 14)
+            buttons[i] = GlassButton(14)
         }
 
         buttons[0] = HeadButton()
@@ -58,15 +64,79 @@ class ProfileLayout(
             buttons[6] = SettingsButton()
         }
 
+        if (activeTab == ProfileMenuTab.COMMENTS) {
+            if (!user.hasPostedProfileComment(player.uniqueId)) {
+                val allowingComments = (user.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
+                if (allowingComments) {
+                    buttons[12] = AddCommentButton()
+                } else {
+                    buttons[12] = NotAllowingCommentsButton()
+                }
+            }
+        }
+
         return buttons
+    }
+
+    private inner class AddCommentButton : AddButton() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.AQUA}${ChatColor.BOLD}Post New Comment"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            val description = arrayListOf<String>()
+
+            description.add("")
+            description.addAll(TextSplitter.split(text = "Post a new comment to ${user.getUsername()}'s profile.", linePrefix = "${ChatColor.GRAY}"))
+            description.add("")
+            description.addAll(TextSplitter.split(text = "Posting unsolicited links or content deemed as harassment will result in punishment.", linePrefix = "${ChatColor.RED}"))
+            description.add("")
+            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to post a comment")
+
+            return description
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                val allowingComments = (user.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
+                if (allowingComments && !user.hasPostedProfileComment(player.uniqueId)) {
+                    EzPrompt.Builder()
+                        .promptText("${ChatColor.GREEN}Please type the message you'd like to post on ${user.getUsername()}'s profile. ${ChatColor.GRAY}(Limited to 120 characters)")
+                        .acceptInput { _, input ->
+                            user.addProfileComment(ProfileComment(creator = player.uniqueId, message = input))
+                            ProfileCommentsMenu(user).openMenu(player)
+                        }
+                        .charLimit(120)
+                        .build()
+                        .start(player)
+                }
+            }
+        }
+    }
+
+    private inner class NotAllowingCommentsButton : Button() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.GRAY}${ChatColor.BOLD}Comments Disabled"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            val description = arrayListOf<String>()
+            description.add("")
+            description.addAll(TextSplitter.split(length = 40, text = "${user.getUsername()} has disabled other players from leaving comments on their profile.", linePrefix = "${ChatColor.GRAY}"))
+            return description
+        }
+
+        override fun getMaterial(player: Player): Material {
+            return Material.BARRIER
+        }
     }
 
     private inner class HeadButton : SkullButton(owner = user.uuid) {
         override fun getName(player: Player): String {
             val status = if (Bukkit.getPlayer(user.uuid) != null) {
-                "${ChatColor.GREEN}${ChatColor.BOLD}${Constants.DOT_SYMBOL} ONLINE"
+                "${ChatColor.GREEN}${ChatColor.BOLD}${Constants.DOT_SYMBOL}ONLINE"
             } else {
-                "${ChatColor.RED}${ChatColor.BOLD}${Constants.DOT_SYMBOL} OFFLINE"
+                "${ChatColor.RED}${ChatColor.BOLD}${Constants.DOT_SYMBOL}OFFLINE"
             }
 
             val text = if (user.uuid == player.uniqueId) {

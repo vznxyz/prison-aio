@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.enchant.type
 import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
+import net.evilblock.prisonaio.module.environment.analytic.Analytic
 import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -37,6 +38,7 @@ object Locksmith : AbstractEnchant("locksmith", "Locksmith", 5) {
     override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
         for ((key, value) in readKeyPercentMap()) {
             if (Chance.percent(value * (1.0 + (level / 10)))) {
+                Analytic.LOCKSMITH_KEYS_GIVEN.updateValue(Analytic.LOCKSMITH_KEYS_GIVEN.getValue<Int>() + 1)
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "crate givekey to " + event.player.name + " " + key + " 1")
                 sendMessage(event.player, "You have found a " + ChatColor.RED + ChatColor.BOLD + key + " Key" + ChatColor.GRAY + "!")
                 break

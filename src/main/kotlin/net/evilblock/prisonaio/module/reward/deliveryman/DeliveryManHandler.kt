@@ -38,7 +38,7 @@ object DeliveryManHandler : PluginHandler {
         return RewardsModule
     }
 
-    override fun hasInternalData(): Boolean {
+    override fun hasDefaultInternalData(): Boolean {
         return true
     }
 

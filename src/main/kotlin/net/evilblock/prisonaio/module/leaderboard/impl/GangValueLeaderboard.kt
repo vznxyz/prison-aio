@@ -7,26 +7,26 @@
 
 package net.evilblock.prisonaio.module.leaderboard.impl
 
-import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 
-object GangTopLeaderboard : Leaderboard("gang-top", "Gang Top") {
+object GangValueLeaderboard : Leaderboard("gang-value", "${ChatColor.DARK_RED}${ChatColor.BOLD}Top Gang Value") {
 
     override fun fetchEntries(): List<LeaderboardEntry<*>> {
-        val entries = arrayListOf<LeaderboardEntry<Int>>()
+        val entries = arrayListOf<LeaderboardEntry<Long>>()
 
         for (gang in GangHandler.getAllGangs()) {
-            entries.add(LeaderboardEntry(0, gang.name, gang.getTrophies()))
+            entries.add(LeaderboardEntry(0, gang.name, gang.cachedCellValue))
         }
 
-        return entries.sortedByDescending { it.value }.take(5)
+        return entries.sortedByDescending { it.value }.take(CACHED_ENTRIES_SIZE)
     }
 
     override fun formatEntry(entry: LeaderboardEntry<*>): String {
-        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.GOLD}${ChatColor.BOLD}${NumberUtils.format(entry.value as Int)} Trophies"
+        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${Formats.formatMoney((entry.value as Long).toDouble())}"
     }
 
 }

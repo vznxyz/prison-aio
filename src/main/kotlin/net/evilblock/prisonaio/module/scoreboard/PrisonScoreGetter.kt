@@ -16,10 +16,13 @@ import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldownHandler
 import net.evilblock.prisonaio.module.combat.enderpearl.EnderpearlCooldownHandler
 import net.evilblock.prisonaio.module.combat.region.CombatRegion
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
+import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
+import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
+import net.evilblock.prisonaio.module.user.setting.option.ScoreboardStyleOption
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.*
@@ -37,9 +40,19 @@ object PrisonScoreGetter : ScoreGetter {
             return
         }
 
+        if (EventGameHandler.isOngoingGame()) {
+            val game = EventGameHandler.getOngoingGame()
+            if (game != null) {
+                if (game.isPlayingOrSpectating(player.uniqueId)) {
+                    game.getScoreboardLines(player, scores)
+                    renderBorders(user, scores)
+                    return
+                }
+            }
+        }
+
         val region = RegionsModule.findRegion(player.location)
         if (region is CombatRegion) {
-            scores.add("")
             scores.add("  ${ChatColor.YELLOW}${ChatColor.BOLD}Kills: ${ChatColor.RED}${user.statistics.getKills()}")
             scores.add("  ${ChatColor.YELLOW}${ChatColor.BOLD}Deaths: ${ChatColor.RED}${user.statistics.getDeaths()}")
 
@@ -58,15 +71,10 @@ object PrisonScoreGetter : ScoreGetter {
                 scores.add("  ${ChatColor.GOLD}${ChatColor.BOLD}Gopple: ${ChatColor.RED}${TimeUtil.formatIntoMMSS(godAppleCooldown.getRemainingSeconds().toInt())}")
             }
 
-            scores.add("")
-            scores.add(0, "${ChatColor.DARK_GRAY}┌──────────────┐")
-            scores.add("     ${ChatColor.RED}${ChatColor.ITALIC}store.minejunkie.com")
-            scores.add("${ChatColor.DARK_GRAY}└──────────────┘")
-
+            renderBorders(user, scores)
             return
         }
 
-        scores.add("")
         scores.add("  ${ChatColor.RED}${ChatColor.BOLD}${player.name}")
         scores.add("  ${ChatColor.RED}${Constants.CROSSED_SWORDS_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}")
 
@@ -108,12 +116,27 @@ object PrisonScoreGetter : ScoreGetter {
             scores.add("  ${ChatColor.RED}${ChatColor.BOLD}Progress")
             scores.add("  ${ChatColor.GRAY}${user.getRank().displayName} ${ChatColor.GRAY}-> ${nextRank.displayName} ${ChatColor.GRAY}(${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedPrice${ChatColor.GRAY})")
             scores.add("  ${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ($progressColor${progressPercentage.toInt()}%${ChatColor.GRAY})")
-            scores.add("")
         }
 
-        scores.add(0, "${ChatColor.DARK_GRAY}┌──────────────┐")
-        scores.add("     ${ChatColor.RED}${ChatColor.ITALIC}store.minejunkie.com")
-        scores.add("${ChatColor.DARK_GRAY}└──────────────┘")
+        renderBorders(user, scores)
+    }
+
+    private fun renderBorders(user: User, list: MutableList<String>) {
+        when (user.getSettingOption(UserSetting.SCOREBOARD_STYLE).getValue<ScoreboardStyleOption.ScoreboardStyle>()) {
+            ScoreboardStyleOption.ScoreboardStyle.SIMPLE -> {
+                list.add(0, "${ChatColor.BLUE}${ChatColor.GRAY}${ChatColor.STRIKETHROUGH}----------------------")
+                list.add("")
+                list.add("      ${ChatColor.RED}${ChatColor.ITALIC}play.minejunkie.com")
+                list.add("${ChatColor.GRAY}${ChatColor.STRIKETHROUGH}----------------------")
+            }
+            ScoreboardStyleOption.ScoreboardStyle.FANCY -> {
+                list.add(0, "${ChatColor.DARK_GRAY}┌──────────────┐")
+                list.add(1, "")
+                list.add("")
+                list.add("      ${ChatColor.RED}${ChatColor.ITALIC}play.minejunkie.com")
+                list.add("${ChatColor.DARK_GRAY}└──────────────┘")
+            }
+        }
     }
 
 }

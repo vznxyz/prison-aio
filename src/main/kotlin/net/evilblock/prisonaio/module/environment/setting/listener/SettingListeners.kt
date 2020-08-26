@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.environment.setting.listener
 
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.environment.analytic.Analytic
 import net.evilblock.prisonaio.module.environment.setting.Setting
 import org.bukkit.Bukkit
@@ -23,7 +24,7 @@ object SettingListeners : Listener {
                 val message = Setting.FIRST_JOIN_MESSAGE_FORMAT.getValue<String>()
                     .replace("{playerName}", event.player.name)
                     .replace("{playerDisplayName}", event.player.displayName)
-                    .replace("{uniqueJoin}", Analytic.UNIQUE_JOINS.getValue<Int>().toString())
+                    .replace("{uniqueJoin}", NumberUtils.format(Analytic.UNIQUE_JOINS.getValue<Int>()))
 
                 for (player in Bukkit.getOnlinePlayers()) {
                     player.sendMessage(message)

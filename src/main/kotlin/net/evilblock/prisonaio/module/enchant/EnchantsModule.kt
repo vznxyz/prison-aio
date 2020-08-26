@@ -12,6 +12,7 @@ import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.command.*
+import net.evilblock.prisonaio.module.enchant.command.admin.*
 import net.evilblock.prisonaio.module.enchant.command.parameter.AbstractEnchantParameterType
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.enchant.pickaxe.prestige.PickaxePrestigeHandler
@@ -38,6 +39,7 @@ object EnchantsModule : PluginModule() {
         PickaxeHandler.initialLoad()
         PickaxePrestigeHandler.initialLoad()
         SalvagePreventionHandler.initialLoad()
+        EnchantsManager.loadConfig()
     }
 
     override fun onReload() {
@@ -65,8 +67,10 @@ object EnchantsModule : PluginModule() {
     override fun getCommands(): List<Class<*>> {
         return listOf(
             BookCommand.javaClass,
+            ManageEnchantsCommand.javaClass,
             EnchantCommand.javaClass,
             PickaxeCommand.javaClass,
+            PickaxeSetPrestigeCommand.javaClass,
             RemoveEnchantCommand.javaClass,
             SalvageCommand.javaClass,
             ToggleEnchantsMessagesCommand.javaClass,

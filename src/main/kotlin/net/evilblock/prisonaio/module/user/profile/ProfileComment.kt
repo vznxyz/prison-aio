@@ -15,5 +15,6 @@ data class ProfileComment(
 ) {
 
     val createdAt: Long = System.currentTimeMillis()
+    var read: Boolean = false
 
 }

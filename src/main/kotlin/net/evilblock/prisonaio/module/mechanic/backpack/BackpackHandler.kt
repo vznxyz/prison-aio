@@ -30,7 +30,7 @@ object BackpackHandler : PluginHandler {
         return MechanicsModule
     }
 
-    override fun hasInternalData(): Boolean {
+    override fun hasDefaultInternalData(): Boolean {
         return true
     }
 

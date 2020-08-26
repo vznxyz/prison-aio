@@ -82,7 +82,7 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
             lore.add("${ChatColor.DARK_RED}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige ${NumberUtils.format(prestige)}")
         }
 
-        for ((enchant, level) in enchants.entries.sortedWith(EnchantsManager.ENCHANT_COMPARATOR)) {
+        for ((enchant, level) in enchants.entries.sortedWith(EnchantsManager.MAPPED_ENCHANT_COMPARATOR)) {
             lore.add("${enchant.lorified()} ${NumberUtils.format(level)}")
         }
 

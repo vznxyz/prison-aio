@@ -7,7 +7,6 @@
 
 package net.evilblock.prisonaio.module.gang.command
 
-import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.gang.GangHandler
@@ -30,8 +29,8 @@ object GangLeaveCommand {
             return
         }
 
-        if (visitingGang.owner == player.uniqueId) {
-            player.sendMessage("${ChatColor.RED}Owners must disband their gang instead of leaving. Try `/gang disband`.")
+        if (visitingGang.leader == player.uniqueId) {
+            player.sendMessage("${ChatColor.RED}Leaders must disband their gang instead of leaving. Try `/gang disband`.")
             return
         }
 

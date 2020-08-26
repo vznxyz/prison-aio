@@ -7,12 +7,17 @@
 
 package net.evilblock.prisonaio.module.enchant.type
 
+import com.boydti.fawe.bukkit.wrapper.AsyncWorld
 import net.evilblock.cubed.util.Chance
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.setting.UserSetting
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.event.block.BlockBreakEvent
@@ -41,35 +46,48 @@ object JackHammer : AbstractEnchant("jack-hammer", "Jack Hammer", 5000) {
 
         val chance = level * readChance()
         if (Chance.percent(chance)) {
-            val blocks: MutableList<Block> = ArrayList()
+            Tasks.async {
+                val blocks: MutableList<Block> = ArrayList()
 
-            // get all blocks in mine region that are on the same y as the original block broken
-            for (x in region.getBreakableCuboid()!!.lowerX..region.getBreakableCuboid()!!.upperX) {
-                for (z in region.getBreakableCuboid()!!.lowerZ..region.getBreakableCuboid()!!.upperZ) {
-                    val location = Location(region.getBreakableCuboid()!!.world, x.toDouble(), event.block.location.blockY.toDouble(), z.toDouble())
-                    if (MineCrateHandler.isAttached(location)) {
-                        val mineCrate = MineCrateHandler.getSpawnedCrate(location)
-                        if (mineCrate.owner == event.player.uniqueId) {
-                            mineCrate.destroy(true)
+                for (x in region.getBreakableCuboid()!!.lowerX..region.getBreakableCuboid()!!.upperX) {
+                    for (z in region.getBreakableCuboid()!!.lowerZ..region.getBreakableCuboid()!!.upperZ) {
+                        val location = Location(region.getBreakableCuboid()!!.world, x.toDouble(), event.block.location.blockY.toDouble(), z.toDouble())
+
+                        if (MineCrateHandler.isAttached(location)) {
+                            val mineCrate = MineCrateHandler.getSpawnedCrate(location)
+                            if (mineCrate.owner == event.player.uniqueId) {
+                                mineCrate.destroy(true)
+                                MineCrateHandler.forgetSpawnedCrate(mineCrate)
+
+                                val sendMessages = UserHandler.getUser(event.player.uniqueId).getSettingOption(UserSetting.REWARD_MESSAGES).getValue<Boolean>()
+
+                                for (reward in mineCrate.rewardSet.pickRewards()) {
+                                    if (sendMessages) {
+                                        event.player.sendMessage("${RewardsModule.getChatPrefix()}You received ${reward.name} ${ChatColor.GRAY}from the MineCrate!")
+                                    }
+
+                                    reward.execute(event.player)
+                                }
+                            }
+
+                            continue
                         }
 
-                        continue // skip adding block to block list
+                        blocks.add(region.getBreakableCuboid()!!.world.getBlockAt(x, event.block.location.blockY, z))
+                    }
+                }
+
+                Tasks.sync {
+                    val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100F)
+                    Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
+
+                    if (multiBlockBreakEvent.isCancelled) {
+                        return@sync
                     }
 
-                    blocks.add(region.getBreakableCuboid()!!.world.getBlockAt(x, event.block.location.blockY, z))
+                    sendMessage(event.player, "The layer you were mining has collapsed!")
                 }
             }
-
-            // broadcast multi block break
-            val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100F)
-            Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
-
-            if (multiBlockBreakEvent.isCancelled) {
-                return
-            }
-
-            // send notification
-            sendMessage(event.player, "The layer you were mining has collapsed!")
         }
     }
 

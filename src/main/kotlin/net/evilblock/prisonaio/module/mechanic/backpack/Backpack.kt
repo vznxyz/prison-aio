@@ -7,10 +7,12 @@
 
 package net.evilblock.prisonaio.module.mechanic.backpack
 
+import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.mechanic.backpack.enchant.BackpackEnchant
 import net.evilblock.prisonaio.module.mechanic.backpack.menu.BackpackMenu
+import net.evilblock.prisonaio.util.serialize.MappedInventorySerializer
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -19,6 +21,7 @@ import java.util.*
 
 class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").substring(0, 13)) {
 
+    @JsonAdapter(MappedInventorySerializer::class)
     internal val contents: MutableMap<Int, ItemStack> = hashMapOf()
     internal val enchants: MutableMap<BackpackEnchant, Int> = hashMapOf()
 

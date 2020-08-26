@@ -28,10 +28,12 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.SkullMeta
 
 class CoinFlipBrowserMenu : PaginatedMenu() {
 
     init {
+        updateAfterClick = true
         autoUpdate = true
     }
 
@@ -44,6 +46,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
 
         buttons[2] = CreateGameButton()
         buttons[4] = GuideButton()
+        buttons[6] = StatisticsButton()
 
         for (i in 9..17) {
             buttons[i] = if (i % 2 == 0) {
@@ -226,6 +229,32 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
             ))
 
             return description
+        }
+    }
+
+    private inner class StatisticsButton : Button() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.RED}${ChatColor.BOLD}Your Statistics"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            return CoinFlipHandler.renderStatisticsDisplay(UserHandler.getUser(player.uniqueId))
+        }
+
+        override fun getMaterial(player: Player): Material {
+            return Material.SKULL_ITEM
+        }
+
+        override fun getDamageValue(player: Player): Byte {
+            return 3.toByte()
+        }
+
+        override fun getButtonItem(player: Player): ItemStack {
+            val item = super.getButtonItem(player)
+            val meta = item.itemMeta as SkullMeta
+            meta.owner = player.name
+            item.itemMeta = meta
+            return item
         }
     }
 

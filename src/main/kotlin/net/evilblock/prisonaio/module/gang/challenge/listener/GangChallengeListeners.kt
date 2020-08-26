@@ -11,7 +11,7 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.gang.challenge.GangChallengeHandler
 import net.evilblock.prisonaio.module.leaderboard.event.LeaderboardsRefreshedEvent
-import net.evilblock.prisonaio.module.leaderboard.impl.GangTopLeaderboard
+import net.evilblock.prisonaio.module.leaderboard.impl.GangTrophiesLeaderboard
 import net.evilblock.prisonaio.module.rank.event.AsyncPlayerPrestigeEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -45,7 +45,7 @@ object GangChallengeListeners : Listener {
 
     @EventHandler
     fun onLeaderboardsRefreshedEvent(event: LeaderboardsRefreshedEvent) {
-        val gangs = GangTopLeaderboard.entries.mapNotNull { GangHandler.getGangByName(it.displayName) }
+        val gangs = GangTrophiesLeaderboard.entries.mapNotNull { GangHandler.getGangByName(it.displayName) }
         for (gang in gangs) {
             gang.challengesData.placedLeaderboards = true
 

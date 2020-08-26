@@ -82,7 +82,7 @@ enum class GangPermission(
     }
 
     enum class PermissionValue(val detailedName: String) {
-        OWNER("Owner only"),
+        OWNER("Leader only"),
         CAPTAINS("Captains only"),
         MEMBERS("Members only"),
         VISITORS("Visitors and members")

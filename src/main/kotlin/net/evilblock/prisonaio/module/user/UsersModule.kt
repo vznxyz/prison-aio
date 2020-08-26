@@ -23,6 +23,10 @@ import net.evilblock.prisonaio.module.user.command.*
 import net.evilblock.prisonaio.module.user.command.admin.*
 import net.evilblock.prisonaio.module.user.command.parameter.UserParameterType
 import net.evilblock.prisonaio.module.user.listener.*
+import net.evilblock.prisonaio.module.user.news.NewsHandler
+import net.evilblock.prisonaio.module.user.news.command.NewsCommand
+import net.evilblock.prisonaio.module.user.news.command.NewsEditorCommand
+import net.evilblock.prisonaio.module.user.news.listener.NewsListeners
 import net.evilblock.prisonaio.module.user.perk.Perk
 import net.evilblock.prisonaio.module.user.perk.autosell.AutoSellNotification
 import net.evilblock.prisonaio.module.user.setting.listener.UserChatSettingsListeners
@@ -50,6 +54,7 @@ object UsersModule : PluginModule() {
     override fun onEnable() {
         permissionSalesMultipliers = readPermissionSalesMultipliers()
 
+        NewsHandler.initialLoad()
         UserHandler.initialLoad()
         BankNoteHandler.initialLoad()
 
@@ -62,6 +67,7 @@ object UsersModule : PluginModule() {
             user.statistics.syncPlayTime()
         }
 
+        NewsHandler.saveData()
         UserHandler.saveData()
         BankNoteHandler.saveData()
     }
@@ -91,7 +97,8 @@ object UsersModule : PluginModule() {
             BankNoteAdminListeners,
             BankNoteDupeListeners,
             BankNoteListeners,
-            BankNoteLogListeners
+            BankNoteLogListeners,
+            NewsListeners
         )
     }
 
@@ -131,7 +138,9 @@ object UsersModule : PluginModule() {
             UserResetCommand.javaClass,
             UserSetPrestigeCommand.javaClass,
             UserSetRankCommand.javaClass,
-            UserStatisticsCommands.javaClass
+            UserStatisticsCommands.javaClass,
+            NewsCommand.javaClass,
+            NewsEditorCommand.javaClass
         )
     }
 

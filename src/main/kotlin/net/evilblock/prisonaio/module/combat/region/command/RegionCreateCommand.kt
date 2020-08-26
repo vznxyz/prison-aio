@@ -9,10 +9,10 @@ package net.evilblock.prisonaio.module.combat.region.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
+import net.evilblock.cubed.util.hook.WorldEditUtils
 import net.evilblock.prisonaio.module.combat.region.CombatRegion
 import net.evilblock.prisonaio.module.combat.region.CombatRegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
-import net.evilblock.prisonaio.module.region.selection.RegionSelection
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -27,8 +27,9 @@ object RegionCreateCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "id") id: String) {
-        if (!RegionSelection.hasSelection(player)) {
-            player.sendMessage("${ChatColor.RED}You need to select a region using the `/region wand`.")
+        val selection = WorldEditUtils.getSelection(player)
+        if (selection == null) {
+            player.sendMessage("${ChatColor.RED}You need to select a region using the WorldEdit wand!")
             return
         }
 
@@ -37,7 +38,7 @@ object RegionCreateCommand {
             return
         }
 
-        val region = CombatRegion(id, RegionSelection.getSelection(player)!!)
+        val region = CombatRegion(id, WorldEditUtils.toCuboid(selection))
 
         RegionsModule.updateBlockCache(region)
 

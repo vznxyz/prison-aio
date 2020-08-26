@@ -26,7 +26,7 @@ class HomesMenu : Menu() {
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        for (gang in GangHandler.getAccessibleGangs(player.uniqueId).sortedBy { if (it.owner == player.uniqueId) 0 else 1 }) {
+        for (gang in GangHandler.getAccessibleGangs(player.uniqueId).sortedBy { if (it.leader == player.uniqueId) 0 else 1 }) {
             buttons[buttons.size] = GangButton(gang)
         }
 
@@ -40,7 +40,7 @@ class HomesMenu : Menu() {
 
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
-            description.add("${ChatColor.GRAY}Owned by ${gang.getOwnerUsername()}")
+            description.add("${ChatColor.GRAY}Owned by ${gang.getLeaderUsername()}")
             description.add("")
             description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Current Session")
 

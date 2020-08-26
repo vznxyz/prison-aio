@@ -74,6 +74,12 @@ object GangHandler : PluginHandler {
         loadGrid()
 
         Tasks.asyncTimer(GangBoosterExpirationTask, 20L, 20L)
+
+        Tasks.asyncTimer(20L * 60L, 20L * 60L) {
+            for (cell in grid.values) {
+                cell.updateCachedCellValue()
+            }
+        }
     }
 
     private fun loadWorld() {
@@ -172,7 +178,7 @@ object GangHandler : PluginHandler {
      */
     fun getAccessibleGangs(playerUuid: UUID): Set<Gang> {
         return gangAccess.getOrDefault(playerUuid, hashSetOf())
-            .sortedBy {it.owner == playerUuid }
+            .sortedBy {it.leader == playerUuid }
             .reversed()
             .toSet()
     }
@@ -191,7 +197,7 @@ object GangHandler : PluginHandler {
      * Returns a set of [Gang]s that the given [playerUuid] owns.
      */
     fun getOwnedGangs(playerUuid: UUID): Set<Gang> {
-        return gangAccess.getOrDefault(playerUuid, hashSetOf()).filter { it.owner == playerUuid }.toSet()
+        return gangAccess.getOrDefault(playerUuid, hashSetOf()).filter { it.leader == playerUuid }.toSet()
     }
 
     /**
@@ -242,7 +248,7 @@ object GangHandler : PluginHandler {
             RegionBypass.attemptNotify(player)
             gang.joinSession(player)
         } else {
-            if (gang.owner != player.uniqueId) {
+            if (gang.leader != player.uniqueId) {
                 if (gang.visitors.size >= 50) {
                     player.sendMessage("${ChatColor.RED}There are too many players visiting that gang right now to join.")
                     return
@@ -261,9 +267,9 @@ object GangHandler : PluginHandler {
         grid[gang.gridIndex] = gang
         gangsByName[gang.name.toLowerCase()] = gang
 
-        for (player in gang.getMembers()) {
-            gangAccess.putIfAbsent(player, HashSet())
-            gangAccess[player]!!.add(gang)
+        for (member in gang.getMembers().values) {
+            gangAccess.putIfAbsent(member.uuid, HashSet())
+            gangAccess[member.uuid]!!.add(gang)
         }
     }
 
@@ -284,7 +290,7 @@ object GangHandler : PluginHandler {
      * This method should always be called asynchronously.
      */
     @Throws(IllegalStateException::class)
-    fun createNewGang(owner: UUID, name: String, onFinish: (Gang) -> Unit) {
+    fun createNewGang(leader: UUID, name: String, onFinish: (Gang) -> Unit) {
         assert(!Bukkit.isPrimaryThread()) { "Cannot generate new gang on primary thread" }
 
         val schematicFile = GangModule.getIslandSchematicFile()
@@ -317,8 +323,12 @@ object GangHandler : PluginHandler {
                 }
             }
 
-            val gang = Gang(gridIndex, name, owner, scanResults.playerSpawnLocation!!, scanResults.jerrySpawnLocation!!, schematicData.cuboid)
+            val gangLeader = GangMember(leader)
+            gangLeader.role = GangMember.Role.LEADER
+
+            val gang = Gang(gridIndex, name, leader, scanResults.playerSpawnLocation!!, scanResults.jerrySpawnLocation!!, schematicData.cuboid)
             gang.initializeData()
+            gang.addMember(gangLeader)
 
             RegionsModule.updateBlockCache(gang)
 

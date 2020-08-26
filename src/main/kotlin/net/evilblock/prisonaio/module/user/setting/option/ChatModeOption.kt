@@ -33,7 +33,6 @@ class ChatModeOption(private val chatMode: ChatMode) : UserSettingOption {
     }
 
     enum class ChatMode(private val displayName: String) {
-
         HIDDEN("Hidden chat"),
         SYSTEM_CHAT("System chat"),
         GLOBAL_CHAT("Global chat");
@@ -41,7 +40,6 @@ class ChatModeOption(private val chatMode: ChatMode) : UserSettingOption {
         fun getDisplayName(): String {
             return displayName
         }
-
     }
 
 }

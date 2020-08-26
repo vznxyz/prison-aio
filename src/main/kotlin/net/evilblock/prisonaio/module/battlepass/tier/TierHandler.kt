@@ -25,7 +25,7 @@ object TierHandler : PluginHandler {
         return BattlePassModule
     }
 
-    override fun hasInternalData(): Boolean {
+    override fun hasDefaultInternalData(): Boolean {
         return true
     }
 

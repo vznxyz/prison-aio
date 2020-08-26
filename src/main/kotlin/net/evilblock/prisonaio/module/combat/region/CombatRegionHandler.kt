@@ -26,7 +26,7 @@ object CombatRegionHandler : PluginHandler {
         return CombatModule
     }
 
-    override fun hasInternalData(): Boolean {
+    override fun hasDefaultInternalData(): Boolean {
         return true
     }
 

@@ -13,11 +13,13 @@ import net.evilblock.cubed.command.CommandHandler
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.prisonaio.command.GKitzCommand
 import net.evilblock.prisonaio.command.ReloadCommand
 import net.evilblock.prisonaio.command.SaveCommand
 import net.evilblock.prisonaio.command.HealthCommand
+import net.evilblock.prisonaio.listener.PrematureLoadListeners
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.gang.GangModule
@@ -43,14 +45,19 @@ import net.evilblock.prisonaio.module.shop.ShopsModule
 import net.evilblock.prisonaio.module.storage.StorageModule
 import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
+import org.bukkit.Location
 import org.bukkit.generator.ChunkGenerator
 
 class PrisonAIO : PluginFramework() {
 
+    var fullyLoaded = false
     val enabledModules: MutableList<PluginModule> = arrayListOf()
 
     override fun onEnable() {
         instance = this
+
+        // register this listener with priority
+        server.pluginManager.registerEvents(PrematureLoadListeners, this)
 
         Cubed.instance.configureOptions(CubedOptions(requireRedis = true, requireMongo = true))
 
@@ -89,10 +96,18 @@ class PrisonAIO : PluginFramework() {
         super.onEnable()
 
         loadCommands()
+
+        Tasks.delayed(1L) {
+            fullyLoaded = true
+        }
     }
 
     override fun getModules(): List<PluginModule> {
         return enabledModules
+    }
+
+    fun getSpawnLocation(): Location {
+        return server.worlds[0].spawnLocation
     }
 
     private fun loadCommands() {

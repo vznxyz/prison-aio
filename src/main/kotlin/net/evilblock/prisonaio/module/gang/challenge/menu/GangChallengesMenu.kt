@@ -73,13 +73,15 @@ class GangChallengesMenu(private val gang: Gang) : Menu() {
                 description.add("${ChatColor.GRAY}$line")
             }
 
-            description.add("")
-
             if (gang.challengesData.hasCompleted(challenge)) {
+                description.add("")
                 description.add("${ChatColor.GREEN}${ChatColor.BOLD}COMPLETED")
             } else {
-                description.add("${ChatColor.YELLOW}${ChatColor.BOLD}CHALLENGE PROGRESS")
-                description.addAll(challenge.renderProgress(gang))
+                if (challenge.isProgressive()) {
+                    description.add("")
+                    description.add("${ChatColor.YELLOW}${ChatColor.BOLD}CHALLENGE PROGRESS")
+                    description.addAll(challenge.renderProgress(gang))
+                }
             }
 
             return description

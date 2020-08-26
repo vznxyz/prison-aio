@@ -19,36 +19,36 @@ object GangSetLeaderCommand {
 
     @Command(
         names = ["gang leader", "gangs leader"],
-        description = "Relinquish ownership of your gang to a member",
+        description = "Relinquish leadership of your gang to a member",
         async = true
     )
     @JvmStatic
-    fun execute(player: Player, @Param(name = "player") newOwner: UUID) {
+    fun execute(player: Player, @Param(name = "player") newLeader: UUID) {
         val gang = GangHandler.getAssumedGang(player.uniqueId)
         if (gang == null) {
-            player.sendMessage("${ChatColor.RED}You must be inside a gang to set relinquish ownership of it.")
+            player.sendMessage("${ChatColor.RED}You must be inside a gang to set relinquish leadership of it.")
             return
         }
 
-        if (!gang.isOwner(player.uniqueId)) {
-            player.sendMessage("${ChatColor.RED}Only the owner can relinquish ownership of the gang.")
+        if (!gang.isLeader(player.uniqueId)) {
+            player.sendMessage("${ChatColor.RED}Only the leader can relinquish leadership of the gang.")
             return
         }
 
-        if (player.uniqueId == newOwner) {
-            player.sendMessage("${ChatColor.RED}You are already the owner of your gang.")
+        if (player.uniqueId == newLeader) {
+            player.sendMessage("${ChatColor.RED}You are already the leader of your gang.")
             return
         }
 
-        val newOwnerUsername = Cubed.instance.uuidCache.name(newOwner)
+        val newLeaderUsername = Cubed.instance.uuidCache.name(newLeader)
 
-        if (!gang.isMember(newOwner)) {
-            player.sendMessage("${ChatColor.RED}$newOwnerUsername is not a member of your gang.")
+        if (!gang.isMember(newLeader)) {
+            player.sendMessage("${ChatColor.RED}$newLeaderUsername is not a member of your gang.")
             return
         }
 
-        gang.updateOwner(newOwner)
-        player.sendMessage("${ChatColor.GREEN}You have given ownership of your gang to $newOwnerUsername.")
+        gang.updateLeader(newLeader)
+        player.sendMessage("${ChatColor.GREEN}You have given leadership of your gang to $newLeaderUsername.")
     }
 
 }

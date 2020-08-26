@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.user.profile.menu.tab
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.TimeUtil
+import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipHandler
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.profile.menu.ProfileLayout
 import net.evilblock.prisonaio.module.user.profile.menu.ProfileLayoutMenu
@@ -28,6 +29,7 @@ class ProfileStatisticsMenu(user: User) : ProfileLayoutMenu(layout = ProfileLayo
         buttons[20] = FirstSeenButton()
         buttons[21] = BlocksMinedButton()
         buttons[22] = TimePlayedButton()
+        buttons[23] = CoinFlipButton()
 
         return buttons
     }
@@ -88,6 +90,18 @@ class ProfileStatisticsMenu(user: User) : ProfileLayoutMenu(layout = ProfileLayo
         }
     }
 
+    private inner class CoinFlipButton : Button() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.AQUA}${ChatColor.BOLD}COIN${ChatColor.YELLOW}${ChatColor.BOLD}FLIP"
+        }
 
+        override fun getDescription(player: Player): List<String> {
+            return CoinFlipHandler.renderStatisticsDisplay(layout.user)
+        }
+
+        override fun getMaterial(player: Player): Material {
+            return Material.DOUBLE_PLANT
+        }
+    }
 
 }

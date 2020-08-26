@@ -26,8 +26,8 @@ object GangSetHomeCommand {
             return
         }
 
-        if (visitingGang.owner != player.uniqueId) {
-            player.sendMessage("${ChatColor.RED}Only the owner of the gang can set the HQ location.")
+        if (visitingGang.leader != player.uniqueId) {
+            player.sendMessage("${ChatColor.RED}Only the leader of the gang can set the HQ location.")
             return
         }
 

@@ -28,7 +28,7 @@ object GangForceDisbandCommand {
     fun execute(sender: CommandSender, @Param(name = "gang") gang: Gang) {
         gang.sendMessagesToMembers("${ChatColor.YELLOW}The gang has been forcefully disbanded by an administrator.")
 
-        for (member in gang.getMembers()) {
+        for (member in gang.getMembers().keys) {
             GangHandler.updateGangAccess(member, gang, false)
         }
 

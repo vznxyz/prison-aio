@@ -7,42 +7,38 @@
 
 package net.evilblock.prisonaio.module.user.statistic
 
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.event.AsyncPlayTimeSyncEvent
+import net.evilblock.prisonaio.util.economy.Currency
+import java.math.BigDecimal
+import java.math.BigInteger
+import java.util.*
+
 
 class UserStatistics(@Transient internal var user: User) {
 
-    /**
-     * The amount of blocks the user has mined.
-     */
-    private var blocksMined: Int = 0
-
-    /**
-     * The amount of blocks the user has mined at each mine.
-     */
-    private val blocksMinedAtMines: MutableMap<String, Int> = hashMapOf()
-
-    /**
-     * The amount of time, in milliseconds, that the user has played on the server.
-     */
     private var playTime: Long = 0L
 
-    /**
-     * This user's kills count.
-     */
-    private var kills: Int = 0
-
-    /**
-     * This user's deaths count.
-     */
-    private var deaths: Int = 0
-
-    /**
-     * The timestamp that the user logged into the server, if currently logged in.
-     */
     @Transient
     internal var lastPlayTimeSync: Long = 0L
+
+    private var kills: Int = 0
+    private var deaths: Int = 0
+
+    private var blocksMined: Int = 0
+    private val blocksMinedAtMines: MutableMap<String, Int> = hashMapOf()
+
+    private var coinflipWins: Int = 0
+    private var coinflipLosses: Int = 0
+    private var coinflipProfit: MutableMap<Currency.Type, BigInteger> = EnumMap(Currency.Type::class.java)
+
+    fun init() {
+        if (coinflipProfit == null) {
+            coinflipProfit = EnumMap(Currency.Type::class.java)
+        }
+    }
 
     fun getBlocksMined(): Int {
         return blocksMined
@@ -119,6 +115,39 @@ class UserStatistics(@Transient internal var user: User) {
     fun addDeath() {
         deaths++
         user.requiresSave = true
+    }
+
+    fun getCoinflipWins(): Int {
+        return coinflipWins
+    }
+
+    fun addCoinflipWin() {
+        coinflipWins++
+        user.requiresSave = true
+    }
+
+    fun getCoinflipLosses(): Int {
+        return coinflipLosses
+    }
+
+    fun addCoinflipLoss() {
+        coinflipLosses++
+        user.requiresSave = true
+    }
+
+    fun getCoinflipProfit(currency: Currency.Type): BigInteger {
+        if (!coinflipProfit.containsKey(currency)) {
+            coinflipProfit[currency] = BigInteger("0")
+        }
+        return coinflipProfit[currency]!!
+    }
+
+    fun addCoinflipProfit(currency: Currency.Type, amount: Number) {
+        coinflipProfit[currency] = getCoinflipProfit(currency) + BigInteger(amount.toString())
+    }
+
+    fun subtractCoinflipProfit(currency: Currency.Type, amount: Number) {
+        coinflipProfit[currency] = getCoinflipProfit(currency) - BigInteger(amount.toString())
     }
 
 }

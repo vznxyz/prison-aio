@@ -34,7 +34,7 @@ object ShopHandler: PluginHandler {
         return ShopsModule
     }
 
-    override fun hasInternalData(): Boolean {
+    override fun hasDefaultInternalData(): Boolean {
         return true
     }
 

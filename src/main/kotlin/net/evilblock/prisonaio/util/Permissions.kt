@@ -16,6 +16,9 @@ object Permissions {
     const val USERS_ADMIN = "prisonaio.users.admin"
     const val NICKNAME_GRANT = "prisonaio.users.nickname.grant"
 
+    const val NEWS_EDITOR = "prisonaio.news.editor"
+    const val NEWS_VIEW_STATS = "prisonaio.news.view-stats"
+
     const val GANGS_ADMIN = "prisonaio.gangs.admin"
     const val GANGS_TROPHIES_GIVE = "prisonaio.gangs.trophies.give"
     const val GANGS_TROPHIES_SET = "prisonaio.gangs.trophies.set"
@@ -37,5 +40,11 @@ object Permissions {
 
     const val LEADERBOARDS_REFRESH = "prisonaio.leaderboards.refresh"
     const val LEADERBOARDS_SPAWN = "prisonaio.leaderboards.spawn"
+
+    const val EVENTS_HOST = "prisonaio.events.host."
+    const val EVENTS_HOST_COOLDOWN_BYPASS = "prisonaio.events.host.cooldown-bypass"
+    const val EVENTS_HOST_CONTROLS = "prisonaio.events.control"
+    const val EVENTS_TOGGLE = "prisonaio.events.toggle"
+    const val EVENTS_EDIT = "prisonaio.events.edit"
 
 }

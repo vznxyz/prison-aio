@@ -22,7 +22,8 @@ enum class Analytic(
 
     UNIQUE_JOINS("Unique Joins", 0, ItemBuilder.of(Material.NETHER_STAR).build()),
     BLOCKS_MINED("Blocks Mined", 0, ItemBuilder.of(Material.DIAMOND_PICKAXE).build()),
-    TIME_PLAYED("Time Played", 0L, ItemBuilder.of(Material.WATCH).build());
+    TIME_PLAYED("Time Played", 0L, ItemBuilder.of(Material.WATCH).build()),
+    LOCKSMITH_KEYS_GIVEN("Locksmith Keys Given", 0, ItemBuilder.of(Material.TRIPWIRE_HOOK).build());
 
     fun <T> getValue(): T {
         return AnalyticHandler.getValue(this)
@@ -34,7 +35,7 @@ enum class Analytic(
 
     fun getFormattedValue(): String {
         return when (this) {
-            UNIQUE_JOINS, BLOCKS_MINED -> NumberUtils.format(getValue<Double>())
+            UNIQUE_JOINS, BLOCKS_MINED, LOCKSMITH_KEYS_GIVEN -> NumberUtils.format(getValue<Double>())
             TIME_PLAYED -> TimeUtil.formatIntoDetailedString(round(getValue<Long>() / 1000.0).toInt())
         }
     }

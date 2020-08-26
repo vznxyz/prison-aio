@@ -17,7 +17,7 @@ import org.bukkit.entity.Player
 object MineSetSpawnCommand {
 
     @Command(
-        names = ["mine setspawn"],
+        names = ["mine set-spawn"],
         description = "Set the spawn point of a mine",
         permission = "prisonaio.mines.setspawn",
         async = true

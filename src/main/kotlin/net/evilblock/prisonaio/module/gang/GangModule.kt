@@ -11,6 +11,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.gang.challenge.GangChallengeHandler
@@ -44,15 +45,11 @@ object GangModule : PluginModule() {
         GangChallengeHandler.initialLoad()
         GangHandler.initialLoad()
 
-        getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), {
+        Tasks.asyncTimer(20L, 20L * 15) {
             for (gang in GangHandler.getAllGangs()) {
                 gang.expireInvitations()
             }
-        }, 20L, 20L * 15)
-    }
-
-    override fun requiresLateLoad(): Boolean {
-        return true
+        }
     }
 
     override fun getListeners(): List<Listener> {
@@ -92,6 +89,7 @@ object GangModule : PluginModule() {
             GangForceKickCommand.javaClass,
             GangForceLeaderCommand.javaClass,
             GangForceResetCommand.javaClass,
+            GangRefreshValueCommand.javaClass,
             GangTrophiesGiveCommand.javaClass,
             GangTrophiesSetCommand.javaClass,
             GangTrophiesTakeCommand.javaClass,

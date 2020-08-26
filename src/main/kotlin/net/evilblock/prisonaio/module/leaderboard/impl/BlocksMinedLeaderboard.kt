@@ -16,7 +16,7 @@ import org.bson.Document
 import org.bukkit.ChatColor
 import java.util.*
 
-object BlocksMinedLeaderboard : Leaderboard("blocks-mined", "Top Blocks Mined") {
+object BlocksMinedLeaderboard : Leaderboard("blocks-mined", "${ChatColor.AQUA}${ChatColor.BOLD}Top Blocks Mined") {
 
     override fun fetchEntries(): List<LeaderboardEntry<*>> {
         val entries = arrayListOf<LeaderboardEntry<Int>>()
@@ -28,11 +28,11 @@ object BlocksMinedLeaderboard : Leaderboard("blocks-mined", "Top Blocks Mined") 
             entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), blocksMined))
         }
 
-        return entries.sortedByDescending { it.value }.take(5)
+        return entries.sortedByDescending { it.value }.take(CACHED_ENTRIES_SIZE)
     }
 
     override fun formatEntry(entry: LeaderboardEntry<*>): String {
-        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.GOLD}${NumberUtils.format((entry.value as Int).toLong())}"
+        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.AQUA}${NumberUtils.format((entry.value as Int).toLong())}"
     }
 
 }

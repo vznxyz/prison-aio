@@ -216,6 +216,8 @@ object PrivateMineHandler : PluginHandler {
 
     private fun initialMineSetup(mine: PrivateMine) {
         mine.activePlayers = hashSetOf()
+        mine.salesTax = mine.salesTax.coerceAtLeast(1.0)
+
         grid[mine.gridIndex] = mine
 
         for (player in mine.whitelistedPlayers) {

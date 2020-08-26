@@ -11,6 +11,10 @@ import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.reward.RewardsModule
+import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.setting.UserSetting
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.event.block.BlockBreakEvent
@@ -30,15 +34,36 @@ object Cubed : AbstractEnchant("cubed", "Cubed", 3) {
 
     override fun onBreak(event: BlockBreakEvent, itemStack: ItemStack?, level: Int, region: Region) {
         val blocks: MutableList<Block> = ArrayList()
-        val l = event.block.location
-        for (x in l.blockX - level..l.blockX + level) {
-            for (y in l.blockY - level..l.blockY + level) {
-                for (z in l.blockZ - level..l.blockZ + level) {
-                    val block = Location(l.world, x.toDouble(), y.toDouble(), z.toDouble())
-                    val type = block.block.type
-                    if (type != Material.ENDER_CHEST && type != Material.BEDROCK && type != Material.AIR) {
-                        if (region.getBreakableCuboid() != null && region.getBreakableCuboid()!!.contains(block.block)) {
-                            blocks.add(block.block)
+
+        val origin = event.block.location
+        for (x in origin.blockX - level..origin.blockX + level) {
+            for (y in origin.blockY - level..origin.blockY + level) {
+                for (z in origin.blockZ - level..origin.blockZ + level) {
+                    val location = Location(origin.world, x.toDouble(), y.toDouble(), z.toDouble())
+                    if (MineCrateHandler.isAttached(location)) {
+                        val mineCrate = MineCrateHandler.getSpawnedCrate(location)
+                        if (mineCrate.owner == event.player.uniqueId) {
+                            mineCrate.destroy(true)
+                            MineCrateHandler.forgetSpawnedCrate(mineCrate)
+
+                            val sendMessages = UserHandler.getUser(event.player.uniqueId).getSettingOption(UserSetting.REWARD_MESSAGES).getValue<Boolean>()
+
+                            for (reward in mineCrate.rewardSet.pickRewards()) {
+                                if (sendMessages) {
+                                    event.player.sendMessage("${RewardsModule.getChatPrefix()}You received ${reward.name} ${ChatColor.GRAY}from the MineCrate!")
+                                }
+
+                                reward.execute(event.player)
+                            }
+                        }
+
+                        continue // skip adding block to block list
+                    }
+
+                    val type = location.block.type
+                    if (type != Material.BEDROCK && type != Material.AIR) {
+                        if (region.getBreakableCuboid() != null && region.getBreakableCuboid()!!.contains(location.block)) {
+                            blocks.add(location.block)
                         }
                     }
                 }

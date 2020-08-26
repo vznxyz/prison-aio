@@ -28,6 +28,26 @@ interface Currency {
 
     fun format(amount: Number): String
 
+    fun toType(): Type {
+        return when (this) {
+            is Currency.Type -> {
+                this
+            }
+            is Money -> {
+                Type.MONEY
+            }
+            is Tokens -> {
+                Type.TOKENS
+            }
+            is PrestigeTokens -> {
+                Type.PRESTIGE_TOKENS
+            }
+            else -> {
+                throw IllegalStateException("Unsupported currency: ${this::class.java.name}")
+            }
+        }
+    }
+
     object Money : Currency {
         override fun getName(): String {
             return "money"

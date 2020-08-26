@@ -24,11 +24,13 @@ import net.evilblock.prisonaio.module.leaderboard.npc.LeaderboardNpcEntity
 object LeaderboardsModule : PluginModule() {
 
 	private val leaderboards: List<Leaderboard> = listOf(
+		GangTrophiesLeaderboard,
+		GangValueLeaderboard,
 		BlocksMinedLeaderboard,
-		GangTopLeaderboard,
 		MoneyBalanceLeaderboard,
-		TopTokensLeaderboard,
-		PrestigeLeaderboard
+		PrestigeLeaderboard,
+		TopTimePlayedLeaderboard,
+		TopTokensLeaderboard
 	)
 
 	override fun getName(): String {

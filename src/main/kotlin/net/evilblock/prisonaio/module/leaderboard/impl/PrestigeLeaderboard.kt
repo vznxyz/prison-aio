@@ -15,7 +15,7 @@ import org.bukkit.ChatColor
 import java.text.NumberFormat
 import java.util.*
 
-object PrestigeLeaderboard : Leaderboard("prestige", "Top Prestige") {
+object PrestigeLeaderboard : Leaderboard("prestige", "${ChatColor.RED}${ChatColor.BOLD}Top Prestige") {
 
     override fun fetchEntries(): List<LeaderboardEntry<*>> {
         val entries = arrayListOf<LeaderboardEntry<Int>>()
@@ -27,7 +27,7 @@ object PrestigeLeaderboard : Leaderboard("prestige", "Top Prestige") {
             entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), currentPrestige))
         }
 
-        return entries.sortedByDescending { it.value }.take(5)
+        return entries.sortedByDescending { it.value }.take(CACHED_ENTRIES_SIZE)
     }
 
     override fun formatEntry(entry: LeaderboardEntry<*>): String {

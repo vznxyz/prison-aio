@@ -73,6 +73,7 @@ object MechanicsModule : PluginModule() {
             DisableBrewingMechanicsListeners,
             DisableExplosionsListeners,
             DisableFarmingMechanicsListeners,
+            DisableHoppersListeners,
             DisableRedstoneListeners,
             DisableSpawnMobEggsListeners,
             FirstJoinListeners,

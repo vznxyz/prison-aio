@@ -88,7 +88,7 @@ language:
           title: "&c&lManage Players"
           lore:
             - "&7View, add, or remove players from"
-            - "your private mine."
+            - "&7your private mine."
             - ""
             - "&eClick to manage players"
         public-access:

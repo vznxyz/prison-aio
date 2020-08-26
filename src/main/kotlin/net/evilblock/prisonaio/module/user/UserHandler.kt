@@ -16,6 +16,7 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.store.bukkit.UUIDCache
 import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.storage.StorageModule
 import org.bson.Document
 import org.bson.json.JsonMode
@@ -79,7 +80,12 @@ object UserHandler : PluginHandler {
                 usersMap.remove(user.uuid)
 
                 if (user.requiresSave) {
-                    saveUser(user)
+                    try {
+                        saveUser(user)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        PrisonAIO.instance.logger.severe("Failed to save user ${user.getUsername()}!")
+                    }
                 }
             }
         }
@@ -197,6 +203,9 @@ object UserHandler : PluginHandler {
         return if (!usersMap.containsKey(uuid)) {
             val user = loadUser(uuid = uuid, throws = throws)
             user.cacheExpiry = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30L)
+
+            usersMap[uuid] = user
+
             user
         } else {
             getUser(uuid)

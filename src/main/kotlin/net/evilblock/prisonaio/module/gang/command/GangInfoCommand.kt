@@ -8,12 +8,12 @@
 package net.evilblock.prisonaio.module.gang.command
 
 import mkremins.fanciful.FancyMessage
-import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.gang.Gang
+import net.evilblock.prisonaio.module.gang.GangMember
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -38,26 +38,43 @@ object GangInfoCommand {
             .then("${ChatColor.GRAY}]")
             .send(sender)
 
-        val memberNames = gang.getMembers().map { uuid ->
-            val username = Cubed.instance.uuidCache.name(uuid)
+        sender.sendMessage("${ChatColor.GRAY} Announcement: ${ChatColor.RED}${gang.announcement}")
+        sender.sendMessage("${ChatColor.GRAY} Leader: ${ChatColor.WHITE}${gang.getLeaderUsername()}")
 
-            val role = if (gang.isOwner(uuid)) {
-                "**"
-            } else {
-                ""
-            }
-
-            return@map if (Bukkit.getPlayer(uuid) == null) {
-                "${ChatColor.RED}$role$username"
-            } else {
-                "${ChatColor.GREEN}$role$username"
-            }
+        val coLeaders = gang.getMembers().values.filter { it.role == GangMember.Role.CO_LEADER }
+        if (coLeaders.isNotEmpty()) {
+            sender.sendMessage("${ChatColor.GRAY} Co-Leaders: ${ChatColor.WHITE}${coLeaders.joinToString { getFormattedMemberName(gang, it) }}")
         }
 
-        sender.sendMessage("${ChatColor.GRAY} Announcement: ${ChatColor.RED}${gang.announcement}")
-        sender.sendMessage("${ChatColor.GRAY} Members: ${ChatColor.WHITE}${memberNames.joinToString(separator = "${ChatColor.GRAY}, ")}")
+        val captains = gang.getMembers().values.filter { it.role == GangMember.Role.CAPTAIN }
+        if (captains.isNotEmpty()) {
+            sender.sendMessage("${ChatColor.GRAY} Captains: ${ChatColor.WHITE}${coLeaders.joinToString { getFormattedMemberName(gang, it) }}")
+        }
+
+        val members = gang.getMembers().values.filter { it.role == GangMember.Role.MEMBER }
+        if (members.isNotEmpty()) {
+            sender.sendMessage("${ChatColor.GRAY} Members: ${ChatColor.WHITE}${members.joinToString { getFormattedMemberName(gang, it) }}")
+        }
+
         sender.sendMessage("${ChatColor.GRAY} Trophies: ${ChatColor.RED}${NumberUtils.format(gang.getTrophies())}")
+        sender.sendMessage("${ChatColor.GRAY} Value: ${ChatColor.RED}${NumberUtils.format(gang.cachedCellValue)}")
         sender.sendMessage("${ChatColor.GRAY}${Constants.LONG_LINE}")
+    }
+
+    private fun getFormattedMemberName(gang: Gang, member: GangMember): String {
+        val username = member.getUsername()
+
+        val role = if (gang.isLeader(member.uuid)) {
+            "**"
+        } else {
+            ""
+        }
+
+        return if (Bukkit.getPlayer(member.uuid) == null) {
+            "${ChatColor.RED}$role$username"
+        } else {
+            "${ChatColor.GREEN}$role$username"
+        }
     }
 
 }

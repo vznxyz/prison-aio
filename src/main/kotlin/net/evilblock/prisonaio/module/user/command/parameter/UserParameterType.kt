@@ -11,6 +11,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -43,7 +44,10 @@ object UserParameterType : ParameterType<User?> {
             if (UserHandler.isUserLoaded(uuid)) {
                 UserHandler.getUser(uuid)
             } else {
-                sender.sendMessage("${ChatColor.GRAY}(Fetching user info)")
+                if (sender.isOp || sender.hasPermission(Permissions.USERS_ADMIN)) {
+                    sender.sendMessage("${ChatColor.GRAY}(Fetching user info...)")
+                }
+
                 return UserHandler.getOrLoadAndCacheUser(uuid, true)
             }
         } catch (e: IllegalStateException) {

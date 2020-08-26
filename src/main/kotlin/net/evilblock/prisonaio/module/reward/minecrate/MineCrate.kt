@@ -11,7 +11,6 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.entity.hologram.HologramEntity
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.reward.minecrate.reward.MineCrateRewardSet
 import org.bukkit.Bukkit
 import org.bukkit.Location

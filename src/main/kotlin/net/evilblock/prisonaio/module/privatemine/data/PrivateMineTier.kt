@@ -34,7 +34,7 @@ class PrivateMineTier(
                     number = map["tier"] as Int,
                     blocks = (map["blocks"] as List<Map<String, Any>>).map { PrivateMineBlockData.fromMap(it) },
                     resetInterval = resetInterval,
-                    salesTaxRange = DoubleRange(0.0, map["sales-tax"] as Double),
+                    salesTaxRange = DoubleRange(1.0, map["sales-tax"] as Double),
                     playerLimit = map["player-limit"] as Int
             )
         }

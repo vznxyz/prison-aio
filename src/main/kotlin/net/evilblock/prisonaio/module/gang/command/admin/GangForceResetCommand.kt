@@ -25,20 +25,20 @@ object GangForceResetCommand {
         async = true
     )
     @JvmStatic
-    fun execute(sender: CommandSender, @Param(name = "gang") gang: Gang, @Param(name = "player") newOwner: UUID) {
-        val newOwnerUsername = Cubed.instance.uuidCache.name(newOwner)
-        if (gang.isOwner(newOwner)) {
-            sender.sendMessage("${ChatColor.RED}$newOwnerUsername is already the owner of ${gang.name}.")
+    fun execute(sender: CommandSender, @Param(name = "gang") gang: Gang, @Param(name = "player") newLeader: UUID) {
+        val newLeaderUsername = Cubed.instance.uuidCache.name(newLeader)
+        if (gang.isLeader(newLeader)) {
+            sender.sendMessage("${ChatColor.RED}$newLeaderUsername is already the leader of ${gang.name}.")
             return
         }
 
-        if (!gang.isMember(newOwner)) {
-            sender.sendMessage("${ChatColor.RED}$newOwnerUsername is not a member of ${gang.name}.")
+        if (!gang.isMember(newLeader)) {
+            sender.sendMessage("${ChatColor.RED}$newLeaderUsername is not a member of ${gang.name}.")
             return
         }
 
-        gang.updateOwner(newOwner)
-        sender.sendMessage("${ChatColor.GREEN}You have given ownership of ${gang.name} to $newOwnerUsername.")
+        gang.updateLeader(newLeader)
+        sender.sendMessage("${ChatColor.GREEN}You have given leadership of ${gang.name} to $newLeaderUsername.")
     }
 
 }

@@ -8,10 +8,8 @@
 package net.evilblock.prisonaio.module.gang.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -30,14 +28,14 @@ object GangDisbandCommand {
             return
         }
 
-        if (!gang.isOwner(player.uniqueId)) {
-            player.sendMessage("${ChatColor.RED}You must be the owner of this gang to disband it.")
+        if (!gang.isLeader(player.uniqueId)) {
+            player.sendMessage("${ChatColor.RED}You must be the leader of this gang to disband it.")
             return
         }
 
-        gang.sendMessagesToMembers("${ChatColor.YELLOW}The gang has been disbanded by the owner.")
+        gang.sendMessagesToMembers("${ChatColor.YELLOW}The gang has been disbanded by the leader.")
 
-        for (member in gang.getMembers()) {
+        for (member in gang.getMembers().keys) {
             GangHandler.updateGangAccess(member, gang, false)
         }
 

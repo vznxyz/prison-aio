@@ -30,7 +30,7 @@ object MineHandler : PluginHandler {
         return MinesModule
     }
 
-    override fun hasInternalData(): Boolean {
+    override fun hasDefaultInternalData(): Boolean {
         return true
     }
 

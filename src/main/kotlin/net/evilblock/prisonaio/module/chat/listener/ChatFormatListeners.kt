@@ -104,9 +104,18 @@ object ChatFormatListeners : Listener {
                 val lastPart = event.message.substring(placeholderIndex + 6)
                 fancyMessage.then(lastPart)
 
-                val firstPartColors = ChatColor.getLastColors(firstPart)
-                if (firstPartColors.isNotEmpty()) {
-                    fancyMessage.color(ChatColor.getByChar(firstPartColors.toCharArray()[1]))
+                if (lastColors != null && lastColors.isNotEmpty()) {
+                    fancyMessage.color(ChatColor.getByChar(lastColors[1]))
+                } else {
+                    val lastPartColors = ChatColor.getLastColors(lastPart)
+                    if (lastPartColors != null && lastPartColors.isNotEmpty()) {
+                        fancyMessage.color(ChatColor.getByChar(lastPartColors[1]))
+                    } else {
+                        val firstPartColors = ChatColor.getLastColors(firstPart)
+                        if (firstPartColors != null && firstPartColors.isNotEmpty()) {
+                            fancyMessage.color(ChatColor.getByChar(firstPartColors[1]))
+                        }
+                    }
                 }
             }
         } else {

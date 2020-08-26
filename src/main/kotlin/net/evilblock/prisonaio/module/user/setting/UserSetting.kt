@@ -36,6 +36,18 @@ enum class UserSetting(
             )
         }
     ),
+    SCOREBOARD_STYLE(
+        displayName = "Scoreboard Style",
+        description = "This setting controls the style of the scoreboard.",
+        icon = ItemStack(Material.PAINTING),
+        defaultOption = { ScoreboardStyleOption(ScoreboardStyleOption.ScoreboardStyle.FANCY) },
+        options = {
+            arrayListOf(
+                ScoreboardStyleOption(ScoreboardStyleOption.ScoreboardStyle.SIMPLE),
+                ScoreboardStyleOption(ScoreboardStyleOption.ScoreboardStyle.FANCY)
+            )
+        }
+    ),
     CHAT_MODE(
         displayName = "Chat Mode",
         description = "This setting controls what chat mode you'll receive messages from.",
@@ -151,6 +163,18 @@ enum class UserSetting(
             arrayListOf(
                 RewardMessagesOption(true),
                 RewardMessagesOption(false)
+            )
+        }
+    ),
+    ROBOT_HOLOGRAMS(
+        displayName = "Robot Holograms",
+        description = "This setting controls if the hologram that appears above robots will be displayed to you.",
+        icon = ItemStack(Material.ARMOR_STAND),
+        defaultOption = { RobotHologramsOption(true) },
+        options = {
+            arrayListOf(
+                RobotHologramsOption(true),
+                RobotHologramsOption(false)
             )
         }
     );

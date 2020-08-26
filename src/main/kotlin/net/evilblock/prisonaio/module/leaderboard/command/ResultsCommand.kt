@@ -22,7 +22,7 @@ object ResultsCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "leaderboard") leaderboard: Leaderboard) {
-        for (line in leaderboard.getDisplayLines()) {
+        for (line in leaderboard.getDisplayLines(false)) {
             sender.sendMessage(line)
         }
     }

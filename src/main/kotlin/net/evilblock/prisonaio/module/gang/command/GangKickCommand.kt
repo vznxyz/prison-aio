@@ -23,31 +23,31 @@ object GangKickCommand {
         async = true
     )
     @JvmStatic
-    fun execute(player: Player, @Param(name = "player") playerUuid: UUID) {
+    fun execute(player: Player, @Param(name = "player") kickTarget: UUID) {
         val gang = GangHandler.getAssumedGang(player.uniqueId)
         if (gang == null) {
-            player.sendMessage("${ChatColor.RED}You must be inside a gang to kick a player from it.")
+            player.sendMessage("${ChatColor.RED}You must be in a gang to kick a player from it.")
             return
         }
 
-        if (!gang.isOwner(player.uniqueId)) {
-            player.sendMessage("${ChatColor.RED}Only the owner can kick players from the gang.")
+        if (!gang.isLeader(player.uniqueId)) {
+            player.sendMessage("${ChatColor.RED}Only the leader can kick players from the gang.")
             return
         }
 
-        if (player.uniqueId == playerUuid) {
+        if (player.uniqueId == kickTarget) {
             player.sendMessage("${ChatColor.RED}You can't kick yourself from the gang.")
             return
         }
 
-        if (!gang.isMember(playerUuid)) {
+        if (!gang.isMember(kickTarget)) {
             player.sendMessage("${ChatColor.RED}That player is not a member of the gang.")
             return
         }
 
-        gang.kickMember(playerUuid)
+        gang.kickMember(kickTarget)
 
-        val playerName = Cubed.instance.uuidCache.name(playerUuid)
+        val playerName = Cubed.instance.uuidCache.name(kickTarget)
         player.sendMessage("${ChatColor.GREEN}Successfully kicked $playerName from the gang.")
     }
 

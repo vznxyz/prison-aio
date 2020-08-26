@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.gang.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.gang.GangHandler
+import net.evilblock.prisonaio.module.gang.GangModule
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -34,13 +35,18 @@ object GangRenameCommand {
             }
         }
 
-        if (!gang.isOwner(player.uniqueId)) {
-            player.sendMessage("${ChatColor.RED}Only the owner can rename the gang.")
+        if (!gang.isLeader(player.uniqueId)) {
+            player.sendMessage("${ChatColor.RED}Only the leader can rename the gang.")
             return
         }
 
         if (GangHandler.getGangByName(name) != null) {
             player.sendMessage("${ChatColor.RED}The name `$name` is already taken by another gang.")
+            return
+        }
+
+        if (name.length > GangModule.getMaxNameLength()) {
+            player.sendMessage("${ChatColor.RED}A gang's name can only be ${GangModule.getMaxNameLength()} characters long. The name you entered was ${name.length} characters.")
             return
         }
 

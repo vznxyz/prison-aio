@@ -25,11 +25,13 @@ import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.rank.serialize.RankReferenceSerializer
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
 import net.evilblock.prisonaio.module.user.activity.type.CompletedAchievementActivity
+import net.evilblock.prisonaio.module.user.news.News
 import net.evilblock.prisonaio.module.user.perk.UserPerks
 import net.evilblock.prisonaio.module.user.profile.ProfileComment
 import net.evilblock.prisonaio.module.user.statistic.UserStatistics
 import net.evilblock.prisonaio.module.user.serialize.UserClaimedRewardsSerializer
 import net.evilblock.prisonaio.module.user.serialize.UserQuestProgressionSerializer
+import net.evilblock.prisonaio.module.user.serialize.UserReadNewsPostsSerializer
 import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import org.bukkit.Bukkit
@@ -75,9 +77,14 @@ class User(val uuid: UUID) {
     @JsonAdapter(UserClaimedRewardsSerializer::class)
     private val claimedRewards: MutableMap<DeliveryManReward, Long> = hashMapOf()
 
+    @JsonAdapter(UserReadNewsPostsSerializer::class)
+    private var readNews: MutableSet<News> = hashSetOf()
+
     fun init() {
         perks.user = this
+
         statistics.user = this
+        statistics.init()
 
         if (nicknameColors == null) {
             nicknameColors = hashSetOf()
@@ -91,6 +98,10 @@ class User(val uuid: UUID) {
             battlePassProgress = BattlePassProgress(this)
         } else {
             battlePassProgress.user = this
+        }
+
+        if (readNews == null) {
+            readNews = hashSetOf()
         }
     }
 
@@ -389,11 +400,12 @@ class User(val uuid: UUID) {
         requiresSave = true
 
         val player = getPlayer()
-        if (player != null && player.isOnline) {
+        if (player != null) {
             FancyMessage("${ChatColor.YELLOW}A comment has been left on your profile by ${Cubed.instance.uuidCache.name(comment.creator)}! ")
                 .then("${ChatColor.GREEN}${ChatColor.BOLD}[VIEW]")
                 .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to view the comment."))
                 .command("/profile ${player.name} comments")
+                .send(player)
         }
     }
 
@@ -459,6 +471,15 @@ class User(val uuid: UUID) {
      */
     fun markRewardAsClaimed(reward: DeliveryManReward) {
         claimedRewards[reward] = System.currentTimeMillis()
+        requiresSave = true
+    }
+
+    fun hasReadNewsPost(news: News): Boolean {
+        return readNews.contains(news)
+    }
+
+    fun markNewsPostAsRead(news: News) {
+        readNews.add(news)
         requiresSave = true
     }
 

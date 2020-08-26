@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.enchant.type
 
 import net.evilblock.cubed.util.TimeUtil.formatIntoDetailedString
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
@@ -59,7 +60,7 @@ object Laser : AbstractEnchant("laser", "Laser", 1) {
             sendMessage(event.player, "Activated ability for 10 seconds!")
 
             // start laser task
-            LaserRunnable(event.player).runTaskTimer(PrisonAIO.instance, 2L, 2L)
+            LaserRunnable(event.player).runTaskTimerAsynchronously(PrisonAIO.instance, 2L, 2L)
 
             event.isCancelled = true
         }
@@ -95,6 +96,10 @@ object Laser : AbstractEnchant("laser", "Laser", 1) {
             for (vec in rayTrace.traverse(20.0, 0.05)) {
                 val toLocation = vec.toLocation(player.world)
                 // skip bedrock, air, and enderchest (MineCrate) blocks
+                if (!toLocation.isChunkLoaded) {
+                    continue
+                }
+
                 if (toLocation.block.type == Material.BEDROCK || toLocation.block.type == Material.AIR || toLocation.block.type == Material.ENDER_CHEST) {
                     continue
                 }
@@ -117,8 +122,10 @@ object Laser : AbstractEnchant("laser", "Laser", 1) {
             }
 
             if (needsDestroyed.isNotEmpty()) {
-                val multiBlockBreakEvent = MultiBlockBreakEvent(player, needsDestroyed.iterator().next(), needsDestroyed, 100F)
-                Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
+                Tasks.sync {
+                    val multiBlockBreakEvent = MultiBlockBreakEvent(player, needsDestroyed.iterator().next(), needsDestroyed, 100F)
+                    Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
+                }
             }
         }
     }

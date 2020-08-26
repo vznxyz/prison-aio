@@ -77,7 +77,7 @@ class PickaxeButton(
                             player.sendMessage("")
                             player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}NEW ENCHANT LIMITS")
 
-                            for ((enchant, level) in newNextPrestige.enchantLimits.entries.sortedWith(EnchantsManager.ENCHANT_COMPARATOR)) {
+                            for ((enchant, level) in newNextPrestige.enchantLimits.entries.sortedWith(EnchantsManager.MAPPED_ENCHANT_COMPARATOR)) {
                                 if (!nextPrestige.enchantLimits.containsKey(enchant) || nextPrestige.enchantLimits.getValue(enchant) != level) {
                                     player.sendMessage(" ${enchant.lorified()} ${ChatColor.GRAY}${NumberUtils.format(level)}")
                                 }

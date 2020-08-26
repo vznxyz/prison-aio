@@ -12,11 +12,14 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.minigame.MinigamesModule
 import net.evilblock.prisonaio.module.minigame.coinflip.task.CoinFlipGameTicker
+import net.evilblock.prisonaio.module.user.User
+import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.ChatColor
 import java.util.*
 
 object CoinFlipHandler : PluginHandler {
 
+    val CHAT_PREFIX: String = "${ChatColor.GRAY}[${ChatColor.AQUA}${ChatColor.BOLD}COIN${ChatColor.YELLOW}${ChatColor.BOLD}FLIP${ChatColor.GRAY}] "
     val PRIMARY_COLOR = ChatColor.WHITE
     val PRIMARY_COLOR_ID = 0.toByte()
     val SECONDARY_COLOR = ChatColor.RED
@@ -94,6 +97,51 @@ object CoinFlipHandler : PluginHandler {
 
     fun getMaxBetTokens(): Long {
         return getModule().config.getLong("coinflip.rules.max-bet.tokens")
+    }
+
+    fun renderStatisticsDisplay(user: User): List<String> {
+        val list = arrayListOf<String>()
+
+        list.add("${ChatColor.GRAY}Wins: ${ChatColor.GREEN}${NumberUtils.format(user.statistics.getCoinflipWins())}")
+        list.add("${ChatColor.GRAY}Losses: ${ChatColor.RED}${NumberUtils.format(user.statistics.getCoinflipLosses())}")
+        list.add("")
+
+        val moneyProfit = user.statistics.getCoinflipProfit(Currency.Type.MONEY)
+
+        val moneyProfitStyle = when {
+            moneyProfit.toDouble() == 0.0 -> {
+                ""
+            }
+            moneyProfit.toDouble() > 0 -> {
+                "${ChatColor.GREEN}+"
+            }
+            else -> {
+                "${ChatColor.RED}-"
+            }
+        }
+
+        list.add("${ChatColor.GRAY}Net Profit (Money): $moneyProfitStyle${Currency.Type.MONEY.format(moneyProfit)}")
+
+        val tokensProfit = user.statistics.getCoinflipProfit(Currency.Type.TOKENS)
+
+        val tokensProfitStyle = when {
+            tokensProfit.toLong() == 0L -> {
+                ""
+            }
+            tokensProfit.toLong() > 0 -> {
+                "${ChatColor.GREEN}+"
+            }
+            else -> {
+                "${ChatColor.RED}-"
+            }
+        }
+
+        list.add("${ChatColor.GRAY}Net Profit (Tokens): $tokensProfitStyle${Currency.Type.TOKENS.format(tokensProfit)}")
+        list.add("")
+        list.add("${ChatColor.GRAY}Last 24 Hrs: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")
+        list.add("${ChatColor.GRAY}Last 7 Days: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")
+
+        return list
     }
 
 }

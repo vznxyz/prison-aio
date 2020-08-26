@@ -7,6 +7,9 @@
 
 package net.evilblock.prisonaio.module.enchant
 
+import com.google.common.base.Charsets
+import com.google.common.io.Files
+import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.type.*
@@ -31,14 +34,21 @@ import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
+import java.io.File
+import java.io.IOException
 import java.lang.StringBuilder
+import java.lang.reflect.Type
 import java.util.*
 
 object EnchantsManager : Listener {
 
     val CHAT_PREFIX: String = "${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}Enchants${ChatColor.GRAY}] "
 
-    private val enchants: MutableList<AbstractEnchant> = arrayListOf()
+    private val dataFile: File = File(PrisonAIO.instance.dataFolder, "enchants-config.json")
+    private val dataType: Type = object : TypeToken<EnchantsConfig>() {}.type
+
+    private val registeredEnchants: MutableList<AbstractEnchant> = arrayListOf()
+    lateinit var config: EnchantsConfig
 
     init {
         // old enchants
@@ -66,6 +76,29 @@ object EnchantsManager : Listener {
         registerEnchant(Laser)
     }
 
+    fun loadConfig() {
+        if (dataFile.exists()) {
+            try {
+                Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
+                    config = net.evilblock.cubed.Cubed.gson.fromJson(reader, dataType) as EnchantsConfig
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        } else {
+            config = EnchantsConfig()
+        }
+    }
+
+    fun saveConfig() {
+        try {
+            Files.write(net.evilblock.cubed.Cubed.gson.toJson(config, dataType), dataFile, Charsets.UTF_8)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            PrisonAIO.instance.logger.severe(ChatColor.RED.toString() + "Failed to save enchants-config.json!")
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     fun onBlockBreakEvent(event: BlockBreakEvent) {
         val map = handleItemSwitch(event.player, event.player.itemInHand, event)
@@ -79,7 +112,9 @@ object EnchantsManager : Listener {
         }
 
         for ((key, enchantLevel) in map) {
-            key.onBreak(event, event.player.itemInHand, enchantLevel, region)
+            if (config.isEnchantEnabled(key)) {
+                key.onBreak(event, event.player.itemInHand, enchantLevel, region)
+            }
         }
     }
 
@@ -95,7 +130,9 @@ object EnchantsManager : Listener {
         }
 
         for ((key, value) in map) {
-            key.onInteract(event, event.item, value)
+            if (config.isEnchantEnabled(key)) {
+                key.onInteract(event, event.item, value)
+            }
         }
     }
 
@@ -110,7 +147,9 @@ object EnchantsManager : Listener {
             val map = handleItemSwitch(event.player, event.player.inventory.itemInMainHand, event)
 
             for ((enchant, level) in map) {
-                enchant.onSellAll(event.player, event.player.inventory.itemInMainHand, level, event)
+                if (config.isEnchantEnabled(enchant)) {
+                    enchant.onSellAll(event.player, event.player.inventory.itemInMainHand, level, event)
+                }
             }
         }
     }
@@ -285,7 +324,11 @@ object EnchantsManager : Listener {
 
         val map = pickaxeData?.enchants ?: emptyMap<AbstractEnchant, Int>()
         if (Bukkit.isPrimaryThread()) {
-            for (enchant in enchants) {
+            for (enchant in registeredEnchants) {
+                if (!config.isEnchantEnabled(enchant)) {
+                    continue
+                }
+
                 if (player.hasMetadata("JE-" + enchant.id)) {
                     if (map.containsKey(enchant)) {
                         if (map[enchant] != player.getMetadata("JE-" + enchant.id)[0].asInt()) {
@@ -404,10 +447,10 @@ object EnchantsManager : Listener {
                 continue
             }
 
-            val enchantName = if (splitLoreLine.size > 3) {
+            val enchantName = if (splitLoreLine.size >= 3) {
                 val builder = StringBuilder()
 
-                for (i in 1 until splitLoreLine.size) {
+                for (i in 1 until splitLoreLine.size - 1) {
                     builder.append(splitLoreLine[i])
                 }
 
@@ -425,10 +468,10 @@ object EnchantsManager : Listener {
                 val intLevel = splitLoreLine[splitLoreLine.size - 1]
                 if (NumberUtils.isInt(intLevel)) {
                     map[enchant] = Integer.valueOf(intLevel)
-                    break
                 }
             }
         }
+
         return map
     }
 
@@ -442,7 +485,7 @@ object EnchantsManager : Listener {
         if (item == null) {
             return null
         }
-        for (enchant in enchants) {
+        for (enchant in registeredEnchants) {
             if (enchant.isEnchantItem(item)) {
                 return enchant
             }
@@ -452,7 +495,7 @@ object EnchantsManager : Listener {
 
     @JvmStatic
     fun matchEnchant(string: String?): AbstractEnchant? {
-        for (enchant in enchants) {
+        for (enchant in registeredEnchants) {
             if (ChatColor.stripColor(string).equals(enchant.getStrippedEnchant(), ignoreCase = true)) {
                 return enchant
             }
@@ -462,22 +505,22 @@ object EnchantsManager : Listener {
 
     @JvmStatic
     fun registerEnchant(enchant: AbstractEnchant) {
-        enchants.add(enchant)
+        registeredEnchants.add(enchant)
     }
 
     @JvmStatic
     fun getRegisteredEnchants(): List<AbstractEnchant> {
-        return enchants.toList()
+        return registeredEnchants.toList()
     }
 
     @JvmStatic
     fun getEnchantById(id: String): AbstractEnchant? {
-        return enchants.first { it.id.equals(id, ignoreCase = true) }
+        return registeredEnchants.firstOrNull { it.id.equals(id, ignoreCase = true) }
     }
 
     @JvmStatic
     fun getEnchantByName(name: String): AbstractEnchant? {
-        return enchants.first { it.enchant.equals(name, ignoreCase = true) }
+        return registeredEnchants.firstOrNull { it.enchant.equals(name, ignoreCase = true) }
     }
 
     private val enchantColorOrder = mapOf<Color, Int>(
@@ -488,7 +531,23 @@ object EnchantsManager : Listener {
         Color.AQUA to 5
     )
 
-    val ENCHANT_COMPARATOR = Comparator<Map.Entry<AbstractEnchant, Int>> { o1, o2 ->
+    val ENCHANT_COMPARATOR = Comparator<AbstractEnchant> { o1, o2 ->
+        val o1Order = enchantColorOrder.getOrDefault(o1.iconColor, 4)
+        val o2Order = enchantColorOrder.getOrDefault(o2.iconColor, 4)
+        when {
+            o1Order == o2Order -> {
+                return@Comparator 0
+            }
+            o1Order > o2Order -> {
+                return@Comparator 1
+            }
+            else -> {
+                return@Comparator -1
+            }
+        }
+    }
+
+    val MAPPED_ENCHANT_COMPARATOR = Comparator<Map.Entry<AbstractEnchant, Int>> { o1, o2 ->
         val o1Order = enchantColorOrder.getOrDefault(o1.key.iconColor, 4)
         val o2Order = enchantColorOrder.getOrDefault(o2.key.iconColor, 4)
         when {

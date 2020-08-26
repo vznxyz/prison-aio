@@ -26,7 +26,7 @@ object AnalyticHandler : PluginHandler {
         return EnvironmentModule
     }
 
-    override fun hasInternalData(): Boolean {
+    override fun hasDefaultInternalData(): Boolean {
         return true
     }
 

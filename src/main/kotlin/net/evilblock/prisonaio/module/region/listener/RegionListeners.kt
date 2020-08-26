@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.region.listener
 
+import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
@@ -164,11 +165,19 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onEntityDamageEvent(event: EntityDamageByEntityEvent) {
+        if (EventGameHandler.isOngoingGame() && EventGameHandler.getOngoingGame()!!.isPlayingOrSpectating(event.damager.uniqueId)) {
+            return
+        }
+
         RegionsModule.findRegion(event.damager.location).onEntityDamage(event.damager, event.cause, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onEntityDamageByEntityEvent(event: EntityDamageByEntityEvent) {
+        if (EventGameHandler.isOngoingGame() && EventGameHandler.getOngoingGame()!!.isPlayingOrSpectating(event.damager.uniqueId)) {
+            return
+        }
+
         RegionsModule.findRegion(event.damager.location).onEntityDamageEntity(event.damager, event.entity, event.cause, event.finalDamage, event)
     }
 

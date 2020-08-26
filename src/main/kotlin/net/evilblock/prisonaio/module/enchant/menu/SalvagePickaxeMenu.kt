@@ -70,7 +70,7 @@ class SalvagePickaxeMenu(private val pickaxeItem: ItemStack, private val pickaxe
 
             enchants.entries
                 .filter { entry -> entry.key !is Cubed }
-                .sortedWith(EnchantsManager.ENCHANT_COMPARATOR)
+                .sortedWith(EnchantsManager.MAPPED_ENCHANT_COMPARATOR)
                 .forEach { entry ->
                     description.add("${ColorUtil.toChatColor(entry.key.iconColor)}${ChatColor.BOLD}❙ ${ChatColor.GRAY}${entry.key.getStrippedEnchant()} ${entry.value} (${ChatColor.GOLD}${Formats.formatTokens(entry.key.getRefundTokens(entry.value))}${ChatColor.GRAY})")
                 }

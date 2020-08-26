@@ -193,8 +193,8 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (!jerry.gang.isOwner(player.uniqueId)) {
-                player.sendMessage("${ChatColor.RED}You must be the owner of the gang to manage its settings.")
+            if (!jerry.gang.isLeader(player.uniqueId)) {
+                player.sendMessage("${ChatColor.RED}You must be the leader of the gang to manage its settings.")
                 return
             }
 
@@ -224,21 +224,20 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
             return 3.toByte()
         }
 
-        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (!jerry.gang.isOwner(player.uniqueId)) {
-                player.sendMessage("${ChatColor.RED}You must be the owner of the gang to manage its members.")
-                return
-            }
-
-            ManageMembersMenu(jerry.gang).openMenu(player)
-        }
-
         override fun getButtonItem(player: Player): ItemStack {
             val item = super.getButtonItem(player)
             val meta = item.itemMeta as SkullMeta
             meta.owner = player.name
             item.itemMeta = meta
             return item
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (jerry.gang.isLeader(player.uniqueId)) {
+                ManageMembersMenu(jerry.gang).openMenu(player)
+            } else {
+                MembersMenu(jerry.gang).openMenu(player)
+            }
         }
     }
 

@@ -30,7 +30,7 @@ object PrivateMineShopListeners : Listener {
         if (event.player.uniqueId != currentMine.owner) {
             val mineOwner = Bukkit.getOfflinePlayer(currentMine.owner)
 
-            if (currentMine.salesTax.coerceAtLeast(0.0) != 0.0) {
+            if (currentMine.salesTax.coerceAtLeast(1.0) != 1.0) {
                 val taxedMoney = event.getSellCost().toDouble() / currentMine.salesTax
 
                 currentMine.moneyGained += taxedMoney.toLong()

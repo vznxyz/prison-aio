@@ -22,11 +22,6 @@ object GangVisitCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "player", defaultValue = "self") gang: Gang) {
-        if (GangHandler.getAccessibleGangs(player.uniqueId).contains(gang)) {
-            player.sendMessage("${ChatColor.RED}If you want to teleport to your gang's HQ, use the `/gang hq` command.")
-            return
-        }
-
         // attemptJoinSession handles the ALLOW_VISITORS permission test so we don't have to
         GangHandler.attemptJoinSession(player, gang)
     }

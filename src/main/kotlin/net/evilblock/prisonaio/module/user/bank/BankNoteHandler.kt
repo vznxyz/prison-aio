@@ -32,10 +32,6 @@ object BankNoteHandler : PluginHandler {
         return UsersModule
     }
 
-    override fun hasInternalData(): Boolean {
-        return true
-    }
-
     override fun getInternalDataFile(): File {
         return File(File(PrisonAIO.instance.dataFolder, "internal"), "bank-notes.json")
     }

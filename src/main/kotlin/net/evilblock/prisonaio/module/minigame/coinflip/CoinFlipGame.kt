@@ -8,9 +8,11 @@
 package net.evilblock.prisonaio.module.minigame.coinflip
 
 import net.evilblock.cubed.util.Chance
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.*
 import kotlin.math.round
@@ -27,6 +29,8 @@ class CoinFlipGame(
     var stage: Stage = Stage.WAITING_FOR_OPPONENT
     var stageTicks: Int = 0
     var winner: User? = null
+
+    val watchers: MutableSet<UUID> = hashSetOf()
 
     private var rollIndex = 0
     private var rollSequence = arrayListOf(3, 3, 3, 3, 4)
@@ -61,10 +65,26 @@ class CoinFlipGame(
 
     fun finishGame() {
         if (winner == null) {
+            sendMessage("${CoinFlipHandler.CHAT_PREFIX}There was no winner, so both players have been refunded!")
+
             currency.give(Bukkit.getOfflinePlayer(creator.uuid), currencyAmount)
+
+            if (opponent != null) {
+                currency.give(Bukkit.getOfflinePlayer(opponent!!.uuid), currencyAmount)
+            }
         } else {
+            sendMessage("${CoinFlipHandler.CHAT_PREFIX}${ChatColor.GREEN}${ChatColor.BOLD}${winner!!.getUsername()} ${ChatColor.GRAY}won the game for ${currency.format(NumberUtils.numberOperation(currencyAmount, currencyAmount, true))}${ChatColor.GRAY}!")
+
+            winner!!.statistics.addCoinflipWin()
+            winner!!.statistics.addCoinflipProfit(currency.toType(), currencyAmount)
+
             currency.give(Bukkit.getOfflinePlayer(winner!!.uuid), currencyAmount)
             currency.give(Bukkit.getOfflinePlayer(winner!!.uuid), currencyAmount)
+
+            if (opponent != null) {
+                opponent!!.statistics.addCoinflipLoss()
+                opponent!!.statistics.subtractCoinflipProfit(currency.toType(), currencyAmount)
+            }
         }
 
         CoinFlipHandler.forgetGame(this)
@@ -112,6 +132,23 @@ class CoinFlipGame(
                     finishGame()
                 }
             }
+        }
+    }
+
+    fun sendMessage(message: String) {
+        creator.getPlayer()?.sendMessage(message)
+        opponent?.getPlayer()?.sendMessage(message)
+
+        for (watcher in watchers) {
+            if (watcher == creator.uuid) {
+                continue
+            }
+
+            if (opponent != null && watcher == opponent!!.uuid) {
+                continue
+            }
+
+            Bukkit.getPlayer(watcher)?.sendMessage(message)
         }
     }
 

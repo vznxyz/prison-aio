@@ -14,9 +14,9 @@ class SneakToTeleportOption(private val enabled: Boolean) : UserSettingOption {
 
     override fun getName(): String {
         return if (enabled) {
-            "Enable sneak-to-teleport"
+            "Enable sneak to teleport"
         } else {
-            "Disable sneak-to-teleport"
+            "Disable sneak to teleport"
         }
     }
 

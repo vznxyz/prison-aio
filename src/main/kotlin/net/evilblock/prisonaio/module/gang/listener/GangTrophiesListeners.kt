@@ -39,6 +39,11 @@ object GangTrophiesListeners : Listener {
                 val amount = Random.nextInt(GangModule.readTrophyBlockBreakMinAmount(), GangModule.readTrophyBlockBreakMaxAmount())
                 assumedGang.giveTrophies(amount)
 
+                val memberInfo = assumedGang.getMemberInfo(event.player.uniqueId)
+                if (memberInfo != null) {
+                    memberInfo.trophiesCollected += amount
+                }
+
                 val user = UserHandler.getUser(event.player.uniqueId)
                 if (user.getSettingOption(UserSetting.REWARD_MESSAGES).getValue()) {
                     event.player.sendMessage("${RewardsModule.getChatPrefix()}You found ${ChatColor.GOLD}${ChatColor.BOLD}$amount ${ChatColor.GOLD}Trophies ${ChatColor.GRAY}for your gang while mining!")

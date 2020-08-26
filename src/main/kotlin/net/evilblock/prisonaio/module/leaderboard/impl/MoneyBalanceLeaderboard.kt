@@ -15,7 +15,7 @@ import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 
-object MoneyBalanceLeaderboard : Leaderboard("top-balance", "Top Balance") {
+object MoneyBalanceLeaderboard : Leaderboard("top-balance", "${ChatColor.GREEN}${ChatColor.BOLD}Top Balance") {
 
     override fun fetchEntries(): List<LeaderboardEntry<*>> {
         val entries = arrayListOf<LeaderboardEntry<Double>>()
@@ -28,7 +28,7 @@ object MoneyBalanceLeaderboard : Leaderboard("top-balance", "Top Balance") {
                     .filter { it.name != null }
                     .map { LeaderboardEntry(0, Cubed.instance.uuidCache.name(it.uniqueId), economy.getBalance(it)) }
                     .sortedByDescending { it.value }
-                    .take(5)
+                    .take(CACHED_ENTRIES_SIZE)
                     .toList()
             )
         }

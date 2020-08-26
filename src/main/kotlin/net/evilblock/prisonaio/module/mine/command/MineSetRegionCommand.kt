@@ -9,25 +9,26 @@ package net.evilblock.prisonaio.module.mine.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
+import net.evilblock.cubed.util.hook.WorldEditUtils
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
-import net.evilblock.prisonaio.module.region.selection.RegionSelection
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
 object MineSetRegionCommand {
 
     @Command(
-        names = ["mine setregion"],
+        names = ["mine set-region"],
         description = "Set the region of a mine",
         permission = "prisonaio.mines.setregion",
         async = true
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "mine") mine: Mine) {
-        if (!RegionSelection.hasSelection(player)) {
-            player.sendMessage(RegionSelection.FINISH_SELECTION)
+        val selection = WorldEditUtils.getSelection(player)
+        if (selection == null) {
+            player.sendMessage("${ChatColor.RED}You need to select a region using the WorldEdit wand!")
             return
         }
 
@@ -36,7 +37,7 @@ object MineSetRegionCommand {
         }
 
         // update the mine's region to the player's selection
-        mine.region = RegionSelection.getSelection(player)
+        mine.region = WorldEditUtils.toCuboid(selection)
         mine.cacheChunks()
 
         // make changes to block cache

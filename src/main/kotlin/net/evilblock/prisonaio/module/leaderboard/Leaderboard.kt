@@ -14,23 +14,31 @@ import org.bukkit.entity.Player
 
 abstract class Leaderboard(val id: String, val name: String) {
 
+    companion object {
+        internal val CACHED_ENTRIES_SIZE = 10
+    }
+
     internal var entries: List<LeaderboardEntry<*>> = arrayListOf()
 
     abstract fun fetchEntries(): List<LeaderboardEntry<*>>
 
     abstract fun formatEntry(entry: LeaderboardEntry<*>): String
 
-    fun getDisplayLines(): List<String> {
+    fun getDisplayLines(fullView: Boolean): List<String> {
         val lines = arrayListOf<String>()
-        lines.add("${ChatColor.RED}${ChatColor.BOLD}$name")
+        lines.add(name)
 
         if (entries.isEmpty()) {
             lines.add("${ChatColor.GRAY}Loading data...")
             return lines
         }
 
-        for (entry in entries) {
+        for ((index, entry) in entries.withIndex()) {
             lines.add(formatEntry(entry))
+
+            if (fullView && index >= 4) {
+                break
+            }
         }
 
         return lines
@@ -48,7 +56,7 @@ abstract class Leaderboard(val id: String, val name: String) {
 
         for (npc in LeaderboardsModule.getLeaderboardNpcs()) {
             if (npc.leaderboard == this) {
-                npc.updateLines(getDisplayLines())
+                npc.updateLines(getDisplayLines(true))
             }
         }
     }

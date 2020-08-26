@@ -11,11 +11,11 @@ import org.bukkit.inventory.ItemStack
 
 data class ShopItem(
     /**
-     * This shop item's actual item
+     * The actual item representing this shop item
      */
     val itemStack: ItemStack,
     /**
-     * This shop item's amount
+     * The item stack amount
      */
     val amount: Int,
     /**

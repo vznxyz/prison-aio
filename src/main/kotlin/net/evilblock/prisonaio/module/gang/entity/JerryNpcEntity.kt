@@ -29,7 +29,7 @@ class JerryNpcEntity(location: Location) : NpcEntity(listOf(""), location) {
         }
 
         if (!canOpen) {
-            if (gang.owner == player.uniqueId) {
+            if (gang.leader == player.uniqueId) {
                 canOpen = true
             }
 

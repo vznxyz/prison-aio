@@ -33,15 +33,6 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
         autoUpdate = true
     }
 
-    override fun onOpen(player: Player) {
-        if (game.stage == CoinFlipGame.Stage.FINISHED && game.stageTicks >= 15) {
-            CoinFlipBrowserMenu().openMenu(player)
-            return
-        }
-
-        super.onOpen(player)
-    }
-
     override fun getTitle(player: Player): String {
         val formattedValue = game.currency.format(game.currencyAmount)
 
@@ -148,7 +139,18 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
         return buttons
     }
 
+    override fun onOpen(player: Player) {
+        if (game.stage == CoinFlipGame.Stage.FINISHED && game.stageTicks >= 15) {
+            CoinFlipBrowserMenu().openMenu(player)
+            return
+        }
+
+        super.onOpen(player)
+    }
+
     override fun onClose(player: Player, manualClose: Boolean) {
+        game.watchers.remove(player.uniqueId)
+
         if (manualClose) {
             Tasks.delayed(1L) {
                 CoinFlipBrowserMenu().openMenu(player)
@@ -170,13 +172,47 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            return listOf(
-                "",
-                "${ChatColor.GRAY}Wins: ${ChatColor.GREEN}0",
-                "${ChatColor.GRAY}Losses: ${ChatColor.RED}0",
-                "${ChatColor.GRAY}Net Profit (Money): ${ChatColor.GREEN}+${NumberUtils.format(1337000.55)}",
-                "${ChatColor.GRAY}Net Profit (Tokens): ${ChatColor.GREEN}+${NumberUtils.format(0L)}"
-            )
+            val description = arrayListOf<String>()
+
+            description.add("${ChatColor.GRAY}Wins: ${ChatColor.GREEN}${NumberUtils.format(user.statistics.getCoinflipWins())}")
+            description.add("${ChatColor.GRAY}Losses: ${ChatColor.RED}${NumberUtils.format(user.statistics.getCoinflipLosses())}")
+
+            val moneyProfit = user.statistics.getCoinflipProfit(Currency.Type.MONEY)
+
+            val moneyProfitStyle = when {
+                moneyProfit.toDouble() == 0.0 -> {
+                    "${ChatColor.YELLOW}="
+                }
+                moneyProfit.toDouble() > 0 -> {
+                    "${ChatColor.GREEN}+"
+                }
+                else -> {
+                    "${ChatColor.RED}-"
+                }
+            }
+
+            description.add("${ChatColor.GRAY}Net Profit (Money): $moneyProfitStyle${Currency.Type.MONEY.format(moneyProfit)}")
+
+            val tokensProfit = user.statistics.getCoinflipProfit(Currency.Type.TOKENS)
+
+            val tokensProfitStyle = when {
+                tokensProfit.toLong() == 0L -> {
+                    "${ChatColor.YELLOW}="
+                }
+                tokensProfit.toLong() > 0 -> {
+                    "${ChatColor.GREEN}+"
+                }
+                else -> {
+                    "${ChatColor.RED}-"
+                }
+            }
+
+            description.add("${ChatColor.GRAY}Net Profit (Tokens): $tokensProfitStyle${Currency.Type.TOKENS.format(moneyProfit)}")
+            description.add("")
+            description.add("${ChatColor.GRAY}Last 24 Hrs: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")
+            description.add("${ChatColor.GRAY}Last 7 Days: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")
+
+            return description
         }
     }
 
@@ -233,6 +269,8 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
                         if (confirmed) {
                             game.currency.take(player, game.currencyAmount)
                             game.opponent = UserHandler.getUser(player.uniqueId)
+                            game.sendMessage("${ChatColor.AQUA}${ChatColor.BOLD}${player.name} ${ChatColor.GRAY}has entered the game!")
+                            game.sendMessage("Starting in 3 seconds...")
                         }
                     }
 

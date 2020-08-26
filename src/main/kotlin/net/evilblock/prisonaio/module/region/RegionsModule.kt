@@ -11,11 +11,9 @@ import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.region.listener.RegionListeners
-import net.evilblock.prisonaio.module.region.listener.RegionWandListeners
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.command.RegionBypassCommand
 import net.evilblock.prisonaio.module.region.command.RegionDebugCommand
-import net.evilblock.prisonaio.module.region.command.RegionWandCommand
 import net.evilblock.prisonaio.module.region.impl.safezone.SafeZoneRegion
 import org.bukkit.Location
 import org.bukkit.event.Listener
@@ -44,7 +42,6 @@ object RegionsModule : PluginModule() {
     override fun getCommands(): List<Class<*>> {
         return listOf(
             RegionBypassCommand.javaClass,
-            RegionWandCommand.javaClass,
             RegionDebugCommand.javaClass
         )
     }
@@ -52,8 +49,7 @@ object RegionsModule : PluginModule() {
     override fun getListeners(): List<Listener> {
         return listOf(
             RegionListeners,
-            RegionBypass,
-            RegionWandListeners
+            RegionBypass
         )
     }
 

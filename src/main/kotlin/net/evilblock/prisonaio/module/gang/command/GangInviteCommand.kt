@@ -29,8 +29,8 @@ object GangInviteCommand {
             return
         }
 
-        if (gang.owner != sender.uniqueId) {
-            sender.sendMessage("${ChatColor.RED}Only the owner of the gang can invite other players.")
+        if (gang.leader != sender.uniqueId) {
+            sender.sendMessage("${ChatColor.RED}Only the leader of the gang can invite other players.")
             return
         }
 

@@ -27,8 +27,8 @@ object GangSetAnnouncementCommand {
             return
         }
 
-        if (gang.owner != player.uniqueId) {
-            player.sendMessage("${ChatColor.RED}Only the owner can update the gang's announcement.")
+        if (gang.leader != player.uniqueId) {
+            player.sendMessage("${ChatColor.RED}Only the leader can update the gang's announcement.")
             return
         }
 

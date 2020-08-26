@@ -31,7 +31,7 @@ object SpawnCommand {
 
         EntityManager.trackEntity(npc)
 
-        player.sendMessage("${ChatColor.GREEN}Successfully spawned a ${ChatColor.RED}${ChatColor.BOLD}${leaderboard.name} ${ChatColor.GREEN}leaderboard NPC!")
+        player.sendMessage("${ChatColor.GREEN}Successfully spawned a ${leaderboard.name} ${ChatColor.GREEN}leaderboard NPC!")
     }
 
 }

@@ -26,7 +26,7 @@ object RankHandler : PluginHandler {
         return RanksModule
     }
 
-    override fun hasInternalData(): Boolean {
+    override fun hasDefaultInternalData(): Boolean {
         return true
     }
 

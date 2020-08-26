@@ -7,6 +7,8 @@
 
 package net.evilblock.prisonaio.module.user.listener
 
+import mkremins.fanciful.FancyMessage
+import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -22,7 +24,18 @@ object UserLoadListeners : Listener {
 
     @EventHandler
     fun onPlayerJoinEvent(event: PlayerJoinEvent) {
-        UserHandler.getUser(event.player.uniqueId).applyPermissions(event.player)
+        UserHandler.getUser(event.player.uniqueId).let { user ->
+            user.applyPermissions(event.player)
+
+            val unreadProfileComments = user.getProfileComments().filter { !it.read }
+            if (unreadProfileComments.isNotEmpty()) {
+                FancyMessage("${ChatColor.YELLOW}You have ${unreadProfileComments.size} un-read comments left on your profile! ")
+                    .then("${ChatColor.GREEN}${ChatColor.BOLD}[VIEW]")
+                    .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to view your profile comments."))
+                    .command("/profile ${event.player.name} comments")
+                    .send(event.player)
+            }
+        }
     }
 
     @EventHandler

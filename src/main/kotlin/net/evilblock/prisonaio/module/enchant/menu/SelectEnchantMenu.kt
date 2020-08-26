@@ -29,7 +29,7 @@ class SelectEnchantMenu(
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        for (enchant in EnchantsManager.getRegisteredEnchants()) {
+        for (enchant in EnchantsManager.getRegisteredEnchants().sortedWith(EnchantsManager.ENCHANT_COMPARATOR)) {
             if (filtered.contains(enchant)) {
                 continue
             }

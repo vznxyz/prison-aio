@@ -16,7 +16,7 @@ import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
 import java.util.*
 
-object TopTokensLeaderboard : Leaderboard("top-tokens", "Top Tokens") {
+object TopTokensLeaderboard : Leaderboard("top-tokens", "${ChatColor.GOLD}${ChatColor.BOLD}Top Tokens") {
 
     override fun fetchEntries(): List<LeaderboardEntry<*>> {
         val entries = arrayListOf<LeaderboardEntry<Long>>()
@@ -32,7 +32,7 @@ object TopTokensLeaderboard : Leaderboard("top-tokens", "Top Tokens") {
             }
         }
 
-        return entries.sortedByDescending { it.value }.take(5)
+        return entries.sortedByDescending { it.value }.take(CACHED_ENTRIES_SIZE)
     }
 
     override fun formatEntry(entry: LeaderboardEntry<*>): String {

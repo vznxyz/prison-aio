@@ -58,7 +58,7 @@ object GangCreateCommand {
             GangHandler.createNewGang(player.uniqueId, name) { gang ->
                 Tasks.sync {
                     GangHandler.attemptJoinSession(player, gang)
-                    player.sendMessage("${ChatColor.YELLOW}You are now the owner of this gang. Use ${ChatColor.YELLOW}/gang home ${ChatColor.YELLOW}to teleport back to your gang headquarters.")
+                    player.sendMessage("${ChatColor.YELLOW}You are now the leader of this gang. Use ${ChatColor.YELLOW}/gang home ${ChatColor.YELLOW}to teleport back to your gang headquarters.")
                 }
             }
         } catch (e: Exception) {

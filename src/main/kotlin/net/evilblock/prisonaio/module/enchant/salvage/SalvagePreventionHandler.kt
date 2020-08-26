@@ -30,7 +30,7 @@ object SalvagePreventionHandler : PluginHandler {
         return EnchantsModule
     }
 
-    override fun hasInternalData(): Boolean {
+    override fun hasDefaultInternalData(): Boolean {
         return true
     }
 

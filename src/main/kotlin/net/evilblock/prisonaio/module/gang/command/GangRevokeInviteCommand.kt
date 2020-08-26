@@ -29,8 +29,8 @@ object GangRevokeInviteCommand {
             return
         }
 
-        if (visitingGang.owner != sender.uniqueId) {
-            sender.sendMessage("${ChatColor.RED}Only the owner can revoke player invitations.")
+        if (visitingGang.leader != sender.uniqueId) {
+            sender.sendMessage("${ChatColor.RED}Only the leader can revoke player invitations.")
             return
         }
 
