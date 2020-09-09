@@ -13,6 +13,8 @@ import net.evilblock.cubed.util.bukkit.Constants
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.text.NumberFormat
 import java.util.*
 
@@ -62,9 +64,27 @@ object Formats {
     }
 
     @JvmStatic
+    fun formatMoney(amount: BigDecimal): String {
+        if (amount.toDouble() < Long.MAX_VALUE) {
+            return formatMoney(amount.toDouble())
+        }
+
+        return "${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${String.format("%,e", amount)}"
+    }
+
+    @JvmStatic
     fun formatTokens(amount: Long): String {
         val formatted = NumberFormat.getInstance().format(amount)
         return "${ChatColor.RED}${Constants.TOKENS_SYMBOL}${ChatColor.YELLOW}${ChatColor.BOLD}$formatted"
+    }
+
+    @JvmStatic
+    fun formatTokens(amount: BigInteger): String {
+        if (amount.toLong() < Long.MAX_VALUE) {
+            return formatTokens(amount.toLong())
+        }
+
+        return "${ChatColor.RED}${Constants.TOKENS_SYMBOL}${ChatColor.YELLOW}${ChatColor.BOLD}${String.format("%,d", amount)}"
     }
 
     @JvmStatic

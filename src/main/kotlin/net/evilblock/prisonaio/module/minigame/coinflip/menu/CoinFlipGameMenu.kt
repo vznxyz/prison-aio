@@ -259,7 +259,7 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
                     return
                 }
 
-                if (!game.currency.has(player, game.currencyAmount)) {
+                if (!game.currency.has(player.uniqueId, game.currencyAmount)) {
                     player.sendMessage("${ChatColor.RED}You don't have enough money to match the game's bet.")
                     return
                 }
@@ -267,10 +267,10 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
                 ConfirmMenu("${ChatColor.GREEN}${ChatColor.BOLD}ENTER GAME?") { confirmed ->
                     if (game.isWaitingForOpponent()) {
                         if (confirmed) {
-                            game.currency.take(player, game.currencyAmount)
+                            game.currency.take(player.uniqueId, game.currencyAmount)
                             game.opponent = UserHandler.getUser(player.uniqueId)
-                            game.sendMessage("${ChatColor.AQUA}${ChatColor.BOLD}${player.name} ${ChatColor.GRAY}has entered the game!")
-                            game.sendMessage("Starting in 3 seconds...")
+                            game.sendMessage("${CoinFlipHandler.CHAT_PREFIX}${ChatColor.AQUA}${ChatColor.BOLD}${player.name} ${ChatColor.GRAY}has entered the game!")
+                            game.sendMessage("${CoinFlipHandler.CHAT_PREFIX}Starting in 3 seconds...")
                         }
                     }
 

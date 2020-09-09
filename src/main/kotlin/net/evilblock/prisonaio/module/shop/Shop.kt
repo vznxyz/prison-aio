@@ -92,11 +92,11 @@ class Shop(var id: String) {
             finalCost = finalCost
         )
 
-        if (!shopReceipt.currency.has(player, shopReceipt.finalCost)) {
+        if (!shopReceipt.currency.has(player.uniqueId, shopReceipt.finalCost)) {
             return ShopReceipt(result = TransactionResult.CANNOT_AFFORD, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
-        currency.take(player, finalCost)
+        currency.take(player.uniqueId, finalCost)
 
         val splitItems = arrayListOf<ItemStack>()
         for (item in shopReceipt.items) {

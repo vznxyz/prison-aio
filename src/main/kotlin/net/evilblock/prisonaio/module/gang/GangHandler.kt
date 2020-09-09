@@ -75,9 +75,9 @@ object GangHandler : PluginHandler {
 
         Tasks.asyncTimer(GangBoosterExpirationTask, 20L, 20L)
 
-        Tasks.asyncTimer(20L * 60L, 20L * 60L) {
-            for (cell in grid.values) {
-                cell.updateCachedCellValue()
+        Tasks.asyncTimer(0, 20L * 60L) {
+            for (gang in grid.values) {
+                gang.updateCachedValue()
             }
         }
     }

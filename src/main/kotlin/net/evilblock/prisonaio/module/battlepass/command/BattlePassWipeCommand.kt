@@ -30,6 +30,7 @@ object BattlePassWipeCommand {
 
         for (user in UserHandler.getUsers()) {
             user.battlePassProgress = BattlePassProgress(user)
+            user.requiresSave = true
         }
 
         sender.sendMessage("${ChatColor.GREEN}You have reset all users' BattlePass progress.")

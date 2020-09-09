@@ -13,9 +13,11 @@ import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
+import java.math.BigDecimal
 
 object RankupCommand {
 
@@ -36,7 +38,7 @@ object RankupCommand {
         val rank = optionalNextRank.get()
         val rankPrice = rank.getPrice(user.getPrestige())
 
-        if (user.getMoneyBalance() >= rankPrice) {
+        if (user.hasMoneyBalance(rankPrice)) {
             val previousRank = user.getRank()
 
             val playerRankupEvent = PlayerRankupEvent(player, previousRank, rank)
@@ -61,7 +63,8 @@ object RankupCommand {
             player.sendMessage(" ${ChatColor.GRAY}The rankup cost ${ChatColor.GREEN}$${ChatColor.YELLOW}$moneyNeeded${ChatColor.GRAY}.")
             player.sendMessage("")
         } else {
-            val moneyNeeded = NumberUtils.format((rankPrice - user.getMoneyBalance()).toLong())
+            val moneyNeeded = Formats.formatMoney(user.getMoneyBalance() - BigDecimal(rankPrice))
+
             player.sendMessage("")
             player.sendMessage(" ${ChatColor.RED}${ChatColor.BOLD}Cannot Afford Rankup")
             player.sendMessage(" ${ChatColor.GRAY}You need ${ChatColor.GREEN}$${ChatColor.YELLOW}$moneyNeeded ${ChatColor.GRAY}more to rankup to ${rank.displayName}${ChatColor.GRAY}.")

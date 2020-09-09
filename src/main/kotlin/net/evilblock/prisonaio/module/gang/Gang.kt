@@ -30,6 +30,8 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
+import java.math.BigInteger
+import java.text.DecimalFormat
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -55,7 +57,7 @@ class Gang(
     private var trophies: Int = 0
     private var boosters: MutableSet<GangBooster> = hashSetOf()
 
-    internal var cachedCellValue: Long = 0L
+    internal var cachedValue: BigInteger = BigInteger("0")
 
     internal var guideNpc: JerryNpcEntity = JerryNpcEntity(guideLocation)
 
@@ -114,6 +116,8 @@ class Gang(
         }
 
         visitors = hashSetOf()
+
+        cachedValue = BigInteger("0")
 
         guideNpc.initializeData()
         guideNpc.persistent = false
@@ -520,16 +524,20 @@ class Gang(
         cancellable.isCancelled = false
     }
 
-    fun updateCachedCellValue() {
-        var totalBalance = 0L
+    fun updateCachedValue() {
+        var sum = BigInteger("0")
 
         VaultHook.useEconomy { economy ->
             for (member in members.keys) {
-                totalBalance += economy.getBalance(Bukkit.getOfflinePlayer(member)).toLong()
+                sum += BigInteger(DECIMAL_FORMAT.format(economy.getBalance(Bukkit.getOfflinePlayer(member))))
             }
         }
 
-        cachedCellValue = totalBalance
+        cachedValue = sum
+    }
+
+    companion object {
+        private val DECIMAL_FORMAT = DecimalFormat("#")
     }
 
 }

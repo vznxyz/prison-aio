@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.minigame.coinflip
 
+import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.user.User
@@ -67,10 +68,10 @@ class CoinFlipGame(
         if (winner == null) {
             sendMessage("${CoinFlipHandler.CHAT_PREFIX}There was no winner, so both players have been refunded!")
 
-            currency.give(Bukkit.getOfflinePlayer(creator.uuid), currencyAmount)
+            currency.give(creator.uuid, currencyAmount)
 
             if (opponent != null) {
-                currency.give(Bukkit.getOfflinePlayer(opponent!!.uuid), currencyAmount)
+                currency.give(opponent!!.uuid, currencyAmount)
             }
         } else {
             sendMessage("${CoinFlipHandler.CHAT_PREFIX}${ChatColor.GREEN}${ChatColor.BOLD}${winner!!.getUsername()} ${ChatColor.GRAY}won the game for ${currency.format(NumberUtils.numberOperation(currencyAmount, currencyAmount, true))}${ChatColor.GRAY}!")
@@ -78,8 +79,8 @@ class CoinFlipGame(
             winner!!.statistics.addCoinflipWin()
             winner!!.statistics.addCoinflipProfit(currency.toType(), currencyAmount)
 
-            currency.give(Bukkit.getOfflinePlayer(winner!!.uuid), currencyAmount)
-            currency.give(Bukkit.getOfflinePlayer(winner!!.uuid), currencyAmount)
+            currency.give(winner!!.uuid, currencyAmount)
+            currency.give(winner!!.uuid, currencyAmount)
 
             if (opponent != null) {
                 opponent!!.statistics.addCoinflipLoss()

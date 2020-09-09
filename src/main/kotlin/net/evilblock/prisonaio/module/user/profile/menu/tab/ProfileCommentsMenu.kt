@@ -16,6 +16,7 @@ import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.profile.ProfileComment
 import net.evilblock.prisonaio.module.user.profile.menu.PaginatedProfileLayoutMenu
 import net.evilblock.prisonaio.module.user.profile.menu.ProfileLayout
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -69,12 +70,15 @@ class ProfileCommentsMenu(user: User) : PaginatedProfileLayoutMenu(layout = Prof
             val description = arrayListOf<String>()
             description.addAll(TextSplitter.split(length = 40, text = comment.message, linePrefix = "${ChatColor.GRAY}"))
 
-            if (comment.creator == player.uniqueId) {
-                description.add("")
-                description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to remove your comment")
-            } else if (layout.user.uuid == player.uniqueId) {
-                description.add("")
-                description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to remove ${Cubed.instance.uuidCache.name(comment.creator)}'s comment")
+            val canRemove = comment.creator == player.uniqueId || layout.user.uuid == player.uniqueId || player.hasPermission(Permissions.USERS_ADMIN_REMOVE_COMMENT)
+            if (canRemove) {
+                if (comment.creator == player.uniqueId) {
+                    description.add("")
+                    description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to remove your comment")
+                } else {
+                    description.add("")
+                    description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to remove ${Cubed.instance.uuidCache.name(comment.creator)}'s comment")
+                }
             }
 
             return description
@@ -86,7 +90,7 @@ class ProfileCommentsMenu(user: User) : PaginatedProfileLayoutMenu(layout = Prof
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isRightClick) {
-                if (comment.creator == player.uniqueId || layout.user.uuid == player.uniqueId) {
+                if (comment.creator == player.uniqueId || layout.user.uuid == player.uniqueId || player.hasPermission(Permissions.USERS_ADMIN_REMOVE_COMMENT)) {
                     ConfirmMenu("Remove comment?") { confirmed ->
                         if (confirmed) {
                             layout.user.removeProfileComment(comment)

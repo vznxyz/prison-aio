@@ -20,7 +20,7 @@ import org.bukkit.inventory.InventoryView
 class HomesMenu : Menu() {
 
     override fun getTitle(player: Player): String {
-        return "Your Cells"
+        return "Your Gang HQs"
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {

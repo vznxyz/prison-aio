@@ -1,9 +1,3 @@
-help-messages:
-  - "{LONG_LINE}"
-  - "&7&lMine&c&lJunkie &78- &7&lHelpful Information"
-  - "&eUse `/gang create` to create a new cell."
-  - "{LONG_LINE}"
-
 vanilla-mechanics:
   # If fall damage is disabled
   disable-fall-damage: true

@@ -219,7 +219,7 @@ class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val picka
             val user = UserHandler.getUser(player.uniqueId)
             // left click and drop click are purchase actions, so we can check a few conditions collectively
             if (clickType == ClickType.LEFT || clickType == ClickType.DROP) {
-                if (user.getTokenBalance() < enchant.getCost(nextLevel)) {
+                if (user.hasTokenBalance(enchant.getCost(nextLevel))) {
                     player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}You don't have enough tokens to purchase the ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}enchantment.")
                     return
                 }
@@ -245,7 +245,7 @@ class PurchaseEnchantsMenu(private val pickaxeItem: ItemStack, private val picka
 
                 for (level in currentLevel + 1 until maxLevel + 1) {
                     val cost = enchant.getCost(level)
-                    if (user.getTokenBalance() < levelsCost + cost) {
+                    if (user.hasTokenBalance(levelsCost + cost)) {
                         break
                     }
 

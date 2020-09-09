@@ -48,8 +48,8 @@ class ProfileLayout(
     fun renderLayout(player: Player): MutableMap<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        for (i in GREY_SLOTS) {
-            buttons[i] = GlassButton(7)
+        for (i in BLACK_SLOTS) {
+            buttons[i] = GlassButton(15)
         }
 
         for (i in RED_SLOTS) {
@@ -278,7 +278,7 @@ class ProfileLayout(
 
     companion object {
         private val RED_SLOTS = listOf(1, 8, 9, 45)
-        private val GREY_SLOTS = arrayListOf(9, 18, 27, 36, 45).also { list -> list.addAll(0..9) }
+        private val BLACK_SLOTS = arrayListOf(9, 18, 27, 36, 45).also { list -> list.addAll(0..9) }
     }
 
 }

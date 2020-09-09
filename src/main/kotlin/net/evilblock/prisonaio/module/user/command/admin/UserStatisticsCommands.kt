@@ -21,7 +21,7 @@ import org.bukkit.command.CommandSender
 object UserStatisticsCommands {
 
     @Command(
-        names = ["user setstat blocks-mined"],
+        names = ["user set-stat blocks-mined"],
         description = "Set the blocks-mined statistic of a user",
         permission = Permissions.USERS_ADMIN,
         async = true
@@ -37,7 +37,7 @@ object UserStatisticsCommands {
     }
 
     @Command(
-        names = ["user setstat blocks-mined-at-mine"],
+        names = ["user set-stat blocks-mined-at-mine"],
         description = "Set the blocks-mined-at-mine statistic of a user",
         permission = Permissions.USERS_ADMIN,
         async = true
@@ -63,7 +63,7 @@ object UserStatisticsCommands {
     }
 
     @Command(
-        names = ["user setstat playtime"],
+        names = ["user set-stat playtime"],
         description = "Set the play-time statistic of a user",
         permission = Permissions.USERS_ADMIN,
         async = true

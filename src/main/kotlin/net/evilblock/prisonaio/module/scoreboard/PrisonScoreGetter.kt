@@ -87,7 +87,7 @@ object PrisonScoreGetter : ScoreGetter {
         val moneyBalance = try {
             user.getMoneyBalance()
         } catch (e: Exception) {
-            0.0
+            UserHandler.MINIMUM_MONEY_BALANCE
         }
 
         val formattedMoneyBalance = NumberUtils.format(moneyBalance)
@@ -104,10 +104,10 @@ object PrisonScoreGetter : ScoreGetter {
             val nextRankPrice = nextRank.getPrice(user.getPrestige())
             val formattedPrice = NumberUtils.format(nextRankPrice)
 
-            val progressPercentage = if (moneyBalance > nextRankPrice) {
+            val progressPercentage = if (user.hasMoneyBalance(nextRankPrice)) {
                 100.0
             } else {
-                (moneyBalance / nextRankPrice) * 100.0
+                (moneyBalance.toDouble() / nextRankPrice) * 100.0
             }
 
             val progressColor = ProgressBarBuilder.colorPercentage(progressPercentage)

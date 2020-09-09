@@ -5,12 +5,11 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.mechanic.command
+package net.evilblock.prisonaio.module.user.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.cubed.util.bukkit.Constants
-import net.evilblock.prisonaio.module.mechanic.MechanicsModule
-import org.bukkit.command.CommandSender
+import net.evilblock.prisonaio.module.user.menu.UserHelpMenu
+import org.bukkit.entity.Player
 
 object HelpCommand {
 
@@ -19,10 +18,8 @@ object HelpCommand {
         description = "Helpful information about our server"
     )
     @JvmStatic
-    fun execute(sender: CommandSender) {
-        for (line in MechanicsModule.getHelpMessages()) {
-            sender.sendMessage(line.replace("{LONG_LINE}", Constants.LONG_LINE))
-        }
+    fun execute(player: Player) {
+        UserHelpMenu().openMenu(player)
     }
 
 }

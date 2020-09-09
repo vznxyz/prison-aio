@@ -215,7 +215,7 @@ class RefundEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxe
                                 player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have refunded your pickaxe's ${enchant.textColor}${ChatColor.BOLD}Level $refundableLevels ${enchant.enchant} ${ChatColor.GRAY}enchant for ${Formats.formatTokens(refundedTokens)}${ChatColor.GRAY}.")
                                 player.updateInventory()
 
-                                Currency.Type.TOKENS.give(player, refundedTokens)
+                                Currency.Type.TOKENS.give(player.uniqueId, refundedTokens)
 
                                 pickaxeData.removeEnchant(enchant)
                                 pickaxeData.applyMeta(pickaxeItem)

@@ -27,7 +27,7 @@ object NewsListeners : Listener {
                 event.player.sendMessage("")
                 event.player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Heads up! ${ChatColor.GRAY}There's a new server announcement!")
 
-                FancyMessage("${ChatColor.GRAY}Click to read the latest post: ")
+                FancyMessage(" ${ChatColor.GRAY}Click to read the latest post: ")
                     .then("${ChatColor.RESET}${latestPost.title}")
                     .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to view the latest announcement."))
                     .command("/news")

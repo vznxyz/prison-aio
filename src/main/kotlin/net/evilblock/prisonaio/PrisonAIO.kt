@@ -15,10 +15,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
-import net.evilblock.prisonaio.command.GKitzCommand
-import net.evilblock.prisonaio.command.ReloadCommand
-import net.evilblock.prisonaio.command.SaveCommand
-import net.evilblock.prisonaio.command.HealthCommand
+import net.evilblock.prisonaio.command.*
 import net.evilblock.prisonaio.listener.PrematureLoadListeners
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
@@ -45,8 +42,11 @@ import net.evilblock.prisonaio.module.shop.ShopsModule
 import net.evilblock.prisonaio.module.storage.StorageModule
 import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
+import net.evilblock.prisonaio.util.economy.EconomyProvider
+import net.milkbowl.vault.economy.Economy
 import org.bukkit.Location
 import org.bukkit.generator.ChunkGenerator
+import org.bukkit.plugin.ServicePriority
 
 class PrisonAIO : PluginFramework() {
 
@@ -56,8 +56,8 @@ class PrisonAIO : PluginFramework() {
     override fun onEnable() {
         instance = this
 
-        // register this listener with priority
         server.pluginManager.registerEvents(PrematureLoadListeners, this)
+        server.servicesManager.register(Economy::class.java, EconomyProvider(), this, ServicePriority.Lowest)
 
         Cubed.instance.configureOptions(CubedOptions(requireRedis = true, requireMongo = true))
 
@@ -112,6 +112,7 @@ class PrisonAIO : PluginFramework() {
 
     private fun loadCommands() {
         CommandHandler.registerClass(RunWizardCommand::class.java)
+        CommandHandler.registerClass(HotFixCommands::class.java)
         CommandHandler.registerClass(GKitzCommand::class.java)
         CommandHandler.registerClass(ReloadCommand::class.java)
         CommandHandler.registerClass(SaveCommand::class.java)

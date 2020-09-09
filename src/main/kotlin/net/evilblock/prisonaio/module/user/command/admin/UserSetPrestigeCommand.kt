@@ -21,7 +21,7 @@ import org.bukkit.entity.Player
 object UserSetPrestigeCommand {
 
     @Command(
-        names = ["user setprestige"],
+        names = ["user set-prestige"],
         description = "Update a user's prestige",
         permission = "prisonaio.user.prestige.set",
         async = true

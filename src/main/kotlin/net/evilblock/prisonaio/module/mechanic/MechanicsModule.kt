@@ -19,9 +19,6 @@ import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackViewComm
 import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackWipeCommand
 import net.evilblock.prisonaio.module.mechanic.backpack.command.parameter.BackpackParameterType
 import net.evilblock.prisonaio.module.mechanic.backpack.listener.BackpackListeners
-import net.evilblock.prisonaio.module.mechanic.command.HotFixCommands
-import net.evilblock.prisonaio.module.mechanic.command.HelpCommand
-import net.evilblock.prisonaio.module.mechanic.command.SpawnCommand
 import net.evilblock.prisonaio.module.mechanic.listener.*
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -89,9 +86,6 @@ object MechanicsModule : PluginModule() {
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
-            HotFixCommands.javaClass,
-            HelpCommand.javaClass,
-            SpawnCommand.javaClass,
             BackpackDebugCommand.javaClass,
             BackpackGiveCommand.javaClass,
             BackpackViewCommand.javaClass,
@@ -126,10 +120,6 @@ object MechanicsModule : PluginModule() {
                 getPluginFramework().logger.warning("Error with string in drops-to-inv ignored block list config: `$string`")
             }
         }
-    }
-
-    fun getHelpMessages(): List<String> {
-        return config.getStringList("help-messages").map { ChatColor.translateAlternateColorCodes('&', it) }
     }
 
     fun isFallDamageDisabled(): Boolean {

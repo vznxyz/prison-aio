@@ -39,6 +39,8 @@ import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.permissions.PermissionAttachment
 import java.lang.StringBuilder
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.*
 
 class User(val uuid: UUID) {
@@ -59,7 +61,8 @@ class User(val uuid: UUID) {
     private var prestige: Int = 0
     private var prestigeTokens: Int = 0
 
-    private var tokenBalance: Long = 0L
+    private var moneyBalance: BigDecimal = BigDecimal("0.00")
+    private var tokenBalance: BigInteger = BigInteger("0")
 
     val perks: UserPerks = UserPerks(this)
     val statistics: UserStatistics = UserStatistics(this)
@@ -85,6 +88,14 @@ class User(val uuid: UUID) {
 
         statistics.user = this
         statistics.init()
+
+        if (moneyBalance == null) {
+            moneyBalance = BigDecimal(0.0)
+        }
+
+        if (tokenBalance == null) {
+            tokenBalance = BigInteger("0")
+        }
 
         if (nicknameColors == null) {
             nicknameColors = hashSetOf()
@@ -204,7 +215,7 @@ class User(val uuid: UUID) {
             }
 
             val rankPrice = rank.getPrice(prestige)
-            if (rankPrice > balance) {
+            if (!hasMoneyBalance(rankPrice)) {
                 break
             }
 
@@ -216,12 +227,12 @@ class User(val uuid: UUID) {
             }
 
             VaultHook.useEconomy { economy ->
-                val response = economy.withdrawPlayer(player, rankPrice.toDouble())
+                val response = economy.withdrawPlayer(player, rankPrice)
                 if (!response.transactionSuccess()) {
                     return@useEconomy
                 }
 
-                balance -= rankPrice
+                subtractMoneyBalance(rankPrice)
 
                 updateRank(rank)
                 rank.executeCommands(player)
@@ -317,47 +328,121 @@ class User(val uuid: UUID) {
     /**
      * Gets the user's current money balance.
      */
-    fun getMoneyBalance(): Double {
-        return VaultHook.getBalance(uuid)
+    fun getMoneyBalance(): BigDecimal {
+        return moneyBalance
+    }
+
+    /**
+     * If the user's [moneyBalance] is more than or equal to the given [amount].
+     */
+    fun hasMoneyBalance(amount: BigDecimal): Boolean {
+        return moneyBalance >= amount
+    }
+
+    /**
+     * If the user's [moneyBalance] is more than or equal to the given [amount].
+     */
+    fun hasMoneyBalance(amount: Double): Boolean {
+        return hasMoneyBalance(BigDecimal(amount))
+    }
+
+    /**
+     * Updates the user's [moneyBalance] to the given [newBalance].
+     */
+    fun updateMoneyBalance(newBalance: BigDecimal) {
+        moneyBalance = newBalance.coerceAtLeast(UserHandler.MINIMUM_MONEY_BALANCE)
+        requiresSave = true
+    }
+
+    /**
+     * Adds the given [amount] to the user's [moneyBalance].
+     */
+    fun addMoneyBalance(amount: BigDecimal) {
+        assert(amount > UserHandler.MINIMUM_MONEY_BALANCE) { "Amount must be more than 0" }
+        updateMoneyBalance(moneyBalance + amount)
+    }
+
+    /**
+     * Adds the given [amount] to the user's [moneyBalance].
+     */
+    fun addMoneyBalance(amount: Double) {
+        addMoneyBalance(BigDecimal(amount))
+    }
+
+    /**
+     * Subtracts the given [amount] from the users [moneyBalance].
+     */
+    fun subtractMoneyBalance(amount: BigDecimal) {
+        assert(amount > UserHandler.MINIMUM_MONEY_BALANCE) { "Amount must be more than 0" }
+        assert(moneyBalance - amount > UserHandler.MINIMUM_MONEY_BALANCE) { "Can't subtract money to make balance negative" }
+        updateMoneyBalance(moneyBalance - amount)
+    }
+
+    /**
+     * Subtracts the given [amount] from the users [moneyBalance].
+     */
+    fun subtractMoneyBalance(amount: Double) {
+        subtractMoneyBalance(BigDecimal(amount))
     }
 
     /**
      * Gets the user's current [tokenBalance].
      */
-    fun getTokenBalance(): Long {
+    fun getTokenBalance(): BigInteger {
         return tokenBalance
     }
 
     /**
-     * If the user's balance is more than or equal to the given [amount].
+     * If the user's [tokenBalance] is more than or equal to the given [amount].
      */
-    fun hasTokenBalance(amount: Long): Boolean {
+    fun hasTokenBalance(amount: BigInteger): Boolean {
         return tokenBalance >= amount
     }
 
     /**
-     * Updates the user's token balance to the given [newBalance].
+     * If the user's [tokenBalance] is more than or equal to the given [amount].
      */
-    fun updateTokenBalance(newBalance: Long) {
-        tokenBalance = if (newBalance < 0) { 0 } else { newBalance }
+    fun hasTokenBalance(amount: Long): Boolean {
+        return hasTokenBalance(BigInteger(amount.toString()))
+    }
+
+    /**
+     * Updates the user's [tokenBalance] to the given [newBalance].
+     */
+    fun updateTokenBalance(newBalance: BigInteger) {
+        tokenBalance = newBalance.coerceAtLeast(UserHandler.MINIMUM_TOKEN_BALANCE)
         requiresSave = true
     }
 
     /**
-     * Adds the given [amount] to the user's token balance.
+     * Adds the given [amount] to the user's [tokenBalance].
+     */
+    fun addTokensBalance(amount: BigInteger) {
+        assert(amount > UserHandler.MINIMUM_TOKEN_BALANCE) { "Amount must be more than 0" }
+        updateTokenBalance(tokenBalance + amount)
+    }
+
+    /**
+     * Adds the given [amount] to the user's [tokenBalance].
      */
     fun addTokensBalance(amount: Long) {
-        assert(amount > 0) { "Amount must be more than 0" }
-        updateTokenBalance(tokenBalance + amount)
+        addTokensBalance(BigInteger(amount.toString()))
+    }
+
+    /**
+     * Subtracts the given [amount] from the users [tokenBalance].
+     */
+    fun subtractTokensBalance(amount: BigInteger) {
+        assert(amount > UserHandler.MINIMUM_TOKEN_BALANCE) { "Amount must be more than 0" }
+        assert(tokenBalance - amount > UserHandler.MINIMUM_TOKEN_BALANCE) { "Can't subtract tokens to make balance negative" }
+        updateTokenBalance(tokenBalance - amount)
     }
 
     /**
      * Subtracts the given [amount] from the users [tokenBalance].
      */
     fun subtractTokensBalance(amount: Long) {
-        assert(amount > 0) { "Amount must be more than 0" }
-        assert(tokenBalance - amount > 0) { "Can't subtract tokens to make balance negative" }
-        updateTokenBalance(tokenBalance - amount)
+        subtractTokensBalance(BigInteger(amount.toString()))
     }
 
     /**

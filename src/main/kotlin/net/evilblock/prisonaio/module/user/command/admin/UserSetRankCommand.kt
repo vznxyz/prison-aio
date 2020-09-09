@@ -21,7 +21,7 @@ import org.bukkit.entity.Player
 object UserSetRankCommand {
 
     @Command(
-        names = ["user setrank"],
+        names = ["user set-rank"],
         description = "Update a user's rank",
         permission = "prisonaio.user.rank.set",
         async = true

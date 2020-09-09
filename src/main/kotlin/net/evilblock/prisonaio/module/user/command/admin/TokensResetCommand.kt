@@ -13,6 +13,7 @@ import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
+import java.math.BigInteger
 
 object TokensResetCommand {
 
@@ -24,8 +25,7 @@ object TokensResetCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player") user: User) {
-        user.updateTokenBalance(0)
-        UserHandler.saveUser(user)
+        user.updateTokenBalance(UserHandler.MINIMUM_TOKEN_BALANCE)
 
         sender.sendMessage("${ChatColor.GREEN}You reset ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s tokens balance.")
     }

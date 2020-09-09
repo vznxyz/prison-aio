@@ -7,30 +7,29 @@
 
 package net.evilblock.prisonaio.util.economy
 
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.OfflinePlayer
+import java.util.*
 
 interface Currency {
 
     fun getName(): String
 
-    fun get(player: OfflinePlayer): Number
+    fun get(player: UUID): Number
 
-    fun has(player: OfflinePlayer, amount: Number): Boolean
+    fun has(player: UUID, amount: Number): Boolean
 
-    fun give(player: OfflinePlayer, amount: Number)
+    fun give(player: UUID, amount: Number)
 
-    fun take(player: OfflinePlayer, amount: Number)
+    fun take(player: UUID, amount: Number)
 
     fun format(amount: Number): String
 
     fun toType(): Type {
         return when (this) {
-            is Currency.Type -> {
+            is Type -> {
                 this
             }
             is Money -> {
@@ -53,20 +52,20 @@ interface Currency {
             return "money"
         }
 
-        override fun get(player: OfflinePlayer): Number {
-            return VaultHook.useEconomyAndReturn { economy -> economy.getBalance(player) }
+        override fun get(player: UUID): Number {
+            return UserHandler.getOrLoadAndCacheUser(player).getMoneyBalance()
         }
 
-        override fun has(player: OfflinePlayer, amount: Number): Boolean {
-            return VaultHook.useEconomyAndReturn { economy -> economy.has(player, amount.toDouble()) }
+        override fun has(player: UUID, amount: Number): Boolean {
+            return UserHandler.getOrLoadAndCacheUser(player).hasMoneyBalance(amount.toDouble())
         }
 
-        override fun give(player: OfflinePlayer, amount: Number) {
-            VaultHook.useEconomy { economy -> economy.depositPlayer(player, amount.toDouble()) }
+        override fun give(player: UUID, amount: Number) {
+            UserHandler.getOrLoadAndCacheUser(player).addMoneyBalance(amount.toDouble())
         }
 
-        override fun take(player: OfflinePlayer, amount: Number) {
-            VaultHook.useEconomy { economy -> economy.withdrawPlayer(player, amount.toDouble()) }
+        override fun take(player: UUID, amount: Number) {
+            UserHandler.getOrLoadAndCacheUser(player).subtractMoneyBalance(amount.toDouble())
         }
 
         override fun format(amount: Number): String {
@@ -79,20 +78,20 @@ interface Currency {
             return "tokens"
         }
 
-        override fun get(player: OfflinePlayer): Number {
-            return UserHandler.getOrLoadAndCacheUser(player.uniqueId).getTokenBalance()
+        override fun get(player: UUID): Number {
+            return UserHandler.getOrLoadAndCacheUser(player).getTokenBalance()
         }
 
-        override fun has(player: OfflinePlayer, amount: Number): Boolean {
-            return UserHandler.getOrLoadAndCacheUser(player.uniqueId).getTokenBalance() >= amount.toLong()
+        override fun has(player: UUID, amount: Number): Boolean {
+            return UserHandler.getOrLoadAndCacheUser(player).hasTokenBalance(amount.toLong())
         }
 
-        override fun give(player: OfflinePlayer, amount: Number) {
-            UserHandler.getOrLoadAndCacheUser(player.uniqueId).addTokensBalance(amount.toLong())
+        override fun give(player: UUID, amount: Number) {
+            UserHandler.getOrLoadAndCacheUser(player).addTokensBalance(amount.toLong())
         }
 
-        override fun take(player: OfflinePlayer, amount: Number) {
-            UserHandler.getOrLoadAndCacheUser(player.uniqueId).subtractTokensBalance(amount.toLong())
+        override fun take(player: UUID, amount: Number) {
+            UserHandler.getOrLoadAndCacheUser(player).subtractTokensBalance(amount.toLong())
         }
 
         override fun format(amount: Number): String {
@@ -105,20 +104,20 @@ interface Currency {
             return "prestige tokens"
         }
 
-        override fun get(player: OfflinePlayer): Number {
-            return UserHandler.getOrLoadAndCacheUser(player.uniqueId).getPrestigeTokens()
+        override fun get(player: UUID): Number {
+            return UserHandler.getOrLoadAndCacheUser(player).getPrestigeTokens()
         }
 
-        override fun has(player: OfflinePlayer, amount: Number): Boolean {
-            return UserHandler.getOrLoadAndCacheUser(player.uniqueId).getPrestigeTokens() >= amount.toInt()
+        override fun has(player: UUID, amount: Number): Boolean {
+            return UserHandler.getOrLoadAndCacheUser(player).hasPrestigeTokens(amount.toInt())
         }
 
-        override fun give(player: OfflinePlayer, amount: Number) {
-            UserHandler.getOrLoadAndCacheUser(player.uniqueId).addPrestigeTokens(amount.toInt())
+        override fun give(player: UUID, amount: Number) {
+            UserHandler.getOrLoadAndCacheUser(player).addPrestigeTokens(amount.toInt())
         }
 
-        override fun take(player: OfflinePlayer, amount: Number) {
-            UserHandler.getOrLoadAndCacheUser(player.uniqueId).subtractPrestigeTokens(amount.toInt())
+        override fun take(player: UUID, amount: Number) {
+            UserHandler.getOrLoadAndCacheUser(player).subtractPrestigeTokens(amount.toInt())
         }
 
         override fun format(amount: Number): String {
@@ -135,19 +134,19 @@ interface Currency {
             return currency.getName()
         }
 
-        override fun get(player: OfflinePlayer): Number {
+        override fun get(player: UUID): Number {
             return currency.get(player)
         }
 
-        override fun has(player: OfflinePlayer, amount: Number): Boolean {
+        override fun has(player: UUID, amount: Number): Boolean {
             return currency.has(player, amount)
         }
 
-        override fun give(player: OfflinePlayer, amount: Number) {
+        override fun give(player: UUID, amount: Number) {
             currency.give(player, amount)
         }
 
-        override fun take(player: OfflinePlayer, amount: Number) {
+        override fun take(player: UUID, amount: Number) {
             currency.take(player, amount)
         }
 

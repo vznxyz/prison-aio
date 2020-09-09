@@ -8,11 +8,12 @@
 package net.evilblock.prisonaio.module.enchant.pickaxe.prestige
 
 import com.google.gson.annotations.JsonAdapter
+import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.enchant.serialize.EnchantsMapReferenceSerializer
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.economy.Economy
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -30,8 +31,8 @@ class PickaxePrestige(val number: Int) {
 
     fun meetsRequirements(player: Player): Boolean {
         val user = UserHandler.getUser(player.uniqueId)
-        return user.getMoneyBalance() >= moneyRequired
-                && user.getTokenBalance() >= tokensRequired
+        return user.hasMoneyBalance(moneyRequired.toDouble())
+                && user.hasTokenBalance(tokensRequired)
                 && user.getPrestige() >= prestigeRequired
                 && user.statistics.getBlocksMined() >= blocksMinedRequired
     }
@@ -39,8 +40,8 @@ class PickaxePrestige(val number: Int) {
     fun renderRequirements(player: Player): List<String> {
         val user = UserHandler.getUser(player.uniqueId)
 
-        val hasMoney = user.getMoneyBalance() >= moneyRequired
-        val hasTokens = user.getTokenBalance() >= tokensRequired
+        val hasMoney = user.hasMoneyBalance(moneyRequired.toDouble())
+        val hasTokens = user.hasTokenBalance(tokensRequired)
         val hasPrestige = user.getPrestige() >= prestigeRequired
         val hasBlocksMined = user.statistics.getBlocksMined() >= blocksMinedRequired
 
@@ -56,7 +57,9 @@ class PickaxePrestige(val number: Int) {
         val user = UserHandler.getUser(player.uniqueId)
         user.subtractTokensBalance(tokensRequired)
 
-        Economy.takeBalance(player.uniqueId, moneyRequired.toDouble())
+        VaultHook.useEconomy { economy ->
+            economy.withdrawPlayer(player.name, moneyRequired.toDouble())
+        }
 
         pickaxeData.prestige++
         pickaxeData.applyMeta(pickaxeItem)

@@ -30,7 +30,7 @@ object TokensWithdrawCommand {
 
         val user = UserHandler.getUser(player.uniqueId)
 
-        if (tokens > user.getTokenBalance()){
+        if (!user.hasTokenBalance(tokens)){
             player.sendMessage("${ChatColor.RED}You don't have enough tokens in your account to withdraw that amount.")
             return
         }

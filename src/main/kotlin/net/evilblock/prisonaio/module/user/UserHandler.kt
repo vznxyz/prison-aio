@@ -23,6 +23,8 @@ import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -48,6 +50,9 @@ object UserHandler : PluginHandler {
         ChatColor.ITALIC,
         ChatColor.UNDERLINE
     )
+
+    val MINIMUM_MONEY_BALANCE = BigDecimal(0.0)
+    val MINIMUM_TOKEN_BALANCE = BigInteger("0")
 
     private val JSON_WRITER_SETTINGS = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()
 

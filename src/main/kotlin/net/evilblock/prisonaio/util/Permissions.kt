@@ -14,7 +14,11 @@ object Permissions {
     const val REGION_BYPASS = "prisonaio.regions.bypass"
 
     const val USERS_ADMIN = "prisonaio.users.admin"
+    const val USERS_ADMIN_REMOVE_COMMENT = "prisonaio.users.profile.comments.remove"
+
     const val NICKNAME_GRANT = "prisonaio.users.nickname.grant"
+
+    const val ECONOMY_ADMIN = "prisonaio.economy.admin"
 
     const val NEWS_EDITOR = "prisonaio.news.editor"
     const val NEWS_VIEW_STATS = "prisonaio.news.view-stats"

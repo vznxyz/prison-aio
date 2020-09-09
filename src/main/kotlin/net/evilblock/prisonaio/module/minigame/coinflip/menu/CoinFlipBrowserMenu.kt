@@ -121,12 +121,12 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                             return@NumberPrompt
                         }
 
-                        if (!currency.has(player, input)) {
+                        if (!currency.has(player.uniqueId, input)) {
                             player.sendMessage("${ChatColor.RED}You don't have enough ${currency.getName()}${ChatColor.RED} to bet ${currency.format(input)}${ChatColor.RED}.")
                             return@NumberPrompt
                         }
 
-                        currency.take(player, input)
+                        currency.take(player.uniqueId, input)
 
                         val game = CoinFlipGame(
                             creator = UserHandler.getUser(player.uniqueId),

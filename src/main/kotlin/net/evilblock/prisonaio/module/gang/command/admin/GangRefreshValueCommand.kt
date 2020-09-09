@@ -16,8 +16,8 @@ import org.bukkit.command.CommandSender
 object GangRefreshValueCommand {
 
     @Command(
-        names = ["cell admin refresh-values", "cells admin refresh-values"],
-        description = "Forcefully refresh each cell's value",
+        names = ["gang admin refresh-values", "gangs admin refresh-values"],
+        description = "Forcefully refresh each gang's value",
         permission = Permissions.GANGS_ADMIN,
         async = true
     )
@@ -25,7 +25,7 @@ object GangRefreshValueCommand {
     fun execute(sender: CommandSender) {
         var count = 0
         for (gang in GangHandler.getAllGangs()) {
-            gang.updateCachedCellValue()
+            gang.updateCachedValue()
             count++
         }
 

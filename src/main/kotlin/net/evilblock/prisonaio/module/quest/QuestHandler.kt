@@ -12,7 +12,6 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.quest.dialogue.DialoguePlayer
 import net.evilblock.prisonaio.module.quest.dialogue.DialogueSequence
-import net.evilblock.prisonaio.module.quest.impl.narcotic.NarcoticsQuest
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.metadata.FixedMetadataValue
@@ -21,7 +20,7 @@ import org.bukkit.scheduler.BukkitTask
 
 object QuestHandler : PluginHandler {
 
-    private val quests = arrayListOf<Quest<*>>(NarcoticsQuest)
+    private val quests = arrayListOf<Quest<*>>()
 
     override fun getModule(): PluginModule {
         return QuestsModule

@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.mechanic.command
+package net.evilblock.prisonaio.module.user.command
 
 import net.evilblock.cubed.command.Command
 import org.bukkit.Bukkit
