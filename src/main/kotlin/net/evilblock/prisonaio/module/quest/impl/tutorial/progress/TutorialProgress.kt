@@ -5,14 +5,9 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.quest.impl.narcotic
+package net.evilblock.prisonaio.module.quest.impl.tutorial.progress
 
-enum class NarcoticClass {
+import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 
-    CANNABINOIDS,
-    BENZODIAZEPINES,
-    OPIOIDS,
-    PSYCHEDELICS,
-    STIMULANTS,
-
+class TutorialProgress : QuestProgress {
 }

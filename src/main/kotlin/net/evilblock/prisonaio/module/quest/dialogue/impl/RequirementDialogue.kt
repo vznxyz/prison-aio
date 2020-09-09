@@ -9,14 +9,14 @@ package net.evilblock.prisonaio.module.quest.dialogue.impl
 
 import net.evilblock.prisonaio.module.quest.Quest
 import net.evilblock.prisonaio.module.quest.dialogue.Dialogue
-import net.evilblock.prisonaio.module.quest.progression.QuestProgression
+import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.entity.Player
 import java.util.function.BiPredicate
 
-class RequirementDialogue<T : Quest<T>>(
-    private val quest: T,
-    private val predicate: BiPredicate<Player, QuestProgression>,
+class RequirementDialogue(
+    private val quest: Quest,
+    private val predicate: BiPredicate<Player, QuestProgress>,
     private val failureDialogue: Dialogue,
     delay: Long = 0L
 ) : Dialogue(delay) {
@@ -25,7 +25,7 @@ class RequirementDialogue<T : Quest<T>>(
 
     override fun canSend(player: Player): Boolean {
         val user = UserHandler.getUser(player.uniqueId)
-        val test = predicate.test(player, user.getQuestProgression(quest) as QuestProgression)
+        val test = predicate.test(player, user.getQuestProgression(quest) as QuestProgress)
 
         if (!test) {
             failureDialogue.send(player)

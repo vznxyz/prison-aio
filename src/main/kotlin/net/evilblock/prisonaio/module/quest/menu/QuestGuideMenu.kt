@@ -10,7 +10,7 @@ package net.evilblock.prisonaio.module.quest.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.TextSplitter
-import net.evilblock.prisonaio.module.quest.progression.QuestProgression
+import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -33,7 +33,7 @@ class QuestGuideMenu : Menu() {
         return buttons
     }
 
-    private inner class QuestButton(private val progress: QuestProgression) : Button() {
+    private inner class QuestButton(private val progress: QuestProgress) : Button() {
         override fun getName(player: Player): String {
             return "${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}${progress.quest.getName()}"
         }
@@ -80,7 +80,7 @@ class QuestGuideMenu : Menu() {
     }
 
     companion object {
-        private val questOrderSort: (QuestProgression) -> Int? = { progress ->
+        private val questOrderSort: (QuestProgress) -> Int? = { progress ->
             when {
                 progress.isCompleted() -> 1
                 progress.hasStarted() -> 2

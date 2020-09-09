@@ -20,7 +20,7 @@ import org.bukkit.scheduler.BukkitTask
 
 object QuestHandler : PluginHandler {
 
-    private val quests = arrayListOf<Quest<*>>()
+    private val quests = arrayListOf<Quest>()
 
     override fun getModule(): PluginModule {
         return QuestsModule
@@ -36,11 +36,11 @@ object QuestHandler : PluginHandler {
         }
     }
 
-    fun getQuests(): List<Quest<*>> {
+    fun getQuests(): List<Quest> {
         return quests.toList()
     }
 
-    fun getQuestById(id: String): Quest<*>? {
+    fun getQuestById(id: String): Quest? {
         return quests.firstOrNull { it.getId() == id }
     }
 

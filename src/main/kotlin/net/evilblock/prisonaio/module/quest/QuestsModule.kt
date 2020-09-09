@@ -15,12 +15,6 @@ import net.evilblock.prisonaio.module.quest.command.QuestGuideCommand
 import net.evilblock.prisonaio.module.quest.dialogue.command.QuestDialogueSkipCommand
 import net.evilblock.prisonaio.module.quest.dialogue.listener.DialogueChatListeners
 import net.evilblock.prisonaio.module.quest.dialogue.listener.DialogueSequenceListeners
-import net.evilblock.prisonaio.module.quest.impl.narcotic.Narcotic
-import net.evilblock.prisonaio.module.quest.impl.narcotic.command.GiveNarcoticsCommand
-import net.evilblock.prisonaio.module.quest.impl.narcotic.command.SpawnDealerCommand
-import net.evilblock.prisonaio.module.quest.impl.narcotic.command.SpawnPabloEscobarCommand
-import net.evilblock.prisonaio.module.quest.impl.narcotic.command.SpawnLexLuthorCommand
-import net.evilblock.prisonaio.module.quest.impl.narcotic.command.parameter.DrugDealerAutoComplete
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -43,21 +37,23 @@ object QuestsModule : PluginModule() {
     }
 
     override fun getCommands(): List<Class<*>> {
-        return listOf(
-            GiveNarcoticsCommand.javaClass,
-            SpawnDealerCommand.javaClass,
-            SpawnLexLuthorCommand.javaClass,
-            SpawnPabloEscobarCommand.javaClass,
-            QuestDialogueSkipCommand.javaClass,
-            QuestGuideCommand.javaClass
-        )
+        val list = arrayListOf<Class<*>>(QuestDialogueSkipCommand.javaClass, QuestGuideCommand.javaClass)
+
+        for (quest in QuestHandler.getQuests()) {
+            list.addAll(quest.getCommands())
+        }
+
+        return list
     }
 
     override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
-        return mapOf(
-            DrugDealerAutoComplete::class.java to DrugDealerAutoComplete.CommandParameterType,
-            Narcotic::class.java to Narcotic.CommandParameterType
-        )
+        val map = hashMapOf<Class<*>, ParameterType<*>>()
+
+        for (quest in QuestHandler.getQuests()) {
+            map.putAll(quest.getCommandParameterTypes())
+        }
+
+        return map
     }
 
     override fun getListeners(): List<Listener> {

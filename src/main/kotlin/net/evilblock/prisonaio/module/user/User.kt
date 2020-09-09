@@ -17,7 +17,7 @@ import net.evilblock.prisonaio.module.achievement.Achievement
 import net.evilblock.prisonaio.module.battlepass.BattlePassProgress
 import net.evilblock.prisonaio.module.quest.Quest
 import net.evilblock.prisonaio.module.quest.QuestHandler
-import net.evilblock.prisonaio.module.quest.progression.QuestProgression
+import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 import net.evilblock.prisonaio.module.rank.Rank
 import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.rank.RanksModule
@@ -75,7 +75,7 @@ class User(val uuid: UUID) {
     var battlePassProgress: BattlePassProgress = BattlePassProgress(this)
 
     @JsonAdapter(UserQuestProgressionSerializer::class)
-    private val questProgression: MutableMap<Quest<*>, QuestProgression> = hashMapOf()
+    private val questProgress: MutableMap<Quest<*>, QuestProgress> = hashMapOf()
 
     @JsonAdapter(UserClaimedRewardsSerializer::class)
     private val claimedRewards: MutableMap<DeliveryManReward, Long> = hashMapOf()
@@ -168,7 +168,7 @@ class User(val uuid: UUID) {
             return true
         }
 
-        for (progress in questProgression.values) {
+        for (progress in questProgress.values) {
             if (progress.requiresSave) {
                 return true
             }
@@ -517,8 +517,8 @@ class User(val uuid: UUID) {
     /**
      * Gets all of the user's progression data for every quest.
      */
-    fun getQuestProgressions(): List<QuestProgression> {
-        val list = arrayListOf<QuestProgression>()
+    fun getQuestProgressions(): List<QuestProgress> {
+        val list = arrayListOf<QuestProgress>()
         for (quest in QuestHandler.getQuests()) {
             list.add(getQuestProgression(quest))
         }
@@ -528,9 +528,9 @@ class User(val uuid: UUID) {
     /**
      * Gets the user's progression data for the given [quest].
      */
-    fun getQuestProgression(quest: Quest<*>): QuestProgression {
-        questProgression.putIfAbsent(quest, quest.startProgress())
-        return questProgression[quest]!!
+    fun getQuestProgression(quest: Quest<*>): QuestProgress {
+        questProgress.putIfAbsent(quest, quest.startProgress())
+        return questProgress[quest]!!
     }
 
     /**

@@ -5,16 +5,16 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.quest.progression
+package net.evilblock.prisonaio.module.quest.progress
 
 import com.google.gson.*
 import net.evilblock.prisonaio.module.quest.QuestHandler
 import net.evilblock.prisonaio.module.quest.mission.QuestMission
 import java.lang.reflect.Type
 
-class QuestProgressionMissionCompletedSerializer : JsonSerializer<Set<QuestMission<*>>>, JsonDeserializer<Set<QuestMission<*>>> {
+class QuestProgressMissionCompletedSerializer : JsonSerializer<Set<QuestMission>>, JsonDeserializer<Set<QuestMission>> {
 
-    override fun serialize(source: Set<QuestMission<*>>, type: Type, context: JsonSerializationContext): JsonElement {
+    override fun serialize(source: Set<QuestMission>, type: Type, context: JsonSerializationContext): JsonElement {
         val array = JsonArray()
         for (mission in source) {
             val obj = JsonObject()
@@ -25,8 +25,8 @@ class QuestProgressionMissionCompletedSerializer : JsonSerializer<Set<QuestMissi
         return array
     }
 
-    override fun deserialize(json: JsonElement, type: Type, context: JsonDeserializationContext): Set<QuestMission<*>> {
-        val set = hashSetOf<QuestMission<*>>()
+    override fun deserialize(json: JsonElement, type: Type, context: JsonDeserializationContext): Set<QuestMission> {
+        val set = hashSetOf<QuestMission>()
         for (element in json.asJsonArray) {
             val obj = element.asJsonObject
             val quest = QuestHandler.getQuestById(obj["quest"].asString)!!

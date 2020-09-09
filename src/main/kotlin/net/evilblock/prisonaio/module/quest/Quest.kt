@@ -7,23 +7,23 @@
 
 package net.evilblock.prisonaio.module.quest
 
+import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.prisonaio.module.quest.mission.QuestMission
-import net.evilblock.prisonaio.module.quest.impl.narcotic.NarcoticsQuest
-import net.evilblock.prisonaio.module.quest.progression.QuestProgression
+import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
-interface Quest<T : Quest<T>> {
+interface Quest {
 
     fun getId(): String
 
     fun getName(): String
 
-    fun getSortedMissions(): List<QuestMission<T>>
+    fun getSortedMissions(): List<QuestMission>
 
-    fun getMissionById(id: String): QuestMission<T>? {
+    fun getMissionById(id: String): QuestMission? {
         for (mission in getSortedMissions()) {
             if (mission.getId() == id) {
                 return mission
@@ -41,7 +41,7 @@ interface Quest<T : Quest<T>> {
         progress.start()
 
         player.sendMessage("")
-        player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Quest Started! ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${NarcoticsQuest.getName()}${ChatColor.GRAY})")
+        player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Quest Started! ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${getName()}${ChatColor.GRAY})")
         player.sendMessage(" ${ChatColor.GRAY}Your quest has begun. If you need help throughout the")
         player.sendMessage(" ${ChatColor.GRAY}quest, use the /quest help command.")
         player.sendMessage("")
@@ -49,7 +49,7 @@ interface Quest<T : Quest<T>> {
 
     fun onCompleteQuest(player: Player) {
         player.sendMessage("")
-        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Quest Complete! ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${NarcoticsQuest.getName()}${ChatColor.GRAY})")
+        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Quest Complete! ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${getName()}${ChatColor.GRAY})")
 
         val completionText = " Congratulations on completing your quest. " + getCompletionText()
 
@@ -69,7 +69,7 @@ interface Quest<T : Quest<T>> {
         player.sendMessage("")
     }
 
-    fun onCompleteMission(player: Player, mission: QuestMission<T>) {
+    fun onCompleteMission(player: Player, mission: QuestMission) {
         val progress = getProgress(player)
         progress.markMissionCompleted(mission)
         progress.requiresSave = true
@@ -88,17 +88,17 @@ interface Quest<T : Quest<T>> {
         }
     }
 
-    fun getFirstMission(): QuestMission<T> {
+    fun getFirstMission(): QuestMission {
         return getSortedMissions().first()
     }
 
-    fun getLastMission(): QuestMission<T> {
+    fun getLastMission(): QuestMission {
         return getSortedMissions().last()
     }
 
-    fun startProgress(): QuestProgression
+    fun startProgress(): QuestProgress
 
-    fun getProgress(player: Player): QuestProgression {
+    fun getProgress(player: Player): QuestProgress {
         val user = UserHandler.getUser(player.uniqueId)
         return user.getQuestProgression(this)
     }
@@ -115,6 +115,14 @@ interface Quest<T : Quest<T>> {
 
     fun getRewardsText(): List<String> {
         return emptyList()
+    }
+
+    fun getCommands(): List<Class<*>> {
+        return listOf()
+    }
+
+    fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
+        return mapOf()
     }
 
 }

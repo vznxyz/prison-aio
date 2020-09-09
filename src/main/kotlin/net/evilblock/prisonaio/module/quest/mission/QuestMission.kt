@@ -10,9 +10,9 @@ package net.evilblock.prisonaio.module.quest.mission
 import net.evilblock.prisonaio.module.quest.Quest
 import org.bukkit.entity.Player
 
-interface QuestMission<T : Quest<T>> {
+interface QuestMission {
 
-    fun getQuest(): T
+    fun getQuest(): Quest
 
     fun getId(): String
 

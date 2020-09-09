@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.quest.progression
+package net.evilblock.prisonaio.module.quest.progress
 
 import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
@@ -15,14 +15,14 @@ import net.evilblock.prisonaio.module.quest.QuestReferenceSerializer
 import net.evilblock.prisonaio.module.quest.mission.QuestMission
 import java.lang.reflect.Type
 
-open class QuestProgression(@JsonAdapter(QuestReferenceSerializer::class) internal var quest: Quest<*>) {
+open class QuestProgress(@JsonAdapter(QuestReferenceSerializer::class) internal var quest: Quest) {
 
     @Transient internal var requiresSave: Boolean = false
 
     protected var started: Boolean = false
 
-    @JsonAdapter(QuestProgressionMissionCompletedSerializer::class)
-    protected val completedMissions: MutableSet<QuestMission<*>> = hashSetOf()
+    @JsonAdapter(QuestProgressMissionCompletedSerializer::class)
+    protected val completedMissions: MutableSet<QuestMission> = hashSetOf()
 
     fun hasStarted(): Boolean {
         return started
@@ -46,7 +46,7 @@ open class QuestProgression(@JsonAdapter(QuestReferenceSerializer::class) intern
         return currentMissionIndex < quest.getSortedMissions().size
     }
 
-    fun getCurrentMission(): QuestMission<*> {
+    fun getCurrentMission(): QuestMission {
         if (!started) {
             throw IllegalStateException("Can't find current mission because quest hasn't been started")
         }
@@ -69,18 +69,17 @@ open class QuestProgression(@JsonAdapter(QuestReferenceSerializer::class) intern
         return quest.getSortedMissions()[currentMissionIndex]
     }
 
-    fun hasCompletedMission(mission: QuestMission<*>): Boolean {
+    fun hasCompletedMission(mission: QuestMission): Boolean {
         return completedMissions.contains(mission)
     }
 
-    fun markMissionCompleted(mission: QuestMission<*>) {
+    fun markMissionCompleted(mission: QuestMission) {
         completedMissions.add(mission)
         requiresSave = true
     }
 
-    object Serializer : JsonSerializer<QuestProgression>, JsonDeserializer<QuestProgression> {
-
-        override fun serialize(src: QuestProgression, typeOf: Type, context: JsonSerializationContext): JsonElement {
+    object Serializer : JsonSerializer<QuestProgress>, JsonDeserializer<QuestProgress> {
+        override fun serialize(src: QuestProgress, typeOf: Type, context: JsonSerializationContext): JsonElement {
             val json = JsonObject()
             json.addProperty("quest", src.quest.getId())
             json.addProperty("type", src::class.java.name)
@@ -88,7 +87,7 @@ open class QuestProgression(@JsonAdapter(QuestReferenceSerializer::class) intern
             return json
         }
 
-        override fun deserialize(json: JsonElement, typeOf: Type, context: JsonDeserializationContext): QuestProgression {
+        override fun deserialize(json: JsonElement, typeOf: Type, context: JsonDeserializationContext): QuestProgress {
             val jsonObject = json.asJsonObject
             val questId = jsonObject.get("quest").asString
             val type = jsonObject.get("type").asString
@@ -96,12 +95,11 @@ open class QuestProgression(@JsonAdapter(QuestReferenceSerializer::class) intern
 
             try {
                 val quest = QuestHandler.getQuestById(questId) ?: throw IllegalStateException("Quest doesn't exist")
-                return context.deserialize<QuestProgression>(properties, Class.forName(type)).also { it.quest = quest }
+                return context.deserialize<QuestProgress>(properties, Class.forName(type)).also { it.quest = quest }
             } catch (e: ClassNotFoundException) {
                 throw JsonParseException("Unknown type: $type", e)
             }
         }
-
     }
 
 }

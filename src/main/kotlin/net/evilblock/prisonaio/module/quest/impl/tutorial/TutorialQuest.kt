@@ -8,6 +8,25 @@
 package net.evilblock.prisonaio.module.quest.impl.tutorial
 
 import net.evilblock.prisonaio.module.quest.Quest
+import net.evilblock.prisonaio.module.quest.mission.QuestMission
+import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 
-object TutorialQuest : Quest<> {
+object TutorialQuest : Quest {
+
+    override fun getId(): String {
+        return "tutorial"
+    }
+
+    override fun getName(): String {
+        return "Tutorial"
+    }
+
+    override fun getSortedMissions(): List<QuestMission> {
+        return listOf()
+    }
+
+    override fun startProgress(): QuestProgress {
+
+    }
+
 }

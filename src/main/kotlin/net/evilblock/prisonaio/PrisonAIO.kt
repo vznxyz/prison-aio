@@ -32,7 +32,7 @@ import net.evilblock.prisonaio.module.mine.block.BlockType
 import net.evilblock.prisonaio.module.minigame.MinigamesModule
 import net.evilblock.prisonaio.module.privatemine.PrivateMinesModule
 import net.evilblock.prisonaio.module.quest.QuestsModule
-import net.evilblock.prisonaio.module.quest.progression.QuestProgression
+import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.reward.RewardsModule
@@ -63,7 +63,7 @@ class PrisonAIO : PluginFramework() {
 
         // register this plugins gson type adapters
         Cubed.instance.useGsonBuilderThenRebuild { builder ->
-            builder.registerTypeAdapter(QuestProgression::class.java, QuestProgression.Serializer)
+            builder.registerTypeAdapter(QuestProgress::class.java, QuestProgress.Serializer)
             builder.registerTypeAdapter(BlockType::class.java, BlockType.Serializer)
             builder.registerTypeAdapter(DeliveryManRewardRequirement::class.java, DeliveryManRewardRequirement.Serializer)
             builder.registerTypeAdapter(UserSettingOption::class.java, AbstractTypeSerializer<UserSettingOption>())
