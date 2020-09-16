@@ -7,7 +7,6 @@
 
 package net.evilblock.prisonaio.module.enchant.type
 
-import com.boydti.fawe.bukkit.wrapper.AsyncWorld
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
@@ -59,7 +58,7 @@ object JackHammer : AbstractEnchant("jack-hammer", "Jack Hammer", 5000) {
                                 mineCrate.destroy(true)
                                 MineCrateHandler.forgetSpawnedCrate(mineCrate)
 
-                                val sendMessages = UserHandler.getUser(event.player.uniqueId).getSettingOption(UserSetting.REWARD_MESSAGES).getValue<Boolean>()
+                                val sendMessages = UserHandler.getUser(event.player.uniqueId).settings.getSettingOption(UserSetting.REWARD_MESSAGES).getValue<Boolean>()
 
                                 for (reward in mineCrate.rewardSet.pickRewards()) {
                                     if (sendMessages) {

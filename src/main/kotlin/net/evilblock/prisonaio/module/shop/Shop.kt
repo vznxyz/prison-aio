@@ -11,8 +11,9 @@ import net.evilblock.cubed.menu.template.menu.TemplateMenu
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.hook.VaultHook
-import net.evilblock.prisonaio.module.region.RegionsModule
-import net.evilblock.prisonaio.module.region.impl.safezone.SafeZoneRegion
+import net.evilblock.prisonaio.module.region.bitmask.RegionBitmask
+import net.evilblock.prisonaio.module.region.RegionHandler
+import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
 import net.evilblock.prisonaio.module.shop.event.PlayerBuyFromShopEvent
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import net.evilblock.prisonaio.module.shop.item.ShopItem
@@ -118,8 +119,8 @@ class Shop(var id: String) {
         Tasks.sync {
             val droppedItems = player.inventory.addItem(*splitItems.toTypedArray())
             if (droppedItems.isNotEmpty()) {
-                val region = RegionsModule.findRegion(player.location)
-                if (region !is SafeZoneRegion) {
+                val region = RegionHandler.findRegion(player.location)
+                if (region is BitmaskRegion && region.hasBitmask(RegionBitmask.SAFE_ZONE)) {
                     for (item in droppedItems) {
                         player.location.world.dropItem(player.location, item.value)
                     }

@@ -13,6 +13,7 @@ import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.enchant.event.MineBombExplodeEvent
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.*
 import org.bukkit.block.Block
@@ -30,6 +31,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.random.Random
 
 object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
@@ -65,7 +67,7 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
             }
         }
 
-        val region = RegionsModule.findRegion(event.player.location)
+        val region = RegionHandler.findRegion(event.player.location)
         if (!region.supportsAbilityEnchants() || region.getBreakableCuboid() == null) {
             return
         }
@@ -115,7 +117,7 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
 
         val player =  fireball.shooter as Player
 
-        val region = RegionsModule.findRegion(location)
+        val region = RegionHandler.findRegion(location)
         if (!region.supportsAbilityEnchants() || region.getBreakableCuboid() == null) {
             return
         }
@@ -132,7 +134,7 @@ object MineBomb : AbstractEnchant("mine-bomb", "Mine Bomb", 3), Listener {
                     }
 
                     val dist = block.location.distance(location)
-                    if (dist <= level || dist <= largeRadius && 85.0 > Random.nextDouble() * 100.0) {
+                    if (dist <= level || dist <= largeRadius && 85.0 > ThreadLocalRandom.current().nextDouble() * 100.0) {
                         if (block.location.distance(location) <= largeRadius && block.type != Material.ENDER_CHEST) {
                             val regionCriteria = region.supportsAbilityEnchants() && region.getBreakableCuboid() != null && region.getBreakableCuboid()!!.contains(block)
                             if (regionCriteria) {

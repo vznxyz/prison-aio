@@ -34,10 +34,6 @@ object ShopHandler: PluginHandler {
         return ShopsModule
     }
 
-    override fun hasDefaultInternalData(): Boolean {
-        return true
-    }
-
     override fun getInternalDataFile(): File {
         return File(File(getModule().getPluginFramework().dataFolder, "internal"), "shops.json")
     }

@@ -1,0 +1,15 @@
+prison-guard:
+  name: "&e&lPrison Guard"
+  texture:
+    value: "ewogICJ0aW1lc3RhbXAiIDogMTU4ODYwMzU0MjQ3NSwKICAicHJvZmlsZUlkIiA6ICIwZDQwNjZmYzdiMjk0ZTBjOTc2ZjYxN2JhYmRlZTFiYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJENFJVWCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85YTZjMTJiMmQ5ZDJmZmNmNWFlMzAwZDNiMTExNmZjN2M2MjExMWNkOWVmZjYxMmFhMzkyOWFmNDZlYjYxMDlmIgogICAgfQogIH0KfQ=="
+    signature: "KiVYbTvJQFGoTwaRo97l2VyLTpsJ8hcHqYw4bs3WM7YDI8HVp4h71MKVU9j8bvGQ9JhfnhJ9FpNgV3nNhC+Ng9ka6HYAiQ22i842ddOuFLPvs6lZoI3TIXBBuHRF2INwqpUEhaDftxrTUfqxtcIF9QwzBb1QYEWhH2Gc+LZzIjsTEylnlLxHP2w4Xsoj6m/emlUBjo1GwWgm8qF2o8sHb4EYVwyO+drmV33ipnLPZ3S7LZrRXEqMJmRvO/1QyrrXnza3Bk7FvCFwHK311GFEEFerNfvoOvhzJtqH4eyXrgbTZW/vTrSnKgTeaxGUiKgDKyME6iU5MpNHq72CEGbW+TIyvBRmKdIMXVYFnyDMQT3RZuH9x2y+8ChBFDtZqWzENub5ChHShRUU1ET7fMQQ7FbsjSiZxrEqjm2HKN1smF4KN7sIBbiG7mD1E1lIQJiDAHIEHYEBQNirxyFfSvS0Xg8nW2EcYGx2QDS2T3gC+OaA4YdU/VWRwBfeUkuxm6oDP1vEHmhW4Du2zcIMGGuE/rLnzU2ZVilugLGYuBhSK0trmS8rpP/4AmbNfuKuBcdzs9ubeQoy91g2w7y7pFKxs5ldjFfblQKTZ/JJWZknUniB1ZwdIhTPLfFSeFv3i3PMfUIWWiq9HtkJsWmzvfzBcHFp5LwepmjCGOdYXVHohZU="
+  phrases:
+    - lines:
+        - "&eOne of you filthy prisoners reek!"
+        - "&eMaybe that's just me..."
+    - lines:
+        - "&eI'm not paid enough to babysit you grown a** men!"
+    - lines:
+        - "&eSimmer down you maggots!"
+    - lines:
+        - "Get to work! I don't hear enough mining happening!"

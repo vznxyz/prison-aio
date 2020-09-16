@@ -56,7 +56,7 @@ class UserSettingsMenu(private val user: User) : Menu() {
             for (option in setting.getOptions<UserSettingOption>()) {
                 val builder = StringBuilder()
 
-                builder.append(if (user.getSettingOption(setting) == option) {
+                builder.append(if (user.settings.getSettingOption(setting) == option) {
                     " ${ChatColor.BLUE}${ChatColor.BOLD}» ${ChatColor.GREEN}${option.getName()}"
                 } else {
                     "    ${ChatColor.YELLOW}${option.getName()}"
@@ -86,11 +86,11 @@ class UserSettingsMenu(private val user: User) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                user.updateSettingOption(setting, setting.getPreviousValue(user.getSettingOption(setting)))
-                setting.onUpdate.invoke(user, user.getSettingOption(setting))
+                user.settings.updateSettingOption(setting, setting.getPreviousValue(user.settings.getSettingOption(setting)))
+                setting.onUpdate.invoke(user, user.settings.getSettingOption(setting))
             } else if (clickType.isRightClick) {
-                user.updateSettingOption(setting, setting.getNextValue(user.getSettingOption(setting)))
-                setting.onUpdate.invoke(user, user.getSettingOption(setting))
+                user.settings.updateSettingOption(setting, setting.getNextValue(user.settings.getSettingOption(setting)))
+                setting.onUpdate.invoke(user, user.settings.getSettingOption(setting))
             }
         }
     }

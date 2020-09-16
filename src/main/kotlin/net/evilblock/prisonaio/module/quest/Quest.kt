@@ -9,13 +9,23 @@ package net.evilblock.prisonaio.module.quest
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.util.TextSplitter
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.quest.mission.QuestMission
 import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
+import org.bukkit.Location
 import org.bukkit.entity.Player
 
 interface Quest {
+
+    fun initializeData() {
+
+    }
+
+    fun saveData() {
+
+    }
 
     fun getId(): String
 
@@ -39,21 +49,15 @@ interface Quest {
         }
 
         progress.start()
-
-        player.sendMessage("")
-        player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Quest Started! ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${getName()}${ChatColor.GRAY})")
-        player.sendMessage(" ${ChatColor.GRAY}Your quest has begun. If you need help throughout the")
-        player.sendMessage(" ${ChatColor.GRAY}quest, use the /quest help command.")
-        player.sendMessage("")
     }
 
     fun onCompleteQuest(player: Player) {
+        val progress = getProgress(player)
+        progress.start()
+
         player.sendMessage("")
-        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Quest Complete! ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${getName()}${ChatColor.GRAY})")
 
-        val completionText = " Congratulations on completing your quest. " + getCompletionText()
-
-        for (line in TextSplitter.split(52, completionText, "${ChatColor.GRAY}", " ")) {
+        for (line in TextSplitter.split(52, getCompletionText(), "${ChatColor.GRAY}", " ")) {
             player.sendMessage(line)
         }
 
@@ -62,7 +66,7 @@ interface Quest {
             player.sendMessage(" ${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Quest Rewards")
 
             for (rewardText in getRewardsText()) {
-                player.sendMessage("  $rewardText")
+                player.sendMessage(" ${ChatColor.GRAY}${Constants.DOT_SYMBOL} $rewardText")
             }
         }
 
@@ -100,14 +104,16 @@ interface Quest {
 
     fun getProgress(player: Player): QuestProgress {
         val user = UserHandler.getUser(player.uniqueId)
-        return user.getQuestProgression(this)
+        return user.getQuestProgress(this)
     }
+
+    fun getStartText(): String
+
+    fun getStartLocation(): Location
 
     fun getCompletionText(): String {
         return ""
     }
-
-    fun getStartText(): String
 
     fun hasRewards(): Boolean {
         return false
@@ -123,6 +129,10 @@ interface Quest {
 
     fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
         return mapOf()
+    }
+
+    fun formatLocation(location: Location): String {
+        return "${ChatColor.AQUA}${location.blockX}, ${location.blockY}, ${location.blockZ}"
     }
 
 }

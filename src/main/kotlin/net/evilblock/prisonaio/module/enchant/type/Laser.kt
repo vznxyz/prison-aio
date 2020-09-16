@@ -12,6 +12,7 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.util.nms.RayTrace
 import org.bukkit.*
@@ -104,7 +105,7 @@ object Laser : AbstractEnchant("laser", "Laser", 1) {
                     continue
                 }
 
-                val regionAtBlock = RegionsModule.findRegion(toLocation)
+                val regionAtBlock = RegionHandler.findRegion(toLocation)
                 if (regionAtBlock.supportsAbilityEnchants() && regionAtBlock.getBreakableCuboid() != null) {
                     if (!regionAtBlock.getBreakableCuboid()!!.contains(toLocation)) {
                         continue

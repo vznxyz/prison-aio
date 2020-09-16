@@ -14,7 +14,7 @@ data class MineBlocksConfig(
     /**
      * The block types used to fill a newly generated mining region
      */
-    val blockTypes: MutableSet<BlockType> = hashSetOf()
+    val blockTypes: MutableList<BlockType> = arrayListOf()
 ) {
 
     fun pickRandomBlockType(): BlockType {

@@ -12,7 +12,9 @@ import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.cubed.util.hook.WorldEditUtils
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -21,7 +23,7 @@ object MineSetRegionCommand {
     @Command(
         names = ["mine set-region"],
         description = "Set the region of a mine",
-        permission = "prisonaio.mines.setregion",
+        permission = Permissions.MINES_ADMIN,
         async = true
     )
     @JvmStatic
@@ -33,7 +35,7 @@ object MineSetRegionCommand {
         }
 
         if (mine.region != null) {
-            RegionsModule.clearBlockCache(mine)
+            RegionHandler.clearBlockCache(mine)
         }
 
         // update the mine's region to the player's selection
@@ -41,7 +43,7 @@ object MineSetRegionCommand {
         mine.cacheChunks()
 
         // make changes to block cache
-        RegionsModule.updateBlockCache(mine)
+        RegionHandler.updateBlockCache(mine)
 
         // save changes to file
         MineHandler.saveData()

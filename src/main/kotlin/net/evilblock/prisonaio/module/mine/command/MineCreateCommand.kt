@@ -10,7 +10,8 @@ package net.evilblock.prisonaio.module.mine.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.mine.MineHandler
-import net.evilblock.prisonaio.module.region.RegionsModule
+import net.evilblock.prisonaio.module.region.RegionHandler
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -19,7 +20,7 @@ object MineCreateCommand {
     @Command(
         names = ["mine create"],
         description = "Create a new mine",
-        permission = "prisonaio.mines.create",
+        permission = Permissions.MINES_ADMIN,
         async = true
     )
     @JvmStatic
@@ -29,12 +30,18 @@ object MineCreateCommand {
             return
         }
 
-        val mine = MineHandler.createMine(name)
-        MineHandler.saveData()
+        try {
+            val mine = MineHandler.createMine(name)
+            MineHandler.saveData()
 
-        RegionsModule.updateBlockCache(mine)
+            RegionHandler.updateBlockCache(mine)
 
-        player.sendMessage("${ChatColor.GREEN}Created new mine ${ChatColor.WHITE}$name${ChatColor.GREEN}.")
+            player.sendMessage("${ChatColor.GREEN}Successfully created new mine ${ChatColor.WHITE}$name${ChatColor.GREEN}.")
+        } catch (e: IllegalStateException) {
+            player.sendMessage("${ChatColor.RED}Failed to create mine: ${e.message}")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }

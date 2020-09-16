@@ -33,8 +33,6 @@ import net.evilblock.prisonaio.module.user.setting.listener.UserChatSettingsList
 import net.evilblock.prisonaio.module.user.setting.listener.UserSettingsListeners
 import net.evilblock.prisonaio.module.user.setting.task.UserSettingsTickTask
 import net.evilblock.prisonaio.module.user.task.PlayTimeSyncTask
-import net.evilblock.prisonaio.module.user.tutorial.TutorialHandler
-import net.evilblock.prisonaio.module.user.tutorial.listener.TutorialLoadListeners
 import org.bukkit.event.Listener
 
 object UsersModule : PluginModule() {
@@ -59,7 +57,6 @@ object UsersModule : PluginModule() {
         NewsHandler.initialLoad()
         UserHandler.initialLoad()
         BankNoteHandler.initialLoad()
-        TutorialHandler.initialLoad()
 
         Tasks.asyncTimer(PlayTimeSyncTask, 20L * 30, 2L * 30)
         Tasks.asyncTimer(UserSettingsTickTask, 20L, 20L)
@@ -73,7 +70,6 @@ object UsersModule : PluginModule() {
         NewsHandler.saveData()
         UserHandler.saveData()
         BankNoteHandler.saveData()
-        TutorialHandler.saveData()
     }
 
     override fun onReload() {

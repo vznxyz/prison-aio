@@ -22,7 +22,7 @@ import java.util.*
 class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").substring(0, 13)) {
 
     @JsonAdapter(MappedInventorySerializer::class)
-    internal val contents: MutableMap<Int, ItemStack> = hashMapOf()
+    internal val contents: MutableList<ItemStack> = arrayListOf()
     internal val enchants: MutableMap<BackpackEnchant, Int> = hashMapOf()
 
     fun addItem(itemStack: ItemStack): ItemStack? {

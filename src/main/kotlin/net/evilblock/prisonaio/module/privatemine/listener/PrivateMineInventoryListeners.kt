@@ -23,7 +23,7 @@ object PrivateMineInventoryListeners : Listener {
     @EventHandler
     fun onPlayerToggleSneakEvent(event: PlayerToggleSneakEvent) {
         val user = UserHandler.getUser(event.player.uniqueId)
-        if (user.getSettingOption(UserSetting.SNEAK_TO_TELEPORT).getValue()) {
+        if (user.settings.getSettingOption(UserSetting.SNEAK_TO_TELEPORT).getValue()) {
             if (event.isSneaking) {
                 if (event.player.world == PrivateMineHandler.getGridWorld()) {
                     if (event.player.inventory.firstEmpty() == -1) {

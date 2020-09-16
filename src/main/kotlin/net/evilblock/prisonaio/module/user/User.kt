@@ -30,10 +30,11 @@ import net.evilblock.prisonaio.module.user.perk.UserPerks
 import net.evilblock.prisonaio.module.user.profile.ProfileComment
 import net.evilblock.prisonaio.module.user.statistic.UserStatistics
 import net.evilblock.prisonaio.module.user.serialize.UserClaimedRewardsSerializer
-import net.evilblock.prisonaio.module.user.serialize.UserQuestProgressionSerializer
+import net.evilblock.prisonaio.module.user.serialize.UserQuestProgressSerializer
 import net.evilblock.prisonaio.module.user.serialize.UserReadNewsPostsSerializer
 import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
+import net.evilblock.prisonaio.module.user.setting.UserSettings
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -66,16 +67,15 @@ class User(val uuid: UUID) {
 
     val perks: UserPerks = UserPerks(this)
     val statistics: UserStatistics = UserStatistics(this)
-
-    private val settings: MutableMap<UserSetting, UserSettingOption> = EnumMap(UserSetting::class.java)
+    val settings: UserSettings = UserSettings(this)
 
     private val profileComments: MutableList<ProfileComment> = arrayListOf()
     private val achievements: MutableMap<String, CompletedAchievementActivity> = hashMapOf()
 
     var battlePassProgress: BattlePassProgress = BattlePassProgress(this)
 
-    @JsonAdapter(UserQuestProgressionSerializer::class)
-    private val questProgress: MutableMap<Quest<*>, QuestProgress> = hashMapOf()
+    @JsonAdapter(UserQuestProgressSerializer::class)
+    private val questProgress: MutableMap<Quest, QuestProgress> = hashMapOf()
 
     @JsonAdapter(UserClaimedRewardsSerializer::class)
     private val claimedRewards: MutableMap<DeliveryManReward, Long> = hashMapOf()
@@ -85,35 +85,8 @@ class User(val uuid: UUID) {
 
     fun init() {
         perks.user = this
-
         statistics.user = this
-        statistics.init()
-
-        if (moneyBalance == null) {
-            moneyBalance = BigDecimal(0.0)
-        }
-
-        if (tokenBalance == null) {
-            tokenBalance = BigInteger("0")
-        }
-
-        if (nicknameColors == null) {
-            nicknameColors = hashSetOf()
-        }
-
-        if (rank == null) {
-            rank = RankHandler.getStartingRank()
-        }
-
-        if (battlePassProgress == null) {
-            battlePassProgress = BattlePassProgress(this)
-        } else {
-            battlePassProgress.user = this
-        }
-
-        if (readNews == null) {
-            readNews = hashSetOf()
-        }
+        settings.user = this
     }
 
     /**
@@ -446,24 +419,6 @@ class User(val uuid: UUID) {
     }
 
     /**
-     * Updates the user's setting option for the given [setting].
-     */
-    fun updateSettingOption(setting: UserSetting, value: UserSettingOption) {
-        settings[setting] = value
-        requiresSave = true
-    }
-
-    /**
-     * Gets the user's setting option for the given [setting].
-     */
-    fun getSettingOption(setting: UserSetting): UserSettingOption {
-        if (!settings.containsKey(setting)) {
-            settings[setting] = setting.newDefaultOption()
-        }
-        return settings[setting]!!
-    }
-
-    /**
      * Gets a copy of the user's [profileComments].
      */
     fun getProfileComments(): List<ProfileComment> {
@@ -515,20 +470,20 @@ class User(val uuid: UUID) {
     }
 
     /**
-     * Gets all of the user's progression data for every quest.
+     * Gets all of the user's progress for all quests.
      */
-    fun getQuestProgressions(): List<QuestProgress> {
+    fun getAllQuestsProgress(): List<QuestProgress> {
         val list = arrayListOf<QuestProgress>()
         for (quest in QuestHandler.getQuests()) {
-            list.add(getQuestProgression(quest))
+            list.add(getQuestProgress(quest))
         }
         return list
     }
 
     /**
-     * Gets the user's progression data for the given [quest].
+     * Gets the user's progress for the given [quest].
      */
-    fun getQuestProgression(quest: Quest<*>): QuestProgress {
+    fun getQuestProgress(quest: Quest): QuestProgress {
         questProgress.putIfAbsent(quest, quest.startProgress())
         return questProgress[quest]!!
     }

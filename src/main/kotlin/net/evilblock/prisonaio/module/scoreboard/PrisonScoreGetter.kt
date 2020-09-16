@@ -14,11 +14,13 @@ import net.evilblock.cubed.util.ProgressBarBuilder
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldownHandler
 import net.evilblock.prisonaio.module.combat.enderpearl.EnderpearlCooldownHandler
-import net.evilblock.prisonaio.module.combat.region.CombatRegion
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.rank.RankHandler
-import net.evilblock.prisonaio.module.region.RegionsModule
+import net.evilblock.prisonaio.module.region.RegionHandler
+import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
+import net.evilblock.prisonaio.module.region.bitmask.RegionBitmask
+import net.evilblock.prisonaio.module.scoreboard.animation.RainbowAnimation
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
@@ -36,8 +38,14 @@ object PrisonScoreGetter : ScoreGetter {
 
     override fun getScores(scores: LinkedList<String>, player: Player) {
         val user = UserHandler.getUser(player.uniqueId)
-        if (!user.getSettingOption(UserSetting.SCOREBOARD_VISIBILITY).getValue<Boolean>()) {
+        if (!user.settings.getSettingOption(UserSetting.SCOREBOARD_VISIBILITY).getValue<Boolean>()) {
             return
+        }
+
+        val primaryColor: ChatColor = if (user.settings.getSettingOption(UserSetting.RAINBOW_SCOREBOARD).getValue()) {
+            RainbowAnimation.getCurrentDisplay()
+        } else {
+            ChatColor.RED
         }
 
         if (EventGameHandler.isOngoingGame()) {
@@ -45,20 +53,20 @@ object PrisonScoreGetter : ScoreGetter {
             if (game != null) {
                 if (game.isPlayingOrSpectating(player.uniqueId)) {
                     game.getScoreboardLines(player, scores)
-                    renderBorders(user, scores)
+                    renderBorders(user, scores, primaryColor)
                     return
                 }
             }
         }
 
-        val region = RegionsModule.findRegion(player.location)
-        if (region is CombatRegion) {
-            scores.add("  ${ChatColor.YELLOW}${ChatColor.BOLD}Kills: ${ChatColor.RED}${user.statistics.getKills()}")
-            scores.add("  ${ChatColor.YELLOW}${ChatColor.BOLD}Deaths: ${ChatColor.RED}${user.statistics.getDeaths()}")
+        val region = RegionHandler.findRegion(player.location)
+        if (region is BitmaskRegion && region.hasBitmask(RegionBitmask.DANGER_ZONE)) {
+            scores.add("  $primaryColor${ChatColor.BOLD}Kills: ${ChatColor.RED}${user.statistics.getKills()}")
+            scores.add("  $primaryColor${ChatColor.BOLD}Deaths: ${ChatColor.RED}${user.statistics.getDeaths()}")
 
             val combatTimer = CombatTimerHandler.getTimer(player.uniqueId)
             if (combatTimer != null && !combatTimer.hasExpired()) {
-                scores.add("  ${ChatColor.RED}${ChatColor.BOLD}Combat: ${ChatColor.RED}${TimeUtil.formatIntoMMSS(combatTimer.getRemainingSeconds().toInt())}")
+                scores.add("  $primaryColor${ChatColor.BOLD}Combat: ${ChatColor.RED}${TimeUtil.formatIntoMMSS(combatTimer.getRemainingSeconds().toInt())}")
             }
 
             val enderpearlCooldown = EnderpearlCooldownHandler.getCooldown(player.uniqueId)
@@ -71,17 +79,17 @@ object PrisonScoreGetter : ScoreGetter {
                 scores.add("  ${ChatColor.GOLD}${ChatColor.BOLD}Gopple: ${ChatColor.RED}${TimeUtil.formatIntoMMSS(godAppleCooldown.getRemainingSeconds().toInt())}")
             }
 
-            renderBorders(user, scores)
+            renderBorders(user, scores, primaryColor)
             return
         }
 
-        scores.add("  ${ChatColor.RED}${ChatColor.BOLD}${player.name}")
-        scores.add("  ${ChatColor.RED}${Constants.CROSSED_SWORDS_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}")
+        scores.add("  $primaryColor${ChatColor.BOLD}${player.name}")
+        scores.add("  $primaryColor${Constants.CROSSED_SWORDS_SYMBOL} ${ChatColor.GRAY}Rank ${user.getRank().displayName}")
 
         if (user.getPrestige() == 0) {
-            scores.add("  ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Not Prestiged")
+            scores.add("  $primaryColor${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Not Prestiged")
         } else {
-            scores.add("  ${ChatColor.RED}${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Prestige ${user.getPrestige()}")
+            scores.add("  $primaryColor${Constants.PRESTIGE_SYMBOL} ${ChatColor.GRAY}Prestige ${user.getPrestige()}")
         }
 
         val moneyBalance = try {
@@ -91,10 +99,10 @@ object PrisonScoreGetter : ScoreGetter {
         }
 
         val formattedMoneyBalance = NumberUtils.format(moneyBalance)
-        scores.add("  ${ChatColor.RED}${Constants.MONEY_SYMBOL} ${ChatColor.GRAY}$formattedMoneyBalance")
+        scores.add("  $primaryColor${Constants.MONEY_SYMBOL} ${ChatColor.GRAY}$formattedMoneyBalance")
 
         val formattedTokensBalance = NumberUtils.format(user.getTokenBalance())
-        scores.add("  ${ChatColor.RED}${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}$formattedTokensBalance")
+        scores.add("  $primaryColor${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}$formattedTokensBalance")
 
         scores.add("")
 
@@ -113,27 +121,27 @@ object PrisonScoreGetter : ScoreGetter {
             val progressColor = ProgressBarBuilder.colorPercentage(progressPercentage)
             val progressBar = ProgressBarBuilder(char = '⬛').build(progressPercentage)
 
-            scores.add("  ${ChatColor.RED}${ChatColor.BOLD}Progress")
+            scores.add("  $primaryColor${ChatColor.BOLD}Progress")
             scores.add("  ${ChatColor.GRAY}${user.getRank().displayName} ${ChatColor.GRAY}-> ${nextRank.displayName} ${ChatColor.GRAY}(${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedPrice${ChatColor.GRAY})")
             scores.add("  ${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ($progressColor${progressPercentage.toInt()}%${ChatColor.GRAY})")
         }
 
-        renderBorders(user, scores)
+        renderBorders(user, scores, primaryColor)
     }
 
-    private fun renderBorders(user: User, list: MutableList<String>) {
-        when (user.getSettingOption(UserSetting.SCOREBOARD_STYLE).getValue<ScoreboardStyleOption.ScoreboardStyle>()) {
+    private fun renderBorders(user: User, list: MutableList<String>, primaryColor: ChatColor) {
+        when (user.settings.getSettingOption(UserSetting.SCOREBOARD_STYLE).getValue<ScoreboardStyleOption.ScoreboardStyle>()) {
             ScoreboardStyleOption.ScoreboardStyle.SIMPLE -> {
                 list.add(0, "${ChatColor.BLUE}${ChatColor.GRAY}${ChatColor.STRIKETHROUGH}----------------------")
                 list.add("")
-                list.add("      ${ChatColor.RED}${ChatColor.ITALIC}play.minejunkie.com")
+                list.add("      $primaryColor${ChatColor.ITALIC}play.minejunkie.com")
                 list.add("${ChatColor.GRAY}${ChatColor.STRIKETHROUGH}----------------------")
             }
             ScoreboardStyleOption.ScoreboardStyle.FANCY -> {
                 list.add(0, "${ChatColor.DARK_GRAY}┌──────────────┐")
                 list.add(1, "")
                 list.add("")
-                list.add("      ${ChatColor.RED}${ChatColor.ITALIC}play.minejunkie.com")
+                list.add("      $primaryColor${ChatColor.ITALIC}play.minejunkie.com")
                 list.add("${ChatColor.DARK_GRAY}└──────────────┘")
             }
         }

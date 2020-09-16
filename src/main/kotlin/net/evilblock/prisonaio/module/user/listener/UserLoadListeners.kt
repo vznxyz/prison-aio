@@ -8,7 +8,6 @@
 package net.evilblock.prisonaio.module.user.listener
 
 import mkremins.fanciful.FancyMessage
-import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -41,12 +40,14 @@ object UserLoadListeners : Listener {
     @EventHandler
     fun onAsyncPlayerPreLoginEvent(event: AsyncPlayerPreLoginEvent) {
         try {
-            val user = UserHandler.getOrLoadAndCacheUser(event.uniqueId)
+            val user = UserHandler.getOrLoadAndCacheUser(event.uniqueId, lookup = false)
             user.cacheExpiry = null
             user.statistics.lastPlayTimeSync = System.currentTimeMillis()
 
             UserHandler.cacheUser(user)
         } catch (exception: Exception) {
+            exception.printStackTrace()
+
             val eventDetails = mapOf(
                 "Player Name" to event.name,
                 "Player UUID" to event.uniqueId.toString(),

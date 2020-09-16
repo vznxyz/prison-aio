@@ -25,7 +25,7 @@ class RequirementDialogue(
 
     override fun canSend(player: Player): Boolean {
         val user = UserHandler.getUser(player.uniqueId)
-        val test = predicate.test(player, user.getQuestProgression(quest) as QuestProgress)
+        val test = predicate.test(player, user.getQuestProgress(quest) as QuestProgress)
 
         if (!test) {
             failureDialogue.send(player)

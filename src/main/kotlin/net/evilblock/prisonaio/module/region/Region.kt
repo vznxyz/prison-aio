@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.region
 
+import net.evilblock.cubed.serialize.AbstractTypeSerializable
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.module.region.listener.RegionListeners
 import org.bukkit.block.Block
@@ -17,73 +18,87 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.projectiles.ProjectileSource
 
-interface Region {
+abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : AbstractTypeSerializable {
 
-    fun getRegionName(): String
+    abstract fun getRegionName(): String
 
-    fun getCuboid(): Cuboid?
+    abstract fun getPriority(): Int
 
-    fun is3D(): Boolean
-
-    fun getBreakableCuboid(): Cuboid?
-
-    fun resetBreakableCuboid()
-
-    fun supportsAbilityEnchants(): Boolean {
+    open fun is3D(): Boolean {
         return false
     }
 
-    fun supportsPassiveEnchants(): Boolean {
+    open fun getCuboid(): Cuboid? {
+        return cuboid
+    }
+
+    open fun setCuboid(cuboid: Cuboid?) {
+        this.cuboid = cuboid
+    }
+
+    open fun getBreakableCuboid(): Cuboid? {
+        return null
+    }
+
+    open fun resetBreakableCuboid() {
+
+    }
+
+    open fun supportsAbilityEnchants(): Boolean {
+        return false
+    }
+
+    open fun supportsPassiveEnchants(): Boolean {
         return true
     }
 
-    fun supportsRewards(): Boolean {
+    open fun supportsRewards(): Boolean {
         return false
     }
 
-    fun supportsAutoSell(): Boolean {
+    open fun supportsAutoSell(): Boolean {
         return false
     }
 
-    fun onLeftClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
+    open fun onLeftClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
 
     }
 
-    fun onRightClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
+    open fun onRightClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
 
     }
 
-    fun onBlockBreak(player: Player, block: Block, cancellable: Cancellable) {
+    open fun onBlockBreak(player: Player, block: Block, cancellable: Cancellable) {
         cancellable.isCancelled = true
     }
 
-    fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
+    open fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
         cancellable.isCancelled = true
     }
 
-    fun onBucketEmpty(player: Player, emptiedAt: Block, cancellable: Cancellable) {
+    open fun onBucketEmpty(player: Player, emptiedAt: Block, cancellable: Cancellable) {
         cancellable.isCancelled = true
     }
 
-    fun onBucketFill(player: Player, filledFrom: Block, cancellable: Cancellable) {
+    open fun onBucketFill(player: Player, filledFrom: Block, cancellable: Cancellable) {
         cancellable.isCancelled = true
     }
 
-    fun onBlockExplode(block: Block, cancellable: Cancellable) {
+    open fun onBlockExplode(block: Block, cancellable: Cancellable) {
         cancellable.isCancelled = true
     }
 
-    fun onBlockIgnite(block: Block, entity: Entity?, cause: BlockIgniteEvent.IgniteCause, cancellable: Cancellable) {
+    open fun onBlockIgnite(block: Block, entity: Entity?, cause: BlockIgniteEvent.IgniteCause, cancellable: Cancellable) {
         cancellable.isCancelled = true
     }
 
-    fun onEntityDamage(entity: Entity, cause: EntityDamageEvent.DamageCause, cancellable: Cancellable) {
+    open fun onEntityDamage(entity: Entity, cause: EntityDamageEvent.DamageCause, cancellable: Cancellable) {
         if (entity is Player) {
             cancellable.isCancelled = true
         }
     }
 
-    fun onEntityDamageEntity(attacker: Entity, victim: Entity, cause: EntityDamageEvent.DamageCause, damage: Double, cancellable: Cancellable) {
+    open fun onEntityDamageEntity(attacker: Entity, victim: Entity, cause: EntityDamageEvent.DamageCause, damage: Double, cancellable: Cancellable) {
         if (victim is Player) {
             cancellable.isCancelled = true
         }
@@ -97,15 +112,15 @@ interface Region {
         }
     }
 
-    fun onProjectileLaunch(projectile: Projectile, source: ProjectileSource, cancellable: Cancellable) {
+    open fun onProjectileLaunch(projectile: Projectile, source: ProjectileSource, cancellable: Cancellable) {
 
     }
 
-    fun onFoodLevelChange(cancellable: Cancellable) {
+    open fun onFoodLevelChange(cancellable: Cancellable) {
         cancellable.isCancelled = true
     }
 
-    fun onPlayerInteractEntity(player: Player, rightClicked: Entity, cancellable: Cancellable) {
+    open fun onPlayerInteractEntity(player: Player, rightClicked: Entity, cancellable: Cancellable) {
         if (RegionListeners.bypassCheck(player, cancellable)) {
             return
         }
@@ -113,15 +128,15 @@ interface Region {
         cancellable.isCancelled = rightClicked !is Boat && rightClicked !is Minecart
     }
 
-    fun onPlayerDeath(player: Player, event: PlayerDeathEvent) {
+    open fun onPlayerDeath(player: Player, event: PlayerDeathEvent) {
 
     }
 
-    fun onLeaveRegion(player: Player) {
+    open fun onLeaveRegion(player: Player) {
 
     }
 
-    fun onEnterRegion(player: Player) {
+    open fun onEnterRegion(player: Player) {
 
     }
 

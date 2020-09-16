@@ -15,7 +15,6 @@ import net.evilblock.prisonaio.module.mine.command.*
 import net.evilblock.prisonaio.module.mine.command.parameter.MineParameterType
 import net.evilblock.prisonaio.module.mine.listener.MineChunkListeners
 import net.evilblock.prisonaio.module.mine.listener.MineInventoryListeners
-import net.evilblock.prisonaio.module.mine.task.MineEffectsTask
 import net.evilblock.prisonaio.module.mine.task.MineResetTask
 import org.bukkit.event.Listener
 
@@ -37,7 +36,6 @@ object MinesModule : PluginModule() {
         MineHandler.initialLoad()
 
         getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), MineResetTask, 20L * 10L, 20L * 1L)
-        getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), MineEffectsTask, 20L, 20L)
     }
 
     override fun onDisable() {

@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.quest.dialogue.listener
 
 import net.evilblock.prisonaio.module.quest.QuestHandler
+import net.evilblock.prisonaio.module.quest.dialogue.reason.DialogueEndReason
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -19,7 +20,7 @@ object DialogueSequenceListeners : Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     fun onPlayerQuitEvent(event: PlayerQuitEvent) {
         if (QuestHandler.isDialogueSequencePlaying(event.player)) {
-            QuestHandler.stopDialogueSequence(event.player)
+            QuestHandler.stopDialogueSequence(event.player, DialogueEndReason.DISCONNECTED)
         }
     }
 

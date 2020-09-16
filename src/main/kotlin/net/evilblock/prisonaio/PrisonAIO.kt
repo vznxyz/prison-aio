@@ -15,7 +15,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
-import net.evilblock.prisonaio.command.*
+import net.evilblock.prisonaio.module.system.command.*
 import net.evilblock.prisonaio.listener.PrematureLoadListeners
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
@@ -23,8 +23,8 @@ import net.evilblock.prisonaio.module.gang.GangModule
 import net.evilblock.prisonaio.module.chat.ChatModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
-import net.evilblock.prisonaio.module.environment.EnvironmentModule
-import net.evilblock.prisonaio.module.environment.wizard.command.RunWizardCommand
+import net.evilblock.prisonaio.module.system.SystemModule
+import net.evilblock.prisonaio.module.system.wizard.command.RunSetupCheckCommand
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mine.MinesModule
@@ -71,7 +71,7 @@ class PrisonAIO : PluginFramework() {
         }
 
         enabledModules.addAll(arrayListOf(
-            EnvironmentModule,
+            SystemModule,
             StorageModule,
             RegionsModule,
             MechanicsModule,
@@ -95,8 +95,6 @@ class PrisonAIO : PluginFramework() {
 
         super.onEnable()
 
-        loadCommands()
-
         Tasks.delayed(1L) {
             fullyLoaded = true
         }
@@ -108,15 +106,6 @@ class PrisonAIO : PluginFramework() {
 
     fun getSpawnLocation(): Location {
         return server.worlds[0].spawnLocation
-    }
-
-    private fun loadCommands() {
-        CommandHandler.registerClass(RunWizardCommand::class.java)
-        CommandHandler.registerClass(HotFixCommands::class.java)
-        CommandHandler.registerClass(GKitzCommand::class.java)
-        CommandHandler.registerClass(ReloadCommand::class.java)
-        CommandHandler.registerClass(SaveCommand::class.java)
-        CommandHandler.registerClass(HealthCommand::class.java)
     }
 
     override fun getDefaultWorldGenerator(worldName: String?, id: String?): ChunkGenerator {

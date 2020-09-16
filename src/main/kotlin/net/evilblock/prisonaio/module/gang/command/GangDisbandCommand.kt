@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.gang.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.prisonaio.module.gang.GangHandler
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -42,7 +43,7 @@ object GangDisbandCommand {
         gang.kickVisitors(force = true)
 
         GangHandler.forgetGang(gang)
-        RegionsModule.clearBlockCache(gang)
+        RegionHandler.clearBlockCache(gang)
 
         player.sendMessage("${ChatColor.GREEN}You have successfully disbanded your gang.")
     }

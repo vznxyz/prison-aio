@@ -31,7 +31,7 @@ object GangSetHomeCommand {
             return
         }
 
-        if (!visitingGang.cuboid.contains(player.location)) {
+        if (!visitingGang.getCuboid().contains(player.location)) {
             player.sendMessage("${ChatColor.RED}You can only set the HQ location to somewhere within the gang headquarters.")
             return
         }

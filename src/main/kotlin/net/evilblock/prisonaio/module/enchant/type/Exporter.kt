@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.TimeUtil.formatIntoDetailedString
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import net.evilblock.prisonaio.util.Formats
@@ -58,7 +59,7 @@ object Exporter : AbstractEnchant("exporter", "Exporter", 3) {
      */
     override fun onInteract(event: PlayerInteractEvent, enchantedItem: ItemStack, level: Int) {
         val isRightClick = event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK
-        val miningRegion = RegionsModule.findRegion(event.player.location)
+        val miningRegion = RegionHandler.findRegion(event.player.location)
         if (isRightClick && miningRegion.supportsAbilityEnchants()) {
             val cooldownMap = readLevelToCooldownMap()
 

@@ -36,6 +36,10 @@ object QuestsModule : PluginModule() {
         QuestHandler.initialLoad()
     }
 
+    override fun onDisable() {
+        QuestHandler.saveData()
+    }
+
     override fun getCommands(): List<Class<*>> {
         val list = arrayListOf<Class<*>>(QuestDialogueSkipCommand.javaClass, QuestGuideCommand.javaClass)
 

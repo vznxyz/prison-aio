@@ -31,7 +31,7 @@ object UserSettingsListeners : Listener {
             val itemInHand = event.player.inventory.itemInMainHand
             if (MechanicsModule.isPickaxe(itemInHand)) {
                 val user = UserHandler.getUser(event.player.uniqueId)
-                if (user.getSettingOption(UserSetting.QUICK_ACCESS_ENCHANTS).getValue()) {
+                if (user.settings.getSettingOption(UserSetting.QUICK_ACCESS_ENCHANTS).getValue()) {
                     EnchantsManager.handleItemSwitch(event.player, itemInHand, event)
 
                     val pickaxeData = PickaxeHandler.getPickaxeData(itemInHand)
@@ -48,9 +48,9 @@ object UserSettingsListeners : Listener {
         val user = UserHandler.getUser(event.uuid)
 
         if (event.receiving) {
-            user.updateSettingOption(UserSetting.PRIVATE_MESSAGES, PrivateMessagesOption(PrivateMessagesOption.OptionValue.RECEIVE_ALL))
+            user.settings.updateSettingOption(UserSetting.PRIVATE_MESSAGES, PrivateMessagesOption(PrivateMessagesOption.OptionValue.RECEIVE_ALL))
         } else {
-            user.updateSettingOption(UserSetting.PRIVATE_MESSAGES, PrivateMessagesOption(PrivateMessagesOption.OptionValue.DISABLED))
+            user.settings.updateSettingOption(UserSetting.PRIVATE_MESSAGES, PrivateMessagesOption(PrivateMessagesOption.OptionValue.DISABLED))
         }
 
         user.requiresSave = true
@@ -61,9 +61,9 @@ object UserSettingsListeners : Listener {
         val user = UserHandler.getUser(event.uuid)
 
         if (event.playSounds) {
-            user.updateSettingOption(UserSetting.PRIVATE_MESSAGE_SOUNDS, PrivateMessageSoundsOption(true))
+            user.settings.updateSettingOption(UserSetting.PRIVATE_MESSAGE_SOUNDS, PrivateMessageSoundsOption(true))
         } else {
-            user.updateSettingOption(UserSetting.PRIVATE_MESSAGE_SOUNDS, PrivateMessageSoundsOption(false))
+            user.settings.updateSettingOption(UserSetting.PRIVATE_MESSAGE_SOUNDS, PrivateMessageSoundsOption(false))
         }
 
         user.requiresSave = true

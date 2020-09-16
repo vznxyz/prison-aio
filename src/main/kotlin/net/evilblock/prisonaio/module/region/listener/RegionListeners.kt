@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.region.listener
 
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
@@ -47,8 +48,8 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onPlayerMoveEvent(event: PlayerMoveEvent) {
-        val fromRegion = RegionsModule.findRegion(event.from)
-        val toRegion = RegionsModule.findRegion(event.to)
+        val fromRegion = RegionHandler.findRegion(event.from)
+        val toRegion = RegionHandler.findRegion(event.to)
 
         if (fromRegion != toRegion) {
             fromRegion.onLeaveRegion(event.player)
@@ -58,8 +59,8 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onPlayerTeleportEvent(event: PlayerTeleportEvent) {
-        val fromRegion = RegionsModule.findRegion(event.from)
-        val toRegion = RegionsModule.findRegion(event.to)
+        val fromRegion = RegionHandler.findRegion(event.from)
+        val toRegion = RegionHandler.findRegion(event.to)
 
         if (fromRegion != toRegion) {
             fromRegion.onLeaveRegion(event.player)
@@ -77,7 +78,7 @@ object RegionListeners : Listener {
             return
         }
 
-        RegionsModule.findRegion(event.block.location).onBlockPlace(event.player, event.blockPlaced, event)
+        RegionHandler.findRegion(event.block.location).onBlockPlace(event.player, event.blockPlaced, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -90,7 +91,7 @@ object RegionListeners : Listener {
             return
         }
 
-        val region = RegionsModule.findRegion(event.block.location)
+        val region = RegionHandler.findRegion(event.block.location)
         region.onBlockBreak(event.player, event.block, event)
 
         if (!event.isCancelled) {
@@ -111,7 +112,7 @@ object RegionListeners : Listener {
             return
         }
 
-        RegionsModule.findRegion(emptiedAt.location).onBucketEmpty(event.player, emptiedAt, event)
+        RegionHandler.findRegion(emptiedAt.location).onBucketEmpty(event.player, emptiedAt, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -126,17 +127,17 @@ object RegionListeners : Listener {
             return
         }
 
-        RegionsModule.findRegion(filledFrom.location).onBucketFill(event.player, filledFrom, event)
+        RegionHandler.findRegion(filledFrom.location).onBucketFill(event.player, filledFrom, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBlockExplodeEvent(event: BlockExplodeEvent) {
-        RegionsModule.findRegion(event.block.location).onBlockExplode(event.block, event)
+        RegionHandler.findRegion(event.block.location).onBlockExplode(event.block, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBlockIgniteEvent(event: BlockIgniteEvent) {
-        RegionsModule.findRegion(event.block.location).onBlockIgnite(event.block, event.ignitingEntity, event.cause, event)
+        RegionHandler.findRegion(event.block.location).onBlockIgnite(event.block, event.ignitingEntity, event.cause, event)
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -148,7 +149,7 @@ object RegionListeners : Listener {
         }
 
         if (event.action == Action.LEFT_CLICK_BLOCK || event.action == Action.RIGHT_CLICK_BLOCK) {
-            val region = RegionsModule.findRegion(event.clickedBlock.location)
+            val region = RegionHandler.findRegion(event.clickedBlock.location)
 
             if (event.action == Action.LEFT_CLICK_BLOCK) {
                 region.onLeftClickBlock(event.player, event.clickedBlock, event)
@@ -160,7 +161,7 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onPlayerInteractEntityEvent(event: PlayerInteractEntityEvent) {
-        RegionsModule.findRegion(event.rightClicked.location).onPlayerInteractEntity(event.player, event.rightClicked, event)
+        RegionHandler.findRegion(event.rightClicked.location).onPlayerInteractEntity(event.player, event.rightClicked, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -169,7 +170,7 @@ object RegionListeners : Listener {
             return
         }
 
-        RegionsModule.findRegion(event.damager.location).onEntityDamage(event.damager, event.cause, event)
+        RegionHandler.findRegion(event.damager.location).onEntityDamage(event.damager, event.cause, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -178,20 +179,20 @@ object RegionListeners : Listener {
             return
         }
 
-        RegionsModule.findRegion(event.damager.location).onEntityDamageEntity(event.damager, event.entity, event.cause, event.finalDamage, event)
+        RegionHandler.findRegion(event.damager.location).onEntityDamageEntity(event.damager, event.entity, event.cause, event.finalDamage, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onProjectileLaunchEvent(event: ProjectileLaunchEvent) {
         if (event.entity.shooter != null) {
-            RegionsModule.findRegion(event.entity.location).onProjectileLaunch(event.entity, event.entity.shooter, event)
+            RegionHandler.findRegion(event.entity.location).onProjectileLaunch(event.entity, event.entity.shooter, event)
         }
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onFoodLevelChangeEvent(event: FoodLevelChangeEvent) {
         if (event.entity is Player) {
-            RegionsModule.findRegion(event.entity.location).onFoodLevelChange(event)
+            RegionHandler.findRegion(event.entity.location).onFoodLevelChange(event)
 
             event.isCancelled = true
 
@@ -205,7 +206,7 @@ object RegionListeners : Listener {
 
     @EventHandler
     fun onPlayerDeathEvent(event: PlayerDeathEvent) {
-        RegionsModule.findRegion(event.entity.location).onPlayerDeath(event.entity, event)
+        RegionHandler.findRegion(event.entity.location).onPlayerDeath(event.entity, event)
     }
 
 }

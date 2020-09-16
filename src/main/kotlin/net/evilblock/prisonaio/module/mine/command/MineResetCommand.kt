@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.mine.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.mine.Mine
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -18,7 +19,7 @@ object MineResetCommand {
     @Command(
         names = ["mine reset"],
         description = "Open the mine editor",
-        permission = "prisonaio.mines.reset",
+        permission = Permissions.MINES_ADMIN,
         async = true
     )
     @JvmStatic

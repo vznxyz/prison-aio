@@ -34,12 +34,6 @@ class UserStatistics(@Transient internal var user: User) {
     private var coinflipLosses: Int = 0
     private var coinflipProfit: MutableMap<Currency.Type, BigInteger> = EnumMap(Currency.Type::class.java)
 
-    fun init() {
-        if (coinflipProfit == null) {
-            coinflipProfit = EnumMap(Currency.Type::class.java)
-        }
-    }
-
     fun getBlocksMined(): Int {
         return blocksMined
     }

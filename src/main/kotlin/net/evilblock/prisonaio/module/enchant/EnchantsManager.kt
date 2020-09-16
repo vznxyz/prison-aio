@@ -16,6 +16,7 @@ import net.evilblock.prisonaio.module.enchant.type.*
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import org.bukkit.Bukkit
@@ -44,7 +45,7 @@ object EnchantsManager : Listener {
 
     val CHAT_PREFIX: String = "${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}Enchants${ChatColor.GRAY}] "
 
-    private val dataFile: File = File(PrisonAIO.instance.dataFolder, "enchants-config.json")
+    private val dataFile: File = File(File(PrisonAIO.instance.dataFolder, "internal"),"enchants-config.json")
     private val dataType: Type = object : TypeToken<EnchantsConfig>() {}.type
 
     private val registeredEnchants: MutableList<AbstractEnchant> = arrayListOf()
@@ -106,7 +107,7 @@ object EnchantsManager : Listener {
             return
         }
 
-        val region = RegionsModule.findRegion(event.block.location)
+        val region = RegionHandler.findRegion(event.block.location)
         if (!region.supportsAbilityEnchants()) {
             return
         }
@@ -139,7 +140,7 @@ object EnchantsManager : Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     fun onPlayerSellToShopEvent(event: PlayerSellToShopEvent) {
         if (event.player.inventory.itemInMainHand != null) {
-            val region = RegionsModule.findRegion(event.player.location)
+            val region = RegionHandler.findRegion(event.player.location)
             if (!region.supportsAbilityEnchants()) {
                 return
             }
@@ -320,7 +321,7 @@ object EnchantsManager : Listener {
             }
         }
 
-        val region = RegionsModule.findRegion(player.location)
+        val region = RegionHandler.findRegion(player.location)
 
         val map = pickaxeData?.enchants ?: emptyMap<AbstractEnchant, Int>()
         if (Bukkit.isPrimaryThread()) {

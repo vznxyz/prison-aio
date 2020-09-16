@@ -21,7 +21,7 @@ object UserChatSettingsListeners : Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     fun onAsyncPlayerChatEvent(event: AsyncPlayerChatEvent) {
         val user = UserHandler.getUser(event.player.uniqueId)
-        if (user.getSettingOption(UserSetting.CHAT_MODE).getValue<ChatModeOption.ChatMode>() != ChatModeOption.ChatMode.GLOBAL_CHAT) {
+        if (user.settings.getSettingOption(UserSetting.CHAT_MODE).getValue<ChatModeOption.ChatMode>() != ChatModeOption.ChatMode.GLOBAL_CHAT) {
             event.isCancelled = true
             event.player.sendMessage("${ChatColor.RED}You can't talk in public chat while you have it disabled. View /settings to configure your chat settings.")
             return
@@ -30,7 +30,7 @@ object UserChatSettingsListeners : Listener {
         val recipientsIterator = event.recipients.iterator()
         while (recipientsIterator.hasNext()) {
             val recipient = recipientsIterator.next()
-            if (UserHandler.getUser(recipient.uniqueId).getSettingOption(UserSetting.CHAT_MODE).getValue<ChatModeOption.ChatMode>() != ChatModeOption.ChatMode.GLOBAL_CHAT) {
+            if (UserHandler.getUser(recipient.uniqueId).settings.getSettingOption(UserSetting.CHAT_MODE).getValue<ChatModeOption.ChatMode>() != ChatModeOption.ChatMode.GLOBAL_CHAT) {
                 recipientsIterator.remove()
             }
         }

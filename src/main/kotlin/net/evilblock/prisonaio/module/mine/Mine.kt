@@ -13,7 +13,6 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.module.mine.block.BlockType
 import net.evilblock.prisonaio.module.mine.config.MineBlocksConfig
-import net.evilblock.prisonaio.module.mine.config.MineEffectsConfig
 import net.evilblock.prisonaio.module.mine.config.MineResetConfig
 import net.evilblock.prisonaio.module.mine.event.MineBlockBreakEvent
 import net.evilblock.prisonaio.module.region.Region
@@ -30,7 +29,7 @@ import org.bukkit.event.Cancellable
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 
-class Mine(val id: String) : Region {
+class Mine(id: String) : Region(id) {
 
     @Nullable
     var spawnPoint: Location? = null
@@ -43,9 +42,6 @@ class Mine(val id: String) : Region {
 
     @NotNull
     val resetConfig: MineResetConfig = MineResetConfig()
-
-    @NotNull
-    val effectsConfig: MineEffectsConfig = MineEffectsConfig()
 
     var permission: String? = null
 
@@ -62,6 +58,10 @@ class Mine(val id: String) : Region {
 
     override fun getRegionName(): String {
         return "Mine $id"
+    }
+
+    override fun getPriority(): Int {
+        return 100
     }
 
     override fun getCuboid(): Cuboid? {

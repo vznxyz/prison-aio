@@ -11,6 +11,7 @@ object Permissions {
 
     const val SYSTEM_ADMIN = "prisonaio.system.admin"
 
+    const val REGION_ADMIN = "prisonaio.regions.admin"
     const val REGION_BYPASS = "prisonaio.regions.bypass"
 
     const val USERS_ADMIN = "prisonaio.users.admin"
@@ -22,6 +23,8 @@ object Permissions {
 
     const val NEWS_EDITOR = "prisonaio.news.editor"
     const val NEWS_VIEW_STATS = "prisonaio.news.view-stats"
+
+    const val MINES_ADMIN = "prisonaio.mines.admin"
 
     const val GANGS_ADMIN = "prisonaio.gangs.admin"
     const val GANGS_TROPHIES_GIVE = "prisonaio.gangs.trophies.give"

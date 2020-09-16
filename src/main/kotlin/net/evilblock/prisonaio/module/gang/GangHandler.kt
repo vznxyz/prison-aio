@@ -22,6 +22,7 @@ import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.cubed.util.hook.WorldEditUtils
 import net.evilblock.prisonaio.module.gang.booster.task.GangBoosterExpirationTask
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.Permissions
@@ -139,7 +140,7 @@ object GangHandler : PluginHandler {
      */
     fun getGangByLocation(location: Location): Gang? {
         for (gang in getAllGangs()) {
-            if (gang.cuboid.contains(location)) {
+            if (gang.getCuboid().contains(location)) {
                 return gang
             }
         }
@@ -330,7 +331,7 @@ object GangHandler : PluginHandler {
             gang.initializeData()
             gang.addMember(gangLeader)
 
-            RegionsModule.updateBlockCache(gang)
+            RegionHandler.updateBlockCache(gang)
 
             synchronizeCaches(gang)
             saveData()
@@ -377,9 +378,13 @@ object GangHandler : PluginHandler {
                 }
             }
 
+            RegionHandler.clearBlockCache(gang)
+
             gang.homeLocation = scanResults.playerSpawnLocation!!
             gang.guideNpc.updateLocation(scanResults.jerrySpawnLocation!!)
-            gang.cuboid = schematicData.cuboid
+            gang.setCuboid(schematicData.cuboid)
+
+            RegionHandler.updateBlockCache(gang)
 
             onFinish.invoke()
         }
@@ -513,7 +518,7 @@ object GangHandler : PluginHandler {
                     synchronizeCaches(gang)
 
                     // update region block cache
-                    RegionsModule.updateBlockCache(gang)
+                    RegionHandler.updateBlockCache(gang)
 
                     // set highest grid index so we know where to create the next gang
                     if (gang.gridIndex > this.gridIndex) {

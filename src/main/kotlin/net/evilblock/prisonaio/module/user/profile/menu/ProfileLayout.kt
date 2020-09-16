@@ -66,7 +66,7 @@ class ProfileLayout(
 
         if (activeTab == ProfileMenuTab.COMMENTS) {
             if (!user.hasPostedProfileComment(player.uniqueId)) {
-                val allowingComments = (user.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
+                val allowingComments = (user.settings.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
                 if (allowingComments) {
                     buttons[12] = AddCommentButton()
                 } else {
@@ -98,7 +98,7 @@ class ProfileLayout(
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                val allowingComments = (user.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
+                val allowingComments = (user.settings.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
                 if (allowingComments && !user.hasPostedProfileComment(player.uniqueId)) {
                     EzPrompt.Builder()
                         .promptText("${ChatColor.GREEN}Please type the message you'd like to post on ${user.getUsername()}'s profile. ${ChatColor.GRAY}(Limited to 120 characters)")

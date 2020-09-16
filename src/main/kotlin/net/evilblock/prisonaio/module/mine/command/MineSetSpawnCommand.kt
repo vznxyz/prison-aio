@@ -11,6 +11,7 @@ import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -19,7 +20,7 @@ object MineSetSpawnCommand {
     @Command(
         names = ["mine set-spawn"],
         description = "Set the spawn point of a mine",
-        permission = "prisonaio.mines.setspawn",
+        permission = Permissions.MINES_ADMIN,
         async = true
     )
     @JvmStatic

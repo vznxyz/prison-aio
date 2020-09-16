@@ -34,9 +34,9 @@ class PrivateMine(
     val owner: UUID,
     @JsonAdapter(TierReferenceSerializer::class) val tier: PrivateMineTier,
     val spawnPoint: Location,
-    private val cuboid: Cuboid,
+    cuboid: Cuboid,
     val innerCuboid: Cuboid
-) : Region {
+) : Region("Private-Mine-$gridIndex", cuboid) {
 
     /**
      * The sales tax of this mine, which is applied when visiting players sell to a shop.
@@ -70,8 +70,12 @@ class PrivateMine(
         return "${getOwnerName()}'s Private Mine (Tier ${tier})"
     }
 
+    override fun getPriority(): Int {
+        return 100
+    }
+
     override fun getCuboid(): Cuboid {
-        return cuboid
+        return cuboid!!
     }
 
     override fun is3D(): Boolean {

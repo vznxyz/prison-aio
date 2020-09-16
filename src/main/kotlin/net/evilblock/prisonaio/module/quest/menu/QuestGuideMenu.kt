@@ -26,7 +26,7 @@ class QuestGuideMenu : Menu() {
         val buttons = hashMapOf<Int, Button>()
 
         val user = UserHandler.getUser(player.uniqueId)
-        for (questProgress in user.getQuestProgressions().sortedBy(questOrderSort)) {
+        for (questProgress in user.getAllQuestsProgress().sortedBy(questOrderSort)) {
             buttons[buttons.size] = QuestButton(questProgress)
         }
 

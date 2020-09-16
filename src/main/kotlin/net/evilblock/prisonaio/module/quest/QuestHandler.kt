@@ -9,9 +9,12 @@ package net.evilblock.prisonaio.module.quest
 
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.quest.dialogue.DialoguePlayer
 import net.evilblock.prisonaio.module.quest.dialogue.DialogueSequence
+import net.evilblock.prisonaio.module.quest.dialogue.reason.DialogueEndReason
+import net.evilblock.prisonaio.module.quest.impl.tutorial.TutorialQuest
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.metadata.FixedMetadataValue
@@ -20,7 +23,7 @@ import org.bukkit.scheduler.BukkitTask
 
 object QuestHandler : PluginHandler {
 
-    private val quests = arrayListOf<Quest>()
+    private val quests = arrayListOf<Quest>(TutorialQuest)
 
     override fun getModule(): PluginModule {
         return QuestsModule
@@ -28,6 +31,8 @@ object QuestHandler : PluginHandler {
 
     override fun initialLoad() {
         for (quest in quests) {
+            quest.initializeData()
+
             for (mission in quest.getSortedMissions()) {
                 if (mission is Listener) {
                     getModule().getPluginFramework().server.pluginManager.registerEvents(mission, getModule().getPluginFramework())
@@ -47,20 +52,20 @@ object QuestHandler : PluginHandler {
     fun isDialogueSequencePlaying(player: Player): Boolean {
         return player.hasMetadata("QUEST_DIALOGUE_TICKER")
                 && player.hasMetadata("QUEST_DIALOGUE_PLAYER")
-                && player.hasMetadata("QUEST_CALLBACK")
+                && player.hasMetadata("QUEST_DIALOGUE_CALLBACK")
     }
 
-    fun startDialogueSequence(player: Player, sequence: DialogueSequence, onComplete: () -> Unit) {
+    fun startDialogueSequence(player: Player, sequence: DialogueSequence, onComplete: (DialogueEndReason) -> Unit) {
         if (isDialogueSequencePlaying(player)) {
             throw IllegalStateException("A dialogue sequence is already playing")
         }
 
         val dialoguePlayer = DialoguePlayer(player, sequence)
 
-        val ticker = object : BukkitRunnable() {
+        val ticker = Tasks.asyncTimer(object : BukkitRunnable() {
             override fun run() {
                 if (!player.isOnline) {
-                    stopDialogueSequence(player)
+                    stopDialogueSequence(player, DialogueEndReason.DISCONNECTED)
                     return
                 }
 
@@ -71,21 +76,19 @@ object QuestHandler : PluginHandler {
                 if (dialoguePlayer.hasNext()) {
                     if (dialoguePlayer.canSendNext(player)) {
                         dialoguePlayer.sendNext(player)
-                    } else {
-                        stopDialogueSequence(player)
                     }
                 } else {
-                    stopDialogueSequence(player)
+                    stopDialogueSequence(player, DialogueEndReason.FINISHED)
                 }
             }
-        }.runTaskTimerAsynchronously(PrisonAIO.instance, 1L, 1L)
+        }, 1L, 1L)
 
         player.setMetadata("QUEST_DIALOGUE_TICKER", FixedMetadataValue(PrisonAIO.instance, ticker))
         player.setMetadata("QUEST_DIALOGUE_PLAYER", FixedMetadataValue(PrisonAIO.instance, dialoguePlayer))
-        player.setMetadata("QUEST_CALLBACK", FixedMetadataValue(PrisonAIO.instance, onComplete))
+        player.setMetadata("QUEST_DIALOGUE_CALLBACK", FixedMetadataValue(PrisonAIO.instance, onComplete))
     }
 
-    fun stopDialogueSequence(player: Player) {
+    fun stopDialogueSequence(player: Player, reason: DialogueEndReason) {
         if (!isDialogueSequencePlaying(player)) {
             throw IllegalStateException("A dialogue sequence is not playing")
         }
@@ -106,12 +109,11 @@ object QuestHandler : PluginHandler {
             }
         }
 
-        val dialogueCallback = player.getMetadata("QUEST_CALLBACK").first().value() as () -> Unit
-        dialogueCallback.invoke()
+        (player.getMetadata("QUEST_DIALOGUE_CALLBACK").first().value() as (DialogueEndReason) -> Unit).invoke(reason)
 
         player.removeMetadata("QUEST_DIALOGUE_TICKER", PrisonAIO.instance)
         player.removeMetadata("QUEST_DIALOGUE_PLAYER", PrisonAIO.instance)
-        player.removeMetadata("QUEST_CALLBACK", PrisonAIO.instance)
+        player.removeMetadata("QUEST_DIALOGUE_CALLBACK", PrisonAIO.instance)
     }
 
 }

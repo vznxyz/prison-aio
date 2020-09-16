@@ -21,6 +21,7 @@ import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.random.Random
 
 object GangTrophiesListeners : Listener {
@@ -36,7 +37,7 @@ object GangTrophiesListeners : Listener {
             }
 
             if (Chance.percent(chance)) {
-                val amount = Random.nextInt(GangModule.readTrophyBlockBreakMinAmount(), GangModule.readTrophyBlockBreakMaxAmount())
+                val amount = ThreadLocalRandom.current().nextInt(GangModule.readTrophyBlockBreakMinAmount(), GangModule.readTrophyBlockBreakMaxAmount())
                 assumedGang.giveTrophies(amount)
 
                 val memberInfo = assumedGang.getMemberInfo(event.player.uniqueId)
@@ -45,7 +46,7 @@ object GangTrophiesListeners : Listener {
                 }
 
                 val user = UserHandler.getUser(event.player.uniqueId)
-                if (user.getSettingOption(UserSetting.REWARD_MESSAGES).getValue()) {
+                if (user.settings.getSettingOption(UserSetting.REWARD_MESSAGES).getValue()) {
                     event.player.sendMessage("${RewardsModule.getChatPrefix()}You found ${ChatColor.GOLD}${ChatColor.BOLD}$amount ${ChatColor.GOLD}Trophies ${ChatColor.GRAY}for your gang while mining!")
                 }
 

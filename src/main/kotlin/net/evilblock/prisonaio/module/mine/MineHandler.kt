@@ -15,6 +15,7 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.entity.Player
 import java.io.File
@@ -56,7 +57,7 @@ object MineHandler : PluginHandler {
 
         Tasks.asyncDelayed(20L * 3) {
             for (mine in minesMap.values) {
-                RegionsModule.updateBlockCache(mine)
+                RegionHandler.updateBlockCache(mine)
 
                 if (mine.region != null && mine.blocksConfig.blockTypes.isNotEmpty()) {
                     mine.resetRegion()
@@ -79,7 +80,12 @@ object MineHandler : PluginHandler {
         return Optional.ofNullable(minesMap[id.toLowerCase()])
     }
 
+    @Throws(IllegalStateException::class)
     fun createMine(id: String): Mine {
+        if (RegionHandler.findRegion(id) != null) {
+            throw IllegalStateException("A region with the ID `$id` already exists!")
+        }
+
         val mine = Mine(id)
         minesMap[id.toLowerCase()] = mine
         return mine

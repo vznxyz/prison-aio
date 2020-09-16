@@ -17,6 +17,7 @@ import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.prisonaio.module.user.User
@@ -39,6 +40,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.experimental.and
 import kotlin.math.floor
 import kotlin.random.Random
@@ -70,7 +72,7 @@ object MiningMechanicsListeners : Listener {
 
         val user = UserHandler.getUser(event.player.uniqueId)
         val autoSmeltEnabled = UsersModule.isAutoSmeltPerkEnabledByDefault() || user.perks.isPerkEnabled(Perk.AUTO_SMELT) && user.perks.hasPerk(event.player, Perk.AUTO_SMELT)
-        val region = RegionsModule.findRegion(event.block.location)
+        val region = RegionHandler.findRegion(event.block.location)
 
         val fortuneLevel = if (region.supportsAbilityEnchants() && itemInHand.containsEnchantment(Enchantment.LOOT_BONUS_BLOCKS)) {
             itemInHand.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)
@@ -135,10 +137,10 @@ object MiningMechanicsListeners : Listener {
 
         val user = UserHandler.getUser(event.player.uniqueId)
         val autoSmeltEnabled = UsersModule.isAutoSmeltPerkEnabledByDefault() || user.perks.isPerkEnabled(Perk.AUTO_SMELT) && user.perks.hasPerk(event.player, Perk.AUTO_SMELT)
-        val region = RegionsModule.findRegion(event.block.location)
+        val region = RegionHandler.findRegion(event.block.location)
 
         val ignoredBlocks = MechanicsModule.getDropsToInvIgnoredBlocks()
-        val validBlocks = event.blockList.filter { !ignoredBlocks.contains(it.type) && (event.yield == 100F || Random.nextInt(100) < event.yield) }
+        val validBlocks = event.blockList.filter { !ignoredBlocks.contains(it.type) && (event.yield == 100F || ThreadLocalRandom.current().nextInt(100) < event.yield) }
 
         val fortuneLevel = if (region.supportsAbilityEnchants() && pickaxe.enchants.containsKey(Fortune)) {
             pickaxe.enchants[Fortune]!!
@@ -316,13 +318,13 @@ object MiningMechanicsListeners : Listener {
         when {
             amountToDrop > maxDrops -> {
                 amountToDrop = if (isRandomAmount) {
-                    Random.nextInt(maxDrops) + minDrops
+                    ThreadLocalRandom.current().nextInt(maxDrops) + minDrops
                 } else {
                     maxDrops + minDrops
                 }
             }
             isRandomAmount -> {
-                amountToDrop = Random.nextInt(amountToDrop) + minDrops
+                amountToDrop = ThreadLocalRandom.current().nextInt(amountToDrop) + minDrops
             }
             else -> {
                 amountToDrop += minDrops
@@ -330,14 +332,14 @@ object MiningMechanicsListeners : Listener {
         }
 
         if (modifier > 0) {
-            modifier = Random.nextInt(modifier)
+            modifier = ThreadLocalRandom.current().nextInt(modifier)
         }
 
         if (modifier <= 0) {
             return amountToDrop
         }
 
-        if (Random.nextBoolean()) {
+        if (ThreadLocalRandom.current().nextBoolean()) {
             return amountToDrop + modifier
         }
 

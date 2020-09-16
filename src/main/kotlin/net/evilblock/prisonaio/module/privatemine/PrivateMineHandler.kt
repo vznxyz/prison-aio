@@ -24,6 +24,7 @@ import net.evilblock.cubed.util.hook.WorldEditUtils
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.privatemine.data.PrivateMineTier
 import net.evilblock.prisonaio.module.privatemine.entity.PrivateMineNpcEntity
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.*
 import org.bukkit.block.BlockFace
@@ -227,7 +228,7 @@ object PrivateMineHandler : PluginHandler {
 
         mine.resetRegion()
 
-        RegionsModule.updateBlockCache(mine)
+        RegionHandler.updateBlockCache(mine)
     }
 
     /**

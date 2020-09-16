@@ -24,7 +24,7 @@ object GangJerryListeners : Listener {
     @EventHandler
     fun onEntityMovedEvent(event: EntityMoveTool.EntityMovedEvent) {
         if (event.entity is JerryNpcEntity) {
-            if (!((event.entity as JerryNpcEntity).gang.cuboid.contains(event.location))) {
+            if (!((event.entity as JerryNpcEntity).gang.getCuboid().contains(event.location))) {
                 event.isCancelled = true
                 event.player.sendMessage("${ChatColor.RED}You must place Jerry inside of your cell!")
                 return

@@ -32,7 +32,7 @@ object Cubed : AbstractEnchant("cubed", "Cubed", 3) {
     override val menuDisplay: Material
         get() = Material.BEACON
 
-    override fun onBreak(event: BlockBreakEvent, itemStack: ItemStack?, level: Int, region: Region) {
+    override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
         val blocks: MutableList<Block> = ArrayList()
 
         val origin = event.block.location
@@ -46,7 +46,7 @@ object Cubed : AbstractEnchant("cubed", "Cubed", 3) {
                             mineCrate.destroy(true)
                             MineCrateHandler.forgetSpawnedCrate(mineCrate)
 
-                            val sendMessages = UserHandler.getUser(event.player.uniqueId).getSettingOption(UserSetting.REWARD_MESSAGES).getValue<Boolean>()
+                            val sendMessages = UserHandler.getUser(event.player.uniqueId).settings.getSettingOption(UserSetting.REWARD_MESSAGES).getValue<Boolean>()
 
                             for (reward in mineCrate.rewardSet.pickRewards()) {
                                 if (sendMessages) {

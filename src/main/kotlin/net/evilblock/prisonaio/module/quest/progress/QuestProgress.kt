@@ -11,7 +11,7 @@ import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.prisonaio.module.quest.Quest
 import net.evilblock.prisonaio.module.quest.QuestHandler
-import net.evilblock.prisonaio.module.quest.QuestReferenceSerializer
+import net.evilblock.prisonaio.module.quest.serialize.QuestReferenceSerializer
 import net.evilblock.prisonaio.module.quest.mission.QuestMission
 import java.lang.reflect.Type
 
@@ -20,6 +20,7 @@ open class QuestProgress(@JsonAdapter(QuestReferenceSerializer::class) internal 
     @Transient internal var requiresSave: Boolean = false
 
     protected var started: Boolean = false
+    protected var completed: Boolean = false
 
     @JsonAdapter(QuestProgressMissionCompletedSerializer::class)
     protected val completedMissions: MutableSet<QuestMission> = hashSetOf()
@@ -29,16 +30,24 @@ open class QuestProgress(@JsonAdapter(QuestReferenceSerializer::class) internal 
     }
 
     fun start() {
+        completedMissions.clear()
+        completed = false
         started = true
+        requiresSave = true
     }
 
     fun isCompleted(): Boolean {
-        return completedMissions.size == quest.getSortedMissions().size
+        return completed
+    }
+
+    fun complete() {
+        completed = true
+        requiresSave = true
     }
 
     fun hasCurrentMission(): Boolean {
         if (completedMissions.isEmpty()) {
-            return true
+            return quest.getSortedMissions().isNotEmpty()
         }
 
         val lastCompletedMission = completedMissions.maxBy { it.getOrder() }!!

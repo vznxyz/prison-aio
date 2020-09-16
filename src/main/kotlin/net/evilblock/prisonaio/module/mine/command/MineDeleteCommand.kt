@@ -11,7 +11,9 @@ import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.RegionsModule
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -20,12 +22,12 @@ object MineDeleteCommand {
     @Command(
         names = ["mine delete"],
         description = "Delete an existing mine",
-        permission = "prisonaio.mines.delete",
+        permission = Permissions.MINES_ADMIN,
         async = true
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "mine") mine: Mine) {
-        RegionsModule.clearBlockCache(mine)
+        RegionHandler.clearBlockCache(mine)
         MineHandler.deleteMine(mine)
 
         player.sendMessage("${ChatColor.GREEN}Deleted mine ${ChatColor.WHITE}${mine.id}${ChatColor.GREEN}.")

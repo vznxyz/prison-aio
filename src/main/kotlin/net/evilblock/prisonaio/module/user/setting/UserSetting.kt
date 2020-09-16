@@ -48,6 +48,18 @@ enum class UserSetting(
             )
         }
     ),
+    RAINBOW_SCOREBOARD(
+        displayName = "Rainbow Scoreboard",
+        description = "Cycles the scoreboard's primary color through the rainbow colors.",
+        icon = ItemStack(Material.WOOL),
+        defaultOption = { RainbowScoreboardOption(false) },
+        options = {
+            arrayListOf(
+                RainbowScoreboardOption(true),
+                RainbowScoreboardOption(false)
+            )
+        }
+    ),
     CHAT_MODE(
         displayName = "Chat Mode",
         description = "This setting controls what chat mode you'll receive messages from.",

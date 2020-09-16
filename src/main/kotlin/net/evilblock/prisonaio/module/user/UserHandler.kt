@@ -113,6 +113,7 @@ object UserHandler : PluginHandler {
         Bukkit.getOnlinePlayers().forEach { player ->
             try {
                 val user = loadUser(player.uniqueId)
+                user.cacheExpiry = null
                 user.statistics.lastPlayTimeSync = System.currentTimeMillis()
 
                 cacheUser(user)
@@ -142,24 +143,31 @@ object UserHandler : PluginHandler {
     /**
      * Loads a player's user data.
      */
-    fun loadUser(uuid: UUID, throws: Boolean = false): User {
+    fun loadUser(uuid: UUID, fetch: Boolean = true, throws: Boolean = false): User {
         assert(!Bukkit.isPrimaryThread()) { "Cannot load user on primary thread" }
 
         val document = usersCollection.find(Document("uuid", uuid.toString())).first()
         if (document != null) {
-            val user = Cubed.gson.fromJson(document.toJson(JSON_WRITER_SETTINGS), User::class.java)
-            user.init()
-            return user
+            try {
+                Cubed.gson.fromJson(document.toJson(JSON_WRITER_SETTINGS), User::class.java).also {
+                    it.init()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                throw IllegalStateException("Failed to deserialize user document", e)
+            }
         }
 
-        val fetch = UUIDCache.fetchFromMojang(uuid)
-        if (fetch.isPresent) {
-            val user = User(uuid)
-            user.init()
+        if (fetch) {
+            val lookupResult = UUIDCache.fetchFromMojang(uuid)
+            if (lookupResult.isPresent) {
+                val user = User(uuid)
+                user.init()
 
-            usersCollection.insertOne(Document.parse(Cubed.gson.toJson(user)))
+                usersCollection.insertOne(Document.parse(Cubed.gson.toJson(user)))
 
-            return user
+                return user
+            }
         }
 
         if (throws) {
@@ -202,18 +210,16 @@ object UserHandler : PluginHandler {
     /**
      * Gets a player's user data from the cache, or by loading and caching.
      */
-    fun getOrLoadAndCacheUser(uuid: UUID, throws: Boolean = false): User {
+    fun getOrLoadAndCacheUser(uuid: UUID, lookup: Boolean = true, throws: Boolean = false): User {
         assert(!Bukkit.isPrimaryThread()) { "Cannot load user on primary thread" }
 
-        return if (!usersMap.containsKey(uuid)) {
-            val user = loadUser(uuid = uuid, throws = throws)
-            user.cacheExpiry = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30L)
-
-            usersMap[uuid] = user
-
-            user
-        } else {
+        return if (usersMap.containsKey(uuid)) {
             getUser(uuid)
+        } else {
+            loadUser(uuid = uuid, fetch = lookup, throws = throws).also { user ->
+                user.cacheExpiry = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30L)
+                usersMap[uuid] = user
+            }
         }
     }
 

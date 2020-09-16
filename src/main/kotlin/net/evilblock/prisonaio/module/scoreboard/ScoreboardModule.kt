@@ -10,7 +10,10 @@ package net.evilblock.prisonaio.module.scoreboard
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.scoreboard.ScoreboardHandler
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.scoreboard.animation.RainbowAnimation
+import net.evilblock.prisonaio.module.scoreboard.animation.TitleAnimation
 
 object ScoreboardModule : PluginModule() {
 
@@ -28,7 +31,8 @@ object ScoreboardModule : PluginModule() {
 
     override fun onEnable() {
         ScoreboardHandler.configure(PrisonTitleGetter, PrisonScoreGetter)
-        getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), PrisonScoreboardAnimation, 1L, 1L)
+        Tasks.asyncTimer(TitleAnimation, 1L, 1L)
+        Tasks.asyncTimer(RainbowAnimation, 1L, 1L)
     }
 
 }

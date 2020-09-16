@@ -43,8 +43,8 @@ class Gang(
     var leader: UUID,
     var homeLocation: Location,
     guideLocation: Location,
-    internal var cuboid: Cuboid
-) : Region {
+    cuboid: Cuboid
+) : Region("gang-grid-$gridIndex", cuboid) {
 
     val uuid: UUID = UUID.randomUUID()
     var announcement: String = "This is the default announcement."
@@ -68,20 +68,16 @@ class Gang(
         return "${getLeaderUsername()}'s Gang"
     }
 
+    override fun getPriority(): Int {
+        return 100
+    }
+
     override fun getCuboid(): Cuboid {
-        return cuboid
+        return cuboid!!
     }
 
-    override fun is3D(): Boolean {
-        return false
-    }
-
-    override fun getBreakableCuboid(): Cuboid? {
-        return cuboid
-    }
-
-    override fun resetBreakableCuboid() {
-
+    override fun getBreakableCuboid(): Cuboid {
+        return cuboid!!
     }
 
     override fun supportsAbilityEnchants(): Boolean {
@@ -101,36 +97,19 @@ class Gang(
     }
 
     fun initializeData() {
-        if (invitations == null) {
-            invitations = hashMapOf()
-        }
-
-        if (challengesData == null) {
-            challengesData = GangChallengesData(this)
-        } else {
-            challengesData.gang = this
-        }
-
-        if (boosters == null) {
-            boosters = hashSetOf()
-        }
-
-        visitors = hashSetOf()
-
-        cachedValue = BigInteger("0")
+        challengesData.gang = this
 
         guideNpc.initializeData()
         guideNpc.persistent = false
         guideNpc.gang = this
-
-        guideNpc.updateTexture(
-            GangModule.getJerryTextureValue(),
-            GangModule.getJerryTextureSignature()
-        )
-
+        guideNpc.updateTexture(GangModule.getJerryTextureValue(), GangModule.getJerryTextureSignature())
         guideNpc.updateLines(GangModule.getJerryHologramLines())
 
         EntityManager.trackEntity(guideNpc)
+
+        invitations = hashMapOf()
+        visitors = hashSetOf()
+        cachedValue = BigInteger("0")
     }
 
     fun getLeaderUsername(): String {
@@ -456,8 +435,9 @@ class Gang(
     }
 
     private fun sendBorderUpdate(player: Player) {
-        val worldBorderPacket = PacketPlayOutWorldBorder()
+        val cuboid = getCuboid()
 
+        val worldBorderPacket = PacketPlayOutWorldBorder()
         Reflection.setDeclaredFieldValue(worldBorderPacket, "a", PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE)
         Reflection.setDeclaredFieldValue(worldBorderPacket, "b", 29999984)
         Reflection.setDeclaredFieldValue(worldBorderPacket, "c", cuboid.center.x)
@@ -467,7 +447,6 @@ class Gang(
         Reflection.setDeclaredFieldValue(worldBorderPacket, "h", 20)
 
         val borderSize = max(cuboid.sizeX, cuboid.sizeZ).toDouble()
-
         Reflection.setDeclaredFieldValue(worldBorderPacket, "f", borderSize)
         Reflection.setDeclaredFieldValue(worldBorderPacket, "e", borderSize)
 
@@ -516,7 +495,7 @@ class Gang(
             return
         }
 
-        if (!cuboid.contains(block.location)) {
+        if (!getCuboid().contains(block.location)) {
             player.sendMessage("${ChatColor.RED}You can't build or break outside of the gang's headquarters.")
             return
         }

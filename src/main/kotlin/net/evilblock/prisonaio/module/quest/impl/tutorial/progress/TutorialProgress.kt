@@ -7,7 +7,11 @@
 
 package net.evilblock.prisonaio.module.quest.impl.tutorial.progress
 
+import net.evilblock.prisonaio.module.quest.impl.tutorial.TutorialQuest
 import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 
-class TutorialProgress : QuestProgress {
+class TutorialProgress : QuestProgress(TutorialQuest) {
+
+
+
 }

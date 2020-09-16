@@ -25,10 +25,9 @@ class MineEditMenu(private val mine: Mine) : Menu() {
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        buttons[10] = ManageBlocksButton(mine)
-        buttons[12] = ManageResetButton(mine)
-        buttons[14] = ManageEffectsButton(mine)
-        buttons[16] = MineTeleportButton(mine)
+        buttons[11] = ManageBlocksButton(mine)
+        buttons[13] = ManageResetButton(mine)
+        buttons[15] = MineTeleportButton(mine)
 
         // make empty row on bottom
         buttons[26] = Button.placeholder(Material.AIR)
@@ -76,28 +75,6 @@ class MineEditMenu(private val mine: Mine) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             MineManageResetMenu(mine).openMenu(player)
-        }
-    }
-
-    private inner class ManageEffectsButton(private val mine: Mine) : Button() {
-        override fun getName(player: Player): String {
-            return "${ChatColor.GREEN}${ChatColor.BOLD}Manage Effects"
-        }
-
-        override fun getDescription(player: Player): List<String> {
-            return listOf(
-                "",
-                "${ChatColor.GRAY}Manage the effects given to",
-                "${ChatColor.GRAY}players while near this mine."
-            )
-        }
-
-        override fun getMaterial(player: Player): Material {
-            return Material.BREWING_STAND_ITEM
-        }
-
-        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            MineManageEffectsMenu(mine).openMenu(player)
         }
     }
 

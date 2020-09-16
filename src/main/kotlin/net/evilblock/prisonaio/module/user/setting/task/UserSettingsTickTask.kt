@@ -14,7 +14,7 @@ object UserSettingsTickTask : Runnable {
 
     override fun run() {
         for (user in UserHandler.getUsers()) {
-            if (!user.getSettingOption(UserSetting.AUTO_RANKUP).getValue<Boolean>()) {
+            if (!user.settings.getSettingOption(UserSetting.AUTO_RANKUP).getValue<Boolean>()) {
                 continue
             }
 

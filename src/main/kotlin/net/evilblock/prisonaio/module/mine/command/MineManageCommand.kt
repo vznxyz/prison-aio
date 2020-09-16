@@ -11,6 +11,7 @@ import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.menu.MineEditMenu
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.entity.Player
 
 object MineManageCommand {
@@ -18,7 +19,7 @@ object MineManageCommand {
     @Command(
         names = ["mine manage"],
         description = "Opens a menu of tools to manage a mine",
-        permission = "prisonaio.mines.manage"
+        permission = Permissions.MINES_ADMIN
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "mine") mine: Mine) {

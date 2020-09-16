@@ -10,7 +10,7 @@ package net.evilblock.prisonaio.module.enchant.type
 import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
-import net.evilblock.prisonaio.module.environment.analytic.Analytic
+import net.evilblock.prisonaio.module.system.analytic.Analytic
 import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
