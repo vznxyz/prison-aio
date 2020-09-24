@@ -38,7 +38,7 @@ object BackpackListeners : Listener {
                 if (backpack != null) {
                     event.isCancelled = true
 
-                    backpack.updateBackpackItemLore(event.item)
+                    backpack.updateLore(event.item)
                     backpack.open(event.player)
                 }
             }

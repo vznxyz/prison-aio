@@ -13,7 +13,7 @@ data class ShopItem(
     /**
      * The actual item representing this shop item
      */
-    val itemStack: ItemStack,
+    var itemStack: ItemStack,
     /**
      * The item stack amount
      */
@@ -29,7 +29,15 @@ data class ShopItem(
     /**
      * The order of this shop item
      */
-    var order: Int = 0
+    var order: Int = 0,
+    /**
+     * If the item should be given to players
+     */
+    var giveItem: Boolean = true,
+    /**
+     * The commands that should be executed when a player buys this item
+     */
+    var commands: MutableList<String> = arrayListOf()
 ) {
 
     /**

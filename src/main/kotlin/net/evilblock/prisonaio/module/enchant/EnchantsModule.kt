@@ -67,12 +67,12 @@ object EnchantsModule : PluginModule() {
     override fun getCommands(): List<Class<*>> {
         return listOf(
             BookCommand.javaClass,
+            ForgetPickaxeCommand.javaClass,
             ManageEnchantsCommand.javaClass,
             EnchantCommand.javaClass,
             PickaxeCommand.javaClass,
             PickaxeSetPrestigeCommand.javaClass,
             RemoveEnchantCommand.javaClass,
-            SalvageCommand.javaClass,
             ToggleEnchantsMessagesCommand.javaClass,
             SalvagePreventionEditorCommand.javaClass,
             PrestigeEditorCommand.javaClass

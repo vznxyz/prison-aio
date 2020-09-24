@@ -15,6 +15,7 @@ import net.evilblock.prisonaio.module.mine.command.*
 import net.evilblock.prisonaio.module.mine.command.parameter.MineParameterType
 import net.evilblock.prisonaio.module.mine.listener.MineChunkListeners
 import net.evilblock.prisonaio.module.mine.listener.MineInventoryListeners
+import net.evilblock.prisonaio.module.mine.listener.MineShopListeners
 import net.evilblock.prisonaio.module.mine.task.MineResetTask
 import org.bukkit.event.Listener
 
@@ -68,7 +69,8 @@ object MinesModule : PluginModule() {
     override fun getListeners(): List<Listener> {
         return listOf(
             MineChunkListeners,
-            MineInventoryListeners
+            MineInventoryListeners,
+            MineShopListeners
         )
     }
 

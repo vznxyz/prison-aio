@@ -23,7 +23,7 @@ object MineInventoryListeners : Listener {
 
     /**
      * Handles teleporting a player to a [Mine]'s spawn-point when the player toggles sneak
-     * while located within a [Mine] and has a full-inventory.
+     * while standing inside of a [Mine] region and has a full-inventory.
      */
     @EventHandler
     fun onPlayerToggleSneakEvent(event: PlayerToggleSneakEvent) {
@@ -41,7 +41,7 @@ object MineInventoryListeners : Listener {
     }
 
     /**
-     * Sends a [Title] to the player if their inventory is full while inside a mine.
+     * Sends a [Title] to the player if their inventory is full while inside a [Mine] region.
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     fun onBlockBreakEvent(event: BlockBreakEvent) {

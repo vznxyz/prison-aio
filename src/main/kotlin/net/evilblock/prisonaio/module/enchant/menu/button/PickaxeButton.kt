@@ -33,7 +33,7 @@ class PickaxeButton(
 
         val nextPrestige = PickaxePrestigeHandler.getNextPrestige(pickaxeData.prestige)
         if (nextPrestige != null) {
-            extraLore.add("${ChatColor.RED}${ChatColor.BOLD}PRESTIGE REQUIREMENTS")
+            extraLore.add("${ChatColor.RED}${ChatColor.BOLD}Prestige Requirements")
             extraLore.addAll(nextPrestige.renderRequirements(player))
 
             if (nextPrestige.meetsRequirements(player)) {

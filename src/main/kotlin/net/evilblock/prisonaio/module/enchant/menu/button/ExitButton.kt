@@ -18,7 +18,7 @@ import org.bukkit.inventory.InventoryView
 class ExitButton : Button() {
 
     override fun getName(player: Player): String {
-        return "${ChatColor.GRAY}${Constants.DOUBLE_ARROW_RIGHT} ${ChatColor.RED}${ChatColor.BOLD}Exit ${ChatColor.GRAY}${Constants.DOUBLE_ARROW_LEFT}"
+        return "${ChatColor.RED}${ChatColor.BOLD}Exit"
     }
 
     override fun getDescription(player: Player): List<String> {

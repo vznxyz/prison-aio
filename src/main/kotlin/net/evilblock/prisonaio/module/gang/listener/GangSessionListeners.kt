@@ -9,6 +9,8 @@ package net.evilblock.prisonaio.module.gang.listener
 
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.gang.GangHandler
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.perk.Perk
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
@@ -84,10 +86,18 @@ object GangSessionListeners : Listener {
             GangHandler.getVisitingGang(event.player)?.leaveSession(event.player)
             GangHandler.updateVisitingGang(event.player, null)
 
-            event.player.isFlying = false
-
-            if (event.player.gameMode != GameMode.CREATIVE) {
-                event.player.allowFlight = false
+            val user = UserHandler.getUser(event.player.uniqueId)
+            if (user.perks.isPerkEnabled(Perk.FLY)) {
+                event.player.allowFlight = true
+                event.player.isFlying = true
+            } else {
+                if (event.player.gameMode == GameMode.CREATIVE) {
+                    event.player.isFlying = true
+                    event.player.allowFlight = true
+                } else {
+                    event.player.isFlying = false
+                    event.player.allowFlight = false
+                }
             }
         }
     }

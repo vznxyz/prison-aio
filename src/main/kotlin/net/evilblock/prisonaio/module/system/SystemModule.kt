@@ -17,10 +17,7 @@ import net.evilblock.prisonaio.module.system.analytic.command.WipeAnalyticsComma
 import net.evilblock.prisonaio.module.system.analytic.listener.AnalyticListeners
 import net.evilblock.prisonaio.module.system.command.*
 import net.evilblock.prisonaio.module.system.sentient.SentientHandler
-import net.evilblock.prisonaio.module.system.sentient.guard.command.WalkRegionSetCommand
 import net.evilblock.prisonaio.module.system.sentient.guard.command.SpawnPrisonGuardCommand
-import net.evilblock.prisonaio.module.system.sentient.guard.command.WalkRegionViewCommand
-import net.evilblock.prisonaio.module.system.sentient.guard.entity.PrisonGuard
 import net.evilblock.prisonaio.module.system.setting.listener.SettingListeners
 import net.evilblock.prisonaio.module.system.setting.SettingHandler
 import net.evilblock.prisonaio.module.system.setting.command.ConfigureFirstJoinMessageCommand
@@ -70,8 +67,6 @@ object SystemModule : PluginModule() {
             ConfigureFirstJoinMessageToggleCommand.javaClass,
             AnalyticsCommand.javaClass,
             WipeAnalyticsCommand.javaClass,
-            WalkRegionSetCommand.javaClass,
-            WalkRegionViewCommand.javaClass,
             SpawnPrisonGuardCommand.javaClass,
             RunSetupCheckCommand::class.java,
             ManageCommand::class.java,
@@ -84,9 +79,7 @@ object SystemModule : PluginModule() {
     }
 
     override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
-        return mapOf(
-            PrisonGuard::class.java to PrisonGuard.TypeAdapter
-        )
+        return mapOf()
     }
 
     override fun getListeners(): List<Listener> {

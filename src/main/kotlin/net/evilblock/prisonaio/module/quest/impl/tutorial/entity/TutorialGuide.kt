@@ -11,7 +11,6 @@ import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.prisonaio.module.quest.QuestsModule
 import net.evilblock.prisonaio.module.quest.impl.tutorial.TutorialQuest
-import net.evilblock.prisonaio.module.quest.impl.tutorial.mission.FollowGuideMission
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -28,7 +27,11 @@ class TutorialGuide(location: Location) : NpcEntity(location = location, lines =
 
     override fun isVisibleToPlayer(player: Player): Boolean {
         val progress = UserHandler.getUser(player.uniqueId).getQuestProgress(TutorialQuest)
-        return super.isVisibleToPlayer(player) && (!progress.hasStarted() || progress.isCompleted() || (progress.hasStarted() && !progress.hasCompletedMission(FollowGuideMission)))
+        if (progress.hasStarted() && !progress.isCompleted() && progress.hasCurrentMission()) {
+            return false
+        }
+
+        return super.isVisibleToPlayer(player)
     }
 
     override fun onRightClick(player: Player) {
@@ -43,6 +46,7 @@ class TutorialGuide(location: Location) : NpcEntity(location = location, lines =
 
         ConfirmMenu(title) { confirmed ->
             if (confirmed) {
+                destroy(player)
                 TutorialQuest.onStartQuest(player)
             }
         }.openMenu(player)

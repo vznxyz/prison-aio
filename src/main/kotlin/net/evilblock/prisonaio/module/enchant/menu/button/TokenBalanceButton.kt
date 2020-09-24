@@ -21,12 +21,12 @@ import org.bukkit.inventory.meta.ItemMeta
 class TokenBalanceButton : Button() {
 
     override fun getName(player: Player): String {
-        return "${ChatColor.GRAY}${Constants.DOUBLE_ARROW_RIGHT} ${ChatColor.GOLD}${ChatColor.BOLD}Token Balance ${ChatColor.GRAY}${Constants.DOUBLE_ARROW_LEFT}"
+        return "${ChatColor.GOLD}${ChatColor.BOLD}Token Balance"
     }
 
     override fun getDescription(player: Player): List<String> {
         val user = UserHandler.getUser(player.uniqueId)
-        return listOf(Formats.formatTokens(user.getTokenBalance()))
+        return listOf("${ChatColor.GRAY}You have ${Formats.formatTokens(user.getTokenBalance())}${ChatColor.GRAY} tokens")
     }
 
     override fun getMaterial(player: Player): Material {

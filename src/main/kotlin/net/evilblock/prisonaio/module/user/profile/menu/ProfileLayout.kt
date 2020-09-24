@@ -86,7 +86,6 @@ class ProfileLayout(
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.add("")
             description.addAll(TextSplitter.split(text = "Post a new comment to ${user.getUsername()}'s profile.", linePrefix = "${ChatColor.GRAY}"))
             description.add("")
             description.addAll(TextSplitter.split(text = "Posting unsolicited links or content deemed as harassment will result in punishment.", linePrefix = "${ChatColor.RED}"))
@@ -177,8 +176,6 @@ class ProfileLayout(
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.add("")
-
             description.addAll(
                 TextSplitter.split(
                 length = 36,
@@ -217,8 +214,6 @@ class ProfileLayout(
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.add("")
-
             description.addAll(
                 TextSplitter.split(
                 length = 40,
@@ -256,7 +251,6 @@ class ProfileLayout(
 
         override fun getDescription(player: Player): List<String> {
             return listOf(
-                "",
                 "${ChatColor.GRAY}Manage your account settings and",
                 "${ChatColor.GRAY}privacy options.",
                 "",

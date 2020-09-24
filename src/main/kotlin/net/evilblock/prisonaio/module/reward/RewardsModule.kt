@@ -17,6 +17,9 @@ import net.evilblock.prisonaio.module.reward.event.EventRewardListeners
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.evilblock.prisonaio.module.reward.minecrate.listener.MineCrateListeners
 import net.evilblock.prisonaio.module.reward.minecrate.task.MineCrateExpireTask
+import net.evilblock.prisonaio.module.reward.multiplier.MultiplierEventHandler
+import net.evilblock.prisonaio.module.reward.multiplier.command.MultiplierEventEndCommand
+import net.evilblock.prisonaio.module.reward.multiplier.command.MultiplierEventStartCommand
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -37,12 +40,15 @@ object RewardsModule : PluginModule() {
     override fun onEnable() {
         DeliveryManHandler.initialLoad()
         MineCrateHandler.initialLoad()
+        MultiplierEventHandler.initialLoad()
 
         getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), MineCrateExpireTask, 20L, 20L)
     }
 
     override fun onDisable() {
+        DeliveryManHandler.saveData()
         MineCrateHandler.clearSpawnedCrates()
+        MultiplierEventHandler.saveData()
     }
 
     override fun onReload() {
@@ -61,7 +67,9 @@ object RewardsModule : PluginModule() {
     override fun getCommands(): List<Class<*>> {
         return listOf(
             DeliveryManEditorCommand.javaClass,
-            DeliveryManSpawnCommand.javaClass
+            DeliveryManSpawnCommand.javaClass,
+            MultiplierEventStartCommand.javaClass,
+            MultiplierEventEndCommand.javaClass
         )
     }
 

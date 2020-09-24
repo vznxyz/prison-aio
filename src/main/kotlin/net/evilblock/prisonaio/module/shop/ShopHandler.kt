@@ -18,6 +18,7 @@ import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.shop.event.DetermineShopEvent
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
+import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -131,8 +132,12 @@ object ShopHandler: PluginHandler {
                     }
 
                     receipt.sendCompact(player, true)
-                    sellBackpacksInInventory(player, backpacks, accessibleShops, false)
+                    sellBackpacksContents(player, backpacks, accessibleShops, false)
                     return@async
+                } else if (receipt.result == TransactionResult.NO_ITEMS) {
+                    if (sellBackpacksContents(player, backpacks, accessibleShops, true)) {
+                        return@async
+                    }
                 }
             }
 
@@ -141,7 +146,7 @@ object ShopHandler: PluginHandler {
                 return@async
             }
 
-            if (sellBackpacksInInventory(player, backpacks, accessibleShops, firstOfChain)) {
+            if (sellBackpacksContents(player, backpacks, accessibleShops, firstOfChain)) {
                 soldAnything = true
                 firstOfChain = false
             }
@@ -171,18 +176,18 @@ object ShopHandler: PluginHandler {
             if (soldAnything) {
                 player.updateInventory()
             } else {
-                player.sendMessage("${ChatColor.RED}${TransactionResult.NO_ITEMS.defaultMessage}!")
+                player.sendMessage("${ChatColor.RED}${TransactionResult.NO_ITEMS.getMessage(ShopReceiptType.SELL)}!")
             }
         }
     }
 
-    private fun sellBackpacksInInventory(player: Player, backpacks: List<Backpack>, shops: List<Shop>, _firstOfChain: Boolean): Boolean {
+    private fun sellBackpacksContents(player: Player, backpacks: Map<ItemStack, Backpack>, shops: List<Shop>, _firstOfChain: Boolean): Boolean {
         var soldAnything = false
         var firstOfChain = _firstOfChain
 
         for (shop in shops) {
-            for (backpack in backpacks) {
-                val receipt = shop.sellItems(player, backpack.contents.values, false)
+            for ((backpackItem, backpack) in backpacks) {
+                val receipt = shop.sellItems(player, backpack.contents, false)
                 if (receipt.result == TransactionResult.SUCCESS) {
                     soldAnything = true
 

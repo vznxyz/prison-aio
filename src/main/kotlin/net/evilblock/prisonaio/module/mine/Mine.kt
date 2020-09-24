@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.mine
 
 import net.evilblock.cubed.lite.LiteEdit
 import net.evilblock.cubed.lite.LiteRegion
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.module.mine.block.BlockType
 import net.evilblock.prisonaio.module.mine.config.MineBlocksConfig
@@ -77,9 +76,7 @@ class Mine(id: String) : Region(id) {
     }
 
     override fun resetBreakableCuboid() {
-        Tasks.async {
-            resetRegion()
-        }
+        resetRegion()
     }
 
     override fun supportsAbilityEnchants(): Boolean {

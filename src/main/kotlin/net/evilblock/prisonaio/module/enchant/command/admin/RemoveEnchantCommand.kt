@@ -20,7 +20,7 @@ object RemoveEnchantCommand {
     @Command(
         names = ["remove-enchant", "remove-ench"],
         description = "Remove an enchant from a pickaxe",
-        permission = "prisonaio.enchants.remove-enchant"
+        permission = "prisonaio.enchants.remove"
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "enchant") enchant: AbstractEnchant) {

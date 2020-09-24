@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.quest
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.prisonaio.module.quest.impl.tutorial.TutorialQuest
 import net.evilblock.prisonaio.module.quest.mission.QuestMission
 import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -43,21 +44,26 @@ interface Quest {
     }
 
     fun onStartQuest(player: Player) {
-        val progress = getProgress(player)
-        if (progress.hasStarted()) {
-            throw IllegalStateException("Quest already started")
-        }
+        getProgress(player).start()
 
-        progress.start()
+        val firstMission = getFirstMission()
+
+        player.sendMessage("")
+        player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}New Mission ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${firstMission.getName()}${ChatColor.GRAY})")
+
+        TextSplitter.split(length = 50, text = firstMission.getMissionText(player), linePrefix = " ${ChatColor.GRAY}").forEach { player.sendMessage(it) }
+
+        player.sendMessage("")
     }
 
     fun onCompleteQuest(player: Player) {
         val progress = getProgress(player)
-        progress.start()
+        progress.complete()
 
         player.sendMessage("")
+        player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Quest Completed! ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${TutorialQuest.getName()}${ChatColor.GRAY})")
 
-        for (line in TextSplitter.split(52, getCompletionText(), "${ChatColor.GRAY}", " ")) {
+        for (line in TextSplitter.split(length = 50, text = getCompletionText(), linePrefix = "${ChatColor.GRAY} ")) {
             player.sendMessage(line)
         }
 
@@ -82,8 +88,10 @@ interface Quest {
             val newMission = progress.getCurrentMission()
 
             player.sendMessage("")
-            player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}New Quest Mission ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${newMission.getName()}${ChatColor.GRAY})")
-            player.sendMessage(" ${ChatColor.GRAY}${newMission.getMissionText(player)}")
+            player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}New Mission ${ChatColor.GRAY}(${ChatColor.YELLOW}${ChatColor.BOLD}${newMission.getName()}${ChatColor.GRAY})")
+
+            TextSplitter.split(length = 50, text = newMission.getMissionText(player), linePrefix = " ${ChatColor.GRAY}").forEach { player.sendMessage(it) }
+
             player.sendMessage("")
         }
 

@@ -21,6 +21,7 @@ import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.item.ShopItem
 import net.evilblock.prisonaio.module.shop.menu.EditShopMenu
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
+import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
 import net.evilblock.prisonaio.module.shop.serialize.ShopReferenceSerializer
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
 import net.evilblock.prisonaio.util.economy.Currency
@@ -96,7 +97,7 @@ class ShopMenuTemplate(id: String, @JsonAdapter(ShopReferenceSerializer::class) 
 
                             val receipt = shop.buyItems(player, setOf(ShopReceiptItem(shopItem, ItemBuilder.copyOf(shopItem.itemStack).amount(quantity.toInt()).build())))
                             if (receipt.result != TransactionResult.SUCCESS) {
-                                player.sendMessage("${ChatColor.RED}${receipt.result.defaultMessage}!")
+                                player.sendMessage("${ChatColor.RED}${receipt.result.getMessage(ShopReceiptType.BUY)}!")
                             }
                         }
 
@@ -110,7 +111,7 @@ class ShopMenuTemplate(id: String, @JsonAdapter(ShopReferenceSerializer::class) 
             if (clickType.isLeftClick) {
                 val receipt = shop.buyItems(player, setOf(ShopReceiptItem(shopItem, ItemBuilder.copyOf(shopItem.itemStack).amount(1).build())))
                 if (receipt.result != TransactionResult.SUCCESS) {
-                    player.sendMessage("${ChatColor.RED}${receipt.result.defaultMessage}!")
+                    player.sendMessage("${ChatColor.RED}${receipt.result.getMessage(ShopReceiptType.BUY)}!")
                 }
                 return
             }
@@ -118,7 +119,7 @@ class ShopMenuTemplate(id: String, @JsonAdapter(ShopReferenceSerializer::class) 
             if (clickType.isRightClick && shop.currency == Currency.Type.MONEY) {
                 val receipt = shop.buyItems(player, setOf(ShopReceiptItem(shopItem, ItemBuilder.copyOf(shopItem.itemStack).amount(64).build())))
                 if (receipt.result != TransactionResult.SUCCESS) {
-                    player.sendMessage("${ChatColor.RED}${receipt.result.defaultMessage}!")
+                    player.sendMessage("${ChatColor.RED}${receipt.result.getMessage(ShopReceiptType.BUY)}!")
                 }
             }
         }

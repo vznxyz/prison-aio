@@ -81,7 +81,7 @@ class User(val uuid: UUID) {
     private val claimedRewards: MutableMap<DeliveryManReward, Long> = hashMapOf()
 
     @JsonAdapter(UserReadNewsPostsSerializer::class)
-    private var readNews: MutableSet<News> = hashSetOf()
+    internal var readNews: MutableSet<News> = hashSetOf()
 
     fun init() {
         perks.user = this
@@ -179,8 +179,6 @@ class User(val uuid: UUID) {
             return
         }
 
-        var balance = getMoneyBalance()
-
         val purchasedRanks = arrayListOf<Rank>()
         for (rank in RankHandler.getSortedRanks()) {
             if (previousRank.sortOrder >= rank.sortOrder) {
@@ -199,19 +197,12 @@ class User(val uuid: UUID) {
                 return
             }
 
-            VaultHook.useEconomy { economy ->
-                val response = economy.withdrawPlayer(player, rankPrice)
-                if (!response.transactionSuccess()) {
-                    return@useEconomy
-                }
+            subtractMoneyBalance(rankPrice)
 
-                subtractMoneyBalance(rankPrice)
+            updateRank(rank)
+            rank.executeCommands(player)
 
-                updateRank(rank)
-                rank.executeCommands(player)
-
-                purchasedRanks.add(rank)
-            }
+            purchasedRanks.add(rank)
         }
 
         applyPermissions(player)

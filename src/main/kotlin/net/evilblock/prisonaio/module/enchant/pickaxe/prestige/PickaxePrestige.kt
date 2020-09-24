@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.enchant.pickaxe.prestige
 
 import com.google.gson.annotations.JsonAdapter
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
@@ -45,11 +46,14 @@ class PickaxePrestige(val number: Int) {
         val hasPrestige = user.getPrestige() >= prestigeRequired
         val hasBlocksMined = user.statistics.getBlocksMined() >= blocksMinedRequired
 
+        val green = "${ChatColor.GREEN}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GREEN}${ChatColor.STRIKETHROUGH}"
+        val gray = "${ChatColor.RED}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}"
+
         return listOf(
-            if (hasMoney) { "${ChatColor.GREEN}${ChatColor.STRIKETHROUGH}" } else { "${ChatColor.RED}" } + "Acquire \$${NumberFormat.getInstance().format(moneyRequired)}",
-            if (hasTokens) { "${ChatColor.GREEN}${ChatColor.STRIKETHROUGH}" } else { "${ChatColor.RED}" } + "Acquire ${NumberFormat.getInstance().format(tokensRequired)} tokens",
-            if (hasPrestige) { "${ChatColor.GREEN}${ChatColor.STRIKETHROUGH}" } else { "${ChatColor.RED}" } + "Reach prestige ${NumberFormat.getInstance().format(prestigeRequired)}",
-            if (hasBlocksMined) { "${ChatColor.GREEN}${ChatColor.STRIKETHROUGH}" } else { "${ChatColor.RED}" } + "Mine ${NumberFormat.getInstance().format(blocksMinedRequired)} blocks"
+            if (hasMoney) { green } else { gray } + "Acquire \$${NumberFormat.getInstance().format(moneyRequired)}",
+            if (hasTokens) { green } else { gray } + "Acquire ${NumberFormat.getInstance().format(tokensRequired)} tokens",
+            if (hasPrestige) { green } else { gray } + "Reach prestige ${NumberFormat.getInstance().format(prestigeRequired)}",
+            if (hasBlocksMined) { green } else { gray } + "Mine ${NumberFormat.getInstance().format(blocksMinedRequired)} blocks"
         )
     }
 

@@ -9,11 +9,11 @@ package net.evilblock.prisonaio.module.mechanic.backpack.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.buttons.StaticItemStackButton
 import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.cubed.util.bukkit.InventoryUtils
+import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
-import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
-import net.evilblock.prisonaio.module.mechanic.backpack.enchant.menu.BackpackEnchantsMenu
+import net.evilblock.prisonaio.module.mechanic.backpack.upgrade.menu.BackpackUpgradesMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -38,9 +38,9 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        buttons[0] = PreviousPageButton()
+        buttons[0] = PageButton(-1)
         buttons[4] = InfoButton()
-        buttons[8] = NextPageButton()
+        buttons[8] = PageButton(1)
 
         for (i in 0..8) {
             if (!buttons.containsKey(i)) {
@@ -49,15 +49,19 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
         }
 
         val range = if (page == 1) {
-            0..44
+            0 .. (44.coerceAtMost(backpack.contents.size))
         } else {
-            (((page - 1) * 44) + 1)..(page * 44)
+            val last = (page * 44).coerceAtMost(backpack.contents.size)
+            (last - 44).coerceAtLeast(0) .. last
         }
 
         for (i in range) {
-            if (backpack.contents.containsKey(i)) {
-                buttons[i - ((page - 1) * 45) + 9] = ItemSlotButton(i)
+            if (i >= backpack.contents.size) {
+                break
             }
+
+            val item = backpack.contents[i]
+            buttons[i - ((page - 1) * 45) + 9] = StaticItemStackButton(item)
         }
 
         return buttons
@@ -68,7 +72,7 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
     }
 
     fun getMaxPages(): Int {
-        return ceil(backpack.getMaxSlots() / 44.0).toInt().coerceAtLeast(1)
+        return ceil(backpack.getMaxItemsSize() / 44.0).toInt().coerceAtLeast(1)
     }
 
     override fun onOpen(player: Player) {
@@ -85,108 +89,63 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
     }
 
     override fun acceptsInsertedItem(player: Player, itemStack: ItemStack, slot: Int): Boolean {
-        if (slot < 9) {
-            return false
-        }
-
-        if (backpack.contents.containsKey(slot - 9)) {
-            return false
-        }
-
-        if (BackpackHandler.isBackpackItem(itemStack)) {
-            return false
-        }
-
-        backpack.contents[slot - 9] = itemStack
-
-        return true
+        return false
     }
 
     override fun acceptsShiftClickedItem(player: Player, itemStack: ItemStack): Boolean {
-        if (backpack.contents.size >= backpack.getMaxSlots()) {
-            return false
-        }
-
-        if (BackpackHandler.isBackpackItem(itemStack)) {
-            return false
-        }
-
-        val notInserted = backpack.addItem(itemStack)
-        if (notInserted != null) {
-            InventoryUtils.addAmountToInventory(player.inventory, itemStack, itemStack.amount)
-        }
-
-        return true
+        return false
     }
 
     override fun acceptsDraggedItems(player: Player, items: Map<Int, ItemStack>): Boolean {
-        for (inserted in items) {
-            if (inserted.key < 9) {
-                return false
-            }
-
-            if (backpack.contents.containsKey(inserted.key - 9)) {
-                return false
-            }
-
-            if (BackpackHandler.isBackpackItem(inserted.value)) {
-                return false
-            }
-        }
-
-        for (inserted in items) {
-            backpack.contents[inserted.key - 9] = inserted.value
-        }
-
-        return true
+        return false
     }
 
-    private inner class PreviousPageButton : Button() {
+    private inner class PageButton(private val mod: Int) : Button() {
         override fun getName(player: Player): String {
-            return if (page > 1) {
-                "${ChatColor.RED}${ChatColor.BOLD}Previous Page"
+            return if (mod > 0) {
+                if (page < getMaxPages()) {
+                    "${ChatColor.YELLOW}${ChatColor.BOLD}Next Page"
+                } else {
+                    "${ChatColor.GRAY}${ChatColor.BOLD}No Next Page"
+                }
             } else {
-                "${ChatColor.GRAY}${ChatColor.BOLD}No Previous Page"
+                if (page > 1) {
+                    "${ChatColor.RED}${ChatColor.BOLD}Previous Page"
+                } else {
+                    "${ChatColor.GRAY}${ChatColor.BOLD}No Previous Page"
+                }
             }
         }
 
-        override fun getDescription(player: Player): List<String> {
-            return emptyList()
+        override fun getDamageValue(player: Player): Byte {
+            return 3.toByte()
         }
 
         override fun getMaterial(player: Player): Material {
-            return Material.LEVER
+            return Material.SKULL_ITEM
         }
 
-        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (clickType.isLeftClick && page > 1) {
-                page -= 1
-                openMenu(player)
-            }
-        }
-    }
-
-    private inner class NextPageButton : Button() {
-        override fun getName(player: Player): String {
-            return if (page < getMaxPages()) {
-                "${ChatColor.RED}${ChatColor.BOLD}Next Page"
+        override fun getButtonItem(player: Player): ItemStack {
+            val texture = if (mod > 0) {
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTliZjMyOTJlMTI2YTEwNWI1NGViYTcxM2FhMWIxNTJkNTQxYTFkODkzODgyOWM1NjM2NGQxNzhlZDIyYmYifX19"
             } else {
-                "${ChatColor.GRAY}${ChatColor.BOLD}No Next Page"
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmQ2OWUwNmU1ZGFkZmQ4NGU1ZjNkMWMyMTA2M2YyNTUzYjJmYTk0NWVlMWQ0ZDcxNTJmZGM1NDI1YmMxMmE5In19fQ=="
             }
-        }
 
-        override fun getDescription(player: Player): List<String> {
-            return emptyList()
-        }
-
-        override fun getMaterial(player: Player): Material {
-            return Material.LEVER
+            return ItemUtils.applySkullTexture(super.getButtonItem(player), texture)
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (clickType.isLeftClick && page < getMaxPages()) {
-                page += 1
-                openMenu(player)
+            if (mod > 0) {
+                if (clickType.isLeftClick && page < getMaxPages()) {
+                    page += 1
+                    openMenu(player)
+                }
+            } else {
+                if (clickType.isLeftClick && page > 1) {
+                    page -= 1
+                    openMenu(player)
+                }
             }
         }
     }
@@ -199,21 +158,18 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.add("${ChatColor.GRAY}(ID: #${backpack.id})")
+            description.add("${ChatColor.GRAY}Items: ${ChatColor.RED}${NumberUtils.format(backpack.getItemsSize())}${ChatColor.GRAY}/${ChatColor.RED}${NumberUtils.format(backpack.getMaxItemsSize())}")
             description.add("")
-            description.add("${ChatColor.GRAY}Slots: ${ChatColor.RED}${ChatColor.BOLD}${NumberUtils.format(backpack.contents.size)}${ChatColor.GRAY}/${ChatColor.RED}${NumberUtils.format(backpack.getMaxSlots())}")
-            description.add("${ChatColor.GRAY}Items: ${ChatColor.RED}${NumberUtils.format(backpack.getItemsSize())}")
-            description.add("")
-            description.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
+            description.add("${ChatColor.RED}${ChatColor.BOLD}Upgrades")
 
-            if (backpack.enchants.isEmpty()) {
+            if (backpack.upgrades.isEmpty()) {
                 description.add("${ChatColor.GRAY}None")
             } else {
                 description.add("")
             }
 
             description.add("")
-            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}CLICK TO BUY ENCHANTS")
+            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Click to purchase upgrades")
 
             return description
         }
@@ -224,67 +180,7 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                BackpackEnchantsMenu(backpack).openMenu(player)
-            }
-        }
-    }
-
-    private inner class ItemSlotButton(private val slot: Int) : Button() {
-        override fun getButtonItem(player: Player): ItemStack {
-            return if (backpack.contents.containsKey(slot)) {
-                backpack.contents[slot]!!.clone()
-            } else {
-                ItemStack(Material.AIR)
-            }
-        }
-
-        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (view.cursor != null && view.cursor.type != Material.AIR) {
-                return
-            }
-
-            val adjustedSlot = ((page - 1) * 45) + slot - 9
-
-            if (!backpack.contents.containsKey(adjustedSlot)) {
-                return
-            }
-
-            when (clickType) {
-                ClickType.LEFT -> {
-                    val pickup = backpack.contents.remove(adjustedSlot)!!
-                    view.cursor = pickup.clone()
-                    player.updateInventory()
-                }
-                ClickType.RIGHT -> {
-                    val originalItem = backpack.contents[adjustedSlot]!!
-                    if (originalItem.amount == 1) {
-                        view.cursor = originalItem
-                        backpack.contents.remove(adjustedSlot)
-                    } else {
-                        val halved = (originalItem.amount / 2.0).toInt()
-                        originalItem.amount = originalItem.amount - halved
-
-                        val halvedStack = originalItem.clone()
-                        halvedStack.amount = halved
-
-                        view.cursor = halvedStack
-                    }
-
-                    player.updateInventory()
-                }
-                ClickType.SHIFT_LEFT,
-                ClickType.SHIFT_RIGHT -> {
-                    if (player.inventory.firstEmpty() == -1) {
-                        return
-                    }
-
-                    val item = backpack.contents.remove(adjustedSlot)
-                    if (item != null) {
-                        player.inventory.addItem(item.clone())
-                        player.updateInventory()
-                    }
-                }
-                else -> {}
+                BackpackUpgradesMenu(backpack).openMenu(player)
             }
         }
     }

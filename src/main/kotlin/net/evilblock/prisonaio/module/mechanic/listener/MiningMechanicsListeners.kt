@@ -18,7 +18,6 @@ import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.region.RegionHandler
-import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -28,7 +27,6 @@ import net.minecraft.server.v1_12_R1.BlockPosition
 import net.minecraft.server.v1_12_R1.ChunkCoordIntPair
 import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange
 import net.minecraft.server.v1_12_R1.PacketPlayOutMultiBlockChange
-import org.apache.commons.lang.time.StopWatch
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -41,9 +39,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ThreadLocalRandom
-import kotlin.experimental.and
 import kotlin.math.floor
-import kotlin.random.Random
 
 /**
  * Handles the server's mining mechanics.
@@ -55,15 +51,12 @@ object MiningMechanicsListeners : Listener {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     fun onBlockBreakEvent(event: BlockBreakEvent) {
-        // get the item in the player's hand
         val itemInHand = event.player.inventory.itemInMainHand ?: return
 
-        // make sure the item is a tool
         if (!MechanicsModule.isTool(itemInHand)) {
             return
         }
 
-        // add drops to inventory if the block is on the drops-to-inv ignore list
         if (MechanicsModule.getDropsToInvIgnoredBlocks().contains(event.block.type)) {
             return
         }
@@ -93,35 +86,26 @@ object MiningMechanicsListeners : Listener {
                 if (region.supportsAutoSell() && user.perks.isAutoSellEnabled(event.player)) {
                     ShopHandler.sellItems(event.player, blockDrops, true)
 
-                    for (backpack in backpacks) {
-                        ShopHandler.sellItems(event.player, backpack.contents.values, true)
+                    for ((backpackItem, backpack) in backpacks) {
+                        ShopHandler.sellItems(event.player, backpack.contents, true)
                     }
                 }
 
-                Tasks.async {
-                    for (drop in blockDrops) {
-                        val notInserted = event.player.inventory.addItem(drop)
-                        if (notInserted.isNotEmpty() && backpacks.isNotEmpty()) {
-                            for (backpack in backpacks) {
-                                val backpackMods = hashMapOf<Int, ItemStack?>()
-                                for ((key, item) in notInserted) {
-                                    backpackMods[key] = backpack.addItem(item)
-                                }
+                for (drop in blockDrops) {
+                    var drop: ItemStack? = drop
+                    for ((backpackItem, backpack) in backpacks) {
+                        drop = backpack.addItem(drop!!)
 
-                                for ((key, item) in backpackMods) {
-                                    if (item == null) {
-                                        notInserted.remove(key)
-                                    } else {
-                                        notInserted[key] = item
-                                    }
-                                }
-
-                                if (notInserted.isEmpty()) {
-                                    break
-                                }
-                            }
+                        if (drop == null) {
+                            break
                         }
                     }
+
+                    if (drop == null) {
+                        continue
+                    }
+
+                    event.player.inventory.addItem(drop)
                 }
             }
         }
@@ -206,32 +190,27 @@ object MiningMechanicsListeners : Listener {
                 if (region.supportsAutoSell() && user.perks.isAutoSellEnabled(event.player)) {
                     ShopHandler.sellItems(event.player, blockDrops, true)
 
-                    for (backpack in backpacks) {
-                        ShopHandler.sellItems(event.player, backpack.contents.values, true)
+                    for ((backpackItem, backpack) in backpacks) {
+                        ShopHandler.sellItems(event.player, backpack.contents, true)
                     }
                 }
 
-                for (drop in blockDrops) {
-                    val notInserted = event.player.inventory.addItem(drop)
-                    if (notInserted.isNotEmpty() && backpacks.isNotEmpty()) {
-                        for (backpack in backpacks) {
-                            val backpackMods = hashMapOf<Int, ItemStack?>()
-                            for ((key, item) in notInserted) {
-                                backpackMods[key] = backpack.addItem(item)
-                            }
+                Tasks.sync {
+                    for (drop in blockDrops) {
+                        var drop: ItemStack? = drop
+                        for ((backpackItem, backpack) in backpacks) {
+                            drop = backpack.addItem(drop!!)
 
-                            for ((key, item) in backpackMods) {
-                                if (item == null) {
-                                    notInserted.remove(key)
-                                } else {
-                                    notInserted[key] = item
-                                }
-                            }
-
-                            if (notInserted.isEmpty()) {
+                            if (drop == null) {
                                 break
                             }
                         }
+
+                        if (drop == null) {
+                            continue
+                        }
+
+                        event.player.inventory.addItem(drop)
                     }
                 }
             }

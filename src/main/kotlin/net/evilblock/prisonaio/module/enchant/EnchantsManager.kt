@@ -17,7 +17,6 @@ import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.region.RegionHandler
-import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -466,9 +465,9 @@ object EnchantsManager : Listener {
                     continue
                 }
 
-                val intLevel = splitLoreLine[splitLoreLine.size - 1]
-                if (NumberUtils.isInt(intLevel)) {
-                    map[enchant] = Integer.valueOf(intLevel)
+                val level = splitLoreLine[splitLoreLine.size - 1].replace(",", "").replace(".", "")
+                if (NumberUtils.isInt(level)) {
+                    map[enchant] = Integer.valueOf(level)
                 }
             }
         }

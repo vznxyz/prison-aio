@@ -25,6 +25,10 @@ open class QuestProgress(@JsonAdapter(QuestReferenceSerializer::class) internal 
     @JsonAdapter(QuestProgressMissionCompletedSerializer::class)
     protected val completedMissions: MutableSet<QuestMission> = hashSetOf()
 
+    open fun initializeData() {
+
+    }
+
     fun hasStarted(): Boolean {
         return started
     }

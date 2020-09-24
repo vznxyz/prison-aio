@@ -51,7 +51,7 @@ enum class UserSetting(
     RAINBOW_SCOREBOARD(
         displayName = "Rainbow Scoreboard",
         description = "Cycles the scoreboard's primary color through the rainbow colors.",
-        icon = ItemStack(Material.WOOL),
+        icon = ItemStack(Material.RECORD_8),
         defaultOption = { RainbowScoreboardOption(false) },
         options = {
             arrayListOf(
@@ -155,7 +155,7 @@ enum class UserSetting(
         }
     ),
     QUICK_ACCESS_ENCHANTS(
-        displayName = "Quick Access Enchants",
+        displayName = "Enchant Quick Access",
         description = "This setting controls if the enchant menu should open when right-clicking with a pickaxe in hand.",
         icon = ItemStack(Material.LEVER),
         defaultOption = { QuickAccessEnchantsOption(true) },
@@ -163,6 +163,18 @@ enum class UserSetting(
             arrayListOf(
                 QuickAccessEnchantsOption(true),
                 QuickAccessEnchantsOption(false)
+            )
+        }
+    ),
+    ENCHANT_MESSAGES(
+        displayName = "Enchantment Messages",
+        description = "This setting controls if you will receive messages in chat related to enchantment abilities.",
+        icon = ItemStack(Material.ENCHANTMENT_TABLE),
+        defaultOption = { EnchantmentMessagesOption(true) },
+        options = {
+            arrayListOf(
+                EnchantmentMessagesOption(true),
+                EnchantmentMessagesOption(false)
             )
         }
     ),

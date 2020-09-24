@@ -13,10 +13,8 @@ import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.system.SystemModule
-import net.evilblock.prisonaio.module.system.sentient.guard.PrisonGuardLogic
 import org.bukkit.ChatColor
 import java.io.File
 
@@ -41,8 +39,6 @@ object SentientHandler : PluginHandler {
                 configuration = Cubed.gson.fromJson(reader, DATA_TYPE) as SentientConfiguration
             }
         }
-
-        Tasks.asyncTimer(PrisonGuardLogic, 20L, 20L)
     }
 
     override fun saveData() {
@@ -63,13 +59,11 @@ object SentientHandler : PluginHandler {
         return SystemModule.config.getString("prison-guard.texture.signature")
     }
 
-    fun getRandomPrisonGuardPhrase(): List<String> {
-        val phrases = SystemModule.config.getList("prison-guard.phrases").map { (it as Map<String, Any>)["lines"] as List<String> }
-        if (phrases.size == 1) {
-            return phrases.first().map { ChatColor.translateAlternateColorCodes('&', it) }
+    fun getPrisonGuardPhrases(): List<List<String>> {
+        return SystemModule.config.getList("prison-guard.phrases").map { map ->
+            val lines = (map as Map<String, Any>)["lines"] as List<String>
+            lines.map { ChatColor.translateAlternateColorCodes('&', it) }.toList()
         }
-
-        return phrases.random().map { ChatColor.translateAlternateColorCodes('&', it) }
     }
 
 }

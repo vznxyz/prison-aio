@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.shop.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.buttons.AddButton
 import net.evilblock.cubed.menu.buttons.HelpButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.template.button.CloneableMenuTemplateButton
@@ -21,6 +22,7 @@ import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.prisonaio.module.shop.item.ShopItem
+import net.evilblock.prisonaio.module.shop.item.menu.EditShopItemMenu
 import net.evilblock.prisonaio.module.shop.menu.template.ShopMenuTemplate
 import net.evilblock.prisonaio.util.economy.menu.SelectCurrencyMenu
 import org.bukkit.ChatColor
@@ -57,8 +59,10 @@ class EditShopMenu(val shop: Shop) : Menu() {
             buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 0, " ")
         }
 
+        buttons[18] = CreateShopItemButton()
+
         shop.items.sortedBy { it.order }.forEachIndexed { index, shopItem ->
-            buttons[18 + index] = ShopItemButton(shopItem)
+            buttons[18 + index + 1] = ShopItemButton(shopItem)
         }
 
         val startFrom = 18 + shop.items.size
@@ -188,18 +192,19 @@ class EditShopMenu(val shop: Shop) : Menu() {
 
         override fun getDescription(player: Player): List<String> {
             return listOf(
-                "${ChatColor.GRAY}To add a new item to the shop, simply pickup",
-                "${ChatColor.GRAY}and drop the item on an empty inventory slot.",
+                "${ChatColor.GRAY}To ${ChatColor.GREEN}add ${ChatColor.GRAY}a new item to the shop,",
+                "${ChatColor.GREEN}shift left-click ${ChatColor.GRAY}an item in your inventory, or",
+                "${ChatColor.GRAY}click the green plus.",
                 "",
-                "${ChatColor.GRAY}To ${ChatColor.GREEN}${ChatColor.BOLD}edit ${ChatColor.GRAY}the price of an item, ${ChatColor.GREEN}${ChatColor.BOLD}left/right-click",
+                "${ChatColor.GRAY}To ${ChatColor.AQUA}${ChatColor.BOLD}edit ${ChatColor.GRAY}the price of an item, ${ChatColor.AQUA}${ChatColor.BOLD}left/right-click",
                 "${ChatColor.GRAY}the item and follow the procedure in chat.",
                 "",
-                "${ChatColor.GRAY}To ${ChatColor.RED}${ChatColor.BOLD}delete ${ChatColor.GRAY}an item, ${ChatColor.RED}${ChatColor.BOLD}shift right-click",
+                "${ChatColor.GRAY}To ${ChatColor.RED}${ChatColor.BOLD}delete ${ChatColor.GRAY}an item, ${ChatColor.RED}${ChatColor.BOLD}shift middle-click",
                 "${ChatColor.GRAY}the item and complete the confirmation prompt.",
                 "",
                 "${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Granting Access",
                 "${ChatColor.GRAY}To access this shop, the player needs the",
-                "${ChatColor.YELLOW}prisonaio.shops.${shop.id.toLowerCase()} ${ChatColor.GRAY}permission."
+                "${ChatColor.LIGHT_PURPLE}prisonaio.shops.${shop.id.toLowerCase()} ${ChatColor.GRAY}permission."
             )
         }
     }
@@ -210,11 +215,10 @@ class EditShopMenu(val shop: Shop) : Menu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            val description = arrayListOf(
-                "",
-                "${ChatColor.GRAY}Edit this shop's menu template."
-            )
+            val description = arrayListOf<String>()
 
+            description.add("")
+            description.add("${ChatColor.GRAY}Edit this shop's menu template.")
             description.add("")
 
             if (shop.menuTemplate == null) {
@@ -310,6 +314,36 @@ class EditShopMenu(val shop: Shop) : Menu() {
         }
     }
 
+    private inner class CreateShopItemButton : AddButton() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.AQUA}${ChatColor.BOLD}Create New Shop Item"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            val description = arrayListOf<String>()
+
+            description.add("")
+            description.addAll(TextSplitter.split(text = "Creates a new default shop item and adds it to this shop.", linePrefix = ChatColor.GRAY.toString()))
+            description.add("")
+            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to create new shop item")
+
+            return description
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                val shopItem = ShopItem(itemStack = ItemBuilder.of(Material.COMMAND_REPEATING).name("${ChatColor.YELLOW}Default Shop Item").build(), amount = 1, giveItem = false)
+                shop.items.add(shopItem)
+
+                Tasks.async {
+                    ShopHandler.saveData()
+                }
+
+                EditShopItemMenu(shop, shopItem).openMenu(player)
+            }
+        }
+    }
+
     private inner class ShopItemButton(private val item: ShopItem) : Button() {
         override fun getButtonItem(player: Player): ItemStack {
             val description = arrayListOf<String>()
@@ -319,6 +353,14 @@ class EditShopMenu(val shop: Shop) : Menu() {
             description.add("")
             description.add("${ChatColor.GRAY}Selling Price: ${shop.currency.format(item.sellPricePerUnit)}")
             description.add("${ChatColor.GRAY}(Price that the shop sells for)")
+            description.add("")
+
+            if (item.giveItem) {
+                description.add("${ChatColor.GREEN}${ChatColor.BOLD}Currently giving item")
+            } else {
+                description.add("${ChatColor.RED}${ChatColor.BOLD}Currently not giving item")
+            }
+
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to set buy price")
             description.add("${ChatColor.YELLOW}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.YELLOW}to set sell price")
@@ -338,7 +380,8 @@ class EditShopMenu(val shop: Shop) : Menu() {
 
             description.add("$leftArrowColor${ChatColor.BOLD}⬅ ${ChatColor.YELLOW}${ChatColor.BOLD}SHIFT LEFT/RIGHT CLICK $rightArrowColor${ChatColor.BOLD}➡")
             description.add("")
-            description.add("${ChatColor.RED}${ChatColor.BOLD}MIDDLE-CLICK ${ChatColor.RED}to delete item")
+            description.add("${ChatColor.AQUA}${ChatColor.BOLD}MIDDLE-CLICK ${ChatColor.AQUA}for more options")
+            description.add("${ChatColor.RED}${ChatColor.BOLD}CONTROL DROP ${ChatColor.RED}to delete item")
 
             return ItemBuilder(item.itemStack.clone())
                 .addToLore(*description.toTypedArray())
@@ -346,7 +389,7 @@ class EditShopMenu(val shop: Shop) : Menu() {
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (clickType == ClickType.MIDDLE) {
+            if (clickType == ClickType.DROP || clickType == ClickType.CONTROL_DROP) {
                 ConfirmMenu("Are you sure?") { confirmed ->
                     if (confirmed) {
                         shop.items.remove(item)
@@ -360,6 +403,11 @@ class EditShopMenu(val shop: Shop) : Menu() {
                     openMenu(player)
                 }.openMenu(player)
 
+                return
+            }
+
+            if (clickType == ClickType.MIDDLE) {
+                EditShopItemMenu(shop, item).openMenu(player)
                 return
             }
 

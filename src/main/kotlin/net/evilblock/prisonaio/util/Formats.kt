@@ -90,7 +90,7 @@ object Formats {
     @JvmStatic
     fun formatPrestigeTokens(amount: Int): String {
         val formatted = NumberFormat.getInstance().format(amount)
-        return "${ChatColor.RED}${ChatColor.BOLD}$formatted ${TextUtil.pluralize(amount, "Prestige Token", "Prestige Tokens")}"
+        return "${ChatColor.AQUA}${ChatColor.BOLD}$formatted ${TextUtil.pluralize(amount, "Prestige Token", "Prestige Tokens")}"
     }
 
 }

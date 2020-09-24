@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.quest.impl.tutorial.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.prisonaio.module.quest.impl.tutorial.TutorialQuest
 import net.evilblock.prisonaio.util.Permissions
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
 object TutorialQuestConfigCommands {
@@ -24,6 +25,8 @@ object TutorialQuestConfigCommands {
     fun execute(player: Player) {
         TutorialQuest.config.startLocation = player.location
         TutorialQuest.saveData()
+
+        player.sendMessage("${ChatColor.GREEN}Successfully updated ${TutorialQuest.getName()}'s start location!")
     }
 
 }

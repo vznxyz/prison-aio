@@ -9,8 +9,8 @@ package net.evilblock.prisonaio.module.shop
 
 import net.evilblock.cubed.menu.template.menu.TemplateMenu
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.region.bitmask.RegionBitmask
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
@@ -22,6 +22,7 @@ import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
+import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -38,11 +39,6 @@ class Shop(var id: String) {
 
     fun init() {
         menuTemplate?.shop = this
-
-        // fix null currency (field is new)
-        if (currency == null) {
-            currency = Currency.Type.MONEY
-        }
     }
 
     fun hasAccess(player: Player): Boolean {
@@ -101,6 +97,24 @@ class Shop(var id: String) {
 
         val splitItems = arrayListOf<ItemStack>()
         for (item in shopReceipt.items) {
+            if (item.itemType.commands.isNotEmpty()) {
+                Tasks.sync {
+                    for (command in item.itemType.commands) {
+                        val translatedCommand = command
+                            .replace("{playerName}", player.name)
+                            .replace("{playerUuid}", player.uniqueId.toString())
+                            .replace("{shopItemName}", ItemUtils.getChatName(item.itemType.itemStack))
+                            .replace("{shopItemNameRaw}", ItemUtils.getName(item.itemType.itemStack))
+
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), translatedCommand)
+                    }
+                }
+            }
+
+            if (!item.itemType.giveItem) {
+                continue
+            }
+
             if (item.item.amount > item.item.type.maxStackSize) {
                 var remaining = item.item.amount
                 while (remaining > item.item.type.maxStackSize) {
@@ -171,7 +185,8 @@ class Shop(var id: String) {
             return ShopReceipt(result = TransactionResult.FREE_SELL, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
-        VaultHook.useEconomyAndReturn { economy -> economy.depositPlayer(player, finalCost) }
+        val user = UserHandler.getUser(player.uniqueId)
+        user.addMoneyBalance(finalCost)
 
         val shopReceipt = ShopReceipt(
             result = TransactionResult.SUCCESS,

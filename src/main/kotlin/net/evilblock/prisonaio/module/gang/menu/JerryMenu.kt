@@ -62,7 +62,7 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            for (line in TextSplitter.split(40, jerry.gang.announcement, "${ChatColor.GRAY}", "")) {
+            for (line in TextSplitter.split(length = 40, text = jerry.gang.announcement, linePrefix = "${ChatColor.GRAY}")) {
                 description.add(line)
             }
 

@@ -15,6 +15,7 @@ import net.evilblock.prisonaio.module.quest.command.QuestGuideCommand
 import net.evilblock.prisonaio.module.quest.dialogue.command.QuestDialogueSkipCommand
 import net.evilblock.prisonaio.module.quest.dialogue.listener.DialogueChatListeners
 import net.evilblock.prisonaio.module.quest.dialogue.listener.DialogueSequenceListeners
+import net.evilblock.prisonaio.module.quest.listener.QuestListeners
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -61,7 +62,11 @@ object QuestsModule : PluginModule() {
     }
 
     override fun getListeners(): List<Listener> {
-        return listOf(DialogueChatListeners, DialogueSequenceListeners)
+        return listOf(
+            QuestListeners,
+            DialogueChatListeners,
+            DialogueSequenceListeners
+        )
     }
 
     fun getNpcName(npc: String): String {

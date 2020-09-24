@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.reward.deliveryman.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.reward.deliveryman.DeliveryManHandler
@@ -34,7 +35,7 @@ class DeliveryManMenu(private val user: User) : Menu() {
         val buttons = hashMapOf<Int, Button>()
 
         for (i in BORDER_SLOTS) {
-            buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 14, " ")
+            buttons[i] = GlassButton(14)
         }
 
         DeliveryManHandler.getRewards()
@@ -45,7 +46,7 @@ class DeliveryManMenu(private val user: User) : Menu() {
 
         for (i in 0 until 54) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 7, " ")
+                buttons[i] = GlassButton(8)
             }
         }
 

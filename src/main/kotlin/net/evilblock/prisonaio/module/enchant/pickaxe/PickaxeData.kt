@@ -19,11 +19,13 @@ import org.bukkit.ChatColor
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import java.text.NumberFormat
 import java.util.*
 
 class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
 
     var prestige: Int = 0
+    var blocksMined: Int = 0
 
     @JsonAdapter(EnchantsMapReferenceSerializer::class)
     var enchants: MutableMap<AbstractEnchant, Int> = hashMapOf()
@@ -45,19 +47,6 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
     }
 
     fun sync(itemStack: ItemStack) {
-        if (itemStack.hasItemMeta() && itemStack.itemMeta.hasLore()) {
-            val firstLine = itemStack.itemMeta.lore?.firstOrNull()
-            if (firstLine != null && firstLine.contains("Prestige")) {
-                val splitLore = firstLine.split(" ").toTypedArray()
-                if (splitLore.size > 1) {
-                    val intString = splitLore[splitLore.size - 1].replace(",", "")
-                    if (NumberUtils.isInt(intString)) {
-                        prestige = intString.toInt()
-                    }
-                }
-            }
-        }
-
         enchants = EnchantsManager.readEnchantsFromLore(itemStack)
     }
 
@@ -78,12 +67,19 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
     fun applyMeta(itemStack: ItemStack) {
         val lore = arrayListOf<String>()
 
-        if (prestige > 0) {
-            lore.add("${ChatColor.DARK_RED}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige ${NumberUtils.format(prestige)}")
-        }
+        lore.add("${ChatColor.GREEN}${ChatColor.BOLD}Statistics")
+        lore.add("${ChatColor.GREEN}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige: ${NumberUtils.format(prestige)}")
+        lore.add("${ChatColor.GREEN}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Blocks Mined: ${NumberFormat.getInstance().format(blocksMined)}")
+        lore.add("")
 
-        for ((enchant, level) in enchants.entries.sortedWith(EnchantsManager.MAPPED_ENCHANT_COMPARATOR)) {
-            lore.add("${enchant.lorified()} ${NumberUtils.format(level)}")
+        lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
+
+        if (enchants.isNotEmpty()) {
+            for ((enchant, level) in enchants.entries.sortedWith(EnchantsManager.MAPPED_ENCHANT_COMPARATOR)) {
+                lore.add("${enchant.lorified()} ${NumberUtils.format(level)}")
+            }
+        } else {
+            lore.add("${ChatColor.GRAY}No enchants applied!")
         }
 
         if (itemStack.itemMeta != null) {

@@ -24,12 +24,10 @@ object BackpackDebugCommand {
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "id") backpack: Backpack) {
         sender.sendMessage("${ChatColor.YELLOW}${ChatColor.BOLD}Debug of Backpack #${backpack.id}")
-        sender.sendMessage("Enchants: ${backpack.enchants.size}")
-        sender.sendMessage("Used Slots: ${backpack.contents.size}")
-        sender.sendMessage("Max Slots: ${backpack.getMaxSlots()}")
-        sender.sendMessage("Max Slot Index: ${backpack.contents.maxBy { it.key }?.key ?: "N/A"}")
-        sender.sendMessage("Items Count: ${backpack.getItemsSize()}")
-        sender.sendMessage("Items: ${backpack.contents.entries.joinToString { "${it.key}=${it.value}" }}")
+        sender.sendMessage("Enchants: ${backpack.upgrades.size}")
+        sender.sendMessage("Contents Size: ${backpack.contents.size}")
+        sender.sendMessage("Items Size: ${backpack.getItemsSize()}")
+        sender.sendMessage("Max Items Size: ${backpack.getMaxItemsSize()}")
     }
 
 }

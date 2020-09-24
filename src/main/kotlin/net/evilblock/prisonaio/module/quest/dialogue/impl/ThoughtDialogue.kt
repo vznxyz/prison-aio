@@ -11,7 +11,11 @@ import net.evilblock.prisonaio.module.quest.dialogue.Dialogue
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
-class ThoughtDialogue(private val message: String) : Dialogue() {
+class ThoughtDialogue(
+    private val message: String,
+    delay: Long = 0L,
+    useState: Boolean = false
+) : Dialogue(delay, useState) {
 
     override fun send(player: Player) {
         player.sendMessage(" ${ChatColor.GRAY}You think to yourself: $message")

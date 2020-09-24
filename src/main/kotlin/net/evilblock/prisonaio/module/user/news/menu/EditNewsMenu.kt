@@ -147,40 +147,14 @@ class EditNewsMenu(private val news: News) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                object : SelectItemStackMenu() {
-                    override fun getTitle(player: Player): String {
-                        return "Select an Icon"
+                SelectItemStackMenu() { selected ->
+                    news.icon = selected
+
+                    Tasks.async {
+                        NewsHandler.saveData()
                     }
 
-                    override fun getButtons(player: Player): Map<Int, Button> {
-                        return mapOf(4 to object : Button() {
-                            override fun getName(player: Player): String {
-                                return "${ChatColor.YELLOW}${ChatColor.BOLD}Select an Icon"
-                            }
-
-                            override fun getDescription(player: Player): List<String> {
-                                return listOf(
-                                    "",
-                                    "${ChatColor.GRAY}Click on an item-stack in your",
-                                    "${ChatColor.GRAY}inventory to select as your new icon."
-                                )
-                            }
-
-                            override fun getMaterial(player: Player): Material {
-                                return Material.EYE_OF_ENDER
-                            }
-                        })
-                    }
-
-                    override fun onSelectItem(itemStack: ItemStack) {
-                        news.icon = itemStack
-
-                        Tasks.async {
-                            NewsHandler.saveData()
-                        }
-
-                        this@EditNewsMenu.openMenu(player)
-                    }
+                    this@EditNewsMenu.openMenu(player)
                 }.openMenu(player)
             }
         }

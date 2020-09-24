@@ -7,12 +7,12 @@
 
 package net.evilblock.prisonaio.module.mechanic.backpack
 
-import com.google.gson.annotations.JsonAdapter
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
-import net.evilblock.prisonaio.module.mechanic.backpack.enchant.BackpackEnchant
+import net.evilblock.cubed.util.nms.NBTUtil
+import net.evilblock.prisonaio.module.mechanic.backpack.upgrade.BackpackUpgrade
 import net.evilblock.prisonaio.module.mechanic.backpack.menu.BackpackMenu
-import net.evilblock.prisonaio.util.serialize.MappedInventorySerializer
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -21,80 +21,99 @@ import java.util.*
 
 class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").substring(0, 13)) {
 
-    @JsonAdapter(MappedInventorySerializer::class)
     internal val contents: MutableList<ItemStack> = arrayListOf()
-    internal val enchants: MutableMap<BackpackEnchant, Int> = hashMapOf()
+    internal val upgrades: MutableMap<BackpackUpgrade, Int> = hashMapOf()
 
-    fun addItem(itemStack: ItemStack): ItemStack? {
-        var remainingAmount = itemStack.amount
+    fun addItem(add: ItemStack): ItemStack? {
+        var remainingAmount = add.amount
+        var backpackItemsSize = getItemsSize()
+        val backpackMaxItemsSize = getMaxItemsSize()
 
-        for (slotItem in contents.values) {
-            if (slotItem.amount >= slotItem.maxStackSize) {
+        for (backpackItem in contents) {
+            if (backpackItem.amount >= backpackItem.maxStackSize) {
                 continue
             }
 
-            if (!ItemUtils.isSimilar(slotItem, itemStack) || !ItemUtils.hasSameLore(slotItem, itemStack) || !ItemUtils.hasSameEnchantments(slotItem, itemStack)) {
+            if (!ItemUtils.isSimilar(backpackItem, add) || !ItemUtils.hasSameLore(backpackItem, add) || !ItemUtils.hasSameEnchantments(backpackItem, add)) {
                 continue
             }
 
-            val maxInsert = slotItem.maxStackSize - slotItem.amount
+            var maxInsert = backpackItem.maxStackSize - backpackItem.amount
             if (maxInsert <= 0) {
                 continue
             }
 
-            if (remainingAmount <= maxInsert) {
-                slotItem.amount = slotItem.amount + remainingAmount
-                remainingAmount = 0
-            } else {
-                slotItem.amount = slotItem.amount + maxInsert
-                remainingAmount -= maxInsert
+            if (backpackItemsSize + remainingAmount >= backpackMaxItemsSize) {
+                maxInsert = maxInsert.coerceAtMost(backpackMaxItemsSize - backpackItemsSize)
             }
 
-            if (remainingAmount <= 0) {
+            if (remainingAmount <= maxInsert) {
+                backpackItem.amount = backpackItem.amount + remainingAmount
+                remainingAmount = 0
+                backpackItemsSize += remainingAmount
+            } else {
+                backpackItem.amount = backpackItem.amount + maxInsert
+                remainingAmount -= maxInsert
+                backpackItemsSize += maxInsert
+            }
+
+            if (remainingAmount <= 0 || backpackItemsSize >= backpackMaxItemsSize) {
                 break
             }
         }
 
-        if (remainingAmount > 0) {
-            for (i in 0..getMaxSlots()) {
-                if (!contents.containsKey(i)) {
-                    contents[i] = ItemBuilder.copyOf(itemStack).amount(remainingAmount.coerceAtMost(itemStack.type.maxStackSize)).build()
-                    remainingAmount -= remainingAmount.coerceAtMost(itemStack.type.maxStackSize)
+        if (remainingAmount > 0 && backpackItemsSize < backpackMaxItemsSize) {
+            while (remainingAmount > 0) {
+                var insertAmount = remainingAmount.coerceAtMost(add.maxStackSize)
+
+                if (backpackItemsSize + insertAmount >= backpackMaxItemsSize) {
+                    insertAmount = insertAmount.coerceAtMost(backpackMaxItemsSize - backpackItemsSize)
+                }
+
+                if (insertAmount <= 0) {
+                    break
+                }
+
+                contents.add(ItemBuilder.copyOf(add).amount(insertAmount).build())
+                remainingAmount -= insertAmount
+                backpackItemsSize += insertAmount
+
+                if (remainingAmount <= 0 || backpackItemsSize >= backpackMaxItemsSize) {
                     break
                 }
             }
         }
 
         return if (remainingAmount > 0) {
-            return ItemBuilder.copyOf(itemStack).amount(remainingAmount).build()
+            return ItemBuilder.copyOf(add).amount(remainingAmount).build()
         } else {
             null
         }
     }
 
-    fun removeItem(itemStack: ItemStack) {
-        var remainingAmount = itemStack.amount
+    fun removeItem(remove: ItemStack) {
+        var remainingAmount = remove.amount
 
-        val toRemove = arrayListOf<Int>()
-        for ((slot, slotItem) in contents) {
-            if (slotItem.amount <= 0) {
+        val toRemove = arrayListOf<ItemStack>()
+        for (item in contents) {
+            if (item.amount <= 0) {
                 continue
             }
 
-            if (!ItemUtils.isSimilar(slotItem, itemStack) || !ItemUtils.hasSameLore(slotItem, itemStack) || !ItemUtils.hasSameEnchantments(slotItem, itemStack)) {
+            if (!ItemUtils.isSimilar(item, remove) || !ItemUtils.hasSameLore(item, remove) || !ItemUtils.hasSameEnchantments(item, remove)) {
                 continue
             }
 
-            val maxTake = slotItem.amount.coerceAtMost(remainingAmount)
+            val maxTake = item.amount.coerceAtMost(remainingAmount)
             if (maxTake <= 0) {
                 continue
             }
 
             if (remainingAmount >= maxTake) {
-                toRemove.add(slot)
+                toRemove.add(item)
                 remainingAmount -= maxTake
             } else {
-                slotItem.amount = slotItem.amount - maxTake
+                item.amount = item.amount - maxTake
                 remainingAmount = 0
             }
 
@@ -103,21 +122,25 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
             }
         }
 
-        for (i in toRemove) {
-            contents.remove(i)
+        for (item in toRemove) {
+            contents.remove(item)
         }
     }
 
-    fun hasEnchant(enchant: BackpackEnchant): Boolean {
-        return enchants.containsKey(enchant)
+    fun hasUpgrade(upgrade: BackpackUpgrade): Boolean {
+        return upgrades.containsKey(upgrade)
     }
 
-    fun getMaxSlots(): Int {
-        return 64
+    fun getUpgradeLevel(upgrade: BackpackUpgrade): Int {
+        return upgrades.getOrDefault(upgrade, 0)
     }
 
     fun getItemsSize(): Int {
-        return contents.values.sumBy { it.amount }
+        return contents.sumBy { it.amount }
+    }
+
+    fun getMaxItemsSize(): Int {
+        return 1440
     }
 
     fun open(player: Player) {
@@ -129,22 +152,27 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
             .name("${ChatColor.RED}${ChatColor.BOLD}Backpack")
             .build()
 
-        updateBackpackItemLore(item)
+        updateLore(item)
+
+        val nmsCopy = ItemUtils.getNmsCopy(item)
+        val tag = NBTUtil.getOrCreateTag(nmsCopy)
+
+        NBTUtil.setString(tag, "BackpackID", id)
 
         return item
     }
 
-    fun updateBackpackItemLore(itemStack: ItemStack) {
+    fun updateLore(itemStack: ItemStack) {
         if (itemStack.hasItemMeta()) {
             val lore = arrayListOf<String>()
-            lore.add("${ChatColor.GRAY}(ID: #$id)")
+            lore.add("${ChatColor.GRAY}Items: ${ChatColor.RED}${NumberUtils.format(getItemsSize())}${ChatColor.GRAY}/${ChatColor.RED}${NumberUtils.format(getMaxItemsSize())}")
             lore.add("")
             lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
 
-            if (enchants.isEmpty()) {
+            if (upgrades.isEmpty()) {
                 lore.add("${ChatColor.GRAY}None")
             } else {
-                for (enchant in enchants) {
+                for (enchant in upgrades) {
                     lore.add("${enchant.key.lorified()} ${enchant.value}")
                 }
             }
@@ -152,7 +180,7 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
             lore.add("")
             lore.add("${ChatColor.GRAY}Right-click while holding this")
             lore.add("${ChatColor.GRAY}backpack in your hand to access")
-            lore.add("${ChatColor.GRAY}its contents!")
+            lore.add("${ChatColor.GRAY}its upgrades and statistics!")
 
             val meta = itemStack.itemMeta
             meta.lore = lore

@@ -52,6 +52,8 @@ dependencies {
     implementation 'org.mongodb:mongodb-driver:3.10.2'
     compileOnly 'net.evilblocke:cubed:1.1'
     compileOnly 'net.evilblock:source:1.0'
+    compileOnly 'com.ngxdev:paper:1.12.2'
+    compileOnly 'com.ngxdev:paper-api:1.12.2'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:6.1.4-SNAPSHOT'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.4.0'
@@ -90,6 +92,6 @@ processResources {
 
 tasks.withType(Jar) {
     def home = System.properties['user.home']
-//    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/shared")
-    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/Prison/plugins")
+    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/shared")
+//    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/Prison/plugins")
 }

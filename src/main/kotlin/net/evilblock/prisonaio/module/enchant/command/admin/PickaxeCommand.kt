@@ -25,7 +25,7 @@ object PickaxeCommand {
     @Command(
         names = ["pickaxe", "pick"],
         description = "Spawn a pickaxe with enchantments pre-applied",
-        permission = "prisonaio.enchants.pickaxe"
+        permission = "prisonaio.pickaxe"
     )
     @JvmStatic
     fun execute(

@@ -7,6 +7,8 @@
 
 package net.evilblock.prisonaio.module.quest
 
+import net.evilblock.cubed.entity.Entity
+import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -20,10 +22,12 @@ import org.bukkit.event.Listener
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
+import java.util.*
 
 object QuestHandler : PluginHandler {
 
     private val quests = arrayListOf<Quest>(TutorialQuest)
+    private val missionEntities: MutableMap<UUID, MutableList<Entity>> = hashMapOf()
 
     override fun getModule(): PluginModule {
         return QuestsModule
@@ -49,6 +53,32 @@ object QuestHandler : PluginHandler {
         return quests.firstOrNull { it.getId() == id }
     }
 
+    fun getMissionEntities(player: Player): MutableList<Entity> {
+        return missionEntities.getOrDefault(player.uniqueId, arrayListOf())
+    }
+
+    fun addMissionEntity(player: Player, entity: Entity) {
+        missionEntities.putIfAbsent(player.uniqueId, arrayListOf())
+        missionEntities[player.uniqueId]!!.add(entity)
+        EntityManager.trackEntity(entity)
+    }
+
+    fun removeMissionEntity(player: Player, entity: Entity) {
+        missionEntities.getOrDefault(player.uniqueId, arrayListOf()).remove(entity)
+        EntityManager.forgetEntity(entity)
+        entity.destroyForCurrentWatchers()
+    }
+
+    fun clearMissionEntities(player: Player) {
+        val entities = missionEntities.remove(player.uniqueId)
+        if (entities != null) {
+            for (entity in entities) {
+                EntityManager.forgetEntity(entity)
+                entity.destroyForCurrentWatchers()
+            }
+        }
+    }
+
     fun isDialogueSequencePlaying(player: Player): Boolean {
         return player.hasMetadata("QUEST_DIALOGUE_TICKER")
                 && player.hasMetadata("QUEST_DIALOGUE_PLAYER")
@@ -69,16 +99,23 @@ object QuestHandler : PluginHandler {
                     return
                 }
 
-                if (dialoguePlayer.isOnCooldown()) {
-                    return
-                }
-
                 if (dialoguePlayer.hasNext()) {
-                    if (dialoguePlayer.canSendNext(player)) {
-                        dialoguePlayer.sendNext(player)
+                    if (dialoguePlayer.isSleeping()) {
+                        return
+                    }
+
+                    if (dialoguePlayer.isReady(player)) {
+                        dialoguePlayer.send(player)
                     }
                 } else {
-                    stopDialogueSequence(player, DialogueEndReason.FINISHED)
+                    val lastDialogue = dialoguePlayer.getLast()
+                    if (lastDialogue.useState) {
+                        if (lastDialogue.complete) {
+                            stopDialogueSequence(player, DialogueEndReason.FINISHED)
+                        }
+                    } else {
+                        stopDialogueSequence(player, DialogueEndReason.FINISHED)
+                    }
                 }
             }
         }, 1L, 1L)

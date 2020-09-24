@@ -60,12 +60,12 @@ class QuestGuideMenu : Menu() {
                 progress.hasStarted() -> {
                     description.add("${ChatColor.YELLOW}${ChatColor.BOLD}${progress.getCurrentMission().getName()}")
 
-                    TextSplitter.split(40, progress.getCurrentMission().getMissionText(player), "${ChatColor.GRAY}", " ").forEach { text ->
+                    TextSplitter.split(length = 40, text = progress.getCurrentMission().getMissionText(player), linePrefix = "${ChatColor.GRAY}").forEach { text ->
                         description.add(text)
                     }
                 }
                 else -> {
-                    TextSplitter.split(40, progress.quest.getStartText(), "${ChatColor.GRAY}", " ").forEach { text ->
+                    TextSplitter.split(length = 40, text = progress.quest.getStartText(), linePrefix = "${ChatColor.GRAY}").forEach { text ->
                         description.add(text)
                     }
                 }

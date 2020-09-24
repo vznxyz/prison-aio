@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.user.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -48,8 +47,7 @@ object RankupCommand {
                 return
             }
 
-            VaultHook.useEconomy { it.withdrawPlayer(player, rankPrice) }
-
+            user.subtractMoneyBalance(rankPrice)
             user.updateRank(rank)
             user.applyPermissions(player)
 
@@ -63,11 +61,11 @@ object RankupCommand {
             player.sendMessage(" ${ChatColor.GRAY}The rankup cost ${ChatColor.GREEN}$${ChatColor.YELLOW}$moneyNeeded${ChatColor.GRAY}.")
             player.sendMessage("")
         } else {
-            val moneyNeeded = Formats.formatMoney(user.getMoneyBalance() - BigDecimal(rankPrice))
+            val moneyNeeded = Formats.formatMoney(BigDecimal(rankPrice) - user.getMoneyBalance())
 
             player.sendMessage("")
             player.sendMessage(" ${ChatColor.RED}${ChatColor.BOLD}Cannot Afford Rankup")
-            player.sendMessage(" ${ChatColor.GRAY}You need ${ChatColor.GREEN}$${ChatColor.YELLOW}$moneyNeeded ${ChatColor.GRAY}more to rankup to ${rank.displayName}${ChatColor.GRAY}.")
+            player.sendMessage(" ${ChatColor.GRAY}You need $moneyNeeded ${ChatColor.GRAY}more to rankup to ${rank.displayName}${ChatColor.GRAY}.")
             player.sendMessage("")
         }
     }

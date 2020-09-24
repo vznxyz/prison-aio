@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.user.setting.listener
 
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
-import net.evilblock.prisonaio.module.enchant.menu.PurchaseEnchantsMenu
+import net.evilblock.prisonaio.module.enchant.menu.PurchaseEnchantmentsMenu
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -36,7 +36,7 @@ object UserSettingsListeners : Listener {
 
                     val pickaxeData = PickaxeHandler.getPickaxeData(itemInHand)
                     if (pickaxeData != null) {
-                        PurchaseEnchantsMenu(itemInHand, pickaxeData).openMenu(event.player)
+                        PurchaseEnchantmentsMenu(itemInHand, pickaxeData).openMenu(event.player)
                     }
                 }
             }

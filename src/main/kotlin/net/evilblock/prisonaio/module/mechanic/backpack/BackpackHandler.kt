@@ -13,9 +13,10 @@ import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.cubed.util.nms.NBTUtil
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
-import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -23,7 +24,6 @@ import java.io.File
 
 object BackpackHandler : PluginHandler {
 
-    private val ID_REGEX = "\\(ID: #([a-zA-Z0-9].*)\\)".toRegex()
     private val backpacks: MutableMap<String, Backpack> = hashMapOf()
 
     override fun getModule(): PluginModule {
@@ -70,11 +70,13 @@ object BackpackHandler : PluginHandler {
                 && itemStack.itemMeta.hasDisplayName()
                 && itemStack.itemMeta.hasLore()
                 && itemStack.lore!!.size > 0
-                && ID_REGEX.matches(ChatColor.stripColor(itemStack.lore!!.first()))
+                && ItemUtils.itemTagHasKey(itemStack, "BackpackID")
     }
 
     fun extractBackpack(itemStack: ItemStack): Backpack? {
-        return getBackpack(ID_REGEX.find(ChatColor.stripColor(itemStack.lore!!.first()))!!.groupValues[1].toLowerCase())
+        val nmsCopy = ItemUtils.getNmsCopy(itemStack)
+        val tag = NBTUtil.getOrCreateTag(nmsCopy)
+        return getBackpack(NBTUtil.getString(tag, "BackpackID"))
     }
 
     fun getBackpacks(): Collection<Backpack> {
@@ -89,13 +91,13 @@ object BackpackHandler : PluginHandler {
         backpacks[backpack.id.toLowerCase()] = backpack
     }
 
-    fun findBackpacksInInventory(player: Player): List<Backpack> {
-        val found = arrayListOf<Backpack>()
+    fun findBackpacksInInventory(player: Player): Map<ItemStack, Backpack> {
+        val found = hashMapOf<ItemStack, Backpack>()
         for (item in player.inventory.storageContents) {
             if (item != null && isBackpackItem(item)) {
                 val backpack = extractBackpack(item)
                 if (backpack != null) {
-                    found.add(backpack)
+                    found[item] = backpack
                 }
             }
         }

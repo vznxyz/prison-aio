@@ -37,7 +37,7 @@ tokenator:
   cost: 12000 # formula = {cost} + (level - 1) * 100
   multiplier: 0.08 # formula = level * {multiplier}
 locksmith:
-  description: "Random chance of finding Common, Rare, Legendary, or Junkie keys as you mine."
+  description: "Random chance of finding keys as you mine. The chance is based on the rarity of the key."
   key-percentages:
     Common: 0.1 # 1 in every 1,000 blocks gives a key
     Legendary: 0.05 # 1 in every 2,000 blocks gives a key

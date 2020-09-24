@@ -28,4 +28,13 @@ class RainbowScoreboardOption(private var enabled: Boolean) : UserSettingOption 
         return RainbowScoreboardOption::class.java
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is RainbowScoreboardOption && other.enabled == enabled
+    }
+
+    override fun hashCode(): Int {
+        return enabled.hashCode()
+    }
+
+
 }

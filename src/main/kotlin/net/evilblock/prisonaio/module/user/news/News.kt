@@ -26,4 +26,12 @@ class News(
 
     var reads: Int = 0
 
+    override fun equals(other: Any?): Boolean {
+        return other is News && id.toString() == other.id.toString()
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
 }

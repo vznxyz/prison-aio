@@ -9,13 +9,11 @@ package net.evilblock.prisonaio
 
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.CubedOptions
-import net.evilblock.cubed.command.CommandHandler
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
-import net.evilblock.prisonaio.module.system.command.*
 import net.evilblock.prisonaio.listener.PrematureLoadListeners
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
@@ -24,7 +22,6 @@ import net.evilblock.prisonaio.module.chat.ChatModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import net.evilblock.prisonaio.module.enchant.EnchantsModule
 import net.evilblock.prisonaio.module.system.SystemModule
-import net.evilblock.prisonaio.module.system.wizard.command.RunSetupCheckCommand
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mine.MinesModule
@@ -37,7 +34,6 @@ import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.requirement.DeliveryManRewardRequirement
-import net.evilblock.prisonaio.module.scoreboard.ScoreboardModule
 import net.evilblock.prisonaio.module.shop.ShopsModule
 import net.evilblock.prisonaio.module.storage.StorageModule
 import net.evilblock.prisonaio.module.user.UsersModule
@@ -85,7 +81,6 @@ class PrisonAIO : PluginFramework() {
             PrivateMinesModule,
             BattlePassModule,
             UsersModule,
-            ScoreboardModule,
             ChatModule,
             RewardsModule,
             MinigamesModule,

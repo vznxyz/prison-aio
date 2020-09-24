@@ -19,7 +19,7 @@ object SpawnTutorialGuideCommand {
 
     @Command(
         names = ["npc spawn tutorial-guide"],
-        description = "Spawns the Tutorial Guide NPC",
+        description = "Spawns a Tutorial Guide NPC",
         permission = Permissions.SYSTEM_ADMIN,
         async = true
     )

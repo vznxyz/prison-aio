@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.user
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.scoreboard.ScoreboardHandler
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
@@ -29,6 +30,11 @@ import net.evilblock.prisonaio.module.user.news.command.NewsEditorCommand
 import net.evilblock.prisonaio.module.user.news.listener.NewsListeners
 import net.evilblock.prisonaio.module.user.perk.Perk
 import net.evilblock.prisonaio.module.user.perk.autosell.AutoSellNotification
+import net.evilblock.prisonaio.module.user.scoreboard.PrisonScoreGetter
+import net.evilblock.prisonaio.module.user.scoreboard.PrisonTitleGetter
+import net.evilblock.prisonaio.module.user.scoreboard.animation.ContentSwitching
+import net.evilblock.prisonaio.module.user.scoreboard.animation.RainbowAnimation
+import net.evilblock.prisonaio.module.user.scoreboard.animation.TitleAnimation
 import net.evilblock.prisonaio.module.user.setting.listener.UserChatSettingsListeners
 import net.evilblock.prisonaio.module.user.setting.listener.UserSettingsListeners
 import net.evilblock.prisonaio.module.user.setting.task.UserSettingsTickTask
@@ -60,6 +66,11 @@ object UsersModule : PluginModule() {
 
         Tasks.asyncTimer(PlayTimeSyncTask, 20L * 30, 2L * 30)
         Tasks.asyncTimer(UserSettingsTickTask, 20L, 20L)
+
+        ScoreboardHandler.configure(PrisonTitleGetter, PrisonScoreGetter)
+        Tasks.asyncTimer(TitleAnimation, 1L, 1L)
+        Tasks.asyncTimer(RainbowAnimation, 1L, 1L)
+        Tasks.asyncTimer(ContentSwitching, 1L, 1L)
     }
 
     override fun onDisable() {

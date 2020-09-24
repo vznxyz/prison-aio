@@ -54,4 +54,6 @@ object Permissions {
     const val EVENTS_TOGGLE = "prisonaio.events.toggle"
     const val EVENTS_EDIT = "prisonaio.events.edit"
 
+    const val MULTI_EVENT = "prisonaio.rewards.multi-event"
+
 }

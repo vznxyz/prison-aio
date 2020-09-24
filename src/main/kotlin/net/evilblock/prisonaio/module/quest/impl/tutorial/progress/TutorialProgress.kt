@@ -12,6 +12,6 @@ import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 
 class TutorialProgress : QuestProgress(TutorialQuest) {
 
-
+    var openedEnchantsMenu: Boolean = false
 
 }

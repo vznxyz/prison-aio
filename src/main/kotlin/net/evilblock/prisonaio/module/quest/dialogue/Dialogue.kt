@@ -9,7 +9,12 @@ package net.evilblock.prisonaio.module.quest.dialogue
 
 import org.bukkit.entity.Player
 
-abstract class Dialogue(val delay: Long = 3000L) {
+abstract class Dialogue(
+    var delay: Long = 0L,
+    var useState: Boolean = false
+) {
+
+    internal var complete: Boolean = false
 
     abstract fun send(player: Player)
 

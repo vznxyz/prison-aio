@@ -15,39 +15,38 @@ import java.util.*
 class DialoguePlayer(player: Player, sequence: DialogueSequence) {
 
     private var dialogue: LinkedList<Dialogue> = sequence.getSequence(player)
-    private var sentIndex: Int = -1
+    private var dialoguesSent: Int = 0
     private var lastSent = System.currentTimeMillis()
 
-    fun isOnCooldown(): Boolean {
-        if (sentIndex == -1) {
-            return false
-        }
-
-        val lastDialogue = dialogue[sentIndex]
-        return System.currentTimeMillis() - lastSent < lastDialogue.delay
-    }
-
     fun hasNext(): Boolean {
-        return sentIndex + 1 < dialogue.size
+        return dialoguesSent < dialogue.size
     }
 
-    fun canSendNext(player: Player): Boolean {
+    fun getLast(): Dialogue {
+        return dialogue.last
+    }
+
+    fun isReady(player: Player): Boolean {
         if (!hasNext()) {
             throw IllegalStateException("No next dialogue in sequence")
         }
 
-        return dialogue[sentIndex + 1].canSend(player)
+        if (dialoguesSent > 0 && dialogue[dialoguesSent - 1].useState) {
+            return dialogue[dialoguesSent - 1].complete
+        }
+
+        return dialogue[dialoguesSent].canSend(player)
     }
 
-    fun sendNext(player: Player) {
+    fun send(player: Player) {
         if (!hasNext()) {
             throw IllegalStateException("No next dialogue in sequence")
         }
 
-        val next = dialogue[++sentIndex]
+        val next = dialogue[dialoguesSent++]
         lastSent = System.currentTimeMillis()
 
-        if (sentIndex == 0) {
+        if (dialoguesSent == 1) {
             player.sendMessage("")
 
             FancyMessage(" ")
@@ -74,8 +73,12 @@ class DialoguePlayer(player: Player, sequence: DialogueSequence) {
         }
     }
 
+    fun isSleeping(): Boolean {
+        return System.currentTimeMillis() < lastSent + dialogue[dialoguesSent].delay
+    }
+
     fun getDialoguesForSkip(): List<Dialogue> {
-        return dialogue.filter { !it.canBeSkipped() && dialogue.indexOf(it) > sentIndex }
+        return dialogue.filter { !it.canBeSkipped() && dialogue.indexOf(it) > dialoguesSent }
     }
 
     fun canAllBeSent(player: Player): Boolean {

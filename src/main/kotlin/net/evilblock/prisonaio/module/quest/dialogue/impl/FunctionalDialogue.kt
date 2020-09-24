@@ -10,10 +10,18 @@ package net.evilblock.prisonaio.module.quest.dialogue.impl
 import net.evilblock.prisonaio.module.quest.dialogue.Dialogue
 import org.bukkit.entity.Player
 
-open class FunctionalDialogue(private val function: (Player) -> Unit, delay: Long = 1000L) : Dialogue(delay = delay) {
+open class FunctionalDialogue(
+    private val function: (Player, Dialogue) -> Unit,
+    delay: Long = 0L,
+    useState: Boolean = false
+) : Dialogue(delay, useState) {
 
     override fun send(player: Player) {
-        function.invoke(player)
+        function.invoke(player, this)
+    }
+
+    override fun isSpaced(): Boolean {
+        return false
     }
 
     override fun canBeSkipped(): Boolean {

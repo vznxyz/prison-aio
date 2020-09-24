@@ -61,7 +61,7 @@ class ManageSettingsMenu(private val gang: Gang) : Menu() {
             val description = arrayListOf<String>()
             description.add("")
 
-            for (line in TextSplitter.split(36, permission.description, "${ChatColor.GRAY}", " ")) {
+            for (line in TextSplitter.split(length = 36, text = permission.description, linePrefix = "${ChatColor.GRAY}")) {
                 description.add(line)
             }
 

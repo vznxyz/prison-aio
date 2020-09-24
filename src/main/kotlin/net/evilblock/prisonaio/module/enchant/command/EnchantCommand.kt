@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.enchant.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.prisonaio.module.enchant.EnchantsManager
-import net.evilblock.prisonaio.module.enchant.menu.PurchaseEnchantsMenu
+import net.evilblock.prisonaio.module.enchant.menu.PurchaseEnchantmentsMenu
 import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -17,7 +17,7 @@ import org.bukkit.entity.Player
 object EnchantCommand {
 
     @Command(
-        names = ["enchant", "ench", "upgrade"],
+        names = ["enchant", "enchants", "ench", "upgrade"],
         description = "Enchant your pickaxe"
     )
     @JvmStatic
@@ -30,7 +30,7 @@ object EnchantCommand {
         EnchantsManager.handleItemSwitch(player, player.inventory.itemInMainHand, null)
 
         val pickaxeData = PickaxeHandler.getPickaxeData(player.inventory.itemInMainHand) ?: return
-        PurchaseEnchantsMenu(player.inventory.itemInMainHand, pickaxeData).openMenu(player)
+        PurchaseEnchantmentsMenu(player.inventory.itemInMainHand, pickaxeData).openMenu(player)
     }
 
 }

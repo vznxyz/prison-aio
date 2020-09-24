@@ -18,15 +18,16 @@ class RequirementDialogue(
     private val quest: Quest,
     private val predicate: BiPredicate<Player, QuestProgress>,
     private val failureDialogue: Dialogue,
-    delay: Long = 0L
-) : Dialogue(delay) {
+    delay: Long = 0L,
+    useState: Boolean = false
+) : Dialogue(delay, useState) {
 
     override fun send(player: Player) {}
 
     override fun canSend(player: Player): Boolean {
         val user = UserHandler.getUser(player.uniqueId)
-        val test = predicate.test(player, user.getQuestProgress(quest) as QuestProgress)
 
+        val test = predicate.test(player, user.getQuestProgress(quest))
         if (!test) {
             failureDialogue.send(player)
         }
