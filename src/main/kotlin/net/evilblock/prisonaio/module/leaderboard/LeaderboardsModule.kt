@@ -16,7 +16,7 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.leaderboard.command.RefreshCommand
 import net.evilblock.prisonaio.module.leaderboard.command.IndexCommand
 import net.evilblock.prisonaio.module.leaderboard.command.ResultsCommand
-import net.evilblock.prisonaio.module.leaderboard.command.SpawnCommand
+import net.evilblock.prisonaio.module.leaderboard.command.SpawnLeaderboardCommand
 import net.evilblock.prisonaio.module.leaderboard.event.LeaderboardsRefreshedEvent
 import net.evilblock.prisonaio.module.leaderboard.impl.*
 import net.evilblock.prisonaio.module.leaderboard.npc.LeaderboardNpcEntity
@@ -60,7 +60,7 @@ object LeaderboardsModule : PluginModule() {
 			RefreshCommand.javaClass,
 			IndexCommand.javaClass,
 			ResultsCommand.javaClass,
-			SpawnCommand.javaClass
+			SpawnLeaderboardCommand.javaClass
 		)
 	}
 

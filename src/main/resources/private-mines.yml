@@ -8,31 +8,13 @@ mine:
       left-hand: []
       right-hand:
         - "sellall"
-tiers:
-  - tier: 1
-    sales-tax: 2.5
-    player-limit: 5
-    blocks:
-      - material: "REDSTONE_BLOCK"
-        data: 0
-        percentage: 100.0
-    reset-interval: 100000
-  - tier: 2
-    sales-tax: 5.0
-    player-limit: 10
-    blocks:
-      - material: "REDSTONE_BLOCK"
-        data: 0
-        percentage: 100.0
-    reset-interval: 100000
-  - tier: 3
-    sales-tax: 10.0
-    player-limit: 15
-    blocks:
-      - material: "REDSTONE_BLOCK"
-        data: 0
-        percentage: 100.0
-    reset-interval: 100000
+  reset-interval: 100000
+  sales-tax: 10.0
+  player-limit: 15
+  blocks:
+    - material: "REDSTONE_BLOCK"
+      data: 0
+      percentage: 100.0
 language:
   help:
     - "&c&lPrivate Mines &7&lHelp"
@@ -42,16 +24,6 @@ language:
     - "&7.........................."
     - "&7.........................."
   notifications:
-    mine-created:
-      - ""
-      - " &c&lPrivate Mines"
-      - " &7Your tier {tier} Private Mine is ready to use!"
-      - " &eType /pmine to get started!"
-    mine-reset:
-      - ""
-      - " &c&lThe mine you are in has been reset!"
-      - " &7Owner: {owner} - Tier {tier}"
-      - ""
     mine-gains:
       - ""
       - " &c&lPrivate Mine Gains"
@@ -69,34 +41,3 @@ language:
       - " &c&lPrivate Mines"
       - " &7Your access to &e{owner}'s Mine &7has been revoked."
       - ""
-  menu:
-    main-menu:
-      title: "Private Mines"
-      buttons:
-        my-mines:
-          title: "&a&lMy Mines"
-          lore:
-            - "&7View the mines you have access to."
-        public-mines:
-          title: "&a&lPublic Mines"
-          lore:
-            - "&7View all of the public mines."
-    settings-menu:
-      title: "Private Mine (Tier {tier}) &c&lSettings"
-      buttons:
-        players:
-          title: "&c&lManage Players"
-          lore:
-            - "&7View, add, or remove players from"
-            - "&7your private mine."
-            - ""
-            - "&eClick to manage players"
-        public-access:
-          title: "&e&lPublic Access: {stateWithColor}"
-          lore:
-            - "&7This setting controls who can"
-            - "&7visit your private mine."
-            - ""
-            - "&eClick to toggle public access"
-    players-menu:
-      title: "Private Mine (Tier {tier}) - Players"

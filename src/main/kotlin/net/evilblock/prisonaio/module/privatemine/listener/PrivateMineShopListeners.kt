@@ -48,10 +48,11 @@ object PrivateMineShopListeners : Listener {
      */
     @EventHandler(priority = EventPriority.HIGH)
     fun onDetermineShopEvent(event: DetermineShopEvent) {
-        val currentMine = PrivateMineHandler.getCurrentMine(event.player) ?: return
-        val shop = ShopHandler.getShopById("PMine-${currentMine.tier.number}")
-        if (shop.isPresent) {
-            event.shop = shop.get()
+        if (PrivateMineHandler.getCurrentMine(event.player) != null) {
+            val shop = ShopHandler.getShopById("PMine")
+            if (shop.isPresent) {
+                event.shop = shop.get()
+            }
         }
     }
 

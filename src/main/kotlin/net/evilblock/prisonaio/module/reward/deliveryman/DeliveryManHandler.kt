@@ -88,10 +88,6 @@ object DeliveryManHandler : PluginHandler {
         return ChatColor.translateAlternateColorCodes('&', getModule().config.getString("delivery-man.menu-title"))
     }
 
-    fun getHologramLines(): List<String> {
-        return getModule().config.getStringList("delivery-man.npc.hologram-lines").map { ChatColor.translateAlternateColorCodes('&', it) }
-    }
-
     fun getTextureValue(): String {
         return getModule().config.getString("delivery-man.npc.texture-value")
     }

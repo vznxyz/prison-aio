@@ -7,7 +7,7 @@
 
 package net.evilblock.prisonaio.module.reward.event
 
-import net.evilblock.cubed.util.hook.VaultHook
+import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorHandler
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
@@ -22,15 +22,22 @@ object EventRewardListeners : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onRegionBlockBreakEvent(event: RegionBlockBreakEvent) {
         if (event.region.supportsRewards()) {
+            val user = UserHandler.getUser(event.player.uniqueId)
+
             val moneyPerBlockBreak = RewardsModule.getMoneyPerBlockBreak()
             if (moneyPerBlockBreak > 0.0) {
-                VaultHook.useEconomy { economy -> economy.depositPlayer(event.player, moneyPerBlockBreak) }
+                user.addMoneyBalance(moneyPerBlockBreak)
             }
 
             val tokensPerBlockBreak = RewardsModule.getTokensPerBlockBreak()
             if (tokensPerBlockBreak > 0) {
-                val user = UserHandler.getUser(event.player.uniqueId)
-                user.addTokensBalance(tokensPerBlockBreak)
+                val tokenMultiplier = if (AbilityArmorHandler.getEquippedSet(event.player) != null) {
+                    2.0
+                } else {
+                    1.0
+                }
+
+                user.addTokensBalance((tokensPerBlockBreak * tokenMultiplier).toLong())
             }
         }
     }
@@ -39,15 +46,22 @@ object EventRewardListeners : Listener {
     fun onMultiBlockBreakEvent(event: MultiBlockBreakEvent) {
         val region = RegionHandler.findRegion(event.block.location)
         if (region.supportsRewards()) {
+            val user = UserHandler.getUser(event.player.uniqueId)
+
             val moneyPerBlockBreak = RewardsModule.getMoneyPerBlockBreak()
             if (moneyPerBlockBreak > 0.0) {
-                VaultHook.useEconomy { economy -> economy.depositPlayer(event.player, moneyPerBlockBreak * event.blockList.size) }
+                user.addMoneyBalance(moneyPerBlockBreak * event.blockList.size)
             }
 
             val tokensPerBlockBreak = RewardsModule.getTokensPerBlockBreak()
             if (tokensPerBlockBreak > 0) {
-                val user = UserHandler.getUser(event.player.uniqueId)
-                user.addTokensBalance(tokensPerBlockBreak * event.blockList.size)
+                val tokenMultiplier = if (AbilityArmorHandler.getEquippedSet(event.player) != null) {
+                    2.0
+                } else {
+                    1.0
+                }
+
+                user.addTokensBalance(((tokensPerBlockBreak * event.blockList.size) * tokenMultiplier).toLong())
             }
         }
     }

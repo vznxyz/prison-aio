@@ -8,15 +8,21 @@
 package net.evilblock.prisonaio.module.privatemine.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.prisonaio.module.privatemine.menu.MainMenu
+import net.evilblock.prisonaio.module.privatemine.PrivateMineHandler
+import net.evilblock.prisonaio.module.privatemine.menu.AccessibleMinesMenu
+import net.evilblock.prisonaio.module.privatemine.menu.PublicMinesMenu
 import org.bukkit.entity.Player
 
 object MenuCommand {
 
-    @Command(names = ["privatemine", "pmine"])
+    @Command(names = ["privatemine", "private-mine", "pmine", "pmines"])
     @JvmStatic
     fun execute(player: Player) {
-        MainMenu().openMenu(player)
+        if (PrivateMineHandler.getAccessibleMines(player.uniqueId).isNotEmpty()) {
+            AccessibleMinesMenu().openMenu(player)
+        } else {
+            PublicMinesMenu().openMenu(player)
+        }
     }
 
 }

@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.region.listener
 
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.region.RegionHandler
-import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
 import net.evilblock.prisonaio.util.Permissions

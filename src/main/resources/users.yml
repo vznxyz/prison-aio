@@ -3,7 +3,7 @@ perks:
     # If true, all players will have access to the auto-smelt perk
     default-enabled: true
   sales-boost:
-    # Give a group of players a sales multiplier using permissions
+    # Give a group of players a shop multiplier using permissions
     permission-multipliers:
       sales-multi-kingpin: 3.0
       sales-multi-druglord: 2.0

@@ -65,7 +65,7 @@ class NewsMenu : PaginatedMenu() {
 
         for (i in 0..44) {
             if (i != 4 && !RED_SLOTS.contains(i) && !POSTS_SLOTS.contains(i)) {
-                buttons[i] = GlassButton(15)
+                buttons[i] = GlassButton(8)
             }
         }
 

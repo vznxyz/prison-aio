@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.shop.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.AddButton
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.buttons.HelpButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.template.button.CloneableMenuTemplateButton
@@ -56,7 +57,7 @@ class EditShopMenu(val shop: Shop) : Menu() {
         buttons[8] = EditCurrencyButton()
 
         for (i in 9..17) {
-            buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 0, " ")
+            buttons[i] = GlassButton(0)
         }
 
         buttons[18] = CreateShopItemButton()
@@ -65,7 +66,7 @@ class EditShopMenu(val shop: Shop) : Menu() {
             buttons[18 + index + 1] = ShopItemButton(shopItem)
         }
 
-        val startFrom = 18 + shop.items.size
+        val startFrom = 18 + shop.items.size + 1
         for (index in startFrom until 54) {
             buttons[index] = EmptySlotButton()
         }

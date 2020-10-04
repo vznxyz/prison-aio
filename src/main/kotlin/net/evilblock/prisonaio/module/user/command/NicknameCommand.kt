@@ -15,7 +15,7 @@ import org.bukkit.entity.Player
 object NicknameCommand {
 
     @Command(
-        names = ["nickname", "nick", "nn"],
+        names = ["nickname", "nick", "nn", "nametag", "colors", "color"],
         description = "Change the appearance of your name"
     )
     @JvmStatic

@@ -155,11 +155,12 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
         updateLore(item)
 
         val nmsCopy = ItemUtils.getNmsCopy(item)
+
         val tag = NBTUtil.getOrCreateTag(nmsCopy)
-
         NBTUtil.setString(tag, "BackpackID", id)
+        NBTUtil.setTag(nmsCopy, tag)
 
-        return item
+        return ItemUtils.getBukkitCopy(nmsCopy)
     }
 
     fun updateLore(itemStack: ItemStack) {

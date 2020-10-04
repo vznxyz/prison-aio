@@ -10,8 +10,8 @@ package net.evilblock.prisonaio.module.user.command
 import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
-import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.user.User
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -33,7 +33,7 @@ object TokensCommand {
         }
 
         FancyMessage(context)
-            .then("${ChatColor.GRAY}${NumberUtils.format(user.getTokenBalance())}")
+            .then("${ChatColor.GRAY}${Formats.formatTokens(user.getTokenBalance())}")
             .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Exact balance: ${NumberFormat.getInstance().format(user.getTokenBalance())}"))
             .send(sender)
     }

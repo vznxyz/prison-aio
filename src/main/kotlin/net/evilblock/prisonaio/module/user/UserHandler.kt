@@ -12,6 +12,8 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.ReplaceOptions
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.logging.ErrorHandler
+import net.evilblock.cubed.logging.LogFile
+import net.evilblock.cubed.logging.LogHandler
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.store.bukkit.UUIDCache
@@ -23,6 +25,7 @@ import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -59,6 +62,8 @@ object UserHandler : PluginHandler {
     private val usersCollection: MongoCollection<Document> = StorageModule.database.getCollection("users")
     private val usersMap: MutableMap<UUID, User> = hashMapOf()
 
+    val economyLogFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "economy.txt"))
+
     init {
         usersCollection.createIndex(BasicDBObject("id", 1))
     }
@@ -68,7 +73,8 @@ object UserHandler : PluginHandler {
     }
 
     override fun initialLoad() {
-        // delay a bit otherwise the method thinks there's no online players
+        LogHandler.trackLogFile(economyLogFile)
+
         Tasks.delayed(10L) {
             loadOnlinePlayers()
         }
@@ -149,7 +155,7 @@ object UserHandler : PluginHandler {
         val document = usersCollection.find(Document("uuid", uuid.toString())).first()
         if (document != null) {
             try {
-                Cubed.gson.fromJson(document.toJson(JSON_WRITER_SETTINGS), User::class.java).also {
+                return Cubed.gson.fromJson(document.toJson(JSON_WRITER_SETTINGS), User::class.java).also {
                     it.init()
                 }
             } catch (e: Exception) {

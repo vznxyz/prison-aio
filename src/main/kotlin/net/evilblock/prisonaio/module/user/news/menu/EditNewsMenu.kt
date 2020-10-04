@@ -21,7 +21,6 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
-import org.bukkit.inventory.ItemStack
 
 class EditNewsMenu(private val news: News) : Menu() {
 
@@ -142,7 +141,7 @@ class EditNewsMenu(private val news: News) : Menu() {
         }
 
         override fun getMaterial(player: Player): Material {
-            return Material.EYE_OF_ENDER
+            return Material.NETHER_STAR
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {

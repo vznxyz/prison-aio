@@ -17,9 +17,10 @@ import net.evilblock.prisonaio.module.reward.event.EventRewardListeners
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.evilblock.prisonaio.module.reward.minecrate.listener.MineCrateListeners
 import net.evilblock.prisonaio.module.reward.minecrate.task.MineCrateExpireTask
-import net.evilblock.prisonaio.module.reward.multiplier.MultiplierEventHandler
-import net.evilblock.prisonaio.module.reward.multiplier.command.MultiplierEventEndCommand
-import net.evilblock.prisonaio.module.reward.multiplier.command.MultiplierEventStartCommand
+import net.evilblock.prisonaio.module.reward.multiplier.GlobalMultiplierHandler
+import net.evilblock.prisonaio.module.reward.multiplier.command.GlobalMultiplierRemoveCommand
+import net.evilblock.prisonaio.module.reward.multiplier.command.GlobalMultiplierSetCommand
+import net.evilblock.prisonaio.module.reward.multiplier.listener.GlobalMultiplierListeners
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -40,7 +41,7 @@ object RewardsModule : PluginModule() {
     override fun onEnable() {
         DeliveryManHandler.initialLoad()
         MineCrateHandler.initialLoad()
-        MultiplierEventHandler.initialLoad()
+        GlobalMultiplierHandler.initialLoad()
 
         getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), MineCrateExpireTask, 20L, 20L)
     }
@@ -48,7 +49,7 @@ object RewardsModule : PluginModule() {
     override fun onDisable() {
         DeliveryManHandler.saveData()
         MineCrateHandler.clearSpawnedCrates()
-        MultiplierEventHandler.saveData()
+        GlobalMultiplierHandler.saveData()
     }
 
     override fun onReload() {
@@ -60,7 +61,8 @@ object RewardsModule : PluginModule() {
     override fun getListeners(): List<Listener> {
         return listOf(
             EventRewardListeners,
-            MineCrateListeners
+            MineCrateListeners,
+            GlobalMultiplierListeners
         )
     }
 
@@ -68,8 +70,8 @@ object RewardsModule : PluginModule() {
         return listOf(
             DeliveryManEditorCommand.javaClass,
             DeliveryManSpawnCommand.javaClass,
-            MultiplierEventStartCommand.javaClass,
-            MultiplierEventEndCommand.javaClass
+            GlobalMultiplierSetCommand.javaClass,
+            GlobalMultiplierRemoveCommand.javaClass
         )
     }
 

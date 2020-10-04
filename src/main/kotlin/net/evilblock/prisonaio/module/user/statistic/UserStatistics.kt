@@ -7,15 +7,12 @@
 
 package net.evilblock.prisonaio.module.user.statistic
 
-import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.event.AsyncPlayTimeSyncEvent
 import net.evilblock.prisonaio.util.economy.Currency
-import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
-
 
 class UserStatistics(@Transient internal var user: User) {
 

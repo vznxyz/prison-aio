@@ -31,13 +31,15 @@ class UserNicknameMenu(private val user: User) : Menu() {
             9, 17,
             18, 26,
             27, 35,
-            36, 37, 38, 39, 40, 41, 42, 43, 44
+            36, 44,
+            45, 46, 47, 48, 49, 50, 51, 52, 53
         )
 
         private val BUTTON_SLOTS = listOf(
             10, 11, 12, 13, 14, 15, 16,
             19, 20, 21, 22, 23, 24, 25,
-            28, 29, 30, 31, 32, 33, 34
+            28, 29, 30, 31, 32, 33, 34,
+            37, 38, 39, 40, 41, 42, 43
         )
     }
 
@@ -71,13 +73,17 @@ class UserNicknameMenu(private val user: User) : Menu() {
         return buttons
     }
 
+    override fun size(buttons: Map<Int, Button>): Int {
+        return 54
+    }
+
     private inner class NicknameButton : Button() {
         override fun getName(player: Player): String {
             return user.getFormattedUsername(player)
         }
 
         override fun getDescription(player: Player): List<String> {
-            return listOf("${ChatColor.GRAY}Right-click to ${ChatColor.RED}${ChatColor.BOLD}reset ${ChatColor.GRAY}your nickname.")
+            return listOf("${ChatColor.GRAY}Left-click to reset your nickname settings.")
         }
 
         override fun getMaterial(player: Player): Material {
@@ -91,7 +97,7 @@ class UserNicknameMenu(private val user: User) : Menu() {
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (clickType.isRightClick) {
+            if (clickType.isLeftClick) {
                 user.nicknameColor = null
                 user.nicknameStyle = null
                 user.requiresSave = true

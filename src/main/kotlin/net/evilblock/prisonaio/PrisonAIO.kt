@@ -20,7 +20,7 @@ import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.gang.GangModule
 import net.evilblock.prisonaio.module.chat.ChatModule
 import net.evilblock.prisonaio.module.combat.CombatModule
-import net.evilblock.prisonaio.module.enchant.EnchantsModule
+import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.system.SystemModule
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
@@ -36,6 +36,7 @@ import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.requirement.DeliveryManRewardRequirement
 import net.evilblock.prisonaio.module.shop.ShopsModule
 import net.evilblock.prisonaio.module.storage.StorageModule
+import net.evilblock.prisonaio.module.tool.enchant.config.formula.PriceFormulaType
 import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import net.evilblock.prisonaio.util.economy.EconomyProvider
@@ -64,6 +65,7 @@ class PrisonAIO : PluginFramework() {
             builder.registerTypeAdapter(DeliveryManRewardRequirement::class.java, DeliveryManRewardRequirement.Serializer)
             builder.registerTypeAdapter(UserSettingOption::class.java, AbstractTypeSerializer<UserSettingOption>())
             builder.registerTypeAdapter(Challenge::class.java, AbstractTypeSerializer<Challenge>())
+            builder.registerTypeAdapter(PriceFormulaType.PriceFormula::class.java, AbstractTypeSerializer<PriceFormulaType.PriceFormula>())
         }
 
         enabledModules.addAll(arrayListOf(
@@ -71,7 +73,7 @@ class PrisonAIO : PluginFramework() {
             StorageModule,
             RegionsModule,
             MechanicsModule,
-            EnchantsModule,
+            ToolsModule,
             RanksModule,
 //            AchievementsModule,
             QuestsModule,

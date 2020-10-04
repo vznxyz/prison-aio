@@ -19,7 +19,6 @@ class DeliveryManNpcEntity(location: Location) : NpcEntity(lines = listOf(""), l
     override fun initializeData() {
         super.initializeData()
 
-        updateLines(DeliveryManHandler.getHologramLines())
         updateTexture(DeliveryManHandler.getTextureValue(), DeliveryManHandler.getTextureSignature())
     }
 

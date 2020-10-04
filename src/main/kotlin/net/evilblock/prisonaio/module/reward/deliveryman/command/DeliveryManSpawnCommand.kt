@@ -16,18 +16,19 @@ import org.bukkit.entity.Player
 object DeliveryManSpawnCommand {
 
     @Command(
-        names = ["deliveryman spawn"],
-        description = "Spawn the Delivery Man NPC",
-        permission = "prisonaio.deliveryman.admin"
+        names = ["npc spawn delivery-man"],
+        description = "Spawns a Delivery Man NPC",
+        permission = "prisonaio.rewards.delivery-man.admin"
     )
     @JvmStatic
     fun execute(player: Player) {
         val deliveryMan = DeliveryManNpcEntity(player.location)
         deliveryMan.initializeData()
+        deliveryMan.spawn(player)
 
         EntityManager.trackEntity(deliveryMan)
 
-        player.sendMessage("${ChatColor.GREEN}Successfully spawned Delivery Man!")
+        player.sendMessage("${ChatColor.GREEN}Spawned a Delivery Man!")
     }
 
 }

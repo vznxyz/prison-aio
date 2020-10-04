@@ -11,7 +11,6 @@ import com.google.gson.annotations.JsonAdapter
 import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.achievement.Achievement
 import net.evilblock.prisonaio.module.battlepass.BattlePassProgress
@@ -87,6 +86,7 @@ class User(val uuid: UUID) {
         perks.user = this
         statistics.user = this
         settings.user = this
+        battlePassProgress.user = this
     }
 
     /**

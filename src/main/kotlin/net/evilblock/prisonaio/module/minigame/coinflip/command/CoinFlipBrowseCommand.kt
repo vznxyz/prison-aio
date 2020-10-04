@@ -8,7 +8,9 @@
 package net.evilblock.prisonaio.module.minigame.coinflip.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipHandler
 import net.evilblock.prisonaio.module.minigame.coinflip.menu.CoinFlipBrowserMenu
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
 object CoinFlipBrowseCommand {
@@ -19,6 +21,11 @@ object CoinFlipBrowseCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
+        if (CoinFlipHandler.disabled) {
+            player.sendMessage("${ChatColor.RED}CoinFlip is currently disabled!")
+            return
+        }
+
         CoinFlipBrowserMenu().openMenu(player)
     }
 

@@ -51,7 +51,7 @@ object PerksGrantCommand {
 
         if (metadata == NO_METADATA) {
             if (perk == Perk.SALES_BOOST) {
-                sender.sendMessage("${ChatColor.RED}To grant a sales multiplier, you must provide the multiplier as the metadata.")
+                sender.sendMessage("${ChatColor.RED}To grant a shop multiplier, you must provide the multiplier as the metadata.")
                 return
             }
         } else {

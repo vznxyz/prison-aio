@@ -9,8 +9,8 @@ package net.evilblock.prisonaio.module.reward.minecrate.listener
 
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.enchant.EnchantsManager
-import net.evilblock.prisonaio.module.enchant.type.Luck
+import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.type.Luck
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.gang.GangModule
 import net.evilblock.prisonaio.module.gang.booster.GangBooster

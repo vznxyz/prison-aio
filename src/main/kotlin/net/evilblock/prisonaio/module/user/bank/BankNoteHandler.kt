@@ -26,6 +26,7 @@ import java.util.*
 object BankNoteHandler : PluginHandler {
 
     private val bankNotes = hashMapOf<UUID, BankNote>()
+
     val logFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "bank-notes.txt"))
 
     override fun getModule(): PluginModule {

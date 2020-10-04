@@ -12,6 +12,7 @@ import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipHandler
+import net.evilblock.prisonaio.module.minigame.coinflip.command.CoinFlipToggleCommand
 import net.evilblock.prisonaio.module.minigame.coinflip.command.CoinFlipBrowseCommand
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameType
@@ -68,6 +69,7 @@ object MinigamesModule : PluginModule() {
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
+            CoinFlipToggleCommand.javaClass,
             CoinFlipBrowseCommand.javaClass,
             EventArenaEditorCommand.javaClass,
             EventArenaSetPointCommand.javaClass,

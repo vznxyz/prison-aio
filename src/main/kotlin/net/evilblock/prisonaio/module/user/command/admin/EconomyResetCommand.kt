@@ -15,6 +15,7 @@ import net.evilblock.prisonaio.util.Formats
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 object EconomyResetCommand {
 
@@ -28,6 +29,16 @@ object EconomyResetCommand {
     fun execute(sender: CommandSender, @Param(name = "player", defaultValue = "self") user: User) {
         user.updateMoneyBalance(UserHandler.MINIMUM_MONEY_BALANCE)
         sender.sendMessage("${ChatColor.GOLD}Reset ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GOLD}'s balance to ${Formats.formatMoney(user.getMoneyBalance())}${ChatColor.GOLD}!")
+
+        val log = StringBuilder().append(sender.name)
+
+        if (sender is Player) {
+            log.append(" (${sender.uniqueId}, ${sender.address.address.hostAddress})")
+        }
+
+        log.append(" reset ${user.getUsername()}'s (${user.uuid}) balance")
+
+        UserHandler.economyLogFile.commit(log.toString())
     }
 
 }

@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.region.impl.global
 
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.util.plot.PlotUtil
 import org.bukkit.ChatColor
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -25,6 +26,10 @@ class GlobalRegion : Region("__global__") {
     }
 
     override fun onRightClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
+        if (PlotUtil.getPlot(clickedBlock.location) != null) {
+            return
+        }
+
         if (Constants.CONTAINER_TYPES.contains(clickedBlock.type)) {
             cancellable.isCancelled = true
         }

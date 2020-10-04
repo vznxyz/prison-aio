@@ -69,7 +69,6 @@ object BackpackHandler : PluginHandler {
                 && itemStack.hasItemMeta()
                 && itemStack.itemMeta.hasDisplayName()
                 && itemStack.itemMeta.hasLore()
-                && itemStack.lore!!.size > 0
                 && ItemUtils.itemTagHasKey(itemStack, "BackpackID")
     }
 

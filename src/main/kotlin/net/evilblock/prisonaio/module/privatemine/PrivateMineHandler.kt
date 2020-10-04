@@ -21,11 +21,8 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.cubed.util.hook.WorldEditUtils
-import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.privatemine.data.PrivateMineTier
 import net.evilblock.prisonaio.module.privatemine.entity.PrivateMineNpcEntity
 import net.evilblock.prisonaio.module.region.RegionHandler
-import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.*
 import org.bukkit.block.BlockFace
 import org.bukkit.block.Sign
@@ -42,18 +39,20 @@ import kotlin.collections.set
  */
 object PrivateMineHandler : PluginHandler {
 
-    override fun getModule(): PluginModule {
-        return PrivateMinesModule
-    }
+    private val schematicFile: File = File(File(Bukkit.getPluginManager().getPlugin("WorldEdit").dataFolder, "schematics"), "PrivateMine.schematic")
 
-    private val tiers = hashMapOf<Int, PrivateMineTier>()
     private var gridIndex = 0
     private val grid: HashMap<Int, PrivateMine> = HashMap()
     private val mineAccess: HashMap<UUID, HashSet<PrivateMine>> = HashMap()
     private val currentlyAt: HashMap<UUID, PrivateMine> = HashMap()
 
+    override fun getModule(): PluginModule {
+        return PrivateMinesModule
+    }
+
     override fun initialLoad() {
-        loadConfig()
+        PrivateMineConfig.load()
+
         loadWorld()
         loadGrid()
     }
@@ -62,22 +61,6 @@ object PrivateMineHandler : PluginHandler {
         super.saveData()
 
         saveGrid()
-    }
-
-    fun loadConfig() {
-        for (tierMap in PrivateMinesModule.config.getList("tiers") as List<Map<String, Any>>) {
-            val tier = PrivateMineTier.fromMap(tierMap)
-
-            if (!tier.schematicFile.exists()) {
-                PrisonAIO.instance.logger.severe("Couldn't find schematic file for tier ${tier.number}")
-            }
-
-            tiers[tier.number] = tier
-        }
-    }
-
-    fun getTierByNumber(tier: Int): PrivateMineTier? {
-        return tiers[tier]
     }
 
     private fun loadWorld() {
@@ -170,15 +153,8 @@ object PrivateMineHandler : PluginHandler {
 
             val split = redisValue.split(",")
             val owner = UUID.fromString(split[0])
-            val tier = split[1].toInt()
 
-            for (mine in getOwnedMines(owner)) {
-                if (mine.tier.number == tier) {
-                    return mine
-                }
-            }
-
-            return null
+            return getOwnedMines(owner).firstOrNull()
         } catch (e: Exception) {
             return null
         }
@@ -189,8 +165,10 @@ object PrivateMineHandler : PluginHandler {
             if (mine == null) {
                 redis.del("PrivateMines:LastMine.$uuid")
             } else {
-                redis.set("PrivateMines:LastMine.$uuid", "${mine.owner},${mine.tier.number}")
+                redis.set("PrivateMines:LastMine.$uuid", mine.owner.toString())
             }
+
+            null
         }
     }
 
@@ -207,8 +185,8 @@ object PrivateMineHandler : PluginHandler {
         }
 
         // only allow the player to join if the active player amount is less than the tier player limit
-        if (mine.getActivePlayers().size >= mine.tier.playerLimit) {
-            player.sendMessage("${ChatColor.RED}That mine is full of players! Try again later. (Max slots: (${mine.tier.playerLimit} players)")
+        if (mine.getActivePlayers().size >= PrivateMineConfig.playerLimit) {
+            player.sendMessage("${ChatColor.RED}That mine is full of players! Try again later. (Max slots: (${PrivateMineConfig.playerLimit} players)")
             return
         }
 
@@ -235,17 +213,17 @@ object PrivateMineHandler : PluginHandler {
      * Creates and inserts a [PrivateMine] into the [PrivateMineHandler].
      */
     @Throws(IllegalStateException::class)
-    fun createMine(owner: UUID, tier: PrivateMineTier) {
-        if (!tier.schematicFile.exists()) {
-            throw IllegalStateException("Tier schematic file doesn't exist: ${tier.schematicFile.name}")
+    fun createMine(owner: UUID) {
+        if (!schematicFile.exists()) {
+            throw IllegalStateException("Private Mines schematic file doesn't exist: ${schematicFile.name}")
         }
 
         mineAccess.putIfAbsent(owner, hashSetOf())
 
-        // throw exception if player already owns a mine with the same tier
+        // throw exception if player already owns a private mine
         for (mine in mineAccess[owner]!!) {
-            if (mine.tier == tier && mine.owner == owner) {
-                throw IllegalStateException("Player owns mine tier ${tier.number} already!")
+            if (mine.owner == owner) {
+                throw IllegalStateException("Player already owns a Private Mine")
             }
         }
 
@@ -255,7 +233,7 @@ object PrivateMineHandler : PluginHandler {
 
         // paste schematic
         val pasteVector = Vector(pasteLocation.x, pasteLocation.y, pasteLocation.z)
-        WorldEditUtils.paste(tier.schematicFile, pasteLocation.world, pasteVector, true)
+        WorldEditUtils.paste(schematicFile, pasteLocation.world, pasteVector, true)
         println("Pasted schematic at vector ${pasteLocation.x}, ${pasteLocation.y}, ${pasteLocation.z}")
 
         // find the breakable region of the pasted schematic
@@ -263,16 +241,16 @@ object PrivateMineHandler : PluginHandler {
 
         Tasks.sync {
             // find the spawn points for player and npcs
-            val dataScan = scanSchematic(cubeStart, tier)
+            val dataScan = scanSchematic(cubeStart)
             if (!dataScan.isComplete()) {
-                throw IllegalStateException("Tier ${tier.number} schematic is missing a scanned data field")
+                throw IllegalStateException("Schematic is missing a scanned data field")
             }
 
-            val schematicSize = WorldEditUtils.readSchematicSize(tier.schematicFile)
+            val schematicSize = WorldEditUtils.readSchematicSize(schematicFile)
             val cuboid = Cuboid(pasteLocation, pasteLocation.clone().add(schematicSize.x, schematicSize.y, schematicSize.z))
 
             Tasks.async {
-                val mine = PrivateMine(gridIndex, owner, tier, dataScan.playerSpawnPoint!!, cuboid, Cuboid(dataScan.cuboidLower!!, dataScan.cuboidUpper!!))
+                val mine = PrivateMine(gridIndex, owner, dataScan.playerSpawnPoint!!, cuboid, Cuboid(dataScan.cuboidLower!!, dataScan.cuboidUpper!!))
 
                 // execute initial mine setup
                 initialMineSetup(mine)
@@ -307,8 +285,8 @@ object PrivateMineHandler : PluginHandler {
     /**
      * Finds the spawn point for the NPC by searching for a SIGN tile entity.
      */
-    private fun scanSchematic(start: Location, tier: PrivateMineTier): SchematicDataScan {
-        val schematicSize = WorldEditUtils.readSchematicSize(tier.schematicFile)
+    private fun scanSchematic(start: Location): SchematicDataScan {
+        val schematicSize = WorldEditUtils.readSchematicSize(schematicFile)
 
         val minPoint = start.clone()
         val maxPoint = start.clone().add(schematicSize.x, schematicSize.y, schematicSize.z)
@@ -322,6 +300,7 @@ object PrivateMineHandler : PluginHandler {
                     val block = gridWorld.getBlockAt(x, y, z)
 
                     if (block.state is Skull) {
+                        val below = block.getRelative(BlockFace.DOWN)
                         val skull = block.state as Skull
 
                         when (skull.skullType) {
@@ -332,16 +311,24 @@ object PrivateMineHandler : PluginHandler {
                             SkullType.CREEPER -> {
                                 dataScan.npcSpawnPoint = block.location.add(0.5, 0.0, 0.5)
                                 dataScan.npcSpawnPoint!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
+
+                                if (below.type == Material.FENCE) {
+                                    dataScan.npcSpawnPoint = dataScan.npcSpawnPoint!!.subtract(0.0, 1.0, 0.0)
+                                }
                             }
                             else -> {
                                 continue@zLoop
                             }
                         }
 
-                        // remove sign - run sync
                         TaskManager.IMP.sync {
                             block.type = Material.AIR
                             block.state.update()
+
+                            if (below.type == Material.FENCE) {
+                                below.type = Material.AIR
+                                below.state.update()
+                            }
                         }
                     } else if (block.state is Sign) {
                         val sign = block.state as Sign

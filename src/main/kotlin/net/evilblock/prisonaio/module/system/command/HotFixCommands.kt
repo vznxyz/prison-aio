@@ -15,6 +15,21 @@ import org.bukkit.entity.Player
 object HotFixCommands {
 
     @Command(
+        names = ["remove-entities-radius"],
+        permission = "op"
+    )
+    @JvmStatic
+    fun removeEntities(player: Player, @Param(name = "radius") radius: Int) {
+        for (entity in player.location.world.entities) {
+            if (entity.location.distanceSquared(player.location) <= radius) {
+                if (entity.type != EntityType.PLAYER) {
+                    entity.remove()
+                }
+            }
+        }
+    }
+
+    @Command(
         names = ["remove-armor-stand-radius"],
         permission = "op"
     )

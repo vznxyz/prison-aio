@@ -14,6 +14,8 @@ import org.bson.Document
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
+import org.bukkit.entity.Player
+import java.math.BigDecimal
 
 object EconomyResetAllCommand {
 
@@ -32,7 +34,21 @@ object EconomyResetAllCommand {
 
         val result = UserHandler.getCollection().updateMany(Document(), Document("\$set", Document("moneyBalance", "0")))
 
+        for (user in UserHandler.getUsers()) {
+            user.updateMoneyBalance(BigDecimal(0.0))
+        }
+
         sender.sendMessage("${ChatColor.GOLD}Matched ${result.matchedCount} documents, modified ${result.modifiedCount} documents!")
+
+        val log = StringBuilder().append(sender.name)
+
+        if (sender is Player) {
+            log.append(" (${sender.uniqueId}, ${sender.address.address.hostAddress})")
+        }
+
+        log.append(" reset all player's balances")
+
+        UserHandler.economyLogFile.commit(log.toString())
     }
 
 }

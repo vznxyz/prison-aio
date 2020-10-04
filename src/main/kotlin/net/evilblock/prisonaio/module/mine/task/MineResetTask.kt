@@ -34,7 +34,7 @@ object MineResetTask : Runnable {
                         }
 
                         val progress = air.toFloat() / total.toFloat()
-                        if (progress > 0.5F) {
+                        if (progress > 0.4F) {
                             nextResetCountdown[mine] = AtomicInteger(6)
                         }
                     }

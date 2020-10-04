@@ -11,6 +11,12 @@ import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorHandler
+import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorSet
+import net.evilblock.prisonaio.module.mechanic.armor.command.GiveArmorPieceCommand
+import net.evilblock.prisonaio.module.mechanic.armor.command.GiveArmorSetCommand
+import net.evilblock.prisonaio.module.mechanic.armor.command.SpawnDisplayCommand
+import net.evilblock.prisonaio.module.mechanic.armor.listener.AbilityArmorListeners
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackDebugCommand
@@ -20,7 +26,6 @@ import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackWipeComm
 import net.evilblock.prisonaio.module.mechanic.backpack.command.parameter.BackpackParameterType
 import net.evilblock.prisonaio.module.mechanic.backpack.listener.BackpackListeners
 import net.evilblock.prisonaio.module.mechanic.listener.*
-import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
@@ -47,6 +52,7 @@ object MechanicsModule : PluginModule() {
         loadConfig()
 
         BackpackHandler.initialLoad()
+        AbilityArmorHandler.initialLoad()
     }
 
     override fun onReload() {
@@ -80,7 +86,8 @@ object MechanicsModule : PluginModule() {
             PreventDropsInSpawnListeners,
             StreamListeners,
             VanillaMechanicsListeners,
-            BackpackListeners
+            BackpackListeners,
+            AbilityArmorListeners
         )
     }
 
@@ -89,13 +96,17 @@ object MechanicsModule : PluginModule() {
             BackpackDebugCommand.javaClass,
             BackpackGiveCommand.javaClass,
             BackpackViewCommand.javaClass,
-            BackpackWipeCommand.javaClass
+            BackpackWipeCommand.javaClass,
+            GiveArmorPieceCommand.javaClass,
+            GiveArmorSetCommand.javaClass,
+            SpawnDisplayCommand.javaClass
         )
     }
 
     override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
         return mapOf(
-            Backpack::class.java to BackpackParameterType
+            Backpack::class.java to BackpackParameterType,
+            AbilityArmorSet::class.java to AbilityArmorSet.ArmorParameterType
         )
     }
 

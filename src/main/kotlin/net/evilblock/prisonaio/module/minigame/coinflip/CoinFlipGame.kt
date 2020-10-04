@@ -7,7 +7,6 @@
 
 package net.evilblock.prisonaio.module.minigame.coinflip
 
-import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.user.User

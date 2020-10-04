@@ -39,7 +39,7 @@ object PrivateMinesModule : PluginModule() {
     override fun onReload() {
         super.onReload()
 
-        PrivateMineHandler.loadConfig()
+        PrivateMineConfig.load()
     }
 
     override fun onAutoSave() {
@@ -79,18 +79,6 @@ object PrivateMinesModule : PluginModule() {
 
     fun getNotificationLines(type: String): List<String> {
         return config.getStringList("language.notifications.$type").map { ChatColor.translateAlternateColorCodes('&', it) }
-    }
-
-    fun getMenuTitle(menu: String): String {
-        return ChatColor.translateAlternateColorCodes('&', config.getString("language.menu.$menu.title"))
-    }
-
-    fun getButtonTitle(menu: String, button: String): String {
-        return ChatColor.translateAlternateColorCodes('&', config.getString("language.menu.$menu.buttons.$button.title"))
-    }
-
-    fun getButtonLore(menu: String, button: String): List<String> {
-        return config.getStringList("language.menu.$menu.buttons.$button.lore").map { ChatColor.translateAlternateColorCodes('&', it) }
     }
 
 }

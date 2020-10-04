@@ -24,13 +24,7 @@ object NewsListeners : Listener {
 
         val latestPost = NewsHandler.getLatestNews()
         if (latestPost != null) {
-            println("latest post: ${latestPost.id}")
             if (!user.hasReadNewsPost(latestPost)) {
-                println("has not read it, looping:")
-                println(user.readNews.size)
-                for (news in user.readNews) {
-                    println(news.id)
-                }
                 event.player.sendMessage("")
                 event.player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Heads up! ${ChatColor.GRAY}There's a new server announcement!")
 

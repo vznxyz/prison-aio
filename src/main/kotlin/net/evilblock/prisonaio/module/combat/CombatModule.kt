@@ -39,6 +39,8 @@ object CombatModule : PluginModule() {
     }
 
     override fun onEnable() {
+        super.onEnable()
+
         CombatLoggerHandler.initialLoad()
         CombatTimerHandler.initialLoad()
         DeathMessageHandler.initialLoad()

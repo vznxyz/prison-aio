@@ -7,7 +7,6 @@
 
 package net.evilblock.prisonaio.module.privatemine.listener
 
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.privatemine.PrivateMineHandler
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -15,21 +14,8 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.world.WorldSaveEvent
 
 object PrivateMineWorldListeners : Listener {
-
-    /**
-     * Calls [PrivateMineHandler.saveGrid] when the grid world is saved.
-     */
-    @EventHandler
-    fun onWorldSaveEvent(event: WorldSaveEvent) {
-        if (event.world == PrivateMineHandler.getGridWorld()) {
-            Tasks.async {
-                PrivateMineHandler.saveGrid()
-            }
-        }
-    }
 
     /**
      * Prevents natural creature spawns in the grid world.

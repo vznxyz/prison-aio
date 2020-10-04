@@ -9,8 +9,8 @@ package net.evilblock.prisonaio.module.chat.listener
 
 import me.clip.deluxetags.DeluxeTag
 import mkremins.fanciful.FancyMessage
-import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.NumberUtils
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.apache.commons.lang.WordUtils
@@ -21,9 +21,11 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import java.util.regex.Pattern
 
 object ChatFormatListeners : Listener {
 
+    private val URL_REGEX: Pattern = "((http|https)?:\\/)?((www)|(\\w+)\\.)?(\\w+)+\\.(\\w{2,63})(\\/[^\\s]*)+\\/??".toPattern()
     private const val ITEM_PLACEHOLDER = "[item]"
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -119,7 +121,46 @@ object ChatFormatListeners : Listener {
                 }
             }
         } else {
-            fancyMessage.then(event.message)
+            val matcher = URL_REGEX.matcher(event.message)
+            if (matcher.find()) {
+                if (event.player.hasPermission("prisonaio.chat.clickable-links")) {
+                    val beginIndex = matcher.start()
+                    val endIndex = matcher.end()
+
+                    val link = event.message.subSequence(beginIndex, endIndex).toString()
+
+                    fancyMessage.then(event.message.substring(0, beginIndex))
+
+                    if (lastColors.isNotEmpty()) {
+                        fancyMessage.color(ChatColor.getByChar(lastColors.toCharArray()[1]))
+                    }
+
+                    val processedLink = when {
+                        link.startsWith("https://", ignoreCase = true) -> {
+                            link
+                        }
+                        link.startsWith("http://", ignoreCase = true) -> {
+                            "https://${link.substring(7, link.length)}"
+                        }
+                        else -> {
+                            "https://${link}"
+                        }
+                    }
+
+                    fancyMessage.then(link).link(processedLink).formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to open this link in your browser."))
+
+                    if (lastColors.isNotEmpty()) {
+                        fancyMessage.color(ChatColor.getByChar(lastColors.toCharArray()[1]))
+                    }
+
+                    fancyMessage.then(event.message.substring(endIndex, event.message.length))
+                } else {
+                    event.player.sendMessage("${ChatColor.RED}You don't have access to post links into chat!")
+                    return
+                }
+            } else {
+                fancyMessage.then(event.message)
+            }
 
             if (lastColors.isNotEmpty()) {
                 fancyMessage.color(ChatColor.getByChar(lastColors.toCharArray()[1]))

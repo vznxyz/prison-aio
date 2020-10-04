@@ -21,9 +21,11 @@ object CoinFlipHandler : PluginHandler {
 
     val CHAT_PREFIX: String = "${ChatColor.GRAY}[${ChatColor.AQUA}${ChatColor.BOLD}COIN${ChatColor.YELLOW}${ChatColor.BOLD}FLIP${ChatColor.GRAY}] "
     val PRIMARY_COLOR = ChatColor.WHITE
-    val PRIMARY_COLOR_ID = 0.toByte()
+    const val PRIMARY_COLOR_ID = 0.toByte()
     val SECONDARY_COLOR = ChatColor.RED
-    val SECONDARY_COLOR_ID = 14.toByte()
+    const val SECONDARY_COLOR_ID = 14.toByte()
+
+    var disabled: Boolean = false
 
     private val games: MutableMap<UUID, CoinFlipGame> = hashMapOf()
 
@@ -37,7 +39,9 @@ object CoinFlipHandler : PluginHandler {
 
     fun cancelGames() {
         for (game in games.values.toList()) {
-            game.finishGame()
+            if (game.stage != CoinFlipGame.Stage.FINISHED) {
+                game.finishGame()
+            }
         }
     }
 

@@ -17,7 +17,7 @@ import org.bukkit.entity.Player
 object ProfileCommand {
 
     @Command(
-        names = ["profile", "prof", "user", "stats", "statistics"],
+        names = ["profile", "prof", "user", "u", "stats", "statistics"],
         description = "View a player's profile",
         async = true
     )

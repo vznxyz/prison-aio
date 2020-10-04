@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent
 object UserPerksListeners : Listener {
 
     /**
-     * Applies the player's sales multiplier when selling to shops.
+     * Applies the player's shop multiplier when selling to shops.
      */
     @EventHandler
     fun onPlayerSellToShopEvent(event: PlayerSellToShopEvent) {

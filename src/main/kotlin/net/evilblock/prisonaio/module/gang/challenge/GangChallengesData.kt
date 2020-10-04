@@ -28,7 +28,7 @@ class GangChallengesData(@Transient internal var gang: Gang) {
 
     fun completeChallenge(challenge: GangChallenge) {
         completed.add(challenge)
-        gang.sendMessagesToMembers("${GangHandler.CHAT_PREFIX}The gang has completed the ${ChatColor.GOLD}${challenge.getRenderedName()} ${ChatColor.GRAY}challenge! (${ChatColor.GOLD}${ChatColor.GOLD}${ChatColor.BOLD}${challenge.reward}${ChatColor.GRAY}")
+        gang.sendMessagesToMembers("${GangHandler.CHAT_PREFIX}Your gang has completed the ${ChatColor.GOLD}${challenge.getRenderedName()} ${ChatColor.GRAY}challenge! (${ChatColor.GOLD}${ChatColor.GOLD}${ChatColor.BOLD}${challenge.reward}${ChatColor.GRAY})")
         gang.giveTrophies(challenge.reward)
     }
 

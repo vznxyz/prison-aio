@@ -7,7 +7,6 @@
 
 package net.evilblock.prisonaio.module.privatemine.command
 
-import net.evilblock.prisonaio.module.privatemine.PrivateMinesModule
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.privatemine.PrivateMineHandler
@@ -24,21 +23,17 @@ object CreateCommand {
         permission = "op",
         async = true
     )
-    @JvmStatic fun execute(sender: CommandSender, @Param("player") uuid: UUID, @Param("tier") tier: Int) {
-        val mineTier = PrivateMineHandler.getTierByNumber(tier)
-        if (mineTier == null) {
-            sender.sendMessage("${ChatColor.RED}Mine tier $tier isn't registered.")
-            return
-        }
-
+    @JvmStatic fun execute(sender: CommandSender, @Param("player") uuid: UUID) {
         try {
-            PrivateMineHandler.createMine(uuid, mineTier)
+            PrivateMineHandler.createMine(uuid)
 
             val player = Bukkit.getPlayer(uuid) ?: return
 
-            PrivateMinesModule.getNotificationLines("mine-created").forEach {
-                player.sendMessage(it.replace("{tier}", mineTier.number.toString()))
-            }
+            player.sendMessage("")
+            player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Private Mine Ready")
+            player.sendMessage(" ${ChatColor.GRAY}Your private mine is ready to be mined!")
+            player.sendMessage(" ${ChatColor.YELLOW}Type /pmine to get started!")
+            player.sendMessage("")
         } catch (e: IllegalStateException) {
             sender.sendMessage("${ChatColor.RED}Failed to generate private mine. Please contact an admin.")
 

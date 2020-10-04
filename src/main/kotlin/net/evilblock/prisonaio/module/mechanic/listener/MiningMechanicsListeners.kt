@@ -11,14 +11,15 @@ import net.evilblock.cubed.util.Reflection
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.nms.MinecraftProtocol
-import net.evilblock.prisonaio.module.enchant.pickaxe.PickaxeHandler
-import net.evilblock.prisonaio.module.enchant.type.Fortune
+import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
+import net.evilblock.prisonaio.module.tool.enchant.type.Fortune
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.shop.ShopHandler
+import net.evilblock.prisonaio.module.tool.enchant.type.Tokenator
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.UsersModule
@@ -40,6 +41,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
 /**
  * Handles the server's mining mechanics.
@@ -92,20 +94,18 @@ object MiningMechanicsListeners : Listener {
                 }
 
                 for (drop in blockDrops) {
-                    var drop: ItemStack? = drop
+                    var toAdd: ItemStack? = drop
                     for ((backpackItem, backpack) in backpacks) {
-                        drop = backpack.addItem(drop!!)
+                        toAdd = backpack.addItem(toAdd!!)
 
-                        if (drop == null) {
+                        if (toAdd == null) {
                             break
                         }
                     }
 
-                    if (drop == null) {
-                        continue
+                    if (toAdd != null) {
+                        event.player.inventory.addItem(toAdd)
                     }
-
-                    event.player.inventory.addItem(drop)
                 }
             }
         }
@@ -124,7 +124,7 @@ object MiningMechanicsListeners : Listener {
         val region = RegionHandler.findRegion(event.block.location)
 
         val ignoredBlocks = MechanicsModule.getDropsToInvIgnoredBlocks()
-        val validBlocks = event.blockList.filter { !ignoredBlocks.contains(it.type) && (event.yield == 100F || ThreadLocalRandom.current().nextInt(100) < event.yield) }
+        val validBlocks = event.blockList.filter { isValidBlock(it) && !ignoredBlocks.contains(it.type) && (event.yield == 100F || ThreadLocalRandom.current().nextInt(100) < event.yield) }
 
         val fortuneLevel = if (region.supportsAbilityEnchants() && pickaxe.enchants.containsKey(Fortune)) {
             pickaxe.enchants[Fortune]!!
@@ -132,12 +132,20 @@ object MiningMechanicsListeners : Listener {
             -1
         }
 
-        val blockDrops = arrayListOf<ItemStack>()
+        val collectedDrops = arrayListOf<ItemStack>()
+
         for (block in validBlocks) {
-            getBlockDroppedItems(user, event.player, block, region, blockDrops, itemInHand, autoSmeltEnabled, fortuneLevel)
+            getBlockDroppedItems(user, event.player, block, region, collectedDrops, itemInHand, autoSmeltEnabled, fortuneLevel)
+
+            if (event.useRewardsModifiers) {
+                if (pickaxe.enchants.containsKey(Tokenator)) {
+                    val tokenAmount = (pickaxe.enchants[Tokenator]!! * Tokenator.readMultiplier()).coerceAtLeast(1.0).roundToInt().toLong()
+                    user.addTokensBalance(tokenAmount)
+                }
+            }
         }
 
-        if (blockDrops.isNotEmpty()) {
+        if (collectedDrops.isNotEmpty()) {
             Tasks.async {
                 val backpacks = BackpackHandler.findBackpacksInInventory(event.player)
 
@@ -188,7 +196,7 @@ object MiningMechanicsListeners : Listener {
                 }
 
                 if (region.supportsAutoSell() && user.perks.isAutoSellEnabled(event.player)) {
-                    ShopHandler.sellItems(event.player, blockDrops, true)
+                    ShopHandler.sellItems(event.player, collectedDrops, true)
 
                     for ((backpackItem, backpack) in backpacks) {
                         ShopHandler.sellItems(event.player, backpack.contents, true)
@@ -196,7 +204,7 @@ object MiningMechanicsListeners : Listener {
                 }
 
                 Tasks.sync {
-                    for (drop in blockDrops) {
+                    for (drop in collectedDrops) {
                         var drop: ItemStack? = drop
                         for ((backpackItem, backpack) in backpacks) {
                             drop = backpack.addItem(drop!!)
@@ -331,6 +339,10 @@ object MiningMechanicsListeners : Listener {
 
     private fun toIndex(x: Int, y: Int, z: Int): Short {
         return ((x shl 12) or (z shl 8) or y).toShort()
+    }
+
+    private fun isValidBlock(block: Block): Boolean {
+        return block.type != Material.BARRIER && block.type != Material.ENDER_CHEST && block.type != Material.AIR && block.type != Material.BEDROCK
     }
 
 }
