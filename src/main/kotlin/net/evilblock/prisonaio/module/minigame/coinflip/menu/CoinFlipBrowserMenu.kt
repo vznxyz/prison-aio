@@ -214,7 +214,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
 
     private inner class GuideButton : HelpButton() {
         override fun getName(player: Player): String {
-            return CoinFlipHandler.getGuideTitle()
+            return "${ChatColor.AQUA}${ChatColor.BOLD}COIN${ChatColor.YELLOW}FLIP"
         }
 
         override fun getDescription(player: Player): List<String> {

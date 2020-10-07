@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.user.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
-import net.evilblock.cubed.util.hook.VaultHook
+import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.bank.BankNote
 import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
 import org.bukkit.ChatColor
@@ -28,9 +28,9 @@ object WithdrawCommand {
             return
         }
 
-        val balance = VaultHook.getBalance(player.uniqueId)
+        val user = UserHandler.getUser(player.uniqueId)
 
-        if (money > balance) {
+        if (!user.hasMoneyBalance(money)) {
             player.sendMessage("${ChatColor.RED}You don't have enough money in your account to withdraw that amount.")
             return
         }
@@ -40,7 +40,8 @@ object WithdrawCommand {
             return
         }
 
-        VaultHook.useEconomy { economy -> economy.withdrawPlayer(player, money) }
+        user.subtractMoneyBalance(money)
+        user.requiresSave()
 
         val bankNote = BankNote(
             value = money,

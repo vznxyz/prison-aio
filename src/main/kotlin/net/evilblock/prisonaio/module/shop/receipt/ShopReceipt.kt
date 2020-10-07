@@ -25,7 +25,7 @@ data class ShopReceipt(
     val items: List<ShopReceiptItem> = emptyList(),
     val multiplier: Double = 1.0,
     val currency: Currency.Type = shop.currency,
-    val finalCost: Number = 0.0
+    val finalCost: Number = 0
 ) {
 
     val createdAt: Long = System.currentTimeMillis()

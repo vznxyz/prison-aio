@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.tool.pickaxe.prestige
 
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.util.bukkit.Constants
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.tool.enchant.serialize.EnchantsMapReferenceSerializer
@@ -17,6 +16,7 @@ import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.math.BigDecimal
 import java.text.NumberFormat
 
 class PickaxePrestige(val number: Int) {
@@ -59,13 +59,13 @@ class PickaxePrestige(val number: Int) {
     fun purchase(player: Player, pickaxeItem: ItemStack, pickaxeData: PickaxeData) {
         val user = UserHandler.getUser(player.uniqueId)
         user.subtractTokensBalance(tokensRequired)
-
-        VaultHook.useEconomy { economy ->
-            economy.withdrawPlayer(player.name, moneyRequired.toDouble())
-        }
+        user.subtractMoneyBalance(BigDecimal(moneyRequired))
+        user.requiresSave()
 
         pickaxeData.prestige++
         pickaxeData.applyMeta(pickaxeItem)
+
+        player.updateInventory()
     }
 
 }

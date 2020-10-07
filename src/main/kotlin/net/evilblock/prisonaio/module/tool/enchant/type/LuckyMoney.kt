@@ -8,10 +8,11 @@
 package net.evilblock.prisonaio.module.tool.enchant.type
 
 import net.evilblock.cubed.util.Chance
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
+import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
@@ -45,7 +46,9 @@ object LuckyMoney : AbstractEnchant("lucky-money", "Lucky Money", 3) {
                 else -> 500_000.0
             }
 
-            VaultHook.useEconomyAndReturn { economy -> economy.depositPlayer(event.player, money) }
+            val user = UserHandler.getUser(event.player.uniqueId)
+            user.addMoneyBalance(money)
+            user.requiresSave()
 
             sendMessage(event.player, "You found ${Formats.formatMoney(money)} ${ChatColor.GRAY}while mining!")
         }

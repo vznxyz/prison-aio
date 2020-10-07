@@ -22,11 +22,9 @@ import java.util.concurrent.ConcurrentHashMap
 
 abstract class AbilityEnchant(id: String, enchant: String, maxLevel: Int) : AbstractEnchant(id, enchant, maxLevel) {
 
-    private val useCooldown: MutableMap<UUID, Long> = HashMap()
+    internal val useCooldown: MutableMap<UUID, Long> = HashMap()
 
     override fun onInteract(event: PlayerInteractEvent, enchantedItem: ItemStack, level: Int) {
-        super.onInteract(event, enchantedItem, level)
-
         if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
             if (event.player.gameMode != GameMode.CREATIVE) {
                 val cooldown: Long = if (isCooldownBasedOnLevel()) {
@@ -42,17 +40,13 @@ abstract class AbilityEnchant(id: String, enchant: String, maxLevel: Int) : Abst
                 if (useCooldown.containsKey(event.player.uniqueId)) {
                     val expiry = useCooldown[event.player.uniqueId]!!
                     if (System.currentTimeMillis() < expiry) {
-                        event.isCancelled = true
-
                         val remainingSeconds = ((expiry - System.currentTimeMillis()) / 1000.0).toInt()
                         sendMessage(event.player, "${ChatColor.RED}You can't use this ability for another " + TimeUtil.formatIntoDetailedString(remainingSeconds) + ".")
-
                         return
                     }
                 }
 
                 if (isOnGlobalCooldown(event.player)) {
-                    event.isCancelled = true
                     return
                 }
 

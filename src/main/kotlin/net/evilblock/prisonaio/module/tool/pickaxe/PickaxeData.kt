@@ -47,48 +47,73 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
     }
 
     fun sync(itemStack: ItemStack) {
-        enchants = EnchantsManager.readEnchantsFromLore(itemStack)
+        synchronized(modificationLock) {
+            enchants = EnchantsManager.readEnchantsFromLore(itemStack)
+
+            if (itemStack.hasItemMeta() && itemStack.itemMeta.hasLore()) {
+                for (line in itemStack.itemMeta.lore) {
+                    try {
+                        if (line.contains("Prestige")) {
+                            val level = line.split(" ")[2]
+                            if (NumberUtils.isInt(level)) {
+                                prestige = Integer.valueOf(level)
+                            }
+                        } else if (line.contains("Blocks Mined")) {
+                            val level = line.split(" ")[3]
+                            if (NumberUtils.isInt(level)) {
+                                blocksMined = Integer.valueOf(level)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+        }
     }
 
     fun applyNBT(itemStack: ItemStack): ItemStack {
-        val nmsItemStack = CraftItemStack.asNMSCopy(itemStack)
-        var tag: NBTTagCompound? = nmsItemStack.tag
+        synchronized(modificationLock) {
+            val nmsItemStack = CraftItemStack.asNMSCopy(itemStack)
+            var tag: NBTTagCompound? = nmsItemStack.tag
 
-        if (tag == null) {
-            tag = NBTTagCompound()
-            nmsItemStack.tag = tag
+            if (tag == null) {
+                tag = NBTTagCompound()
+                nmsItemStack.tag = tag
+            }
+
+            tag.setUUID("PickaxeID", uuid)
+
+            return CraftItemStack.asBukkitCopy(nmsItemStack)
         }
-
-        tag.setUUID("PickaxeID", uuid)
-
-        return CraftItemStack.asBukkitCopy(nmsItemStack)
     }
 
     fun applyMeta(itemStack: ItemStack) {
-        val lore = arrayListOf<String>()
+        synchronized(modificationLock) {
+            val lore = arrayListOf<String>()
 
-        lore.add("${ChatColor.GREEN}${ChatColor.BOLD}Statistics")
-        lore.add("${ChatColor.GREEN}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige: ${NumberUtils.format(prestige)}")
-        lore.add("${ChatColor.GREEN}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Blocks Mined: ${NumberFormat.getInstance().format(blocksMined)}")
-        lore.add("")
+            lore.add("${ChatColor.GREEN}${ChatColor.BOLD}Statistics")
+            lore.add("${ChatColor.GREEN}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige: ${NumberUtils.format(prestige)}")
+            lore.add("${ChatColor.GREEN}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Blocks Mined: ${NumberFormat.getInstance().format(blocksMined)}")
+            lore.add("")
 
-        lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
+            lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
 
-        if (enchants.isNotEmpty()) {
-            for ((enchant, level) in enchants.entries.sortedWith(EnchantsManager.MAPPED_ENCHANT_COMPARATOR)) {
-                lore.add("${enchant.lorified()} ${NumberUtils.format(level)}")
+            if (enchants.isNotEmpty()) {
+                for ((enchant, level) in enchants.entries.sortedWith(EnchantsManager.MAPPED_ENCHANT_COMPARATOR)) {
+                    lore.add("${enchant.lorified()} ${NumberUtils.format(level)}")
+                }
+            } else {
+                lore.add("${ChatColor.GRAY}No enchants applied!")
             }
-        } else {
-            lore.add("${ChatColor.GRAY}No enchants applied!")
-        }
 
-        if (itemStack.itemMeta != null) {
-            val meta = itemStack.itemMeta
-            meta.lore = lore
+            if (itemStack.itemMeta != null) {
+                val meta = itemStack.itemMeta
+                meta.lore = lore
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
 
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
-
-            itemStack.itemMeta = meta
+                itemStack.itemMeta = meta
+            }
         }
     }
 
@@ -121,6 +146,10 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
         }
 
         return -1
+    }
+
+    companion object {
+        private val modificationLock = Object()
     }
 
 }

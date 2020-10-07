@@ -50,7 +50,19 @@ object MineBomb : AbilityEnchant("mine-bomb", "Mine Bomb", 3), Listener {
         get() = Material.FIREBALL
 
     override fun onInteract(event: PlayerInteractEvent, enchantedItem: ItemStack, level: Int) {
+        super.onInteract(event, enchantedItem, level)
+
+        if (event.isCancelled) {
+            return
+        }
+
+        if (!isOnGlobalCooldown(event.player)) {
+            return
+        }
+
         if (event.action == Action.RIGHT_CLICK_BLOCK || event.action == Action.RIGHT_CLICK_AIR) {
+            event.isCancelled = true
+
             val region = RegionHandler.findRegion(event.player.location)
             if (!region.supportsAbilityEnchants() || region.getBreakableCuboid() == null) {
                 return
@@ -62,8 +74,6 @@ object MineBomb : AbilityEnchant("mine-bomb", "Mine Bomb", 3), Listener {
             fireball.shooter = event.player
             fireball.velocity = event.player.location.direction
             fireball.setMetadata(METADATA_KEY, FixedMetadataValue(PrisonAIO.instance, level))
-
-            event.isCancelled = true
         }
     }
 

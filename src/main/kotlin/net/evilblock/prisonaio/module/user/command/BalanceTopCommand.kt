@@ -37,6 +37,10 @@ object BalanceTopCommand {
         val startRange = endRange - 9
 
         for (i in startRange..endRange) {
+            if (i >= MoneyBalanceLeaderboard.entries.size) {
+                break
+            }
+
             val entry = MoneyBalanceLeaderboard.entries[i]
             sender.sendMessage("${ChatColor.GRAY}${i + 1}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${Formats.formatMoney(entry.value as BigDecimal)}")
         }

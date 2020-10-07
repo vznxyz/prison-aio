@@ -19,10 +19,11 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object PickaxeHandler : PluginHandler {
 
-    private val pickaxes: MutableMap<UUID, PickaxeData> = hashMapOf()
+    private val pickaxes: MutableMap<UUID, PickaxeData> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return ToolsModule
@@ -76,11 +77,13 @@ object PickaxeHandler : PluginHandler {
     }
 
     private fun readPickaxeId(itemStack: ItemStack): UUID? {
-        val handle = CraftItemStack.asNMSCopy(itemStack)
-        if (handle.hasTag() && handle.tag!!.hasKey("PickaxeIDMost")) {
-            return handle.tag!!.getUUID("PickaxeID")
+        synchronized(itemStack) {
+            val handle = CraftItemStack.asNMSCopy(itemStack)
+            if (handle.hasTag() && handle.tag!!.hasKey("PickaxeIDMost")) {
+                return handle.tag!!.getUUID("PickaxeID")
+            }
+            return null
         }
-        return null
     }
 
 }

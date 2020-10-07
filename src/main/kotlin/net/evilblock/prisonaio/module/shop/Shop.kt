@@ -28,6 +28,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.math.BigDecimal
 
 class Shop(var id: String) {
 
@@ -39,6 +40,12 @@ class Shop(var id: String) {
 
     fun init() {
         menuTemplate?.shop = this
+
+        for (item in items) {
+            if (item.commands == null) {
+                item.commands = arrayListOf()
+            }
+        }
     }
 
     fun hasAccess(player: Player): Boolean {
@@ -75,25 +82,20 @@ class Shop(var id: String) {
             return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, receiptType = ShopReceiptType.BUY)
         }
 
-        val finalCost = itemsBought.sumByDouble { it.getBuyCost().toDouble() }
-        if (finalCost <= 0) {
-            return ShopReceipt(result = TransactionResult.FREE_BUY, shop = this, receiptType = ShopReceiptType.BUY)
-        }
-
         val shopReceipt = ShopReceipt(
             result = TransactionResult.SUCCESS,
             shop = this,
             items = itemsBought,
             receiptType = ShopReceiptType.BUY,
             multiplier = 1.0,
-            finalCost = finalCost
+            finalCost = buyEvent.getCost()
         )
 
         if (!shopReceipt.currency.has(player.uniqueId, shopReceipt.finalCost)) {
-            return ShopReceipt(result = TransactionResult.CANNOT_AFFORD, shop = this, receiptType = ShopReceiptType.BUY)
+            return ShopReceipt(result = TransactionResult.CANNOT_AFFORD, shop = this, receiptType = ShopReceiptType.BUY, finalCost = shopReceipt.finalCost)
         }
 
-        currency.take(player.uniqueId, finalCost)
+        currency.take(player.uniqueId, shopReceipt.finalCost)
 
         val splitItems = arrayListOf<ItemStack>()
         for (item in shopReceipt.items) {
@@ -151,7 +153,7 @@ class Shop(var id: String) {
 
     fun sellItems(player: Player, selling: Collection<ItemStack>, autoSell: Boolean = false): ShopReceipt {
         if (items.none { it.isBuying() }) {
-            return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, receiptType = ShopReceiptType.SELL)
+            return ShopReceipt(result = TransactionResult.SHOP_EMPTY, shop = this, receiptType = ShopReceiptType.SELL, finalCost = 0)
         }
 
         val itemsSold = arrayListOf<ShopReceiptItem>()
@@ -162,11 +164,14 @@ class Shop(var id: String) {
             }
         }
 
+        val user = UserHandler.getUser(player.uniqueId)
+        val multiplier = user.perks.getSalesMultiplier(player)
+
         val sellEvent = PlayerSellToShopEvent(
             player = player,
             shop = this,
             items = itemsSold,
-            multiplier = 1.0,
+            multiplier = multiplier,
             autoSell = autoSell
         )
 
@@ -180,22 +185,16 @@ class Shop(var id: String) {
             return ShopReceipt(result = TransactionResult.NO_ITEMS, shop = this, receiptType = ShopReceiptType.SELL)
         }
 
-        val finalCost = itemsSold.sumByDouble { it.getSellCost().toDouble() } * sellEvent.multiplier
-        if (finalCost <= 0) {
-            return ShopReceipt(result = TransactionResult.FREE_SELL, shop = this, receiptType = ShopReceiptType.SELL)
-        }
-
-        val user = UserHandler.getUser(player.uniqueId)
-        user.addMoneyBalance(finalCost)
-
         val shopReceipt = ShopReceipt(
             result = TransactionResult.SUCCESS,
             shop = this,
             receiptType = ShopReceiptType.SELL,
             items = itemsSold,
             multiplier = sellEvent.multiplier,
-            finalCost = finalCost
+            finalCost = sellEvent.getCost()
         )
+
+        user.addMoneyBalance(shopReceipt.finalCost as BigDecimal)
 
         if (!autoSell) {
             ShopHandler.trackReceipt(player, shopReceipt)

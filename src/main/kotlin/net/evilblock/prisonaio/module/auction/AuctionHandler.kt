@@ -28,7 +28,7 @@ object AuctionHandler : PluginHandler {
     private lateinit var mongoCollection: MongoCollection<Document>
 
     private val listings: MutableMap<UUID, AuctionListing> = ConcurrentHashMap()
-    private val playerListings: MutableMap<UUID, List<AuctionListing>> = ConcurrentHashMap()
+    private val playerListings: MutableMap<UUID, MutableList<AuctionListing>> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return AuctionModule
@@ -41,15 +41,28 @@ object AuctionHandler : PluginHandler {
 
         for (document in mongoCollection.find()) {
             val listing = Cubed.gson.fromJson<AuctionListing>(document.toJson(JSON_WRITER_SETTINGS), LISTING_TYPE)
+            trackListing(listing)
         }
     }
 
     fun trackListing(listing: AuctionListing) {
+        listings[listing.id] = listing
 
+        if (playerListings.containsKey(listing.createdBy)) {
+            playerListings[listing.createdBy]!!.add(listing)
+        } else {
+            playerListings[listing.createdBy] = arrayListOf(listing)
+        }
     }
 
     fun forgetListing(listing: AuctionListing) {
+        listings.remove(listing.id)
 
+        if (playerListings.containsKey(listing.createdBy)) {
+            playerListings[listing.createdBy]!!.remove(listing)
+        }
     }
+
+
 
 }

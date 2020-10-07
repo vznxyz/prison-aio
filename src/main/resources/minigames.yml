@@ -1,6 +1,5 @@
 coinflip:
   menu-title: "&b&lCOIN&e&lFLIP BROWSER&7"
-  guide-title: "&b&lCOIN&e&lFLIP HELP"
   games:
     # Normal game settings
     normal:

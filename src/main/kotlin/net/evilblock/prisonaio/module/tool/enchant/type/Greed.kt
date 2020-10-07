@@ -46,11 +46,9 @@ object Greed : AbstractEnchant("greed", "Greed", 3) {
 
             val multiplierMap = readLevelToMultiplierMap()
 
-            var multiplier: Double = multiplierMap.getOrElse(level) {
+            val multiplier: Double = multiplierMap.getOrElse(level) {
                 multiplierMap.entries.maxBy { it.key }!!.value
             }
-
-            multiplier = UserHandler.getUser(player.uniqueId).perks.getSalesMultiplier(event.player).coerceAtLeast(multiplier)
 
             if (randomItem.multiplier < multiplier) {
                 randomItem.multiplier = multiplier

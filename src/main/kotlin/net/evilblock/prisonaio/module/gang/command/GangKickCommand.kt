@@ -11,6 +11,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.gang.GangHandler
+import net.evilblock.prisonaio.module.gang.GangMember
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.*
@@ -30,7 +31,7 @@ object GangKickCommand {
             return
         }
 
-        if (!gang.isLeader(player.uniqueId)) {
+        if (gang.getMemberInfo(player.uniqueId)?.role?.isAtLeast(GangMember.Role.CO_LEADER) == false) {
             player.sendMessage("${ChatColor.RED}Only the leader can kick players from the gang.")
             return
         }

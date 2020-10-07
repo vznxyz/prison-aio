@@ -15,7 +15,6 @@ import net.evilblock.cubed.util.Reflection
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.cubed.util.nms.MinecraftProtocol
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.gang.challenge.GangChallengesData
@@ -23,6 +22,7 @@ import net.evilblock.prisonaio.module.gang.entity.JerryNpcEntity
 import net.evilblock.prisonaio.module.gang.invite.GangInvite
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.user.UserHandler
 import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -30,6 +30,7 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
+import java.lang.Exception
 import java.math.BigInteger
 import java.text.DecimalFormat
 import java.util.*
@@ -506,9 +507,12 @@ class Gang(
     fun updateCachedValue() {
         var sum = BigInteger("0")
 
-        VaultHook.useEconomy { economy ->
-            for (member in members.keys) {
-                sum += BigInteger(DECIMAL_FORMAT.format(economy.getBalance(Bukkit.getOfflinePlayer(member))))
+        for (member in members.keys) {
+            try {
+                val user = UserHandler.getOrLoadAndCacheUser(member, lookup = false, throws = true)
+                sum += BigInteger(DECIMAL_FORMAT.format(user.getMoneyBalance()))
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
 

@@ -201,6 +201,18 @@ enum class UserSetting(
                 RobotHologramsOption(false)
             )
         }
+    ),
+    TRADE_REQUESTS(
+        displayName = "Trade Requests",
+        description = "This setting controls if you can receive trade requests from other players.",
+        icon = ItemStack(Material.DIAMOND_BARDING),
+        defaultOption = { TradeRequestsOption(true) },
+        options = {
+            arrayListOf(
+                TradeRequestsOption(true),
+                TradeRequestsOption(false)
+            )
+        }
     );
 
     private var cached: UserSettingOption = this.defaultOption()

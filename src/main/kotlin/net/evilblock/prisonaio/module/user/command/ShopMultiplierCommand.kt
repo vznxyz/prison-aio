@@ -48,7 +48,7 @@ object ShopMultiplierCommand {
             hasMultiplier = true
 
             val activePerk = user.perks.getActivePerkGrant(Perk.SALES_BOOST)!!
-            val perkMultiplier = DECIMAL_FORMAT.format(user.perks.getSalesMultiplier(player))
+            val perkMultiplier = DECIMAL_FORMAT.format(activePerk.metadata.get("multiplier")?.asDouble ?: 1.0)
 
             if (activePerk.isPermanent()) {
                 player.sendMessage("${ChatColor.GRAY}You have a granted shop multiplier of ${ChatColor.RED}${ChatColor.BOLD}${perkMultiplier}x ${ChatColor.GRAY}for a period of ${ChatColor.RED}forever${ChatColor.GRAY}.")
@@ -83,6 +83,8 @@ object ShopMultiplierCommand {
 
         if (!hasMultiplier) {
             player.sendMessage("${ChatColor.RED}You don't have any active multipliers!")
+        } else {
+            player.sendMessage("${ChatColor.GRAY}Your stacked multiplier is ${ChatColor.RED}${ChatColor.BOLD}${user.perks.getSalesMultiplier(player)}${ChatColor.GRAY}.")
         }
     }
 

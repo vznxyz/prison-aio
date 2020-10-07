@@ -7,12 +7,14 @@
 
 package net.evilblock.prisonaio.module.privatemine.listener
 
-import net.evilblock.cubed.util.hook.VaultHook
+import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.prisonaio.module.privatemine.PrivateMine
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import net.evilblock.prisonaio.module.privatemine.PrivateMineHandler
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.prisonaio.module.shop.event.DetermineShopEvent
-import org.bukkit.Bukkit
+import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -28,16 +30,19 @@ object PrivateMineShopListeners : Listener {
 
         // ignore if the player owns the mine
         if (event.player.uniqueId != currentMine.owner) {
-            val mineOwner = Bukkit.getOfflinePlayer(currentMine.owner)
-
             if (currentMine.salesTax.coerceAtLeast(1.0) != 1.0) {
-                val taxedMoney = event.getSellCost().toDouble() / currentMine.salesTax
+                val taxedMoney = event.getCost().toDouble() / currentMine.salesTax
 
                 currentMine.moneyGained += taxedMoney.toLong()
 
-                VaultHook.useEconomy { economy ->
-                    economy.withdrawPlayer(event.player, taxedMoney)
-                    economy.depositPlayer(mineOwner, taxedMoney)
+                val taxedUser = UserHandler.getUser(event.player.uniqueId)
+                taxedUser.subtractMoneyBalance(taxedMoney)
+                taxedUser.requiresSave()
+
+                Tasks.async {
+                    val owningUser = UserHandler.getOrLoadAndCacheUser(currentMine.owner)
+                    owningUser.addMoneyBalance(taxedMoney)
+                    owningUser.requiresSave()
                 }
             }
         }
@@ -48,11 +53,12 @@ object PrivateMineShopListeners : Listener {
      */
     @EventHandler(priority = EventPriority.HIGH)
     fun onDetermineShopEvent(event: DetermineShopEvent) {
-        if (PrivateMineHandler.getCurrentMine(event.player) != null) {
-            val shop = ShopHandler.getShopById("PMine")
-            if (shop.isPresent) {
-                event.shop = shop.get()
-            }
+        val currentMine = PrivateMineHandler.getCurrentMine(event.player)
+        val region = RegionHandler.findRegion(event.player)
+
+        val shop = ShopHandler.getShopById("PMine")
+        if (shop.isPresent && (currentMine != null || region is PrivateMine)) {
+            event.shop = shop.get()
         }
     }
 

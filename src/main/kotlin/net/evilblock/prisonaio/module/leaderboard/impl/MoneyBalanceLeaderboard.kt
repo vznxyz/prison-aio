@@ -31,6 +31,9 @@ object MoneyBalanceLeaderboard : Leaderboard("top-balance", "${ChatColor.GREEN}$
                 is Double -> {
                     BigDecimal(rawValue)
                 }
+                is Long -> {
+                    BigDecimal(rawValue)
+                }
                 else -> {
                     BigDecimal(rawValue as Int)
                 }
@@ -43,7 +46,7 @@ object MoneyBalanceLeaderboard : Leaderboard("top-balance", "${ChatColor.GREEN}$
     }
 
     override fun formatEntry(entry: LeaderboardEntry<*>): String {
-        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.AQUA}${ChatColor.BOLD}$${ChatColor.GREEN}${ChatColor.BOLD}${Formats.formatMoney(entry.value as BigDecimal)}"
+        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${Formats.formatMoney(entry.value as BigDecimal)}"
     }
 
 }

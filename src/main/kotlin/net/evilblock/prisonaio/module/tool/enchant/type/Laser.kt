@@ -43,6 +43,10 @@ object Laser : AbilityEnchant(id = "laser", enchant = "Laser", maxLevel = 1) {
             return
         }
 
+        if (!isOnGlobalCooldown(event.player)) {
+            return
+        }
+
         if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
             event.isCancelled = true
 
@@ -72,7 +76,8 @@ object Laser : AbilityEnchant(id = "laser", enchant = "Laser", maxLevel = 1) {
             val eyeLocation = player.eyeLocation
             val lineOfSight = player.eyeLocation.direction.normalize()
             val rayTrace = RayTrace(eyeLocation.toVector(), lineOfSight)
-            val needsDestroyed: MutableList<Block> = ArrayList() // the blocks that need to be destroyed
+
+            val destroyedBlocks: MutableList<Block> = ArrayList()
 
             for (vec in rayTrace.traverse(20.0, 0.05)) {
                 val toLocation = vec.toLocation(player.world)
@@ -92,8 +97,8 @@ object Laser : AbilityEnchant(id = "laser", enchant = "Laser", maxLevel = 1) {
                     }
 
                     val toBlock = toLocation.block
-                    if (!needsDestroyed.contains(toBlock)) {
-                        needsDestroyed.add(toBlock)
+                    if (!destroyedBlocks.contains(toBlock)) {
+                        destroyedBlocks.add(toBlock)
                     }
 
                     if (showParticles) {
@@ -102,9 +107,9 @@ object Laser : AbilityEnchant(id = "laser", enchant = "Laser", maxLevel = 1) {
                 }
             }
 
-            if (needsDestroyed.isNotEmpty()) {
+            if (destroyedBlocks.isNotEmpty()) {
                 Tasks.sync {
-                    val multiBlockBreakEvent = MultiBlockBreakEvent(player, needsDestroyed.iterator().next(), needsDestroyed, 100F)
+                    val multiBlockBreakEvent = MultiBlockBreakEvent(player, destroyedBlocks.iterator().next(), destroyedBlocks, 100F, useRewardsModifiers = true)
                     Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
                 }
             }

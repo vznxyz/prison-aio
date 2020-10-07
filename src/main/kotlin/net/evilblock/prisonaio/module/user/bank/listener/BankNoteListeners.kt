@@ -49,9 +49,9 @@ object BankNoteListeners : Listener {
             }
 
             val announce = if (bankNote.useTokens) {
-                bankNote.value >= 1_000_000L
+                bankNote.value >= 25_000_000L
             } else {
-                bankNote.value >= 50_000_000_000_000
+                bankNote.value >= 10_000_000_000_000_000
             }
 
             if (announce) {

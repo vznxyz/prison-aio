@@ -29,30 +29,13 @@ import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 object UserHandler : PluginHandler {
 
-    val NICKNAME_COLORS: List<ChatColor> = listOf(
-        ChatColor.RED,
-        ChatColor.GOLD,
-        ChatColor.YELLOW,
-        ChatColor.GREEN,
-        ChatColor.DARK_GREEN,
-        ChatColor.AQUA,
-        ChatColor.DARK_AQUA,
-        ChatColor.BLUE,
-        ChatColor.DARK_PURPLE,
-        ChatColor.LIGHT_PURPLE,
-        ChatColor.WHITE,
-        ChatColor.GRAY
-    )
-
-    val NICKNAME_STYLES: List<ChatColor> = listOf(
-        ChatColor.BOLD,
-        ChatColor.ITALIC,
-        ChatColor.UNDERLINE
-    )
+    val NICKNAME_COLORS: List<ChatColor> = listOf(ChatColor.RED, ChatColor.GOLD, ChatColor.YELLOW, ChatColor.GREEN, ChatColor.DARK_GREEN, ChatColor.AQUA, ChatColor.DARK_AQUA, ChatColor.BLUE, ChatColor.DARK_PURPLE, ChatColor.LIGHT_PURPLE, ChatColor.WHITE, ChatColor.GRAY)
+    val NICKNAME_STYLES: List<ChatColor> = listOf(ChatColor.BOLD, ChatColor.ITALIC, ChatColor.UNDERLINE)
 
     val MINIMUM_MONEY_BALANCE = BigDecimal(0.0)
     val MINIMUM_TOKEN_BALANCE = BigInteger("0")
@@ -60,7 +43,7 @@ object UserHandler : PluginHandler {
     private val JSON_WRITER_SETTINGS = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()
 
     private val usersCollection: MongoCollection<Document> = StorageModule.database.getCollection("users")
-    private val usersMap: MutableMap<UUID, User> = hashMapOf()
+    private val usersMap: MutableMap<UUID, User> = ConcurrentHashMap()
 
     val economyLogFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "economy.txt"))
 
@@ -194,8 +177,8 @@ object UserHandler : PluginHandler {
     /**
      * Gets a copy of the loaded [User]s.
      */
-    fun getUsers(): List<User> {
-        return usersMap.values.toList()
+    fun getUsers(): Collection<User> {
+        return usersMap.values
     }
 
     /**

@@ -12,15 +12,39 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.player.PlayerItemHeldEvent
 
 object PickaxeStatisticsListeners : Listener {
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun onInventoryClickEvent(event: InventoryClickEvent) {
+        if (event.clickedInventory == null) {
+            return
+        }
+
+        val item = event.clickedInventory.getItem(event.slot)
+        if (item != null) {
+            PickaxeHandler.getPickaxeData(item)?.applyMeta(item)
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun onPlayerItemHeldEvent(event: PlayerItemHeldEvent) {
+        val itemInHand = event.player.inventory.getItem(event.newSlot)
+        PickaxeHandler.getPickaxeData(itemInHand)?.let {
+            it.applyMeta(itemInHand)
+            event.player.updateInventory()
+        }
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onBlockBreakEvent(event: BlockBreakEvent) {
         val itemInHand = event.player.inventory.itemInMainHand
         PickaxeHandler.getPickaxeData(itemInHand)?.let {
             it.blocksMined++
-            it.applyMeta(event.player.inventory.itemInMainHand)
+//            it.applyMeta(itemInHand)
+            event.player.updateInventory()
         }
     }
 

@@ -113,24 +113,36 @@ abstract class AbilityArmorSet(
         if (checkType) {
             when {
                 itemStack.type.name.endsWith("_HELMET") || itemStack.type.name.equals("SKULL_ITEM", ignoreCase = true) -> {
-                    if (!itemStack.isSimilar(getHelmet())) {
+                    if (itemStack.type != helmet.type) {
                         return false
                     }
+//                    if (!itemStack.isSimilar(getHelmet())) {
+//                        return false
+//                    }
                 }
                 itemStack.type.name.endsWith("_CHESTPLATE") -> {
-                    if (!itemStack.isSimilar(getChestplate())) {
+                    if (itemStack.type != chestplate.type) {
                         return false
                     }
+//                    if (!itemStack.isSimilar(getChestplate())) {
+//                        return false
+//                    }
                 }
                 itemStack.type.name.endsWith("_LEGGINGS") -> {
-                    if (!itemStack.isSimilar(getLeggings())) {
+                    if (itemStack.type != leggings.type) {
                         return false
                     }
+//                    if (!itemStack.isSimilar(getLeggings())) {
+//                        return false
+//                    }
                 }
                 itemStack.type.name.endsWith("_BOOTS") -> {
-                    if (!itemStack.isSimilar(getBoots())) {
+                    if (itemStack.type != boots.type) {
                         return false
                     }
+//                    if (!itemStack.isSimilar(getBoots())) {
+//                        return false
+//                    }
                 }
                 else -> return false
             }

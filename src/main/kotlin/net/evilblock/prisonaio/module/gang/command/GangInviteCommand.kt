@@ -11,6 +11,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.gang.GangHandler
+import net.evilblock.prisonaio.module.gang.GangMember
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.*
@@ -29,8 +30,8 @@ object GangInviteCommand {
             return
         }
 
-        if (gang.leader != sender.uniqueId) {
-            sender.sendMessage("${ChatColor.RED}Only the leader of the gang can invite other players.")
+        if (gang.getMemberInfo(sender.uniqueId)?.role?.isAtLeast(GangMember.Role.CO_LEADER) == false) {
+            sender.sendMessage("${ChatColor.RED}You must be at least a co-leader of the gang to invite players.")
             return
         }
 

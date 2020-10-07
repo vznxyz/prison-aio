@@ -41,6 +41,7 @@ object TokensWithdrawCommand {
         }
 
         user.subtractTokensBalance(tokens)
+        user.requiresSave()
 
         val bankNote = BankNote(
             value = tokens.toDouble(),

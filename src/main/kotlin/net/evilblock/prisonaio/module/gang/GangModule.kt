@@ -54,7 +54,6 @@ object GangModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
-            GangBoostersListeners,
             GangChatListeners,
             GangChallengeListeners,
             GangEntityListeners,

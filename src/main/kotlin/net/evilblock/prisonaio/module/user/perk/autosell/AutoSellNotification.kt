@@ -40,7 +40,7 @@ object AutoSellNotification : Listener {
     @EventHandler
     fun onPlayerSellToShopEvent(event: PlayerSellToShopEvent) {
         if (event.autoSell) {
-            trackedGains[event.player.uniqueId] = trackedGains.getOrDefault(event.player.uniqueId, 0.0) + event.getSellCost().toDouble()
+            trackedGains[event.player.uniqueId] = trackedGains.getOrDefault(event.player.uniqueId, 0.0) + event.getCost().toDouble()
         }
     }
 

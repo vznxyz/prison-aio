@@ -7,6 +7,11 @@
 
 package net.evilblock.prisonaio.module.user.perk
 
+import net.evilblock.prisonaio.module.gang.GangHandler
+import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.booster.GangBooster
+import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorHandler
+import net.evilblock.prisonaio.module.reward.multiplier.GlobalMultiplierHandler
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UsersModule
 import org.bukkit.entity.Player
@@ -112,7 +117,24 @@ class UserPerks(@Transient internal var user: User) {
 
         stackedMultiplier += getActivePerkGrant(Perk.SALES_BOOST)?.metadata?.get("multiplier")?.asDouble ?: 0.0
 
-        return stackedMultiplier
+        val globalMultiplier = GlobalMultiplierHandler.getActiveMultiplier()
+        if (globalMultiplier != null) {
+            stackedMultiplier += globalMultiplier.multiplier
+        }
+
+        val equippedAbilityArmor = AbilityArmorHandler.getEquippedSet(player)
+        if (equippedAbilityArmor != null) {
+            stackedMultiplier += 4.0
+        }
+
+        val assumedGang = GangHandler.getAssumedGang(player.uniqueId)
+        if (assumedGang != null) {
+            if (assumedGang.hasBooster(GangBooster.BoosterType.SALES_MULTIPLIER)) {
+                stackedMultiplier += GangModule.readSalesMultiplierMod()
+            }
+        }
+
+        return stackedMultiplier.coerceAtLeast(1.0)
     }
 
     fun isAutoSellEnabled(player: Player): Boolean {

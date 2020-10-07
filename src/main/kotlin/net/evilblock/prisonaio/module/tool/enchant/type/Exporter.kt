@@ -40,7 +40,7 @@ object Exporter : AbilityEnchant(id = "exporter", enchant = "Exporter", maxLevel
     override fun onSellAll(player: Player, enchantedItem: ItemStack?, level: Int, event: PlayerSellToShopEvent) {
         if (event.player.hasMetadata("PENDING_EXPORT_FEEDBACK")) {
             event.player.removeMetadata("PENDING_EXPORT_FEEDBACK", PrisonAIO.instance)
-            sendMessage(event.player, "You have exported your inventory for a profit of ${Formats.formatMoney(event.getSellCost().toDouble())}${ChatColor.GRAY}!")
+            sendMessage(event.player, "You have exported your inventory for a profit of ${Formats.formatMoney(event.getCost().toDouble())}${ChatColor.GRAY}!")
         }
     }
 
@@ -54,8 +54,13 @@ object Exporter : AbilityEnchant(id = "exporter", enchant = "Exporter", maxLevel
             return
         }
 
+        if (!isOnGlobalCooldown(event.player)) {
+            return
+        }
+
         if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
             event.isCancelled = true
+
             event.player.setMetadata("PENDING_EXPORT_FEEDBACK", FixedMetadataValue(PrisonAIO.instance, true))
             event.player.performCommand("sellall")
         }

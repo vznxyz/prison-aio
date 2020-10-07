@@ -21,9 +21,7 @@ import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeHandl
 import net.evilblock.prisonaio.module.tool.pickaxe.prestige.command.PrestigeEditorCommand
 import net.evilblock.prisonaio.module.tool.enchant.salvage.SalvagePreventionHandler
 import net.evilblock.prisonaio.module.tool.enchant.salvage.command.SalvagePreventionEditorCommand
-import net.evilblock.prisonaio.module.tool.pickaxe.command.ForgetPickaxeCommand
-import net.evilblock.prisonaio.module.tool.pickaxe.command.PickaxeCommand
-import net.evilblock.prisonaio.module.tool.pickaxe.command.PickaxeSetPrestigeCommand
+import net.evilblock.prisonaio.module.tool.pickaxe.command.*
 import net.evilblock.prisonaio.module.tool.pickaxe.listener.PickaxeStatisticsListeners
 import org.bukkit.event.Listener
 
@@ -78,6 +76,9 @@ object ToolsModule : PluginModule() {
             ManageEnchantsCommand.javaClass,
             EnchantCommand.javaClass,
             PickaxeCommand.javaClass,
+            PickaxeDebugCommand.javaClass,
+            PickaxeSetBlocksMinedCommand.javaClass,
+            PickaxeSetLevelCommand.javaClass,
             PickaxeSetPrestigeCommand.javaClass,
             RemoveEnchantCommand.javaClass,
             ToggleEnchantsMessagesCommand.javaClass,

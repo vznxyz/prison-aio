@@ -42,11 +42,7 @@ class PickaxeButton(
             }
         } else {
             extraLore.add("${ChatColor.RED}${ChatColor.BOLD}MAXED")
-            extraLore.addAll(TextSplitter.split(
-                length = 40,
-                text = "It appears you've maxed your pickaxe prestige.",
-                linePrefix = ChatColor.RED.toString()
-            ))
+            extraLore.addAll(TextSplitter.split(text = "It appears you've maxed your pickaxe prestige.", linePrefix = ChatColor.RED.toString()))
         }
 
         return ItemBuilder.copyOf(pickaxeItem)

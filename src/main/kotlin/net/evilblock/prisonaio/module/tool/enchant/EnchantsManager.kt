@@ -182,7 +182,7 @@ object EnchantsManager : Listener {
             return
         }
 
-        update(event.currentItem)
+//        update(event.currentItem)
 
         if (event.clickedInventory.type == InventoryType.PLAYER && event.whoClicked.inventory.heldItemSlot == event.slot) {
             handleItemSwitch(event.whoClicked as Player, event.cursor, event)
@@ -259,28 +259,30 @@ object EnchantsManager : Listener {
         }
     }
 
-    @JvmStatic
-    fun update(newItem: ItemStack?) {
-        if (newItem != null && newItem.type.toString().endsWith("_PICKAXE")) {
-            if (newItem.hasItemMeta() && !newItem.itemMeta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
-                val im = newItem.itemMeta
-                im.addItemFlags(ItemFlag.HIDE_ENCHANTS)
-                newItem.itemMeta = im
-            }
-        }
-    }
+//    @JvmStatic
+//    fun update(newItem: ItemStack?) {
+//        if (newItem != null && newItem.type.toString().endsWith("_PICKAXE")) {
+//            if (newItem.hasItemMeta() && !newItem.itemMeta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
+//                val im = newItem.itemMeta
+//                im.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+//                newItem.itemMeta = im
+//            }
+//        }
+//    }
 
     @JvmStatic
     fun handleItemSwitch(player: Player, newItem: ItemStack?, event: Event?): Map<AbstractEnchant, Int> {
-        update(newItem)
+//        update(newItem)
 
         var pickaxeData = PickaxeHandler.getPickaxeData(newItem)
         var newItem = newItem
         if (newItem != null) {
             if (pickaxeData == null && MechanicsModule.isPickaxe(newItem)) {
                 pickaxeData = PickaxeData()
+
                 PickaxeHandler.trackPickaxeData(pickaxeData)
 
+                println("Registering new pickaxe for player ${player.name}")
                 pickaxeData.sync(newItem)
                 pickaxeData.applyMeta(newItem)
 
@@ -436,6 +438,8 @@ object EnchantsManager : Listener {
         pickaxeData.setLevel(enchant, level)
         pickaxeData.applyMeta(item)
 
+        player.updateInventory()
+
         return true
     }
 
@@ -468,10 +472,10 @@ object EnchantsManager : Listener {
                 val builder = StringBuilder()
 
                 for (i in 1 until splitLoreLine.size - 1) {
-                    builder.append(splitLoreLine[i])
+                    builder.append(splitLoreLine[i]).append(" ")
                 }
 
-                builder.toString()
+                builder.toString().trim()
             } else {
                 splitLoreLine[1]
             }

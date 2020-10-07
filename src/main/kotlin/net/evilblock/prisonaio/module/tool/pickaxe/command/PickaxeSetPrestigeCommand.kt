@@ -39,6 +39,7 @@ object PickaxeSetPrestigeCommand {
         pickaxeData.prestige = prestige
         pickaxeData.applyMeta(itemInHand)
 
+        player.updateInventory()
         player.sendMessage("${ChatColor.GREEN}Updated pickaxe's prestige to $prestige!")
     }
 

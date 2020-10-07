@@ -75,10 +75,6 @@ object CoinFlipHandler : PluginHandler {
         return ChatColor.translateAlternateColorCodes('&', getModule().config.getString("coinflip.menu-title"))
     }
 
-    fun getGuideTitle(): String {
-        return ChatColor.translateAlternateColorCodes('&', getModule().config.getString("coinflip.guide-title"))
-    }
-
     fun getHighlightedGameThresholdMoney(): Double {
         return getModule().config.getDouble("coinflip.games.highlighted.threshold.money")
     }

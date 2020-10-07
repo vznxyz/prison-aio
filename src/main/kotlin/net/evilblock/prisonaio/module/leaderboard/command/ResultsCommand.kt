@@ -22,8 +22,12 @@ object ResultsCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "leaderboard") leaderboard: Leaderboard) {
-        for (line in leaderboard.getDisplayLines(false)) {
+        for ((index, line) in leaderboard.getDisplayLines(false).withIndex()) {
             sender.sendMessage(line)
+
+            if (index >= 11) {
+                break
+            }
         }
     }
 

@@ -20,7 +20,6 @@ import net.evilblock.prisonaio.module.reward.minecrate.task.MineCrateExpireTask
 import net.evilblock.prisonaio.module.reward.multiplier.GlobalMultiplierHandler
 import net.evilblock.prisonaio.module.reward.multiplier.command.GlobalMultiplierRemoveCommand
 import net.evilblock.prisonaio.module.reward.multiplier.command.GlobalMultiplierSetCommand
-import net.evilblock.prisonaio.module.reward.multiplier.listener.GlobalMultiplierListeners
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -61,8 +60,7 @@ object RewardsModule : PluginModule() {
     override fun getListeners(): List<Listener> {
         return listOf(
             EventRewardListeners,
-            MineCrateListeners,
-            GlobalMultiplierListeners
+            MineCrateListeners
         )
     }
 

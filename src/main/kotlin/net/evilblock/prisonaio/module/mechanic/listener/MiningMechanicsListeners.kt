@@ -19,6 +19,7 @@ import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.shop.ShopHandler
+import net.evilblock.prisonaio.module.tool.enchant.type.TokenPouch
 import net.evilblock.prisonaio.module.tool.enchant.type.Tokenator
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -141,6 +142,11 @@ object MiningMechanicsListeners : Listener {
                 if (pickaxe.enchants.containsKey(Tokenator)) {
                     val tokenAmount = (pickaxe.enchants[Tokenator]!! * Tokenator.readMultiplier()).coerceAtLeast(1.0).roundToInt().toLong()
                     user.addTokensBalance(tokenAmount)
+                }
+
+                if (pickaxe.enchants.containsKey(TokenPouch)) {
+                    val tokenPouchLevel = pickaxe.enchants[TokenPouch]!!
+                    TokenPouch.attemptFindPouch(event.player, tokenPouchLevel)
                 }
             }
         }

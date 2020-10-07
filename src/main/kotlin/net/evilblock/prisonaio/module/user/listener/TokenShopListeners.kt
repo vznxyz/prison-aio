@@ -11,11 +11,9 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.Cooldown
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.block.Sign
@@ -28,6 +26,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.SignChangeEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import java.math.BigDecimal
 import java.util.*
 
 object TokenShopListeners : Listener {
@@ -188,7 +187,10 @@ object TokenShopListeners : Listener {
             val price = NumberUtils.parseInput(priceLineSplit[1])
             assert(price.toInt() > 0) { "Price must be more than 0." }
 
+            val bigPrice = BigDecimal(price.toString())
+
             val owningUser = UserHandler.getOrLoadAndCacheUser(owner)
+            val interactingUser = UserHandler.getOrLoadAndCacheUser(player.uniqueId, lookup = false, throws = true)
 
             Tasks.sync {
                 val buying = when {
@@ -209,51 +211,42 @@ object TokenShopListeners : Listener {
                         return@sync
                     }
 
-                    if (VaultHook.getBalance(player.uniqueId) < price.toLong()) {
+                    if (!interactingUser.hasMoneyBalance(bigPrice)) {
                         player.sendMessage("${ChatColor.RED}You don't have enough money to buy tokens from that TokenShop.")
                         return@sync
                     }
 
-                    VaultHook.useEconomy { economy ->
-                        economy.withdrawPlayer(player, price.toDouble())
-                        economy.depositPlayer(Bukkit.getOfflinePlayer(owner), price.toDouble())
-                    }
-
-                    val buyingUser = UserHandler.getUser(player.uniqueId)
-                    buyingUser.addTokensBalance(quantity.toLong())
-                    UserHandler.saveUser(buyingUser)
-
+                    owningUser.addMoneyBalance(bigPrice)
                     owningUser.subtractTokensBalance(quantity.toLong())
-                    UserHandler.saveUser(owningUser)
+                    owningUser.requiresSave()
 
-                    player.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}from ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
-                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
+                    interactingUser.subtractMoneyBalance(bigPrice)
+                    interactingUser.addTokensBalance(quantity.toLong())
+                    interactingUser.requiresSave()
+
+                    player.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}from ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(bigPrice)}${ChatColor.GRAY}!")
+                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(bigPrice)}${ChatColor.GRAY}!")
                 } else {
-                    val ownerBalance = VaultHook.useEconomyAndReturn { it.getBalance(Bukkit.getOfflinePlayer(owner)) }
-                    if (ownerBalance < price.toLong()) {
+                    if (!owningUser.hasMoneyBalance(bigPrice)) {
                         player.sendMessage("${ChatColor.RED}${owningUser.getUsername()} doesn't have enough money to buy your tokens.")
                         return@sync
                     }
 
-                    val sellingUser = UserHandler.getUser(player.uniqueId)
-                    if (!sellingUser.hasTokenBalance(quantity.toLong())) {
-                        player.sendMessage("${ChatColor.RED}You don't have enough tokens to sell to that TokenShop.")
+                    if (!interactingUser.hasTokenBalance(quantity.toLong())) {
+                        player.sendMessage("${ChatColor.RED}You don't have enough tokens to sell to that token shop.")
                         return@sync
                     }
 
-                    VaultHook.useEconomy { economy ->
-                        economy.depositPlayer(player, price.toDouble())
-                        economy.withdrawPlayer(Bukkit.getOfflinePlayer(owner), price.toDouble())
-                    }
+                    interactingUser.addMoneyBalance(bigPrice)
+                    interactingUser.subtractTokensBalance(quantity.toLong())
+                    interactingUser.requiresSave()
 
-                    sellingUser.subtractTokensBalance(quantity.toLong())
-                    sellingUser.requiresSave()
-
+                    owningUser.subtractMoneyBalance(bigPrice)
                     owningUser.addTokensBalance(quantity.toLong())
                     owningUser.requiresSave()
 
-                    player.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
-                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(price.toDouble())}${ChatColor.GRAY}!")
+                    player.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(bigPrice)}${ChatColor.GRAY}!")
+                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(bigPrice)}${ChatColor.GRAY}!")
                 }
             }
         }

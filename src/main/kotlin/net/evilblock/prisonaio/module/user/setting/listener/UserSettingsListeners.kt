@@ -7,11 +7,14 @@
 
 package net.evilblock.prisonaio.module.user.setting.listener
 
+import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.tool.enchant.menu.PurchaseEnchantmentsMenu
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.tool.enchant.type.AbilityEnchant
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
@@ -27,22 +30,50 @@ import org.bukkit.event.player.PlayerInteractEvent
 
 object UserSettingsListeners : Listener {
 
+    /**
+     * Handles the Enchant Quick Access setting functionality.
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerInteractEvent(event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_AIR || (event.action == Action.RIGHT_CLICK_BLOCK && !Constants.CONTAINER_TYPES.contains(event.clickedBlock.type))) {
+            EnchantsManager.handleItemSwitch(event.player, event.player.inventory.itemInMainHand, event)
+
             val itemInHand = event.player.inventory.itemInMainHand
+
             if (MechanicsModule.isPickaxe(itemInHand)) {
                 if (AbilityEnchant.isOnGlobalCooldown(event.player)) {
                     return
                 }
 
+                // prevent menu from opening when on global cooldown
+                if (AbilityEnchant.isOnGlobalCooldown(event.player)) {
+                    return
+                }
+
+                val pickaxeData = PickaxeHandler.getPickaxeData(itemInHand)
+
+                // prevent menu from opening if the player is probably trying to use an ability
+                val checkLocation = if (event.action == Action.RIGHT_CLICK_BLOCK) {
+                    event.clickedBlock.location
+                } else {
+                    event.player.location
+                }
+
+                val region = RegionHandler.findRegion(checkLocation)
+                if (region.supportsAbilityEnchants()) {
+                    if (pickaxeData?.enchants?.any { it.key is AbilityEnchant } == true) {
+                        return
+                    }
+                }
+
                 val user = UserHandler.getUser(event.player.uniqueId)
                 if (user.settings.getSettingOption(UserSetting.QUICK_ACCESS_ENCHANTS).getValue()) {
-                    EnchantsManager.handleItemSwitch(event.player, itemInHand, event)
-
-                    val pickaxeData = PickaxeHandler.getPickaxeData(itemInHand)
                     if (pickaxeData != null) {
-                        PurchaseEnchantmentsMenu(itemInHand, pickaxeData).openMenu(event.player)
+                        Tasks.delayed(2L) {
+                            if (Menu.currentlyOpenedMenus[event.player.uniqueId] == null) {
+                                PurchaseEnchantmentsMenu(itemInHand, pickaxeData).openMenu(event.player)
+                            }
+                        }
                     }
                 }
             }
@@ -63,7 +94,7 @@ object UserSettingsListeners : Listener {
     }
 
     @EventHandler
-    fun onToggleMessagesEvent(event: ToggleSoundsEvent) {
+    fun onToggleSoundsEvent(event: ToggleSoundsEvent) {
         val user = UserHandler.getUser(event.uuid)
 
         if (event.playSounds) {

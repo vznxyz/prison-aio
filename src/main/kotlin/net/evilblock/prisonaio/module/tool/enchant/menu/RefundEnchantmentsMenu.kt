@@ -182,11 +182,11 @@ class RefundEnchantmentsMenu(private val pickaxeItem: ItemStack, private val pic
                             if (confirmed) {
                                 val level = pickaxeData.enchants[enchant]!!
 
-                                player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have discarded your pickaxe's ${enchant.textColor}${ChatColor.BOLD}Level $level ${enchant.enchant} ${ChatColor.GRAY}enchant.")
-                                player.updateInventory()
-
                                 pickaxeData.removeEnchant(enchant)
                                 pickaxeData.applyMeta(pickaxeItem)
+
+                                player.updateInventory()
+                                player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have discarded your pickaxe's ${enchant.textColor}${ChatColor.BOLD}Level $level ${enchant.enchant} ${ChatColor.GRAY}enchant.")
                             } else {
                                 player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted discarding of Cubed enchantment!")
                             }
@@ -206,13 +206,13 @@ class RefundEnchantmentsMenu(private val pickaxeItem: ItemStack, private val pic
                                 val refundableLevels = refundableEnchants.getValue(enchant)
                                 val refundedTokens = enchant.getRefundTokens(refundableLevels)
 
-                                player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have refunded your pickaxe's ${enchant.textColor}${ChatColor.BOLD}Level $refundableLevels ${enchant.enchant} ${ChatColor.GRAY}enchant for ${Formats.formatTokens(refundedTokens)}${ChatColor.GRAY}.")
-                                player.updateInventory()
-
                                 Currency.Type.TOKENS.give(player.uniqueId, refundedTokens)
 
                                 pickaxeData.removeEnchant(enchant)
                                 pickaxeData.applyMeta(pickaxeItem)
+
+                                player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have refunded your pickaxe's ${enchant.textColor}${ChatColor.BOLD}Level $refundableLevels ${enchant.enchant} ${ChatColor.GRAY}enchant for ${Formats.formatTokens(refundedTokens)}${ChatColor.GRAY}.")
+                                player.updateInventory()
                             } else {
                                 player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted refund!")
                             }

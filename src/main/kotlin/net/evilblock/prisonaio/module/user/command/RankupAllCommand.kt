@@ -8,14 +8,7 @@
 package net.evilblock.prisonaio.module.user.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.cubed.util.hook.VaultHook
-import net.evilblock.prisonaio.module.rank.Rank
-import net.evilblock.prisonaio.module.rank.RankHandler
-import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.user.UserHandler
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
 object RankupAllCommand {

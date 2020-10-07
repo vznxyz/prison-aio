@@ -32,6 +32,7 @@ object BackpackWipeCommand {
 
         BackpackHandler.wipeBackpacks()
         BackpackHandler.saveData()
+
         sender.sendMessage("${ChatColor.GOLD}Wiped $count backpacks!")
     }
 

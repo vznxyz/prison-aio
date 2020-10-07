@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.user.bank
 
 import net.evilblock.cubed.util.bukkit.HiddenLore
 import net.evilblock.cubed.util.bukkit.ItemBuilder
-import net.evilblock.cubed.util.hook.VaultHook
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
@@ -60,12 +59,14 @@ data class BankNote(val uuid: UUID = UUID.randomUUID(),
     fun redeem(player: Player) {
         redeemed = true
 
+        val user = UserHandler.getUser(player.uniqueId)
         if (useTokens) {
-            val user = UserHandler.getUser(player.uniqueId)
             user.addTokensBalance(value.toLong())
         } else {
-            VaultHook.useEconomy { economy -> economy.depositPlayer(player, value) }
+            user.addMoneyBalance(value)
         }
+
+        user.requiresSave()
 
         player.sendMessage("${ChatColor.GREEN}You redeemed ${getFormattedValue()} ${ChatColor.GREEN}into your account.")
     }

@@ -42,6 +42,10 @@ object Zeus : AbilityEnchant(id = "zeus", enchant = "Zeus", maxLevel = 3) {
             return
         }
 
+        if (!isOnGlobalCooldown(event.player)) {
+            return
+        }
+
         if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
             event.isCancelled = true
 

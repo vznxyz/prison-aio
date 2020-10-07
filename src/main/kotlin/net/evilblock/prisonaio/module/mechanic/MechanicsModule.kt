@@ -26,6 +26,10 @@ import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackWipeComm
 import net.evilblock.prisonaio.module.mechanic.backpack.command.parameter.BackpackParameterType
 import net.evilblock.prisonaio.module.mechanic.backpack.listener.BackpackListeners
 import net.evilblock.prisonaio.module.mechanic.listener.*
+import net.evilblock.prisonaio.module.mechanic.trade.command.TradeAcceptCommand
+import net.evilblock.prisonaio.module.mechanic.trade.command.TradeCommand
+import net.evilblock.prisonaio.module.mechanic.trade.command.admin.TradeToggleCommand
+import net.evilblock.prisonaio.module.mechanic.trade.listener.TradeListeners
 import org.bukkit.Material
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
@@ -87,7 +91,8 @@ object MechanicsModule : PluginModule() {
             StreamListeners,
             VanillaMechanicsListeners,
             BackpackListeners,
-            AbilityArmorListeners
+            AbilityArmorListeners,
+            TradeListeners
         )
     }
 
@@ -99,7 +104,10 @@ object MechanicsModule : PluginModule() {
             BackpackWipeCommand.javaClass,
             GiveArmorPieceCommand.javaClass,
             GiveArmorSetCommand.javaClass,
-            SpawnDisplayCommand.javaClass
+            SpawnDisplayCommand.javaClass,
+            TradeAcceptCommand.javaClass,
+            TradeToggleCommand.javaClass,
+            TradeCommand.javaClass
         )
     }
 

@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.util.plot.PlotUtil
 import org.bukkit.ChatColor
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
@@ -27,6 +28,10 @@ class GlobalRegion : Region("__global__") {
 
     override fun onRightClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
         if (PlotUtil.getPlot(clickedBlock.location) != null) {
+            return
+        }
+
+        if (clickedBlock.type == Material.ENDER_CHEST) {
             return
         }
 

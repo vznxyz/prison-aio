@@ -13,6 +13,7 @@ import net.evilblock.prisonaio.module.user.event.AsyncPlayTimeSyncEvent
 import net.evilblock.prisonaio.util.economy.Currency
 import java.math.BigInteger
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 class UserStatistics(@Transient internal var user: User) {
 
@@ -25,11 +26,13 @@ class UserStatistics(@Transient internal var user: User) {
     private var deaths: Int = 0
 
     private var blocksMined: Int = 0
-    private val blocksMinedAtMines: MutableMap<String, Int> = hashMapOf()
+    private val blocksMinedAtMines: MutableMap<String, Int> = ConcurrentHashMap()
 
     private var coinflipWins: Int = 0
     private var coinflipLosses: Int = 0
     private var coinflipProfit: MutableMap<Currency.Type, BigInteger> = EnumMap(Currency.Type::class.java)
+
+    private var tradesCompleted: Int = 0
 
     fun getBlocksMined(): Int {
         return blocksMined
@@ -135,10 +138,21 @@ class UserStatistics(@Transient internal var user: User) {
 
     fun addCoinflipProfit(currency: Currency.Type, amount: Number) {
         coinflipProfit[currency] = getCoinflipProfit(currency) + BigInteger(amount.toString())
+        user.requiresSave = true
     }
 
     fun subtractCoinflipProfit(currency: Currency.Type, amount: Number) {
         coinflipProfit[currency] = getCoinflipProfit(currency) - BigInteger(amount.toString())
+        user.requiresSave = true
+    }
+
+    fun getTradesCompleted(): Int {
+        return tradesCompleted
+    }
+
+    fun addTradesCompleted() {
+        tradesCompleted++
+        user.requiresSave = true
     }
 
 }
