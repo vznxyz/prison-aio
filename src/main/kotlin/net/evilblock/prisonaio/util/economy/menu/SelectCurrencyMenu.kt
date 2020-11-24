@@ -16,34 +16,50 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 
-class SelectCurrencyMenu(private val select: (Currency.Type) -> Unit) : Menu() {
-
-    init {
-        placeholder = true
-    }
+class SelectCurrencyMenu(
+    private val title: String = "Select a currency...",
+    private val simple: Boolean = true,
+    private val select: (Currency.Type) -> Unit
+) : Menu() {
 
     override fun getTitle(player: Player): String {
-        return "Select Currency"
+        return title
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        buttons[9] = GlassButton(5)
-        buttons[10] = CurrencyButton(Currency.Type.MONEY)
-        buttons[11] = GlassButton(5)
+        if (simple) {
+            buttons[1] = GlassButton(5)
+            buttons[2] = CurrencyButton(Currency.Type.MONEY)
+            buttons[3] = GlassButton(5)
 
-        buttons[12] = GlassButton(1)
-        buttons[13] = CurrencyButton(Currency.Type.TOKENS)
-        buttons[14] = GlassButton(1)
+            buttons[5] = GlassButton(1)
+            buttons[6] = CurrencyButton(Currency.Type.TOKENS)
+            buttons[7] = GlassButton(1)
 
-        buttons[15] = GlassButton(14)
-        buttons[16] = CurrencyButton(Currency.Type.PRESTIGE_TOKENS)
-        buttons[17] = GlassButton(14)
+            for (i in 0 until 9) {
+                if (!buttons.containsKey(i)) {
+                    buttons[i] = GlassButton(7)
+                }
+            }
+        } else {
+            buttons[9] = GlassButton(5)
+            buttons[10] = CurrencyButton(Currency.Type.MONEY)
+            buttons[11] = GlassButton(5)
 
-        for (i in 0..26) {
-            if (!buttons.containsKey(i)) {
-                buttons[i] = GlassButton(7)
+            buttons[12] = GlassButton(1)
+            buttons[13] = CurrencyButton(Currency.Type.TOKENS)
+            buttons[14] = GlassButton(1)
+
+            buttons[15] = GlassButton(14)
+            buttons[16] = CurrencyButton(Currency.Type.PRESTIGE_TOKENS)
+            buttons[17] = GlassButton(14)
+
+            for (i in 0 until 27) {
+                if (!buttons.containsKey(i)) {
+                    buttons[i] = GlassButton(7)
+                }
             }
         }
 

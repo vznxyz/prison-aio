@@ -16,7 +16,7 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.practice.region.util.CoordSet2D
 import net.evilblock.practice.region.util.CoordSet3D
-import net.evilblock.prisonaio.module.region.impl.global.GlobalRegion
+import net.evilblock.prisonaio.module.region.global.GlobalRegion
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import java.io.File
@@ -56,7 +56,7 @@ object RegionHandler : PluginHandler {
     override fun saveData() {
         super.saveData()
 
-        Files.write(Cubed.gson.toJson(regions.values, DATA_TYPE), getInternalDataFile(), Charsets.UTF_8)
+        Files.write(Cubed.gson.toJson(regions.values.filter { it.persistent }, DATA_TYPE), getInternalDataFile(), Charsets.UTF_8)
     }
 
     fun getRegions(): List<Region> {
@@ -90,7 +90,7 @@ object RegionHandler : PluginHandler {
             val cuboid = region.getCuboid()!!
 
             if (region.is3D()) {
-                for (x in (cuboid.lowerX)..(cuboid.upperX)) {
+                for (x in (cuboid.lowerX + 1)..(cuboid.upperX + 1)) {
                     for (y in (cuboid.lowerY)..(cuboid.upperY)) {
                         for (z in (cuboid.lowerZ)..(cuboid.upperZ)) {
                             val coordSet = CoordSet3D(cuboid.world, x, y, z)
@@ -105,9 +105,9 @@ object RegionHandler : PluginHandler {
                     }
                 }
             } else {
-                for (x in (region.getCuboid()!!.lowerX)..(region.getCuboid()!!.upperX)) {
-                    for (z in (region.getCuboid()!!.lowerZ)..(region.getCuboid()!!.upperZ)) {
-                        val coordSet = CoordSet2D(region.getCuboid()!!.world, x, z)
+                for (x in (cuboid.lowerX + 1)..(cuboid.upperX + 1)) {
+                    for (z in (cuboid.lowerZ)..(cuboid.upperZ)) {
+                        val coordSet = CoordSet2D(cuboid.world, x, z)
 
                         val cachedRegion = regions2D[coordSet]
                         if (cachedRegion != null && cachedRegion.getPriority() > region.getPriority()) {
@@ -126,7 +126,7 @@ object RegionHandler : PluginHandler {
             val cuboid = region.getCuboid()!!
 
             if (region.is3D()) {
-                for (x in (cuboid.lowerX)..(cuboid.upperX)) {
+                for (x in (cuboid.lowerX + 1)..(cuboid.upperX + 1)) {
                     for (y in (cuboid.lowerY)..(cuboid.upperY)) {
                         for (z in (cuboid.lowerZ)..(cuboid.upperZ)) {
                             val coordSet = CoordSet3D(cuboid.world, x, y, z)
@@ -141,7 +141,7 @@ object RegionHandler : PluginHandler {
                     }
                 }
             } else {
-                for (x in (cuboid.lowerX)..(cuboid.upperX)) {
+                for (x in (cuboid.lowerX + 1)..(cuboid.upperX + 1)) {
                     for (y in (cuboid.lowerY)..(cuboid.upperY)) {
                         for (z in (cuboid.lowerZ)..(cuboid.upperZ)) {
                             val coordSet = CoordSet2D(cuboid.world, x, z)

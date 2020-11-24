@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 object ForceStartCommand {
 
     @Command(
-        names = ["event force-start", "events force-start"],
+        names = ["event admin force-start", "events admin force-start"],
         description = "Forcefully start an event",
         permission = Permissions.EVENTS_HOST_CONTROLS
     )

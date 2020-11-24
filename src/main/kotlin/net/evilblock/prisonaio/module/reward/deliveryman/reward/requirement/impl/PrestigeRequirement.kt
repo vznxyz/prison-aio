@@ -49,7 +49,7 @@ class PrestigeRequirement(private var prestige: Int) : DeliveryManRewardRequirem
         }
 
         override fun startSetupProcedure(player: Player, reward: DeliveryManReward) {
-            ConversationUtil.startConversation(player, NumberPrompt { number ->
+            NumberPrompt().acceptInput { number ->
                 assert(number.toInt() > 0)
 
                 reward.requirements.add(PrestigeRequirement(number.toInt()))
@@ -61,7 +61,7 @@ class PrestigeRequirement(private var prestige: Int) : DeliveryManRewardRequirem
                 player.sendMessage("${ChatColor.GREEN}Successfully added requirement.")
 
                 EditDeliveryManRewardRequirementsMenu(reward).openMenu(player)
-            })
+            }.start(player)
         }
 
         override fun isCompatibleWithReward(reward: DeliveryManReward): Boolean {

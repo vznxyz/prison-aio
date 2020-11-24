@@ -14,6 +14,7 @@ import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.achievement.Achievement
 import net.evilblock.prisonaio.module.battlepass.BattlePassProgress
+import net.evilblock.prisonaio.module.exchange.listing.GrandExchangeListing
 import net.evilblock.prisonaio.module.quest.Quest
 import net.evilblock.prisonaio.module.quest.QuestHandler
 import net.evilblock.prisonaio.module.quest.progress.QuestProgress
@@ -24,6 +25,7 @@ import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.rank.serialize.RankReferenceSerializer
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
 import net.evilblock.prisonaio.module.user.activity.type.CompletedAchievementActivity
+import net.evilblock.prisonaio.module.user.exchange.GrandExchangeUserData
 import net.evilblock.prisonaio.module.user.news.News
 import net.evilblock.prisonaio.module.user.perk.UserPerks
 import net.evilblock.prisonaio.module.user.profile.ProfileComment
@@ -31,8 +33,6 @@ import net.evilblock.prisonaio.module.user.statistic.UserStatistics
 import net.evilblock.prisonaio.module.user.serialize.UserClaimedRewardsSerializer
 import net.evilblock.prisonaio.module.user.serialize.UserQuestProgressSerializer
 import net.evilblock.prisonaio.module.user.serialize.UserReadNewsPostsSerializer
-import net.evilblock.prisonaio.module.user.setting.UserSetting
-import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import net.evilblock.prisonaio.module.user.setting.UserSettings
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -61,17 +61,17 @@ class User(val uuid: UUID) {
     private var prestige: Int = 0
     private var prestigeTokens: Int = 0
 
-    private var moneyBalance: BigDecimal = BigDecimal("0.00")
-    private var tokenBalance: BigInteger = BigInteger("0")
+    private var moneyBalance: BigDecimal = BigDecimal.ZERO
+    private var tokenBalance: BigInteger = BigInteger.ZERO
 
-    val perks: UserPerks = UserPerks(this)
-    val statistics: UserStatistics = UserStatistics(this)
-    val settings: UserSettings = UserSettings(this)
+    var perks: UserPerks = UserPerks(this)
+    var statistics: UserStatistics = UserStatistics(this)
+    var settings: UserSettings = UserSettings(this)
+    var grandExchangeData: GrandExchangeUserData = GrandExchangeUserData(this)
+    var battlePassProgress: BattlePassProgress = BattlePassProgress(this)
 
     private val profileComments: MutableList<ProfileComment> = arrayListOf()
     private val achievements: MutableMap<String, CompletedAchievementActivity> = hashMapOf()
-
-    var battlePassProgress: BattlePassProgress = BattlePassProgress(this)
 
     @JsonAdapter(UserQuestProgressSerializer::class)
     private val questProgress: MutableMap<Quest, QuestProgress> = hashMapOf()
@@ -83,10 +83,39 @@ class User(val uuid: UUID) {
     internal var readNews: MutableSet<News> = hashSetOf()
 
     fun init() {
-        perks.user = this
-        statistics.user = this
-        settings.user = this
-        battlePassProgress.user = this
+        if (perks == null) {
+            perks = UserPerks(this)
+        } else {
+            perks.user = this
+        }
+
+        if (statistics == null) {
+            statistics = UserStatistics(this)
+        } else {
+            statistics.user = this
+        }
+
+        if (settings == null) {
+            settings = UserSettings(this)
+        } else {
+            settings.user = this
+        }
+
+        if (grandExchangeData == null) {
+            grandExchangeData = GrandExchangeUserData(this)
+        } else {
+            grandExchangeData.user = this
+
+            if (grandExchangeData.bidListings == null) {
+                grandExchangeData.bidListings = arrayListOf()
+            }
+        }
+
+        if (battlePassProgress == null) {
+            battlePassProgress = BattlePassProgress(this)
+        } else {
+            battlePassProgress.user = this
+        }
     }
 
     /**

@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.util
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.TextUtil
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.source.messaging.MessagingManager
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -27,7 +28,11 @@ object Formats {
 
     @JvmStatic
     fun formatPlayer(player: Player, prefix: String = "${ChatColor.RESET}"): String {
-        return "$prefix${player.playerListName}"
+        return if (player.hasMetadata("EP_PLAYER_LIST_NAME")) {
+            ChatColor.translateAlternateColorCodes('&', prefix + player.getMetadata(MessagingManager.getMetadataAdapterKey())[0].asString() + player.displayName)
+        } else {
+            "${ChatColor.translateAlternateColorCodes('&', prefix)}${player.name}"
+        }
     }
 
     @JvmStatic

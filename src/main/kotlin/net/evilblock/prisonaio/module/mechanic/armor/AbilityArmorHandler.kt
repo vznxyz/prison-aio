@@ -14,6 +14,7 @@ import net.evilblock.prisonaio.module.mechanic.armor.impl.MinerArmorSet
 import net.evilblock.prisonaio.module.mechanic.armor.impl.WardenArmorSet
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
+import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -69,6 +70,15 @@ object AbilityArmorHandler {
 
     fun getEquippedSet(player: Player): AbilityArmorSet? {
         return equippedSet[player.uniqueId]
+    }
+
+    fun isArmorPiece(itemStack: ItemStack): Boolean {
+        for (set in registeredSets) {
+            if (set.isArmorPiece(itemStack, false)) {
+                return true
+            }
+        }
+        return false
     }
 
 }

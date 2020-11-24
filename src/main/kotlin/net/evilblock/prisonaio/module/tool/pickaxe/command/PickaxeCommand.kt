@@ -44,8 +44,7 @@ object PickaxeCommand {
         val pickaxeData = PickaxeData()
         PickaxeHandler.trackPickaxeData(pickaxeData)
 
-        pickaxe = pickaxeData.applyNBT(pickaxe)
-        pickaxeData.applyMeta(pickaxe)
+        pickaxe = pickaxeData.toItemStack(pickaxe)
 
         if (efficiencyLevel > 0) {
             EnchantsManager.upgradeEnchant(target, pickaxeData, pickaxe, Efficiency, efficiencyLevel, true)

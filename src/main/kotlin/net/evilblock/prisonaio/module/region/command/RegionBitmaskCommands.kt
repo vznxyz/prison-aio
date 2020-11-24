@@ -76,7 +76,7 @@ object RegionBitmaskCommands {
             return
         }
 
-        region.setBitmask(region.getRawBitmask() + bitmask.bitmaskValue)
+        region.addBitmask(bitmask)
         RegionHandler.saveData()
 
         sender.sendMessage("${ChatColor.GREEN}Applied ${bitmask.displayName} bitmask flag to ${region.getRegionName()}.")
@@ -103,7 +103,7 @@ object RegionBitmaskCommands {
             return
         }
 
-        region.setBitmask(region.getRawBitmask() - bitmask.bitmaskValue)
+        region.removeBitmask(bitmask)
         RegionHandler.saveData()
 
         sender.sendMessage("${ChatColor.GREEN}Removed ${bitmask.displayName} bitmask flag from ${region.getRegionName()}.")

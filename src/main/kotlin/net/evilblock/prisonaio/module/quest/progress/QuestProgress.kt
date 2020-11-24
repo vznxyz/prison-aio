@@ -91,7 +91,7 @@ open class QuestProgress(@JsonAdapter(QuestReferenceSerializer::class) internal 
         requiresSave = true
     }
 
-    object Serializer : JsonSerializer<QuestProgress>, JsonDeserializer<QuestProgress> {
+    class Serializer : JsonSerializer<QuestProgress>, JsonDeserializer<QuestProgress> {
         override fun serialize(src: QuestProgress, typeOf: Type, context: JsonSerializationContext): JsonElement {
             val json = JsonObject()
             json.addProperty("quest", src.quest.getId())

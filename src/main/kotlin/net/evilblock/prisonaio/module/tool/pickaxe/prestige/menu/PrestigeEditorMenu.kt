@@ -84,10 +84,10 @@ class PrestigeEditorMenu : PaginatedMenu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                NumberPrompt("${ChatColor.GREEN}Please input a prestige (number) to create.") { number ->
+                NumberPrompt().withText("${ChatColor.GREEN}Please input a prestige (number) to create.").acceptInput { number ->
                     if (PickaxePrestigeHandler.getPrestige(number.toInt()) != null) {
                         player.sendMessage("${ChatColor.RED}A prestige with that number already exists.")
-                        return@NumberPrompt
+                        return@acceptInput
                     }
 
                     assert(number.toInt() > 0) { "Number must be more than 0" }

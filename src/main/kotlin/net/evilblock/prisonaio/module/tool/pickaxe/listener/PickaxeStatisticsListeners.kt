@@ -43,7 +43,7 @@ object PickaxeStatisticsListeners : Listener {
         val itemInHand = event.player.inventory.itemInMainHand
         PickaxeHandler.getPickaxeData(itemInHand)?.let {
             it.blocksMined++
-//            it.applyMeta(itemInHand)
+            it.applyMeta(itemInHand)
             event.player.updateInventory()
         }
     }

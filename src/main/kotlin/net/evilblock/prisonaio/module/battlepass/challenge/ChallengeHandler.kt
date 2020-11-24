@@ -113,7 +113,11 @@ object ChallengeHandler : PluginHandler {
         }
 
         for (challenge in DailyChallengeHandler.getSession().getChallenges()) {
-            if (DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) {
+            if (!challenge.daily) {
+                continue
+            }
+
+            if (user.battlePassProgress.hasCompletedChallenge(challenge)) {
                 continue
             }
 

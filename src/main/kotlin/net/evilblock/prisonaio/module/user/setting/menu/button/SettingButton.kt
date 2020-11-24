@@ -10,27 +10,23 @@ package net.evilblock.prisonaio.module.user.setting.menu.button
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import org.bukkit.ChatColor
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
+import org.bukkit.inventory.ItemStack
 
 class SettingButton(private val user: User, private val setting: UserSetting) : Button() {
 
-    override fun getName(player: Player): String {
-        return "${ChatColor.YELLOW}${ChatColor.BOLD}${setting.getDisplayName()}"
-    }
-
-    override fun getDescription(player: Player): List<String> {
-        val description = arrayListOf<String>()
-
-        description.add("")
-        description.addAll(TextSplitter.split(length = 40, text = setting.getDescription(), linePrefix = "${ChatColor.GRAY}"))
-        description.add("")
+    override fun getButtonItem(player: Player): ItemStack {
+        val lore = arrayListOf<String>()
+        lore.add("")
+        lore.addAll(TextSplitter.split(length = 40, text = setting.getDescription(), linePrefix = "${ChatColor.GRAY}"))
+        lore.add("")
 
         for (option in setting.getOptions<UserSettingOption>()) {
             val builder = StringBuilder()
@@ -45,22 +41,19 @@ class SettingButton(private val user: User, private val setting: UserSetting) : 
                 builder.append(" ${ChatColor.GRAY}(Default)")
             }
 
-            description.add(builder.toString())
+            lore.add(builder.toString())
         }
 
-        description.add("")
-        description.add("${ChatColor.BLUE}${Constants.ARROW_UP} ${ChatColor.YELLOW}${ChatColor.BOLD}LEFT-CLICK")
-        description.add("${ChatColor.BLUE}${Constants.ARROW_DOWN} ${ChatColor.YELLOW}${ChatColor.BOLD}RIGHT-CLICK")
+        lore.add("")
+        lore.add("${ChatColor.BLUE}${Constants.ARROW_UP} ${ChatColor.YELLOW}${ChatColor.BOLD}LEFT-CLICK")
+        lore.add("${ChatColor.BLUE}${Constants.ARROW_DOWN} ${ChatColor.YELLOW}${ChatColor.BOLD}RIGHT-CLICK")
 
-        return description
-    }
+        val item = setting.icon.invoke(user.settings.getSettingOption(setting))
 
-    override fun getMaterial(player: Player): Material {
-        return setting.getIcon().type
-    }
-
-    override fun getDamageValue(player: Player): Byte {
-        return setting.getIcon().durability.toByte()
+        return ItemBuilder.copyOf(item)
+            .name("${ChatColor.YELLOW}${ChatColor.BOLD}${setting.getDisplayName()}")
+            .setLore(lore)
+            .build()
     }
 
     override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {

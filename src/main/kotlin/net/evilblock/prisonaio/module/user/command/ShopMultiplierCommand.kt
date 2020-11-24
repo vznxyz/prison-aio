@@ -78,13 +78,13 @@ object ShopMultiplierCommand {
         if (abilityArmor is MinerArmorSet || abilityArmor is WardenArmorSet) {
             hasMultiplier = true
 
-            player.sendMessage("${ChatColor.GRAY}You have a Miner Armor multiplier of ${ChatColor.RED}${ChatColor.BOLD}${DECIMAL_FORMAT.format(4)}x${ChatColor.GRAY}.")
+            player.sendMessage("${ChatColor.GRAY}You have a miner armor multiplier of ${ChatColor.RED}${ChatColor.BOLD}${DECIMAL_FORMAT.format(4)}x${ChatColor.GRAY}.")
         }
 
         if (!hasMultiplier) {
             player.sendMessage("${ChatColor.RED}You don't have any active multipliers!")
         } else {
-            player.sendMessage("${ChatColor.GRAY}Your stacked multiplier is ${ChatColor.RED}${ChatColor.BOLD}${user.perks.getSalesMultiplier(player)}${ChatColor.GRAY}.")
+            player.sendMessage("${ChatColor.GRAY}Your stacked multiplier is ${ChatColor.RED}${ChatColor.BOLD}${user.perks.getSalesMultiplier(player)}x${ChatColor.GRAY}.")
         }
     }
 

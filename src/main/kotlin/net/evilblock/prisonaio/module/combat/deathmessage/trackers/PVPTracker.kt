@@ -26,14 +26,14 @@ class PVPTracker : Listener {
         }
     }
 
-    class PVPDamage(damaged: UUID, damage: Double, damager: UUID, itemStack: ItemStack) : PlayerDamage(damaged, damage, damager) {
-        private var itemString = if (itemStack.type == Material.AIR) {
-            "their fists"
-        } else {
-            getChatName(itemStack)!!
-        }
-
+    class PVPDamage(damaged: UUID, damage: Double, damager: UUID, private val weapon: ItemStack) : PlayerDamage(damaged, damage, damager) {
         override fun getDeathMessage(): String {
+            val itemString = if (weapon.type == Material.AIR) {
+                "their fists"
+            } else {
+                getChatName(weapon)
+            }
+
             val extension = " using ${ChatColor.RED}$itemString${ChatColor.YELLOW}."
             return "${wrapName(damaged)} was slain by ${wrapName(damager)}$extension"
         }

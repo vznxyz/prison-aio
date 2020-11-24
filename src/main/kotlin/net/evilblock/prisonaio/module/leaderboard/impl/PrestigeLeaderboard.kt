@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.leaderboard.impl
 import net.evilblock.cubed.Cubed
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
+import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
 import java.text.NumberFormat
@@ -23,8 +24,14 @@ object PrestigeLeaderboard : Leaderboard("prestige", "${ChatColor.RED}${ChatColo
         for (document in UserHandler.getCollection().find()) {
             val uuid = UUID.fromString(document.getString("uuid"))
 
+            if (LeaderboardsModule.exemptions.contains(uuid)) {
+                continue
+            }
+
+            val displayName = Cubed.instance.uuidCache.name(uuid)
             val currentPrestige = document.getInteger("prestige") ?: document.getInteger("currentPrestige")
-            entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), currentPrestige))
+
+            entries.add(LeaderboardEntry(0, displayName, displayName, currentPrestige))
         }
 
         return entries.sortedByDescending { it.value }.take(CACHED_ENTRIES_SIZE)

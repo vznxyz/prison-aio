@@ -19,11 +19,11 @@ class FallTracker : Listener {
             return
         }
 
-        val record: List<Damage>? = getDamageList(event.getPlayer())
+        val record: List<Damage> = getDamageList(event.getPlayer())
         var knocker: Damage? = null
         var knockerTime = 0L
 
-        if (record != null) {
+        if (record.isNotEmpty()) {
             for (damage in record) {
                 if (damage is FallDamage || damage is FallDamageByPlayer) {
                     continue

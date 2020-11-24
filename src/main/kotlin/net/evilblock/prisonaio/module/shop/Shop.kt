@@ -29,11 +29,12 @@ import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.math.BigDecimal
+import java.util.concurrent.ConcurrentHashMap
 
 class Shop(var id: String) {
 
     var name: String = id
-    val items: MutableList<ShopItem> = arrayListOf()
+    val items: MutableSet<ShopItem> = ConcurrentHashMap.newKeySet()
     var priority: Int = 0
     var menuTemplate: ShopMenuTemplate? = null
     var currency: Currency.Type = Currency.Type.MONEY
@@ -41,9 +42,15 @@ class Shop(var id: String) {
     fun init() {
         menuTemplate?.shop = this
 
+        syncItemsOrder()
+
         for (item in items) {
             if (item.commands == null) {
                 item.commands = arrayListOf()
+            }
+
+            if (item.purchaseTimestamps == null) {
+                item.purchaseTimestamps = ConcurrentHashMap()
             }
         }
     }
@@ -214,7 +221,7 @@ class Shop(var id: String) {
             return
         }
 
-        TemplateMenu(menuTemplate!!).openMenu(player)
+        TemplateMenu(template = menuTemplate!!, autoUpdate = true, autoUpdateInterval = 500L).openMenu(player)
     }
 
 }

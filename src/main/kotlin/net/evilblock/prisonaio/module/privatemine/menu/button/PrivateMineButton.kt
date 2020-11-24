@@ -42,13 +42,20 @@ class PrivateMineButton(private val parent: Menu, private val privateMine: Priva
         description.add("${ChatColor.GRAY}Players: ${ChatColor.GREEN}${privateMine.getActivePlayers().size}${ChatColor.GRAY}/${ChatColor.BOLD}${playerLimit}")
         description.add("${ChatColor.GRAY}Reset Interval: ${ChatColor.GREEN}$resetInterval")
         description.add("${ChatColor.GRAY}Sales Tax: ${ChatColor.GREEN}$salesTax%")
-        description.add("")
 
         if (PrivateMineHandler.getAccessibleMines(player.uniqueId).contains(privateMine)) {
+            if (description.last() != "") {
+                description.add("")
+            }
+
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to teleport")
         }
 
         if (privateMine.owner == player.uniqueId) {
+            if (description.last() != "") {
+                description.add("")
+            }
+
             description.add("${ChatColor.AQUA}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.AQUA}to open settings")
         }
 

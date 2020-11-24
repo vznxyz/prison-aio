@@ -159,7 +159,7 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
     }
 
     override fun getAutoUpdateTicks(): Long {
-        return 10L
+        return 500L
     }
 
     private inner class PlayerButton(private val user: User, private val white: Boolean) : SkullButton(owner = user.uuid) {
@@ -265,12 +265,14 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
                 }
 
                 ConfirmMenu("${ChatColor.GREEN}${ChatColor.BOLD}ENTER GAME?") { confirmed ->
-                    if (game.isWaitingForOpponent()) {
-                        if (confirmed) {
+                    if (confirmed) {
+                        if (game.isWaitingForOpponent()) {
                             game.currency.take(player.uniqueId, game.currencyAmount)
                             game.opponent = UserHandler.getUser(player.uniqueId)
                             game.sendMessage("${CoinFlipHandler.CHAT_PREFIX}${ChatColor.AQUA}${ChatColor.BOLD}${player.name} ${ChatColor.GRAY}has entered the game!")
                             game.sendMessage("${CoinFlipHandler.CHAT_PREFIX}Starting in 3 seconds...")
+                        } else {
+                            game.sendMessage("${ChatColor.RED}That game has already started!")
                         }
                     }
 

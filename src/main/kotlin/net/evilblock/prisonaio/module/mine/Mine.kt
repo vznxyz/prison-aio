@@ -7,17 +7,13 @@
 
 package net.evilblock.prisonaio.module.mine
 
-import net.evilblock.cubed.lite.LiteEdit
-import net.evilblock.cubed.lite.LiteRegion
+import net.evilblock.cubed.menu.Button
+import net.evilblock.cubed.serialize.AbstractTypeSerializable
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import net.evilblock.prisonaio.module.mine.block.BlockType
-import net.evilblock.prisonaio.module.mine.config.MineBlocksConfig
-import net.evilblock.prisonaio.module.mine.config.MineResetConfig
 import net.evilblock.prisonaio.module.mine.event.MineBlockBreakEvent
-import net.evilblock.prisonaio.module.region.Region
-import net.evilblock.prisonaio.module.reward.RewardsModule
-import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
-import net.minecraft.server.v1_12_R1.IBlockData
+import net.evilblock.prisonaio.module.mine.menu.button.MineTeleportButton
+import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Chunk
@@ -25,34 +21,22 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
-import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 
-class Mine(id: String) : Region(id) {
+abstract class Mine(id: String) : BitmaskRegion(id, null), AbstractTypeSerializable {
 
-    @Nullable
-    var spawnPoint: Location? = null
-
-    @Nullable
     var region: Cuboid? = null
-
-    @NotNull
-    val blocksConfig: MineBlocksConfig = MineBlocksConfig()
-
-    @NotNull
-    val resetConfig: MineResetConfig = MineResetConfig()
-
-    var permission: String? = null
-
-    @Transient
-    var lastResetCheck: Long = System.currentTimeMillis()
+    var spawnPoint: Location? = null
+    var permission: String? = Permissions.MINE_ACCESS + id
 
     @Transient
     var cachedChunks: MutableSet<Chunk> = hashSetOf()
 
-    fun cacheChunks() {
-        cachedChunks = hashSetOf()
-        region?.getChunks()?.forEach { chunk -> cachedChunks.add(chunk) }
+    init {
+        persistent = false
+    }
+
+    open fun initializeData() {
+        cacheChunks()
     }
 
     override fun getRegionName(): String {
@@ -110,43 +94,24 @@ class Mine(id: String) : Region(id) {
         MineBlockBreakEvent(player, block, this).call()
     }
 
-    /**
-     * Resets this mine's region
-     */
-    @Throws(IllegalStateException::class)
-    fun resetRegion() {
-        if (region == null) {
-            throw IllegalStateException("Cannot reset mine if its region is not set")
-        }
+    open fun supportsAutomaticReset(): Boolean {
+        return true
+    }
 
-        if (blocksConfig.blockTypes.isEmpty()) {
-            throw IllegalStateException("Cannot reset mine if the blocks config contains no block types")
-        }
-
-        val blockList = arrayListOf<BlockType>()
-        for (i in 0 until (region!!.sizeX * region!!.sizeY * region!!.sizeZ)) {
-            blockList.add(blocksConfig.pickRandomBlockType())
-        }
-
-        var index = 0
-
-        val liteRegion = LiteRegion(region!!)
-        LiteEdit.fill(liteRegion, object : LiteEdit.FillHandler {
-            override fun getBlock(x: Int, y: Int, z: Int): IBlockData? {
-                if (RewardsModule.isEnabled()) {
-                    if (MineCrateHandler.isAttached(Location(region!!.world, x.toDouble(), y.toDouble(), z.toDouble()))) {
-                        return null
-                    }
-                }
-
-                val blockType = blockList[index++]
-                return getData(blockType.material, blockType.data.toInt())
-            }
-        }, LiteEdit.VoidProgressCallBack)
+    open fun getEditorButtons(): List<Button> {
+        return listOf(MineTeleportButton(this))
     }
 
     /**
-     * Gets the players that are nearby this mine
+     * Executes this mine's region reset implementation.
+     */
+    @Throws(IllegalStateException::class)
+    open fun resetRegion() {
+        throw IllegalStateException("")
+    }
+
+    /**
+     * Builds and returns a list of players that are considered nearby.
      */
     fun getNearbyPlayers(): List<Player> {
         // players cannot be nearby a mine that has no region
@@ -158,7 +123,7 @@ class Mine(id: String) : Region(id) {
     }
 
     /**
-     * If a player is nearby this mine
+     * If the given [player] is considered nearby.
      */
     fun isNearbyMine(player: Player): Boolean {
         if (region == null) {
@@ -188,6 +153,11 @@ class Mine(id: String) : Region(id) {
 
         // the player is not nearby
         return false
+    }
+
+    fun cacheChunks() {
+        cachedChunks = hashSetOf()
+        region?.getChunks()?.forEach { chunk -> cachedChunks.add(chunk) }
     }
 
 }

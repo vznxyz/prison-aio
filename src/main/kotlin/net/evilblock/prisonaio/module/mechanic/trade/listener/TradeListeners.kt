@@ -8,6 +8,8 @@
 package net.evilblock.prisonaio.module.mechanic.trade.listener
 
 import net.evilblock.prisonaio.module.mechanic.trade.TradeHandler
+import net.evilblock.prisonaio.util.Formats
+import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -29,7 +31,12 @@ object TradeListeners : Listener {
      */
     @EventHandler
     fun onPlayerQuitEvent(event: PlayerQuitEvent) {
-        val activeTrade = TradeHandler.getActiveTrade(event.player)
+        TradeHandler.getActiveTrade(event.player)?.let { trade ->
+            TradeHandler.forgetActiveTrade(trade)
+
+            trade.cancel()
+            trade.sendMessage("${Formats.formatPlayer(event.player)} ${ChatColor.RED}logged out, so the trade has been cancelled!")
+        }
     }
 
 }

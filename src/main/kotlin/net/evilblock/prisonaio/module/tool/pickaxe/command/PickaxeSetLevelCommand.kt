@@ -20,7 +20,7 @@ object PickaxeSetLevelCommand {
     @Command(
         names = ["pickaxe set-level"],
         description = "Set the prestige of a pickaxe",
-        permission = "prisonaio.pickaxe.set-prestige",
+        permission = "prisonaio.pickaxe.set-level",
         async = true
     )
     @JvmStatic

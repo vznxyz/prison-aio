@@ -20,11 +20,14 @@ import net.evilblock.cubed.store.bukkit.UUIDCache
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.storage.StorageModule
+import net.evilblock.prisonaio.module.user.economy.EconomyProvider
+import net.milkbowl.vault.economy.Economy
 import org.bson.Document
 import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.plugin.ServicePriority
 import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -58,6 +61,8 @@ object UserHandler : PluginHandler {
     override fun initialLoad() {
         LogHandler.trackLogFile(economyLogFile)
 
+        getModule().getPluginFramework().server.servicesManager.register(Economy::class.java, EconomyProvider(), getModule().getPluginFramework(), ServicePriority.Highest)
+
         Tasks.delayed(10L) {
             loadOnlinePlayers()
         }
@@ -90,7 +95,12 @@ object UserHandler : PluginHandler {
 
         for (user in getUsers()) {
             if (user.requiresSave()) {
-                saveUser(user)
+                try {
+                    saveUser(user)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    PrisonAIO.instance.systemLog("Failed to save user data for ${user.getUsername()} (${user.uuid})")
+                }
             }
         }
     }
@@ -171,6 +181,7 @@ object UserHandler : PluginHandler {
 
         val document = Document.parse(Cubed.gson.toJson(user))
         usersCollection.replaceOne(Document("uuid", user.uuid.toString()), document, ReplaceOptions().upsert(true))
+
         user.requiresSave = false
     }
 

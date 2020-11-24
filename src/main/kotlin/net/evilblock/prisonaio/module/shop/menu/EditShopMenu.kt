@@ -8,14 +8,15 @@
 package net.evilblock.prisonaio.module.shop.menu
 
 import net.evilblock.cubed.menu.Button
-import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.AddButton
 import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.buttons.HelpButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
+import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.menu.template.button.CloneableMenuTemplateButton
 import net.evilblock.cubed.menu.template.menu.EditTemplateLayoutMenu
 import net.evilblock.cubed.util.TextSplitter
+import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.ConversationUtil
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -36,48 +37,57 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 
-class EditShopMenu(val shop: Shop) : Menu() {
+class EditShopMenu(val shop: Shop) : PaginatedMenu() {
 
     init {
         updateAfterClick = true
-        shop.syncItemsOrder()
     }
 
-    override fun getTitle(player: Player): String {
+    override fun getPrePaginatedTitle(player: Player): String {
         return "Edit Shop - ${shop.name}"
     }
 
-    override fun getButtons(player: Player): Map<Int, Button> {
-        val buttons = hashMapOf<Int, Button>()
+    override fun getGlobalButtons(player: Player): Map<Int, Button>? {
+        return hashMapOf<Int, Button>().also { buttons ->
+            buttons[1] = CreateShopItemButton()
+            buttons[2] = EditNameButton()
+            buttons[3] = EditPriorityButton()
+            buttons[4] = GuideButton()
+            buttons[5] = EditTemplateButton()
+            buttons[6] = EditCurrencyButton()
 
-        buttons[0] = EditNameButton()
-        buttons[2] = EditPriorityButton()
-        buttons[4] = GuideButton()
-        buttons[6] = EditTemplateButton()
-        buttons[8] = EditCurrencyButton()
-
-        for (i in 9..17) {
-            buttons[i] = GlassButton(0)
+            for (i in 9..17) {
+                buttons[i] = GlassButton(0)
+            }
         }
+    }
 
-        buttons[18] = CreateShopItemButton()
+    override fun getAllPagesButtons(player: Player): Map<Int, Button> {
+        return hashMapOf<Int, Button>().also { buttons ->
+            buttons[0] = CreateShopItemButton()
 
-        shop.items.sortedBy { it.order }.forEachIndexed { index, shopItem ->
-            buttons[18 + index + 1] = ShopItemButton(shopItem)
+            for (item in shop.items) {
+                buttons[buttons.size - 1] = ShopItemButton(item)
+            }
         }
+    }
 
-        val startFrom = 18 + shop.items.size + 1
-        for (index in startFrom until 54) {
-            buttons[index] = EmptySlotButton()
-        }
+    override fun getMaxItemsPerPage(player: Player): Int {
+        return 36
+    }
 
-        return buttons
+    override fun getButtonsStartOffset(): Int {
+        return 9
+    }
+
+    override fun getPageButtonSlots(): Pair<Int, Int> {
+        return Pair(0, 8)
     }
 
     override fun acceptsShiftClickedItem(player: Player, itemStack: ItemStack): Boolean {
         if (itemStack.type != Material.AIR) {
             val shopItemStack = itemStack.clone()
-            shop.items.add(ShopItem(shopItemStack, shopItemStack.amount))
+            shop.items.add(ShopItem(shopItemStack))
 
             Tasks.async {
                 shop.syncItemsOrder()
@@ -302,7 +312,7 @@ class EditShopMenu(val shop: Shop) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                SelectCurrencyMenu { currency ->
+                SelectCurrencyMenu(simple = false) { currency ->
                     shop.currency = currency
 
                     Tasks.async {
@@ -333,7 +343,8 @@ class EditShopMenu(val shop: Shop) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                val shopItem = ShopItem(itemStack = ItemBuilder.of(Material.COMMAND_REPEATING).name("${ChatColor.YELLOW}Default Shop Item").build(), amount = 1, giveItem = false)
+                val shopItem = ShopItem(itemStack = ItemBuilder.of(Material.COMMAND_REPEATING).name("${ChatColor.YELLOW}Default Shop Item").build(), giveItem = false)
+
                 shop.items.add(shopItem)
 
                 Tasks.async {
@@ -356,12 +367,11 @@ class EditShopMenu(val shop: Shop) : Menu() {
             description.add("${ChatColor.GRAY}(Price that the shop sells for)")
             description.add("")
 
-            if (item.giveItem) {
-                description.add("${ChatColor.GREEN}${ChatColor.BOLD}Currently giving item")
-            } else {
-                description.add("${ChatColor.RED}${ChatColor.BOLD}Currently not giving item")
+            if (item.hasPurchaseCooldown()) {
+                description.add("${ChatColor.GRAY}Purchase Cooldown: ${ChatColor.YELLOW}${TimeUtil.formatIntoAbbreviatedString((item.purchaseCooldown!!.get() / 1000.0).toInt())}")
             }
 
+            description.add("${ChatColor.GRAY}Give Item: ${if (item.giveItem) "${ChatColor.GREEN}${ChatColor.BOLD}yes" else "${ChatColor.RED}${ChatColor.BOLD}no"}")
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to set buy price")
             description.add("${ChatColor.YELLOW}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.YELLOW}to set sell price")
@@ -436,55 +446,33 @@ class EditShopMenu(val shop: Shop) : Menu() {
             }
 
             if (clickType.isLeftClick) {
-                NumberPrompt("${ChatColor.GREEN}Please input a buying price.") { price ->
-                    assert(price.toInt() >= 0) { "Price must be equal to or greater than 0.0" }
+                NumberPrompt()
+                    .withText("${ChatColor.GREEN}Please input a new buying price.")
+                    .acceptInput{ price ->
+                        assert(price.toInt() >= 0) { "Price must be equal to or greater than 0.0" }
 
-                    item.buyPricePerUnit = price.toDouble()
+                        item.buyPricePerUnit = price.toDouble()
 
-                    Tasks.async {
-                        ShopHandler.saveData()
-                    }
+                        Tasks.async {
+                            ShopHandler.saveData()
+                        }
 
-                    this@EditShopMenu.openMenu(player)
-                }.start(player)
+                        this@EditShopMenu.openMenu(player)
+                    }.start(player)
             } else if (clickType.isRightClick) {
-                NumberPrompt("${ChatColor.GREEN}Please input a selling price.") { price ->
-                    assert(price.toInt() >= 0) { "Price must be equal to or greater than 0.0" }
+                NumberPrompt()
+                    .withText("${ChatColor.GREEN}Please input a new selling price.")
+                    .acceptInput{ price ->
+                        assert(price.toInt() >= 0) { "Price must be equal to or greater than 0.0" }
 
-                    item.sellPricePerUnit = price.toDouble()
+                        item.sellPricePerUnit = price.toDouble()
 
-                    Tasks.async {
-                        ShopHandler.saveData()
-                    }
+                        Tasks.async {
+                            ShopHandler.saveData()
+                        }
 
-                    this@EditShopMenu.openMenu(player)
-                }.start(player)
-            }
-        }
-    }
-
-    private inner class EmptySlotButton : Button() {
-        override fun getName(player: Player): String {
-            return " "
-        }
-
-        override fun getMaterial(player: Player): Material {
-            return Material.AIR
-        }
-
-        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (view.cursor != null && view.cursor.type != Material.AIR) {
-                val shopItemStack = view.cursor.clone()
-
-                shop.items.add(ShopItem(shopItemStack, shopItemStack.amount))
-
-                Tasks.async {
-                    shop.syncItemsOrder()
-                    ShopHandler.saveData()
-                }
-
-                view.cursor = null
-                player.updateInventory()
+                        this@EditShopMenu.openMenu(player)
+                    }.start(player)
             }
         }
     }

@@ -46,7 +46,7 @@ class DeliveryManMenu(private val user: User) : Menu() {
 
         for (i in 0 until 54) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = GlassButton(8)
+                buttons[i] = GlassButton(7)
             }
         }
 

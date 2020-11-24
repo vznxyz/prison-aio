@@ -21,3 +21,12 @@ coinflip:
       max-bet:
         money: 1000000000000000
         tokens: 10000000
+lottery:
+  # The maximum amount of tickets a player can own in a single lottery session
+  max-owned-tickets: 1000
+  # The price it costs in the chosen currency, to purchase a single ticket
+  ticket-price: "100000"
+  # The starting pot of a lottery, based on the chosen currency
+  starting-pot:
+    MONEY: "100000000000000"
+    TOKENS: "1000000"

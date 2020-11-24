@@ -19,7 +19,7 @@ interface DeliveryManRewardRequirement {
 
     fun test(player: Player): Boolean
 
-    object Serializer : JsonSerializer<DeliveryManRewardRequirement>, JsonDeserializer<DeliveryManRewardRequirement> {
+    class Serializer : JsonSerializer<DeliveryManRewardRequirement>, JsonDeserializer<DeliveryManRewardRequirement> {
         override fun serialize(reward: DeliveryManRewardRequirement, type: Type, context: JsonSerializationContext): JsonElement {
             val json = JsonObject()
             json.addProperty("type", reward::class.java.name)

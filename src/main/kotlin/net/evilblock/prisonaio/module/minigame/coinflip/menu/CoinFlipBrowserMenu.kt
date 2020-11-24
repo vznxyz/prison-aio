@@ -82,7 +82,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
     }
 
     override fun getAutoUpdateTicks(): Long {
-        return 10L
+        return 500L
     }
 
     private inner class CreateGameButton : AddButton() {
@@ -109,7 +109,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                         "${ChatColor.GREEN}Please input the amount of tokens you would like to bet."
                     }
 
-                    NumberPrompt(prompt) { input ->
+                    NumberPrompt().withText(prompt).acceptInput { input ->
                         val minAmount: Number = if (currency == Currency.Type.MONEY) {
                             CoinFlipHandler.getMinBetMoney()
                         } else {
@@ -118,12 +118,12 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
 
                         if ((minAmount is Double && minAmount.toDouble() > input.toDouble()) || minAmount.toLong() > input.toLong()) {
                             player.sendMessage("${ChatColor.RED}You must bet at least ${currency.format(minAmount)}${ChatColor.RED}.")
-                            return@NumberPrompt
+                            return@acceptInput
                         }
 
                         if (!currency.has(player.uniqueId, input)) {
                             player.sendMessage("${ChatColor.RED}You don't have enough ${currency.getName()}${ChatColor.RED} to bet ${currency.format(input)}${ChatColor.RED}.")
-                            return@NumberPrompt
+                            return@acceptInput
                         }
 
                         currency.take(player.uniqueId, input)
@@ -165,7 +165,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                     description.add("${ChatColor.GRAY}${ChatColor.BOLD}WAITING FOR OPPONENT")
                 }
                 CoinFlipGame.Stage.WAITING_FOR_SPECTATORS -> {
-                    description.add("${ChatColor.YELLOW}STARTING SOON")
+                    description.add("${ChatColor.YELLOW}${ChatColor.BOLD}STARTING SOON")
                 }
                 CoinFlipGame.Stage.ROLLING,
                 CoinFlipGame.Stage.FINISHED -> {
@@ -189,10 +189,14 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
             }
 
             if (clickType.isRightClick) {
-                if (game.isCreator(player) && game.isWaitingForOpponent()) {
+                if (game.isCreator(player)) {
                     ConfirmMenu("Are you sure?") { confirmed ->
-                        if (confirmed) {
-                            game.finishGame()
+                        if (game.isCreator(player) && game.isWaitingForOpponent()) {
+                            if (confirmed) {
+                                game.finishGame()
+                            }
+                        } else {
+                            player.sendMessage("${ChatColor.RED}The game has already begun!")
                         }
 
                         this@CoinFlipBrowserMenu.openMenu(player)

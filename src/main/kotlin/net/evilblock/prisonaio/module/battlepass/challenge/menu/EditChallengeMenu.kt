@@ -79,7 +79,7 @@ class EditChallengeMenu(private val challenge: Challenge) : Menu() {
             if (clickType.isLeftClick) {
                 EzPrompt.Builder()
                     .promptText("${ChatColor.GREEN}Please input a new name for the challenge.")
-                    .acceptInput { player, input ->
+                    .acceptInput { _, input ->
                         challenge.name = ChatColor.translateAlternateColorCodes('&', input)
                         ChallengeHandler.saveData()
 
@@ -116,8 +116,9 @@ class EditChallengeMenu(private val challenge: Challenge) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                NumberPrompt { number ->
+                NumberPrompt().acceptInput { number ->
                     assert(number.toInt() > 0) { "Number must be above 0" }
+
                     challenge.rewardXp = number.toInt()
 
                     Tasks.async {

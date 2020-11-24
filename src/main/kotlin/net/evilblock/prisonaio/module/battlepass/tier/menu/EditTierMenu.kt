@@ -75,7 +75,7 @@ class EditTierMenu(private val tier: Tier) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                NumberPrompt { number ->
+                NumberPrompt().acceptInput { number ->
                     assert(number.toInt() > 0) { "The number must be more than 0." }
                     tier.requiredExperience = number.toInt()
 

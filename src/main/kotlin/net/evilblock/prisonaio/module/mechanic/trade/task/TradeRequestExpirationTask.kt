@@ -7,10 +7,23 @@
 
 package net.evilblock.prisonaio.module.mechanic.trade.task
 
+import net.evilblock.prisonaio.module.mechanic.trade.TradeHandler
+import net.evilblock.prisonaio.module.mechanic.trade.TradeRequest
+
 object TradeRequestExpirationTask : Runnable {
 
     override fun run() {
+        val expired = arrayListOf<TradeRequest>()
+        for (request in TradeHandler.getPendingRequests()) {
+            if (System.currentTimeMillis() >= request.createdAt + 20_000L) {
+                expired.add(request)
+            }
+        }
 
+        for (request in expired) {
+            request.expired()
+            TradeHandler.forgetPendingRequest(request.sender, request.target)
+        }
     }
 
 }

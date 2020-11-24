@@ -15,17 +15,17 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.mine.variant.normal.NormalMine
 import net.evilblock.prisonaio.module.region.RegionHandler
-import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.entity.Player
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 object MineHandler : PluginHandler {
 
-    private val minesMap: HashMap<String, Mine> = hashMapOf()
+    private val minesMap: MutableMap<String, Mine> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return MinesModule
@@ -45,12 +45,14 @@ object MineHandler : PluginHandler {
         val dataFile = getInternalDataFile()
         if (dataFile.exists()) {
             Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
-                val mapType = object : TypeToken<Map<String, Mine>>() {}.type
-                val map = Cubed.gson.fromJson(reader, mapType) as Map<String, Mine>
+                val type = object : TypeToken<List<Mine>>() {}.type
+                val list = Cubed.gson.fromJson(reader, type) as List<Mine>
 
-                for (mine in map.values) {
-                    mine.cacheChunks()
+                for (mine in list) {
+                    mine.initializeData()
+
                     minesMap[mine.id.toLowerCase()] = mine
+                    RegionHandler.trackRegion(mine)
                 }
             }
         }
@@ -59,7 +61,7 @@ object MineHandler : PluginHandler {
             for (mine in minesMap.values) {
                 RegionHandler.updateBlockCache(mine)
 
-                if (mine.region != null && mine.blocksConfig.blockTypes.isNotEmpty()) {
+                if (mine is NormalMine && mine.region != null && mine.blocksConfig.blockTypes.isNotEmpty()) {
                     mine.resetRegion()
                 }
             }
@@ -69,7 +71,7 @@ object MineHandler : PluginHandler {
     override fun saveData() {
         super.saveData()
 
-        Files.write(Cubed.gson.toJson(minesMap), getInternalDataFile(), Charsets.UTF_8)
+        Files.write(Cubed.gson.toJson(minesMap.values, object : TypeToken<List<Mine>>() {}.type), getInternalDataFile(), Charsets.UTF_8)
     }
 
     fun getMines(): List<Mine> {
@@ -80,15 +82,8 @@ object MineHandler : PluginHandler {
         return Optional.ofNullable(minesMap[id.toLowerCase()])
     }
 
-    @Throws(IllegalStateException::class)
-    fun createMine(id: String): Mine {
-        if (RegionHandler.findRegion(id) != null) {
-            throw IllegalStateException("A region with the ID `$id` already exists!")
-        }
-
-        val mine = Mine(id)
-        minesMap[id.toLowerCase()] = mine
-        return mine
+    fun trackMine(mine: Mine) {
+        minesMap[mine.id.toLowerCase()] = mine
     }
 
     fun deleteMine(id: String) {

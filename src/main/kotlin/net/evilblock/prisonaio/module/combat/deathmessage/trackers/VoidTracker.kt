@@ -19,15 +19,16 @@ class VoidTracker : Listener {
             return
         }
 
-        val record: List<Damage>? = getDamageList(event.getPlayer())
+        val record: List<Damage> = getDamageList(event.getPlayer())
         var knocker: Damage? = null
         var knockerTime = 0L
 
-        if (record != null) {
+        if (record.isNotEmpty()) {
             for (damage in record) {
                 if (damage is VoidDamage || damage is VoidDamageByPlayer) {
                     continue
                 }
+
                 if (damage is PlayerDamage && (knocker == null || damage.time > knockerTime)) {
                     knocker = damage
                     knockerTime = damage.time

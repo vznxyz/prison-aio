@@ -20,6 +20,8 @@ class GangBooster(
     val expiration: Long = System.currentTimeMillis() + boosterType.duration
 ) {
 
+    var running: Boolean = false
+
     fun getRemainingTime(): Long {
         return expiration - System.currentTimeMillis()
     }

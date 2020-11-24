@@ -80,7 +80,6 @@ class PlayTimeChallenge(id: String, internal var duration: Long) : Challenge(id)
         override fun startSetupPrompt(player: Player, id: String, lambda: (Challenge) -> Unit) {
             DurationPrompt { duration ->
                 assert(duration > 0)
-
                 lambda.invoke(PlayTimeChallenge(id, duration))
             }.start(player)
         }

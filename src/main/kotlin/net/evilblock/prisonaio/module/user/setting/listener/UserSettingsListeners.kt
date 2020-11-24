@@ -10,7 +10,6 @@ package net.evilblock.prisonaio.module.user.setting.listener
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.tool.enchant.menu.PurchaseEnchantmentsMenu
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
@@ -36,8 +35,6 @@ object UserSettingsListeners : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerInteractEvent(event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_AIR || (event.action == Action.RIGHT_CLICK_BLOCK && !Constants.CONTAINER_TYPES.contains(event.clickedBlock.type))) {
-            EnchantsManager.handleItemSwitch(event.player, event.player.inventory.itemInMainHand, event)
-
             val itemInHand = event.player.inventory.itemInMainHand
 
             if (MechanicsModule.isPickaxe(itemInHand)) {
@@ -50,14 +47,14 @@ object UserSettingsListeners : Listener {
                     return
                 }
 
-                val pickaxeData = PickaxeHandler.getPickaxeData(itemInHand)
-
                 // prevent menu from opening if the player is probably trying to use an ability
                 val checkLocation = if (event.action == Action.RIGHT_CLICK_BLOCK) {
                     event.clickedBlock.location
                 } else {
                     event.player.location
                 }
+
+                val pickaxeData = PickaxeHandler.getPickaxeData(itemInHand)
 
                 val region = RegionHandler.findRegion(checkLocation)
                 if (region.supportsAbilityEnchants()) {

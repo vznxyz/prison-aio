@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.privatemine.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.privatemine.PrivateMineHandler
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -20,7 +21,7 @@ object CreateCommand {
 
     @Command(
         names = ["privatemine create", "pmine create"],
-        permission = "op",
+        permission = Permissions.PMINE_CREATE,
         async = true
     )
     @JvmStatic fun execute(sender: CommandSender, @Param("player") uuid: UUID) {

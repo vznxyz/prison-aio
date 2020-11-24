@@ -24,7 +24,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.projectiles.ProjectileSource
 import java.lang.reflect.Type
 
-class BitmaskRegion(id: String, cuboid: Cuboid) : Region(id, cuboid) {
+open class BitmaskRegion(id: String, cuboid: Cuboid? = null) : Region(id, cuboid) {
 
     private var bitmask: Int = 0
 
@@ -62,6 +62,18 @@ class BitmaskRegion(id: String, cuboid: Cuboid) : Region(id, cuboid) {
         bitmask = bitmaskValue
     }
 
+    fun addBitmask(bitmaskType: RegionBitmask) {
+        if (!hasBitmask(bitmaskType)) {
+            setBitmask(getRawBitmask() + bitmaskType.bitmaskValue)
+        }
+    }
+
+    fun removeBitmask(bitmaskType: RegionBitmask) {
+        if (hasBitmask(bitmaskType)) {
+            setBitmask(getRawBitmask() - bitmaskType.bitmaskValue)
+        }
+    }
+
     fun hasBitmask(bitmaskType: RegionBitmask): Boolean {
         return (bitmask and bitmaskType.bitmaskValue) == bitmaskType.bitmaskValue
     }
@@ -79,11 +91,15 @@ class BitmaskRegion(id: String, cuboid: Cuboid) : Region(id, cuboid) {
     }
 
     override fun onBlockBreak(player: Player, block: Block, cancellable: Cancellable) {
-        cancellable.isCancelled = true
+        if (!hasBitmask(RegionBitmask.ALLOW_BUILD)) {
+            cancellable.isCancelled = true
+        }
     }
 
     override fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
-        cancellable.isCancelled = true
+        if (!hasBitmask(RegionBitmask.ALLOW_BUILD)) {
+            cancellable.isCancelled = true
+        }
     }
 
     override fun onEntityDamage(entity: Entity, cause: EntityDamageEvent.DamageCause, cancellable: Cancellable) {
@@ -143,7 +159,7 @@ class BitmaskRegion(id: String, cuboid: Cuboid) : Region(id, cuboid) {
     }
 
     override fun onFoodLevelChange(cancellable: Cancellable) {
-        cancellable.isCancelled = false
+        cancellable.isCancelled = hasBitmask(RegionBitmask.SAFE_ZONE)
     }
 
     override fun onPlayerDeath(player: Player, event: PlayerDeathEvent) {

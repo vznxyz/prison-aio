@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.leaderboard.impl
 
+import net.evilblock.cubed.Cubed
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
@@ -22,7 +23,8 @@ object GangValueLeaderboard : Leaderboard("gang-value", "${ChatColor.DARK_RED}${
         val entries = arrayListOf<LeaderboardEntry<BigInteger>>()
 
         for (gang in GangHandler.getAllGangs()) {
-            entries.add(LeaderboardEntry(0, gang.name, gang.cachedValue))
+            val skinSource = Cubed.instance.uuidCache.name(gang.leader)
+            entries.add(LeaderboardEntry(0, gang.name, skinSource, gang.cachedValue))
         }
 
         return entries.sortedByDescending { it.value }.take(CACHED_ENTRIES_SIZE)

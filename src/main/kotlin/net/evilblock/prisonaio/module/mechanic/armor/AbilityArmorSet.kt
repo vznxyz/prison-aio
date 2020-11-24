@@ -154,13 +154,7 @@ abstract class AbilityArmorSet(
     }
 
     private fun attachNbt(itemStack: ItemStack): ItemStack {
-        val nmsCopy = ItemUtils.getNmsCopy(itemStack)
-
-        val tag = NBTUtil.getOrCreateTag(nmsCopy)
-        NBTUtil.setString(tag, "ArmorSetID", setId)
-        NBTUtil.setTag(nmsCopy, tag)
-
-        return ItemUtils.getBukkitCopy(nmsCopy)
+        return ItemUtils.addToItemTag(itemStack, "ArmorSetID", setId, true)
     }
 
     fun onEquipped(player: Player) {

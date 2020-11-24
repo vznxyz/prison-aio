@@ -11,6 +11,8 @@ import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.region.bitmask.RegionBitmask
+import net.evilblock.prisonaio.module.region.bitmask.RegionBitmaskParameterType
 import net.evilblock.prisonaio.module.region.listener.RegionListeners
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.command.*
@@ -51,7 +53,10 @@ object RegionsModule : PluginModule() {
     }
 
     override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
-        return mapOf(Region::class.java to RegionParameterType())
+        return mapOf(
+            Region::class.java to RegionParameterType(),
+            RegionBitmask::class.java to RegionBitmaskParameterType()
+        )
     }
 
     override fun getListeners(): List<Listener> {

@@ -84,7 +84,7 @@ class EditPrestigeMenu(private val prestige: PickaxePrestige) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                NumberPrompt("${ChatColor.GREEN}Please input the amount of money required.") { number ->
+                NumberPrompt().withText("${ChatColor.GREEN}Please input the amount of money required.").acceptInput { number ->
                     assert(number.toInt() > 0) { "Number must be above 0" }
 
                     prestige.moneyRequired = number.toLong()
@@ -129,7 +129,7 @@ class EditPrestigeMenu(private val prestige: PickaxePrestige) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                NumberPrompt("${ChatColor.GREEN}Please input the amount of tokens required.") { number ->
+                NumberPrompt().withText("${ChatColor.GREEN}Please input the amount of tokens required.").acceptInput { number ->
                     assert(number.toInt() > 0) { "Number must be above 0" }
 
                     prestige.tokensRequired = number.toLong()
@@ -174,7 +174,7 @@ class EditPrestigeMenu(private val prestige: PickaxePrestige) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                NumberPrompt("${ChatColor.GREEN}Please input the prestige required.") { number ->
+                NumberPrompt().withText("${ChatColor.GREEN}Please input the prestige required.").acceptInput { number ->
                     assert(number.toInt() > 0) { "Number must be above 0" }
 
                     prestige.prestigeRequired = number.toInt()
@@ -219,7 +219,7 @@ class EditPrestigeMenu(private val prestige: PickaxePrestige) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                NumberPrompt("${ChatColor.GREEN}Please input the amount of blocks mined required.") { number ->
+                NumberPrompt().withText("${ChatColor.GREEN}Please input the amount of blocks mined required.").acceptInput { number ->
                     assert(number.toInt() > 0) { "Number must be more than 0" }
 
                     prestige.blocksMinedRequired = number.toInt()
@@ -274,7 +274,7 @@ class EditPrestigeMenu(private val prestige: PickaxePrestige) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 SelectEnchantMenu { enchant ->
-                    NumberPrompt("${ChatColor.GREEN}Please input a max level for the enchant.") { number ->
+                    NumberPrompt().withText("${ChatColor.GREEN}Please input a max level for the enchant.").acceptInput { number ->
                         if (number.toInt() == 0) {
                             prestige.enchantLimits.remove(enchant)
                         } else {

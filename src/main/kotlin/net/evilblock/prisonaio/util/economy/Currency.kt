@@ -17,6 +17,8 @@ interface Currency {
 
     fun getName(): String
 
+    fun getAmountContext(): String
+
     fun get(player: UUID): Number
 
     fun has(player: UUID, amount: Number): Boolean
@@ -52,6 +54,10 @@ interface Currency {
             return "money"
         }
 
+        override fun getAmountContext(): String {
+            return "much"
+        }
+
         override fun get(player: UUID): Number {
             return UserHandler.getOrLoadAndCacheUser(player).getMoneyBalance()
         }
@@ -78,6 +84,10 @@ interface Currency {
             return "tokens"
         }
 
+        override fun getAmountContext(): String {
+            return "many"
+        }
+
         override fun get(player: UUID): Number {
             return UserHandler.getOrLoadAndCacheUser(player).getTokenBalance()
         }
@@ -102,6 +112,10 @@ interface Currency {
     object PrestigeTokens : Currency {
         override fun getName(): String {
             return "prestige tokens"
+        }
+
+        override fun getAmountContext(): String {
+            return "many"
         }
 
         override fun get(player: UUID): Number {
@@ -132,6 +146,10 @@ interface Currency {
 
         override fun getName(): String {
             return currency.getName()
+        }
+
+        override fun getAmountContext(): String {
+            return currency.getAmountContext()
         }
 
         override fun get(player: UUID): Number {

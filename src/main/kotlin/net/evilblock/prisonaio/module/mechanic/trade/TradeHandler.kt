@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.mechanic.trade
 
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.mechanic.trade.task.TradeRequestExpirationTask
-import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -18,9 +17,6 @@ object TradeHandler {
 
     @JvmStatic
     var disabled: Boolean = false
-
-    @JvmStatic
-    val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}${ChatColor.GRAY}] "
 
     private val activeTrades: MutableList<Trade> = arrayListOf()
 
@@ -57,6 +53,14 @@ object TradeHandler {
     fun cancelActiveTrades() {
         for (trade in activeTrades) {
             trade.cancel()
+        }
+    }
+
+    fun getPendingRequests(): List<TradeRequest> {
+        return arrayListOf<TradeRequest>().also {
+            for (list in pendingRequests.values) {
+                it.addAll(list)
+            }
         }
     }
 

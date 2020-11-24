@@ -8,12 +8,14 @@
 package net.evilblock.prisonaio.module.battlepass.daily
 
 import com.google.gson.annotations.JsonAdapter
+import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.serialize.ChallengeListReferenceSerializer
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.NoSuchElementException
+import kotlin.math.ceil
 
 class DailyChallengeSession(val uuid: UUID = UUID.randomUUID()) {
 
@@ -54,6 +56,11 @@ class DailyChallengeSession(val uuid: UUID = UUID.randomUUID()) {
 
     fun hasExpired(): Boolean {
         return System.currentTimeMillis() >= expiresAt
+    }
+    
+    fun getTimeRemaining(): String {
+        val remainingSeconds = ((expiresAt - System.currentTimeMillis()) / 1000.0).toInt()
+        return TimeUtil.formatIntoDetailedString(remainingSeconds)
     }
 
     fun clear() {

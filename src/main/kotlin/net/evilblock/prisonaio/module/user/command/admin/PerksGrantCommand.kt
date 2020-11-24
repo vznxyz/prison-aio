@@ -92,10 +92,10 @@ object PerksGrantCommand {
         }
 
         if (duration.isPermanent()) {
-            sender.sendMessage("${ChatColor.GREEN}You have granted the ${ChatColor.YELLOW}${perk.displayName} ${ChatColor.GREEN}perk to ${ChatColor.WHITE}${user.getUsername()} ${ChatColor.GREEN}for a period of ${ChatColor.YELLOW}forever${ChatColor.GREEN}.")
+            sender.sendMessage("${ChatColor.GREEN}You granted the ${ChatColor.YELLOW}${perk.displayName} ${ChatColor.GREEN}perk to ${ChatColor.WHITE}${user.getUsername()} ${ChatColor.GREEN}for a period of ${ChatColor.YELLOW}forever${ChatColor.GREEN}.")
         } else {
             val formattedDuration = TimeUtil.formatIntoDetailedString((duration.get() / 1000.0).toInt())
-            player.sendMessage("${ChatColor.GREEN}You have granted the ${ChatColor.YELLOW}${perk.displayName} ${ChatColor.GREEN}perk to ${ChatColor.WHITE}${user.getUsername()} ${ChatColor.GREEN}for a period of ${ChatColor.YELLOW}$formattedDuration${ChatColor.GREEN}.")
+            player.sendMessage("${ChatColor.GREEN}You granted the ${ChatColor.YELLOW}${perk.displayName} ${ChatColor.GREEN}perk to ${ChatColor.WHITE}${user.getUsername()} ${ChatColor.GREEN}for a period of ${ChatColor.YELLOW}$formattedDuration${ChatColor.GREEN}.")
         }
     }
 

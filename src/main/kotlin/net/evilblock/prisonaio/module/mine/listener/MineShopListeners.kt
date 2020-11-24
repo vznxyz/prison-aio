@@ -25,7 +25,9 @@ object MineShopListeners : Listener {
             if (mine.isNearbyMine(event.player)) {
                 val mineShop = ShopHandler.getShopById(mine.id)
                 if (mineShop.isPresent) {
-                    event.shop = mineShop.get()
+                    if (mineShop.get().hasAccess(event.player)) {
+                        event.shop = mineShop.get()
+                    }
                 }
 
                 break

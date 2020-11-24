@@ -64,7 +64,7 @@ class ManageSettingsMenu(private val previous: Menu, private val mine: PrivateMi
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.addAll(TextSplitter.split(linePrefix = ChatColor.GRAY.toString(), text = "Grant or revoke access to players."))
+            description.addAll(TextSplitter.split(text = "Grant or revoke access to players."))
             description.add("")
             description.add("${ChatColor.YELLOW}Click to manage access")
 
@@ -96,7 +96,7 @@ class ManageSettingsMenu(private val previous: Menu, private val mine: PrivateMi
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.addAll(TextSplitter.split(linePrefix = ChatColor.GRAY.toString(), text = "This setting controls who can access your private mine."))
+            description.addAll(TextSplitter.split(text = "This setting controls who can access your private mine."))
             description.add("")
             description.add("${ChatColor.YELLOW}Click to toggle public access")
 
@@ -120,7 +120,7 @@ class ManageSettingsMenu(private val previous: Menu, private val mine: PrivateMi
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            description.addAll(TextSplitter.split(linePrefix = ChatColor.GRAY.toString(), text = "Control the sales tax that players must contribute to you in return for using your private mine."))
+            description.addAll(TextSplitter.split(text = "Control the sales tax that players must contribute to you in return for using your private mine."))
             description.add("")
             description.add("${ChatColor.YELLOW}Click to edit the sales tax")
 

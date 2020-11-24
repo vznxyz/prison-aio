@@ -7,14 +7,19 @@
 
 package net.evilblock.prisonaio.module.minigame.coinflip
 
+import net.evilblock.cubed.logging.LogFile
+import net.evilblock.cubed.logging.LogHandler
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.NumberUtils
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.minigame.MinigamesModule
 import net.evilblock.prisonaio.module.minigame.coinflip.task.CoinFlipGameTicker
 import net.evilblock.prisonaio.module.user.User
+import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.ChatColor
+import java.io.File
 import java.util.*
 
 object CoinFlipHandler : PluginHandler {
@@ -29,12 +34,16 @@ object CoinFlipHandler : PluginHandler {
 
     private val games: MutableMap<UUID, CoinFlipGame> = hashMapOf()
 
+    val logFile: LogFile = LogFile(File(File(UserHandler.getModule().getPluginFramework().dataFolder, "logs"), "coinflip.txt"))
+
     override fun getModule(): PluginModule {
         return MinigamesModule
     }
 
     override fun initialLoad() {
-        getModule().getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getModule().getPluginFramework(), CoinFlipGameTicker, 4L, 4L)
+        LogHandler.trackLogFile(logFile)
+
+        Tasks.asyncTimer(CoinFlipGameTicker, 4L, 4L)
     }
 
     fun cancelGames() {

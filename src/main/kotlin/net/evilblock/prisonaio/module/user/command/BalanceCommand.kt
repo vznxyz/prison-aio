@@ -7,12 +7,15 @@
 
 package net.evilblock.prisonaio.module.user.command
 
+import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
+import java.text.NumberFormat
 
 object BalanceCommand {
 
@@ -23,7 +26,16 @@ object BalanceCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player", defaultValue = "self") target: User) {
-        sender.sendMessage("${ChatColor.WHITE}${target.getUsername()}${ChatColor.GOLD}'s balance is: ${Formats.formatMoney(target.getMoneyBalance())}")
+        val context = if (sender is Player && target.uuid == sender.uniqueId) {
+            "${ChatColor.GOLD}Your balance: "
+        } else {
+            "${ChatColor.WHITE}${target.getUsername()}'s ${ChatColor.GOLD}balance: "
+        }
+
+        FancyMessage(context)
+            .then(Formats.formatMoney(target.getMoneyBalance()))
+            .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Exact balance: ${NumberFormat.getInstance().format(target.getTokenBalance())}"))
+            .send(sender)
     }
 
 }

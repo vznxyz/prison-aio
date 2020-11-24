@@ -10,11 +10,14 @@ package net.evilblock.prisonaio.module.user.listener
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.Cooldown
 import net.evilblock.cubed.util.NumberUtils
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.block.Sign
 import org.bukkit.entity.Player
@@ -38,27 +41,58 @@ object TokenShopListeners : Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     fun onPlayerInteractEvent(event: PlayerInteractEvent) {
-        if (event.action == Action.RIGHT_CLICK_BLOCK) {
+        if (event.action == Action.LEFT_CLICK_BLOCK || event.action == Action.RIGHT_CLICK_BLOCK) {
             if (event.clickedBlock.type == Material.SIGN || event.clickedBlock.type == Material.SIGN_POST || event.clickedBlock.type == Material.WALL_SIGN) {
                 val sign = event.clickedBlock.state as Sign
                 if (sign.lines[0] == TOKEN_SHOP_TAG) {
-                    event.isCancelled = true
-
-                    val player = event.player
-
-                    if (useCooldown.isOnCooldown(player.uniqueId)) {
+                    if (useCooldown.isOnCooldown(event.player.uniqueId)) {
                         return
                     }
 
-                    useCooldown.putOnCooldown(player.uniqueId)
+                    useCooldown.putOnCooldown(event.player.uniqueId)
 
+                    val tokenShop: TokenShop
                     try {
-                        handleTransaction(player, sign)
+                        tokenShop = readTokenShop(sign) ?: return
                     } catch (e: Exception) {
-                        event.player.sendMessage("${ChatColor.RED}Failed to transact with that TokenShop!")
+                        if (e is IllegalStateException) {
+                            event.player.sendMessage("${ChatColor.RED}Failed to read token shop: ${e.message}")
+                        } else {
+                            event.player.sendMessage("${ChatColor.RED}Failed to read token shop!")
+                            e.printStackTrace()
+                        }
+                        return
+                    }
 
-                        if (event.player.isOp) {
-                            event.player.sendMessage("${ChatColor.RED}[OP] Error: ${e.message}")
+                    if (event.action == Action.LEFT_CLICK_BLOCK) {
+                        if (event.player.uniqueId == tokenShop.owner) {
+                            return
+                        }
+
+                        if (event.player.gameMode == GameMode.CREATIVE) {
+                            return
+                        }
+
+                        event.isCancelled = true
+
+                        val userContext = if (tokenShop.buying) {
+                            "selling"
+                        } else {
+                            "buying"
+                        }
+
+                        event.player.sendMessage("$TOKEN_SHOP_TAG ${Formats.formatPlayer(tokenShop.owner)} ${ChatColor.GRAY}is $userContext ${Formats.formatTokens(tokenShop.quantity.toLong())} ${ChatColor.GRAY}for ${Formats.formatMoney(tokenShop.price as BigDecimal)}${ChatColor.GRAY}.")
+                    } else if (event.action == Action.RIGHT_CLICK_BLOCK) {
+                        event.isCancelled = true
+
+                        try {
+                            handleTransaction(event.player, tokenShop)
+                        } catch (e: Exception) {
+                            event.player.sendMessage("${ChatColor.RED}Failed to transact with that token shop!")
+
+                            if (event.player.isOp) {
+                                event.player.sendMessage("${ChatColor.RED}[OP] Error: ${e.message}")
+                            }
                         }
                     }
                 }
@@ -89,7 +123,7 @@ object TokenShopListeners : Listener {
                 }
 
                 val price = NumberUtils.parseInput(priceLineSplit[1])
-                if (price.toInt() < 1) {
+                if (price.toLong() < 1) {
                     event.player.sendMessage("${ChatColor.RED}Price must be at least 1.")
                     event.isCancelled = true
                     return
@@ -127,13 +161,18 @@ object TokenShopListeners : Listener {
 
                 event.setLine(0, TOKEN_SHOP_TAG)
                 event.setLine(1, event.player.name)
-                event.setLine(2, NumberUtils.format(quantity.toLong()))
+                event.setLine(2, Formats.formatTokens(quantity.toLong()))
                 event.setLine(3, "$buyOrSell ${ChatColor.BLACK}$formattedPrice")
             } catch (e: Exception) {
-                event.player.sendMessage("${ChatColor.RED}Failed to create a TokenShop because the format was incorrect. The format is as follows:")
-                event.player.sendMessage("${ChatColor.GRAY}[TokenShop]")
-                event.player.sendMessage("${ChatColor.GRAY}{quantity}")
-                event.player.sendMessage("${ChatColor.GRAY}B/S {price}")
+                event.player.sendMessage("${ChatColor.RED}You used the wrong format! Try this:")
+                event.player.sendMessage("${ChatColor.GRAY}Line 1: [TokenShop]")
+                event.player.sendMessage("${ChatColor.GRAY}Line 2: {quantity}")
+                event.player.sendMessage("${ChatColor.GRAY}Line 3: B/S {price}")
+
+                if (event.player.isOp) {
+                    println("${ChatColor.DARK_RED}DEBUG OUTPUT:")
+                    e.printStackTrace()
+                }
             }
         }
     }
@@ -153,7 +192,7 @@ object TokenShopListeners : Listener {
 
             if (sign.getLine(1) != event.player.name) {
                 event.isCancelled = true
-                event.player.sendMessage("${ChatColor.RED}You can't destroy that TokenShop because it doesn't belong to you!")
+                event.player.sendMessage("${ChatColor.RED}You can't destroy that token shop because it doesn't belong to you!")
             }
         }
     }
@@ -163,90 +202,125 @@ object TokenShopListeners : Listener {
         useCooldown.removeCooldown(event.player.uniqueId)
     }
 
-    private fun handleTransaction(player: Player, sign: Sign) {
+    data class TokenShop(
+        val owner: UUID,
+        val quantity: Number,
+        val buying: Boolean,
+        val price: Number
+    )
+
+    private fun readTokenShop(sign: Sign): TokenShop? {
+        val owner = Cubed.instance.uuidCache.uuid(sign.lines[1]) ?: throw IllegalStateException("Couldn't determine owner of sign")
+
+        val quantity = NumberUtils.parseInput(ChatColor.stripColor(sign.lines[2]).replace(Constants.TOKENS_SYMBOL, ""))
+        if (quantity.toInt() < 0) {
+            throw IllegalStateException("Quantity is negative")
+        }
+
+        val transactionInfo = ChatColor.stripColor(sign.lines[3]).split(" ")
+
+        val buying = when {
+            transactionInfo[0].equals("b", ignoreCase = true) -> {
+                true
+            }
+            transactionInfo[0].equals("s", ignoreCase = true) -> {
+                false
+            }
+            else -> {
+                throw IllegalStateException("Couldn't determine if buying or selling")
+            }
+        }
+
+        if (transactionInfo[1].startsWith("-")) {
+            throw IllegalStateException("Price is negative")
+        }
+
+        val price = NumberUtils.parseInput(transactionInfo[1])
+        if (price.toLong() < 0) {
+            throw IllegalStateException("Price is negative")
+        }
+
+        return TokenShop(owner, quantity, buying, BigDecimal(price.toString()))
+    }
+
+    private fun handleTransaction(player: Player, tokenShop: TokenShop) {
         Tasks.async {
-            val owner = Cubed.instance.uuidCache.uuid(sign.lines[1]) ?: throw IllegalStateException("Couldn't determine owner of sign")
-
-            if (player.uniqueId == owner) {
-                player.sendMessage("${ChatColor.RED}You can't buy or sell to your own TokenShop!")
+            if (player.uniqueId == tokenShop.owner) {
+                player.sendMessage("${ChatColor.RED}You can't buy or sell to your own token shop!")
                 return@async
             }
 
-            if (sign.lines[2].startsWith("-")) {
-                return@async
-            }
-
-            val quantity = NumberUtils.parseInput(sign.lines[2])
-            assert(quantity.toInt() > 0) { "Quantity must be more than 0." }
-
-            val priceLineSplit = ChatColor.stripColor(sign.lines[3]).split(" ")
-            if (priceLineSplit[1].startsWith("-")) {
-                return@async
-            }
-
-            val price = NumberUtils.parseInput(priceLineSplit[1])
-            assert(price.toInt() > 0) { "Price must be more than 0." }
-
-            val bigPrice = BigDecimal(price.toString())
-
-            val owningUser = UserHandler.getOrLoadAndCacheUser(owner)
+            val owningUser = UserHandler.getOrLoadAndCacheUser(tokenShop.owner)
             val interactingUser = UserHandler.getOrLoadAndCacheUser(player.uniqueId, lookup = false, throws = true)
 
-            Tasks.sync {
-                val buying = when {
-                    priceLineSplit[0].equals("b", ignoreCase = true) -> {
-                        true
-                    }
-                    priceLineSplit[0].equals("s", ignoreCase = true) -> {
-                        false
-                    }
-                    else -> {
-                        throw IllegalStateException("Couldn't determine if buying or selling")
-                    }
-                }
+            val price = tokenShop.price as BigDecimal
+            val quantity = tokenShop.quantity.toLong()
 
-                if (buying) {
-                    if (!owningUser.hasTokenBalance(quantity.toLong())) {
+            Tasks.sync {
+                if (tokenShop.buying) {
+                    if (!owningUser.hasTokenBalance(quantity)) {
                         player.sendMessage("${ChatColor.RED}${owningUser.getUsername()} doesn't have enough tokens to sell you.")
                         return@sync
                     }
 
-                    if (!interactingUser.hasMoneyBalance(bigPrice)) {
-                        player.sendMessage("${ChatColor.RED}You don't have enough money to buy tokens from that TokenShop.")
+                    if (!interactingUser.hasMoneyBalance(price)) {
+                        player.sendMessage("${ChatColor.RED}You don't have enough money to buy tokens from that token shop.")
                         return@sync
                     }
 
-                    owningUser.addMoneyBalance(bigPrice)
-                    owningUser.subtractTokensBalance(quantity.toLong())
+                    owningUser.addMoneyBalance(price)
+                    owningUser.subtractTokensBalance(quantity)
                     owningUser.requiresSave()
 
-                    interactingUser.subtractMoneyBalance(bigPrice)
-                    interactingUser.addTokensBalance(quantity.toLong())
+                    interactingUser.subtractMoneyBalance(price)
+                    interactingUser.addTokensBalance(quantity)
                     interactingUser.requiresSave()
 
-                    player.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}from ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(bigPrice)}${ChatColor.GRAY}!")
-                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(bigPrice)}${ChatColor.GRAY}!")
+                    val owningPlayer = owningUser.getPlayer()
+
+                    val ownerName = if (owningPlayer != null) {
+                        Formats.formatPlayer(owningPlayer)
+                    } else {
+                        owningUser.getUsername()
+                    }
+
+                    player.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity)} ${ChatColor.GRAY}from $ownerName ${ChatColor.GRAY}for ${Formats.formatMoney(price)}${ChatColor.GRAY}!")
+
+                    if (owningUser.settings.getSettingOption(UserSetting.TOKEN_SHOP_NOTIFICATIONS).getValue() as Boolean) {
+                        owningPlayer?.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity)} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(price)}${ChatColor.GRAY}!")
+                    }
                 } else {
-                    if (!owningUser.hasMoneyBalance(bigPrice)) {
+                    if (!owningUser.hasMoneyBalance(price)) {
                         player.sendMessage("${ChatColor.RED}${owningUser.getUsername()} doesn't have enough money to buy your tokens.")
                         return@sync
                     }
 
-                    if (!interactingUser.hasTokenBalance(quantity.toLong())) {
+                    if (!interactingUser.hasTokenBalance(quantity)) {
                         player.sendMessage("${ChatColor.RED}You don't have enough tokens to sell to that token shop.")
                         return@sync
                     }
 
-                    interactingUser.addMoneyBalance(bigPrice)
-                    interactingUser.subtractTokensBalance(quantity.toLong())
+                    interactingUser.addMoneyBalance(price)
+                    interactingUser.subtractTokensBalance(quantity)
                     interactingUser.requiresSave()
 
-                    owningUser.subtractMoneyBalance(bigPrice)
-                    owningUser.addTokensBalance(quantity.toLong())
+                    owningUser.subtractMoneyBalance(price)
+                    owningUser.addTokensBalance(quantity)
                     owningUser.requiresSave()
 
-                    player.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(owningUser.getPlayer()!!)} ${ChatColor.GRAY}for ${Formats.formatMoney(bigPrice)}${ChatColor.GRAY}!")
-                    owningUser.getPlayer()?.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity.toLong())} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(bigPrice)}${ChatColor.GRAY}!")
+                    val owningPlayer = owningUser.getPlayer()
+
+                    val ownerName = if (owningPlayer != null) {
+                        Formats.formatPlayer(owningPlayer)
+                    } else {
+                        owningUser.getUsername()
+                    }
+
+                    player.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity)} ${ChatColor.GRAY}to $ownerName ${ChatColor.GRAY}for ${Formats.formatMoney(price)}${ChatColor.GRAY}!")
+
+                    if (owningUser.settings.getSettingOption(UserSetting.TOKEN_SHOP_NOTIFICATIONS).getValue() as Boolean) {
+                        owningPlayer?.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity)} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(price)}${ChatColor.GRAY}!")
+                    }
                 }
             }
         }

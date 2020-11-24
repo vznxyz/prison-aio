@@ -10,7 +10,9 @@ package net.evilblock.prisonaio.module.user.listener
 import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.rift.bukkit.spoof.SpoofHandler
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -23,6 +25,20 @@ object UserLoadListeners : Listener {
 
     @EventHandler
     fun onPlayerJoinEvent(event: PlayerJoinEvent) {
+        if (!UserHandler.isUserLoaded(event.player.uniqueId)) {
+            if (SpoofHandler.isFakePlayer(event.player)) {
+                val user = User(event.player.uniqueId)
+                user.init()
+                user.applyPermissions(event.player)
+
+                UserHandler.cacheUser(user)
+
+                Tasks.async {
+                    UserHandler.saveUser(user)
+                }
+            }
+        }
+
         UserHandler.getUser(event.player.uniqueId).let { user ->
             user.applyPermissions(event.player)
 

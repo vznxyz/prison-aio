@@ -12,6 +12,8 @@ import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
 import net.evilblock.prisonaio.module.mechanic.trade.TradeHandler
 import net.evilblock.prisonaio.module.mechanic.trade.TradeRequest
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.setting.UserSetting
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -28,8 +30,19 @@ object TradeCommand {
             return
         }
 
+        if (sender.uniqueId == target.uniqueId) {
+            sender.sendMessage("${ChatColor.RED}You can't trade yourself!")
+            return
+        }
+
         if (TradeHandler.hasPendingRequestFrom(sender, target)) {
             sender.sendMessage("${ChatColor.RED}${target.name} already has a pending trade request from you!")
+            return
+        }
+
+        val targetUser = UserHandler.getUser(target.uniqueId)
+        if (!(targetUser.settings.getSettingOption(UserSetting.TRADE_REQUESTS).getValue() as Boolean)) {
+            sender.sendMessage("${ChatColor.RED}${target.name} is currently not accepting trade requests.")
             return
         }
 

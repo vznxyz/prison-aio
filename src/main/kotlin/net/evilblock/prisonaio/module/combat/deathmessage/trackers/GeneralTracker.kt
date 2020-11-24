@@ -19,8 +19,7 @@ class GeneralTracker : Listener {
             EntityDamageEvent.DamageCause.LIGHTNING -> event.trackerDamage = GeneralDamage(event.getPlayer().uniqueId, event.getDamage(), "was struck by lightning")
             EntityDamageEvent.DamageCause.POISON -> event.trackerDamage = GeneralDamage(event.getPlayer().uniqueId, event.getDamage(), "was poisoned")
             EntityDamageEvent.DamageCause.WITHER -> event.trackerDamage = GeneralDamage(event.getPlayer().uniqueId, event.getDamage(), "withered away")
-            else -> {
-            }
+            else -> {}
         }
     }
 

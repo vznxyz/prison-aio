@@ -11,6 +11,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
+import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bson.Document
 import org.bukkit.ChatColor
@@ -24,13 +25,18 @@ object TopTimePlayedLeaderboard : Leaderboard("top-time-played", "${ChatColor.LI
         for (document in UserHandler.getCollection().find()) {
             val uuid = UUID.fromString(document.getString("uuid"))
 
+            if (LeaderboardsModule.exemptions.contains(uuid)) {
+                continue
+            }
+
+            val displayName = Cubed.instance.uuidCache.name(uuid)
             val statistics = document["statistics"] ?: continue
 
             val playTime = (statistics as Document)["playTime"]
             if (playTime is Int) {
-                entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), playTime.toLong()))
+                entries.add(LeaderboardEntry(0, displayName, displayName, playTime.toLong()))
             } else {
-                entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), playTime as Long))
+                entries.add(LeaderboardEntry(0, displayName, displayName, playTime as Long))
             }
         }
 

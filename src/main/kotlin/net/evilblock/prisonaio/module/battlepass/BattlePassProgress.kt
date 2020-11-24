@@ -70,7 +70,11 @@ class BattlePassProgress(@Transient var user: User) {
     }
 
     fun hasCompletedChallenge(challenge: Challenge): Boolean {
-        return completedChallenges.contains(challenge)
+        return if (challenge.daily) {
+            DailyChallengeHandler.getSession().getProgress(user.uuid).hasCompletedChallenge(challenge)
+        } else {
+            completedChallenges.contains(challenge)
+        }
     }
 
     fun completeChallenge(challenge: Challenge) {

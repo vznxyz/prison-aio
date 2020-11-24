@@ -42,6 +42,7 @@ object Zeus : AbilityEnchant(id = "zeus", enchant = "Zeus", maxLevel = 3) {
             return
         }
 
+        // if the player is not on global cooldown, it means the call to super#onInteract was not successful
         if (!isOnGlobalCooldown(event.player)) {
             return
         }

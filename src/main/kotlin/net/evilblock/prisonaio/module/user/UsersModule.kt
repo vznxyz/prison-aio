@@ -68,6 +68,7 @@ object UsersModule : PluginModule() {
         Tasks.asyncTimer(UserSettingsTickTask, 20L, 20L)
 
         ScoreboardHandler.configure(PrisonTitleGetter, PrisonScoreGetter)
+
         Tasks.asyncTimer(TitleAnimation, 1L, 1L)
         Tasks.asyncTimer(RainbowAnimation, 1L, 1L)
         Tasks.asyncTimer(ContentSwitching, 1L, 1L)

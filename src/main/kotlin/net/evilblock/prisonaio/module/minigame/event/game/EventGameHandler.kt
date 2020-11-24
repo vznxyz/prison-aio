@@ -9,12 +9,16 @@ package net.evilblock.prisonaio.module.minigame.event.game
 
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.util.bukkit.prompt.PlayerPrompt
 import net.evilblock.prisonaio.module.minigame.MinigamesModule
 import net.evilblock.prisonaio.module.minigame.event.EventUtils
+import net.evilblock.prisonaio.module.minigame.event.config.EventConfigHandler
 import net.evilblock.prisonaio.module.minigame.event.game.arena.EventGameArena
 import net.evilblock.prisonaio.module.minigame.event.game.arena.EventGameArenaHandler
+import net.evilblock.prisonaio.module.minigame.event.game.ktk.KillTheKingEvent
 import net.evilblock.prisonaio.module.minigame.event.game.sumo.SumoEventGame
 import net.evilblock.prisonaio.util.Permissions
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.util.concurrent.TimeUnit
@@ -84,18 +88,44 @@ object EventGameHandler : PluginHandler {
     }
 
     @Throws(IllegalStateException::class)
-    fun startGame(host: Player, gameType: EventGameType): EventGame? {
+    fun createGame(host: Player, gameType: EventGameType, created: (EventGame) -> Unit) {
         check(ongoingGame == null) { "There is an ongoing game!" }
 
-        if (gameType === EventGameType.SUMO) {
-            ongoingGame = SumoEventGame(host.uniqueId, findArenas(gameType))
-        } else {
-            throw IllegalStateException("Game type not supported yet!")
+        when {
+            gameType === EventGameType.SUMO -> {
+                ongoingGame = SumoEventGame(host.uniqueId, findArenas(gameType))
+                ongoingGame!!.startGame()
+
+                created.invoke(ongoingGame!!)
+            }
+            gameType === EventGameType.KILL_THE_KING -> {
+                if (EventConfigHandler.config.ktkKingKit == null) {
+                    host.sendMessage("${ChatColor.RED}The king kit hasn't been set!")
+                    return
+                }
+
+                if (EventConfigHandler.config.ktkAttackerKit == null) {
+                    host.sendMessage("${ChatColor.RED}The attacker kit hasn't been set!")
+                    return
+                }
+
+                PlayerPrompt { input ->
+                    val player = Bukkit.getPlayer(input)
+                    if (player == null || !player.isOnline) {
+                        player.sendMessage("${ChatColor.RED}That player is not online!")
+                        return@PlayerPrompt
+                    }
+
+                    ongoingGame = KillTheKingEvent(player, host.uniqueId, findArenas(gameType))
+                    ongoingGame!!.startGame()
+
+                    created.invoke(ongoingGame!!)
+                }.start(host)
+            }
+            else -> {
+                throw IllegalStateException("Game type not supported yet!")
+            }
         }
-
-        ongoingGame!!.startGame()
-
-        return ongoingGame
     }
 
     fun endGame() {

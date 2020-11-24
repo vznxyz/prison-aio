@@ -11,8 +11,9 @@ import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.privatemine.command.*
-import net.evilblock.prisonaio.module.privatemine.task.PrivateMineResetTask
+import net.evilblock.prisonaio.module.privatemine.service.ResetMineService
 import net.evilblock.prisonaio.module.privatemine.listener.*
+import net.evilblock.prisonaio.service.ServiceRegistry
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -33,7 +34,7 @@ object PrivateMinesModule : PluginModule() {
     override fun onEnable() {
         PrivateMineHandler.initialLoad()
 
-        getPluginFramework().server.scheduler.runTaskTimerAsynchronously(getPluginFramework(), PrivateMineResetTask, 20L, 20L)
+        ServiceRegistry.register(ResetMineService, 20L)
     }
 
     override fun onReload() {

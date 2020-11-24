@@ -7,16 +7,16 @@
 
 package net.evilblock.prisonaio.module.mine.prompt
 
-import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
 import net.evilblock.prisonaio.module.mine.menu.MineManageResetMenu
+import net.evilblock.prisonaio.module.mine.variant.normal.NormalMine
 import org.bukkit.ChatColor
 import org.bukkit.conversations.ConversationContext
 import org.bukkit.conversations.Prompt
 import org.bukkit.conversations.StringPrompt
 import org.bukkit.entity.Player
 
-class MineEditResetIntervalPrompt(private val mine: Mine) : StringPrompt() {
+class MineEditResetIntervalPrompt(private val mine: NormalMine) : StringPrompt() {
 
     override fun getPromptText(context: ConversationContext): String {
         return "${ChatColor.GREEN}Please input a new reset interval in seconds."

@@ -5,10 +5,9 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.practice.region.bitmask
+package net.evilblock.prisonaio.module.region.bitmask
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.region.bitmask.RegionBitmask
 import org.apache.commons.lang.StringUtils
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender

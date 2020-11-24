@@ -10,6 +10,8 @@ package net.evilblock.prisonaio.module.tool.pickaxe
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.cubed.util.bukkit.ItemUtils
+import net.evilblock.cubed.util.nms.NBTUtil
 import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeHandler
@@ -74,17 +76,7 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
 
     fun applyNBT(itemStack: ItemStack): ItemStack {
         synchronized(modificationLock) {
-            val nmsItemStack = CraftItemStack.asNMSCopy(itemStack)
-            var tag: NBTTagCompound? = nmsItemStack.tag
-
-            if (tag == null) {
-                tag = NBTTagCompound()
-                nmsItemStack.tag = tag
-            }
-
-            tag.setUUID("PickaxeID", uuid)
-
-            return CraftItemStack.asBukkitCopy(nmsItemStack)
+            return ItemUtils.addUUIDToItemTag(itemStack, "PickaxeID", uuid, true)
         }
     }
 
@@ -114,6 +106,12 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
 
                 itemStack.itemMeta = meta
             }
+        }
+    }
+
+    fun toItemStack(original: ItemStack): ItemStack {
+        return applyNBT(original).also {
+            applyMeta(it)
         }
     }
 

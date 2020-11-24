@@ -24,7 +24,7 @@ enum class GangPermission(
         "The owner of that gang isn't accepting visitors right now.",
         Material.WOOD_DOOR,
         PermissionValue.MEMBERS,
-        setOf(PermissionValue.OWNER)
+        setOf(PermissionValue.CO_LEADERS)
     ),
     BUILD_AND_BREAK(
         "Building & Breaking",
@@ -55,7 +55,7 @@ enum class GangPermission(
         "This setting controls who can spend trophies in the Gang Shop.",
         "You don't have permission to spend the gang's trophies.",
         Material.GOLD_INGOT,
-        PermissionValue.OWNER,
+        PermissionValue.CO_LEADERS,
         setOf(PermissionValue.MEMBERS, PermissionValue.VISITORS)
     );
 
@@ -83,6 +83,7 @@ enum class GangPermission(
 
     enum class PermissionValue(val detailedName: String) {
         OWNER("Leader only"),
+        CO_LEADERS("Co-leaders only"),
         CAPTAINS("Captains only"),
         MEMBERS("Members only"),
         VISITORS("Visitors and members")

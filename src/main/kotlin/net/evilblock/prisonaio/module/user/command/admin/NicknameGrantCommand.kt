@@ -48,7 +48,7 @@ object NicknameGrantCommand {
             player.sendMessage("")
         }
 
-        sender.sendMessage("${ChatColor.GREEN}You have granted the ${color}${ChatColor.BOLD}${Formats.capitalizeFully(color.name.replace("_", " "))} ${ChatColor.GREEN}color to ${user.getUsername()}.")
+        sender.sendMessage("${ChatColor.GREEN}You granted the ${color}${ChatColor.BOLD}${Formats.capitalizeFully(color.name.replace("_", " "))} ${ChatColor.GREEN}color to ${user.getUsername()}.")
     }
 
 }

@@ -18,7 +18,7 @@ object RefreshCommand {
     @Command(
         names = ["leaderboards refresh", "lb refresh"],
         description = "Forcefully refresh the leaderboards data",
-        permission = Permissions.LEADERBOARDS_REFRESH,
+        permission = Permissions.LEADERBOARDS_ADMIN,
         async = true
     )
     @JvmStatic

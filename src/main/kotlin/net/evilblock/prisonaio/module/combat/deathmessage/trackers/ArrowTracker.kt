@@ -21,7 +21,7 @@ import java.util.*
 
 class ArrowTracker : Listener {
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     fun onEntityShootBow(event: EntityShootBowEvent) {
         if (event.entity is Player) {
             event.projectile.setMetadata("ShotFromDistance", FixedMetadataValue(PrisonAIO.instance, event.projectile.location))

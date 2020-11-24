@@ -4,3 +4,9 @@
 
 # The radius around each region that determines if the player is considered nearby
 nearby-radius: 5
+
+# Settings relating to LuckyBlock mines
+lucky-block-mines:
+  chat-prefix: "&7[&e&lLuckyBlocks&7] "
+  max-spawns: 16 # The maximum amount of lucky blocks that can be present in a mine
+  regen-time: 15 # The time, in seconds, that it takes for a new lucky block to spawn after mining one

@@ -4,7 +4,10 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.combat.timer.listener.CombatTimerListeners
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.minigame.event.EventItems
+import net.evilblock.prisonaio.module.minigame.event.game.EventGameState
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import org.bukkit.ChatColor
+import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -22,6 +25,23 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.*
 
 object EventGameListeners : Listener {
+
+    @EventHandler
+    fun onPlayerToggleFlightEvent(event: PlayerToggleFlightEvent) {
+        if (EventGameHandler.isOngoingGame()) {
+            val game = EventGameHandler.getOngoingGame()!!
+            if (game.isPlaying(event.player.uniqueId)) {
+                if (event.player.gameMode == GameMode.CREATIVE && RegionBypass.hasBypass(event.player)) {
+                    RegionBypass.attemptNotify(event.player)
+                    return
+                }
+
+                event.player.allowFlight = false
+                event.player.isFlying = false
+                event.isCancelled = true
+            }
+        }
+    }
 
     @EventHandler
     fun onPlayerCommandPreprocessEvent(event: PlayerCommandPreprocessEvent) {
@@ -151,8 +171,24 @@ object EventGameListeners : Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     fun onInventoryClickEvent(event: InventoryClickEvent) {
-        if (EventGameHandler.isOngoingGame() && EventGameHandler.getOngoingGame()!!.isPlayingOrSpectating(event.whoClicked.uniqueId)) {
-            event.isCancelled = true
+        if (EventGameHandler.isOngoingGame()) {
+            val ongoingGame = EventGameHandler.getOngoingGame()!!
+            if (ongoingGame.isPlayingOrSpectating(event.whoClicked.uniqueId)) {
+                if (ongoingGame.state != EventGameState.RUNNING) {
+                    event.isCancelled = true
+                    return
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    fun onPlayerRespawnEvent(event: PlayerRespawnEvent) {
+        if (EventGameHandler.isOngoingGame()) {
+            val ongoingGame = EventGameHandler.getOngoingGame()!!
+            if (ongoingGame.isPlayingOrSpectating(event.player.uniqueId)) {
+                ongoingGame.handleRespawn(event.player)
+            }
         }
     }
 

@@ -14,6 +14,7 @@ import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.battlepass.challenge.menu.BrowseChallengesMenu
+import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.tier.Tier
 import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
 import net.evilblock.prisonaio.module.battlepass.tier.reward.Reward
@@ -126,9 +127,13 @@ class BattlePassMenu(private val user: User) : Menu() {
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
+            if (daily) {
+                description.addAll(TextSplitter.split(text = "New daily challenges will be generated in ${DailyChallengeHandler.getSession().getTimeRemaining()}.", linePrefix = ChatColor.GRAY.toString()))
+            }
+
             if (!daily && !user.battlePassProgress.isPremium()) {
                 description.add("")
-                description.addAll(TextSplitter.split(length = 40, text = "You don't have access to the Premium JunkiePass challenges! Purchase on our store at store.minejunkie.com.", linePrefix = "${ChatColor.RED}"))
+                description.addAll(TextSplitter.split(text = "You don't have access to the Premium JunkiePass challenges! Purchase on our store at store.minejunkie.com.", linePrefix = "${ChatColor.RED}"))
             }
 
             return description

@@ -20,7 +20,7 @@ import java.util.stream.Collectors
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-class SumoEventGame(host: UUID?, arenaOptions: List<EventGameArena>) : EventGame(host!!, EventGameType.SUMO, arenaOptions) {
+class SumoEventGame(host: UUID, arenaOptions: List<EventGameArena>) : EventGame(host, EventGameType.SUMO, arenaOptions) {
 
     private var playerA: Player? = null
     private var playerB: Player? = null
@@ -29,6 +29,10 @@ class SumoEventGame(host: UUID?, arenaOptions: List<EventGameArena>) : EventGame
 
     override fun startGame() {
         super.startGame()
+
+        for (player in getPlayersAndSpectators()) {
+            player.teleport(votedArena!!.spectatorLocation)
+        }
 
         object : BukkitRunnable() {
             override fun run() {

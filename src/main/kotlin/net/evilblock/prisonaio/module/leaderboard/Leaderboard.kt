@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.leaderboard
 
+import net.evilblock.cubed.CubedConfig
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -15,10 +16,11 @@ import org.bukkit.entity.Player
 abstract class Leaderboard(val id: String, val name: String) {
 
     companion object {
-        internal val CACHED_ENTRIES_SIZE = 10
+        internal const val CACHED_ENTRIES_SIZE = 10
     }
 
     internal var entries: List<LeaderboardEntry<*>> = arrayListOf()
+    private var lastSkinSource: String? = null // prevents lookup of the same player texture
 
     abstract fun fetchEntries(): List<LeaderboardEntry<*>>
 
@@ -54,9 +56,41 @@ abstract class Leaderboard(val id: String, val name: String) {
 
         this.entries = newEntries
 
+        val firstEntry = this.entries.firstOrNull()
+        val updateSkin = firstEntry?.skinSource != null || firstEntry?.skinSource != lastSkinSource
+
         for (npc in LeaderboardsModule.getLeaderboardNpcs()) {
             if (npc.leaderboard == this) {
                 npc.updateLines(getDisplayLines(true))
+
+                if (updateSkin) {
+                    val fallbackTexture = if (CubedConfig.hasNpcTexture(LeaderboardsModule.readFallbackTextureId())) {
+                        CubedConfig.getNpcTexture(LeaderboardsModule.readFallbackTextureId())
+                    } else {
+                        null
+                    }
+
+                    // if first entry is null or first entry skin source is null, use the fallback texture
+                    if (firstEntry?.skinSource == null) {
+                        if (fallbackTexture != null) {
+                            npc.updateTexture(fallbackTexture.textureValue, fallbackTexture.textureSignature)
+                        }
+                    } else {
+                        try {
+                            lastSkinSource = firstEntry.skinSource
+
+                            npc.updateTextureByUsername(username = firstEntry.skinSource, onComplete = { success, thrown ->
+                                if (!success) {
+                                    if (fallbackTexture != null) {
+                                        npc.updateTexture(fallbackTexture.textureValue, fallbackTexture.textureSignature)
+                                    }
+                                }
+                            })
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
             }
         }
     }

@@ -12,10 +12,10 @@ import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.BackButton
 import net.evilblock.cubed.menu.menus.ExitButton
 import net.evilblock.cubed.util.bukkit.ConversationUtil
-import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
 import net.evilblock.prisonaio.module.mine.block.BlockType
 import net.evilblock.prisonaio.module.mine.prompt.MineEditBlockChancePrompt
+import net.evilblock.prisonaio.module.mine.variant.normal.NormalMine
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -23,7 +23,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 
-class MineManageBlocksMenu(private val mine: Mine) : Menu() {
+class MineManageBlocksMenu(private val mine: NormalMine) : Menu() {
 
     init {
         updateAfterClick = true
@@ -47,7 +47,7 @@ class MineManageBlocksMenu(private val mine: Mine) : Menu() {
 
         // list block types
         mine.blocksConfig.blockTypes.forEachIndexed { index, blockType ->
-            buttons[18 + index] = BlockTypeButton(mine, blockType)
+            buttons[18 + index] = BlockTypeButton(blockType)
         }
 
         val startFrom = 18 + mine.blocksConfig.blockTypes.size
@@ -111,7 +111,7 @@ class MineManageBlocksMenu(private val mine: Mine) : Menu() {
         }
     }
 
-    private inner class BlockTypeButton(private val mine: Mine, private val blockType: BlockType) : Button() {
+    private inner class BlockTypeButton(private val blockType: BlockType) : Button() {
         init {
             preserveName = true
         }

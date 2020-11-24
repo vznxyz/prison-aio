@@ -7,6 +7,7 @@ import net.evilblock.prisonaio.module.combat.deathmessage.event.PlayerKilledEven
 import net.evilblock.prisonaio.module.combat.deathmessage.objects.Damage
 import net.evilblock.prisonaio.module.combat.deathmessage.objects.PlayerDamage
 import net.evilblock.prisonaio.module.combat.deathmessage.objects.UnknownDamage
+import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.user.UserHandler.getUser
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
@@ -20,10 +21,10 @@ import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class DamageListener : Listener {
+object DamageListener : Listener {
 
-    private val lastKilled: MutableMap<UUID, UUID> = Maps.newHashMap()
-    private val boosting: MutableMap<UUID, Int> = Maps.newHashMap()
+    internal val lastKilled: MutableMap<UUID, Pair<UUID, Long>> = Maps.newHashMap()
+    internal val boosting: MutableMap<UUID, Pair<Int, Long>> = Maps.newHashMap()
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onEntityDamage(event: EntityDamageEvent) {
@@ -44,9 +45,16 @@ class DamageListener : Listener {
     fun onPlayerDeath(event: PlayerDeathEvent) {
         event.deathMessage = null
 
-        val record: List<Damage>? = DeathMessageHandler.getDamageList(event.entity)
+        if (EventGameHandler.isOngoingGame() && EventGameHandler.getOngoingGame()!!.isPlayingOrSpectating(event.entity.uniqueId)) {
+            return
+        }
+
         val deathMessage: String
-        if (record != null) {
+
+        val record: List<Damage> = DeathMessageHandler.getDamageList(event.entity)
+        if (record.isEmpty()) {
+            deathMessage = UnknownDamage(event.entity.uniqueId, 1.0).getDeathMessage()
+        } else {
             val deathCause = record[record.size - 1]
             if (deathCause is PlayerDamage && deathCause.getTimeDifference() < TimeUnit.MINUTES.toMillis(1)) {
                 val killerUuid = deathCause.damager
@@ -60,29 +68,29 @@ class DamageListener : Listener {
                     killedEvent.call()
 
                     // prevent kill boosting
-                    if (lastKilled.containsKey(killer.getUniqueId()) && lastKilled[killer.getUniqueId()] === victim.uniqueId) {
-                        boosting.putIfAbsent(killer.getUniqueId(), 0)
-                        boosting[killer.getUniqueId()] = boosting[killer.getUniqueId()]!! + 1
-                    } else {
-                        boosting[killer.getUniqueId()] = 0
+                    if (lastKilled.containsKey(killer.uniqueId) && lastKilled[killer.uniqueId]!!.first === victim.uniqueId) {
+                        val kills = if (boosting.containsKey(killer.uniqueId)) {
+                            boosting[killer.uniqueId]!!.first
+                        } else {
+                            1
+                        }
+
+                        boosting[killer.uniqueId] = Pair(kills, System.currentTimeMillis())
                     }
 
-//                    val sameAddress = killer.getAddress().address.hostAddress.equals(victim.address.address.hostAddress, ignoreCase = true)
-                    val sameVictim = boosting.containsKey(killer.getUniqueId()) && boosting[killer.getUniqueId()]!! > 1
+                    val sameAddress = killer.getAddress().address.hostAddress.equals(victim.address.address.hostAddress, ignoreCase = true)
+                    val sameVictim = boosting.containsKey(killer.uniqueId) && boosting[killer.uniqueId]!!.first > 1
 
                     getUser(victim.uniqueId).statistics.addDeath()
 
-                    if (!sameVictim) {
-//                    if (!sameAddress && !sameVictim) {
+                    if (!sameAddress && !sameVictim) {
                         getUser(killerUuid).statistics.addKill()
-                        lastKilled[killer.getUniqueId()] = victim.uniqueId
+                        lastKilled[killer.uniqueId] = Pair(victim.uniqueId, System.currentTimeMillis())
                     }
                 }
             }
 
             deathMessage = deathCause.getDeathMessage()
-        } else {
-            deathMessage = UnknownDamage(event.entity.uniqueId, 1.0).getDeathMessage()
         }
 
         for (player in Bukkit.getOnlinePlayers()) {

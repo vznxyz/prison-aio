@@ -42,20 +42,18 @@ object Greed : AbstractEnchant("greed", "Greed", 3) {
         }
 
         if (Chance.percent(readChance())) {
-            val randomItem: ShopReceiptItem = event.items.toList()[Chance.pick(event.items.size)]
-
             val multiplierMap = readLevelToMultiplierMap()
 
-            val multiplier: Double = multiplierMap.getOrElse(level) {
+            val greedMultiplier: Double = multiplierMap.getOrElse(level) {
                 multiplierMap.entries.maxBy { it.key }!!.value
             }
 
-            if (randomItem.multiplier < multiplier) {
-                randomItem.multiplier = multiplier
+            val randomItem: ShopReceiptItem = event.items.toList()[Chance.pick(event.items.size)]
+            val normalMultiplier = UserHandler.getUser(player.uniqueId).perks.getSalesMultiplier(player)
+            val stackedMultiplier = normalMultiplier + randomItem.multiplier + greedMultiplier
 
-                val formattedPrice = (randomItem.itemType.buyPricePerUnit * randomItem.item.amount) * randomItem.multiplier
-                sendMessage(event.player, "You sold ${ChatColor.AQUA}${randomItem.item.amount}x ${Formats.formatItemStack(randomItem.item)} ${ChatColor.GRAY}for a multiplier of ${ChatColor.YELLOW}$multiplier ${ChatColor.GRAY}(${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(formattedPrice.toLong())}${ChatColor.GRAY})!")
-            }
+            val formattedPrice = (randomItem.itemType.buyPricePerUnit * randomItem.item.amount) * stackedMultiplier
+            sendMessage(event.player, "You sold x${randomItem.item.amount} ${ChatColor.RED}${Formats.formatItemStack(randomItem.item)} ${ChatColor.GRAY}for a multiplier of ${ChatColor.GOLD}${ChatColor.BOLD}${stackedMultiplier}x${ChatColor.GRAY}! (${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(formattedPrice.toLong())}${ChatColor.GRAY})")
         }
     }
 

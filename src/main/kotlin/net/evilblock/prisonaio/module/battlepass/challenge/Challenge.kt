@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.battlepass.challenge
 
 import net.evilblock.cubed.serialize.AbstractTypeSerializable
+import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.user.User
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -18,7 +19,6 @@ import java.text.NumberFormat
 abstract class Challenge(val id: String, internal var daily: Boolean = false) : AbstractTypeSerializable {
 
     companion object {
-        private val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}JunkiePass${ChatColor.GRAY}] "
         internal val DECIMAL_FORMAT = DecimalFormat("#.##")
 
         init {
@@ -46,7 +46,7 @@ abstract class Challenge(val id: String, internal var daily: Boolean = false) : 
 
     fun onComplete(player: Player, user: User) {
         val formattedExp = NumberFormat.getInstance().format(rewardXp)
-        player.sendMessage("${CHAT_PREFIX}You have completed the ${ChatColor.YELLOW}$name ${ChatColor.GRAY}challenge! (${ChatColor.GREEN}+$formattedExp XP${ChatColor.GRAY})")
+        player.sendMessage("${BattlePassModule.CHAT_PREFIX}You have completed the ${ChatColor.YELLOW}$name ${ChatColor.GRAY}challenge! (${ChatColor.GREEN}+$formattedExp XP${ChatColor.GRAY})")
 
         val nextTier = user.battlePassProgress.getNextTier()
 
@@ -64,9 +64,9 @@ abstract class Challenge(val id: String, internal var daily: Boolean = false) : 
             }
 
             if (newRewards) {
-                player.sendMessage("${CHAT_PREFIX}You have reached ${ChatColor.GOLD}${ChatColor.BOLD}Tier ${nextTier.number}${ChatColor.GRAY}! You have new rewards waiting to be collected!")
+                player.sendMessage("${BattlePassModule.CHAT_PREFIX}You have reached ${ChatColor.GOLD}${ChatColor.BOLD}Tier ${nextTier.number}${ChatColor.GRAY}! You have new rewards waiting to be collected!")
             } else {
-                player.sendMessage("${CHAT_PREFIX}You have reached ${ChatColor.GOLD}${ChatColor.BOLD}Tier ${nextTier.number}${ChatColor.GRAY}!")
+                player.sendMessage("${BattlePassModule.CHAT_PREFIX}You have reached ${ChatColor.GOLD}${ChatColor.BOLD}Tier ${nextTier.number}${ChatColor.GRAY}!")
             }
         }
     }

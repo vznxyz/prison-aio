@@ -35,6 +35,7 @@ object RegionClaimCommand {
         RegionHandler.clearBlockCache(region)
 
         region.setCuboid(WorldEditUtils.toCuboid(selection))
+
         RegionHandler.updateBlockCache(region)
         RegionHandler.saveData()
 

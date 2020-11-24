@@ -14,16 +14,16 @@ import net.evilblock.cubed.menu.menus.ExitButton
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.ConversationUtil
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
 import net.evilblock.prisonaio.module.mine.prompt.MineEditResetIntervalPrompt
+import net.evilblock.prisonaio.module.mine.variant.normal.NormalMine
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 
-class MineManageResetMenu(private val mine: Mine) : Menu() {
+class MineManageResetMenu(private val mine: NormalMine) : Menu() {
 
     init {
         updateAfterClick = true
@@ -47,13 +47,13 @@ class MineManageResetMenu(private val mine: Mine) : Menu() {
         }
 
         // first row
-        buttons[30] = ResetNowButton(mine)
-        buttons[32] = EditIntervalButton(mine)
+        buttons[30] = ResetNowButton()
+        buttons[32] = EditIntervalButton()
 
         // second row
-        buttons[38] = ToggleResetMessagesButton(mine)
-        buttons[40] = ToggleBroadcastButton(mine)
-        buttons[42] = ToggleIntervalMessagesButton(mine)
+        buttons[38] = ToggleResetMessagesButton()
+        buttons[40] = ToggleBroadcastButton()
+        buttons[42] = ToggleIntervalMessagesButton()
 
         // make empty row on bottom
         buttons[53] = Button.placeholder(Material.AIR)
@@ -61,7 +61,7 @@ class MineManageResetMenu(private val mine: Mine) : Menu() {
         return buttons
     }
 
-    private inner class ResetNowButton(private val mine: Mine) : Button() {
+    private inner class ResetNowButton : Button() {
         override fun getName(player: Player): String {
             return "${ChatColor.AQUA}${ChatColor.BOLD}Reset Now"
         }
@@ -90,7 +90,7 @@ class MineManageResetMenu(private val mine: Mine) : Menu() {
         }
     }
 
-    private inner class EditIntervalButton(private val mine: Mine) : Button() {
+    private inner class EditIntervalButton : Button() {
         override fun getName(player: Player): String {
             return "${ChatColor.AQUA}${ChatColor.BOLD}Reset Interval: ${ChatColor.GRAY}${TimeUtil.formatIntoAbbreviatedString(mine.resetConfig.resetInterval)}"
         }
@@ -119,7 +119,7 @@ class MineManageResetMenu(private val mine: Mine) : Menu() {
         }
     }
 
-    private inner class ToggleResetMessagesButton(private val mine: Mine) : Button() {
+    private inner class ToggleResetMessagesButton : Button() {
         override fun getName(player: Player): String {
             return "${ChatColor.AQUA}${ChatColor.BOLD}Reset Messages Enabled: ${ChatColor.GRAY}${mine.resetConfig.resetMessagesEnabled}"
         }
@@ -156,7 +156,7 @@ class MineManageResetMenu(private val mine: Mine) : Menu() {
         }
     }
 
-    private inner class ToggleBroadcastButton(private val mine: Mine) : Button() {
+    private inner class ToggleBroadcastButton : Button() {
         override fun getName(player: Player): String {
             return "${ChatColor.AQUA}${ChatColor.BOLD}Broadcast Messages Enabled: ${ChatColor.GRAY}${mine.resetConfig.broadcastResetMessages}"
         }
@@ -193,7 +193,7 @@ class MineManageResetMenu(private val mine: Mine) : Menu() {
         }
     }
 
-    private inner class ToggleIntervalMessagesButton(private val mine: Mine) : Button() {
+    private inner class ToggleIntervalMessagesButton : Button() {
         override fun getName(player: Player): String {
             return "${ChatColor.AQUA}${ChatColor.BOLD}Interval Messages Enabled: ${ChatColor.GRAY}${mine.resetConfig.intervalMessagesEnabled}"
         }

@@ -35,7 +35,7 @@ object FixedPriceFormulaType : PriceFormulaType("Fixed Price") {
         override fun getEditActions(): List<EditAction> {
             return listOf(
                 EditAction(name = "edit price", clickType = ClickType.LEFT, clicked = { player, formula ->
-                    NumberPrompt { number ->
+                    NumberPrompt().acceptInput { number ->
                         (formula as FixedPriceFormula).price = number.toLong()
 
                         Tasks.async {

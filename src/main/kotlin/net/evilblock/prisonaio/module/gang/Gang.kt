@@ -106,7 +106,9 @@ class Gang(
         guideNpc.updateTexture(GangModule.getJerryTextureValue(), GangModule.getJerryTextureSignature())
         guideNpc.updateLines(GangModule.getJerryHologramLines())
 
-        EntityManager.trackEntity(guideNpc)
+        if (!EntityManager.isEntityTracked(guideNpc)) {
+            EntityManager.trackEntity(guideNpc)
+        }
 
         invitations = hashMapOf()
         visitors = hashSetOf()
@@ -145,7 +147,14 @@ class Gang(
                     if (sendMessage) {
                         player.sendMessage("${ChatColor.RED}${permission.error}.")
                     }
-
+                    return false
+                }
+            }
+            GangPermission.PermissionValue.CO_LEADERS -> {
+                if (memberInfo?.role?.isAtLeast(GangMember.Role.CO_LEADER) == false) {
+                    if (sendMessage) {
+                        player.sendMessage("${ChatColor.RED}${permission.error}.")
+                    }
                     return false
                 }
             }
@@ -154,7 +163,6 @@ class Gang(
                     if (sendMessage) {
                         player.sendMessage("${ChatColor.RED}${permission.error}.")
                     }
-
                     return false
                 }
             }
@@ -163,7 +171,6 @@ class Gang(
                     if (sendMessage) {
                         player.sendMessage("${ChatColor.RED}${permission.error}.")
                     }
-
                     return false
                 }
             }
@@ -200,6 +207,11 @@ class Gang(
 
     fun updateLeader(owner: UUID) {
         this.leader = owner
+
+        val memberInfo = getMemberInfo(this.leader)
+        if (memberInfo != null) {
+            memberInfo.role = GangMember.Role.LEADER
+        }
 
         val newLeaderUsername = Cubed.instance.uuidCache.name(owner)
         for (player in getOnlineMembers()) {

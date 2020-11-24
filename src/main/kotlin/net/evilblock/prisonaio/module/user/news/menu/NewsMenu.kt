@@ -42,7 +42,7 @@ class NewsMenu : PaginatedMenu() {
     }
 
     override fun getPrePaginatedTitle(player: Player): String {
-        return "MineJunkie News"
+        return "News / Announcements"
     }
 
     override fun getGlobalButtons(player: Player): Map<Int, Button>? {
@@ -65,7 +65,7 @@ class NewsMenu : PaginatedMenu() {
 
         for (i in 0..44) {
             if (i != 4 && !RED_SLOTS.contains(i) && !POSTS_SLOTS.contains(i)) {
-                buttons[i] = GlassButton(8)
+                buttons[i] = GlassButton(7)
             }
         }
 

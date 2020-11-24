@@ -25,6 +25,7 @@ object Permissions {
     const val NEWS_VIEW_STATS = "prisonaio.news.view-stats"
 
     const val MINES_ADMIN = "prisonaio.mines.admin"
+    const val MINE_ACCESS = "prisonaio.mines.access."
 
     const val GANGS_ADMIN = "prisonaio.gangs.admin"
     const val GANGS_TROPHIES_GIVE = "prisonaio.gangs.trophies.give"
@@ -45,7 +46,7 @@ object Permissions {
     const val PERK_AUTO_SELL = "user.perks.autosell"
     const val PERK_FLY = "user.perks.fly"
 
-    const val LEADERBOARDS_REFRESH = "prisonaio.leaderboards.refresh"
+    const val LEADERBOARDS_ADMIN = "prisonaio.leaderboards.admin"
     const val LEADERBOARDS_SPAWN = "prisonaio.leaderboards.spawn"
 
     const val EVENTS_HOST = "prisonaio.events.host."
@@ -59,5 +60,7 @@ object Permissions {
     const val ABILITY_ARMOR_GIVE = "prisonaio.ability-armor.give"
 
     const val COINFLIP_MANAGE = "prisonaio.minigame.coinflip.admin.toggle"
+
+    const val PMINE_CREATE = "prisonaio.pmine.create"
 
 }

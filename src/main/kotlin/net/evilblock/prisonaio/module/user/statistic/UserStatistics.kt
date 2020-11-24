@@ -11,9 +11,11 @@ import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.event.AsyncPlayTimeSyncEvent
 import net.evilblock.prisonaio.util.economy.Currency
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.round
 
 class UserStatistics(@Transient internal var user: User) {
 
@@ -137,12 +139,36 @@ class UserStatistics(@Transient internal var user: User) {
     }
 
     fun addCoinflipProfit(currency: Currency.Type, amount: Number) {
-        coinflipProfit[currency] = getCoinflipProfit(currency) + BigInteger(amount.toString())
+        val add = when (amount) {
+            is Double -> {
+                BigDecimal(round(amount)).toBigIntegerExact()
+            }
+            is BigDecimal -> {
+                amount.toBigInteger()
+            }
+            else -> {
+                BigInteger(amount.toString())
+            }
+        }
+
+        coinflipProfit[currency] = getCoinflipProfit(currency) + add
         user.requiresSave = true
     }
 
     fun subtractCoinflipProfit(currency: Currency.Type, amount: Number) {
-        coinflipProfit[currency] = getCoinflipProfit(currency) - BigInteger(amount.toString())
+        val subtract = when (amount) {
+            is Double -> {
+                BigDecimal(amount.toString()).toBigIntegerExact()
+            }
+            is BigDecimal -> {
+                amount.toBigInteger()
+            }
+            else -> {
+                BigInteger(amount.toString())
+            }
+        }
+
+        coinflipProfit[currency] = getCoinflipProfit(currency) - subtract
         user.requiresSave = true
     }
 
@@ -150,7 +176,7 @@ class UserStatistics(@Transient internal var user: User) {
         return tradesCompleted
     }
 
-    fun addTradesCompleted() {
+    fun addTradeCompleted() {
         tradesCompleted++
         user.requiresSave = true
     }

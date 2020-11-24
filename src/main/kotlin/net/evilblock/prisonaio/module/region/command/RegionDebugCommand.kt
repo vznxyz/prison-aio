@@ -23,7 +23,7 @@ object RegionDebugCommand {
     @JvmStatic
     fun execute(player: Player) {
         val region = RegionHandler.findRegion(player.location)
-        player.sendMessage("Standing in ${region.getRegionName()}")
+        player.sendMessage("You are standing in ${region.getRegionName()} ${region.id}")
     }
 
 }

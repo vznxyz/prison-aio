@@ -11,6 +11,7 @@ import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.source.chat.filter.ChatFilterHandler
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -28,11 +29,9 @@ object GangRenameCommand {
             return
         }
 
-        for (blockedName in GangHandler.BLOCKED_NAMES) {
-            if (blockedName.matches(name)) {
-                player.sendMessage("${ChatColor.RED}The name you input contains inappropriate content. Please try a different name.")
-                return
-            }
+        if (ChatFilterHandler.filterMessage(name) != null) {
+            player.sendMessage("${ChatColor.RED}The name you input contains inappropriate content. Please try a different name.")
+            return
         }
 
         if (!gang.isLeader(player.uniqueId)) {

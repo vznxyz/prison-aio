@@ -13,7 +13,6 @@ import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.HiddenLore
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
-import net.evilblock.prisonaio.module.gang.GangModule
 import net.evilblock.prisonaio.module.gang.challenge.menu.GangChallengesMenu
 import net.evilblock.prisonaio.module.gang.entity.JerryNpcEntity
 import org.bukkit.ChatColor
@@ -41,7 +40,7 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
 
         buttons[10] = AnnouncementButton()
         buttons[13] = ChallengesButton()
-        buttons[16] = AchievementsButton()
+        buttons[16] = BoostersButton()
 
         buttons[28] = SettingsButton()
         buttons[31] = MembersButton()
@@ -65,10 +64,6 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
             for (line in TextSplitter.split(length = 40, text = jerry.gang.announcement, linePrefix = "${ChatColor.GRAY}")) {
                 description.add(line)
             }
-
-            description.add("")
-            description.add("${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Server News")
-            description.addAll(GangModule.getJerryChangeLog())
 
             return description
         }
@@ -105,22 +100,30 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
         }
     }
 
-    private inner class AchievementsButton : Button() {
+    private inner class BoostersButton : Button() {
         override fun getName(player: Player): String {
-            return "${ChatColor.YELLOW}${ChatColor.BOLD}Gang Achievements"
+            return "${ChatColor.YELLOW}${ChatColor.BOLD}Gang Boosters"
         }
 
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
             description.add("")
-            description.add("${ChatColor.GRAY}Coming soon!")
+            description.addAll(TextSplitter.split(text = "Activate boosters to help your gang earn more money, tokens, and trophies."))
+            description.add("")
+            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to manage boosters")
 
             return description
         }
 
         override fun getMaterial(player: Player): Material {
-            return Material.BOAT
+            return Material.NETHER_STAR
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                GangBoostersMenu(jerry.gang).openMenu(player)
+            }
         }
     }
 
@@ -149,6 +152,11 @@ class JerryMenu(private val jerry: JerryNpcEntity) : Menu() {
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (!jerry.gang.isLeader(player.uniqueId)) {
+                player.sendMessage("${ChatColor.RED}You must be the leader of the gang to move Jerry!")
+                return
+            }
+
             if (player.inventory.firstEmpty() == -1) {
                 player.sendMessage("${ChatColor.RED}You need a free inventory space to pickup Jerry!")
                 return

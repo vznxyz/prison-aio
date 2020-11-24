@@ -205,6 +205,10 @@ object RegionListeners : Listener {
 
     @EventHandler
     fun onPlayerDeathEvent(event: PlayerDeathEvent) {
+        if (EventGameHandler.isOngoingGame() && EventGameHandler.getOngoingGame()!!.isPlayingOrSpectating(event.entity.uniqueId)) {
+            return
+        }
+
         RegionHandler.findRegion(event.entity.location).onPlayerDeath(event.entity, event)
     }
 

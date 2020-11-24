@@ -23,11 +23,6 @@ import java.text.NumberFormat
 
 class BlocksMinedChallenge(id: String, internal var blocksMined: Int) : Challenge(id) {
 
-    constructor(id: String, name: String, blocksMined: Int, xp: Int) : this(id, blocksMined) {
-        this.name = name
-        this.rewardXp = xp
-    }
-
     override fun getText(): String {
         return "Mine ${NumberFormat.getInstance().format(blocksMined)} blocks"
     }
@@ -81,7 +76,7 @@ class BlocksMinedChallenge(id: String, internal var blocksMined: Int) : Challeng
         }
 
         override fun startSetupPrompt(player: Player, id: String, lambda: (Challenge) -> Unit) {
-            NumberPrompt { number ->
+            NumberPrompt().acceptInput { number ->
                 assert(number.toInt() > 0)
                 lambda.invoke(BlocksMinedChallenge(id, number.toInt()))
             }.start(player)

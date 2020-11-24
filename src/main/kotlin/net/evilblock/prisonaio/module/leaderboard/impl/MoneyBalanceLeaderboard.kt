@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.leaderboard.impl
 import net.evilblock.cubed.Cubed
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
+import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
@@ -23,6 +24,10 @@ object MoneyBalanceLeaderboard : Leaderboard("top-balance", "${ChatColor.GREEN}$
 
         for (document in UserHandler.getCollection().find()) {
             val uuid = UUID.fromString(document.getString("uuid"))
+
+            if (LeaderboardsModule.exemptions.contains(uuid)) {
+                continue
+            }
 
             val moneyBalance = when (val rawValue = document["moneyBalance"]) {
                 is String -> {
@@ -39,7 +44,9 @@ object MoneyBalanceLeaderboard : Leaderboard("top-balance", "${ChatColor.GREEN}$
                 }
             }
 
-            entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), moneyBalance))
+            val displayName = Cubed.instance.uuidCache.name(uuid)
+
+            entries.add(LeaderboardEntry(0, displayName, displayName, moneyBalance))
         }
 
         return entries.sortedByDescending { it.value }

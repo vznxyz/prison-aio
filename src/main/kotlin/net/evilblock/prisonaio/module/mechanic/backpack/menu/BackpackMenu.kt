@@ -11,8 +11,10 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.StaticItemStackButton
 import net.evilblock.cubed.util.NumberUtils
+import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
+import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.mechanic.backpack.upgrade.menu.BackpackUpgradesMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -39,7 +41,9 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
         val buttons = hashMapOf<Int, Button>()
 
         buttons[0] = PageButton(-1)
+//        buttons[2] = BlockFilterButton()
         buttons[4] = InfoButton()
+        buttons[6] = ClearItemsButton()
         buttons[8] = PageButton(1)
 
         for (i in 0..8) {
@@ -72,7 +76,7 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
     }
 
     fun getMaxPages(): Int {
-        return ceil(backpack.getMaxItemsSize() / 44.0).toInt().coerceAtLeast(1)
+        return ceil((backpack.getMaxItemsSize() / 64.0) / 44.0).toInt().coerceAtLeast(1)
     }
 
     override fun onOpen(player: Player) {
@@ -169,7 +173,7 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
             }
 
             description.add("")
-            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Click to purchase upgrades")
+            description.add("${ChatColor.YELLOW}Click to purchase upgrades")
 
             return description
         }
@@ -181,6 +185,37 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 BackpackUpgradesMenu(backpack).openMenu(player)
+            }
+        }
+    }
+
+    private inner class ClearItemsButton : Button() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.RED}${ChatColor.BOLD}Clear Items"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            return arrayListOf<String>().also { desc ->
+                desc.add("")
+                desc.addAll(TextSplitter.split(text = "Clears all of the items stored in your backpack.", linePrefix = ChatColor.GRAY.toString()))
+                desc.add("")
+                desc.add("${ChatColor.RED}Click to clear items")
+            }
+        }
+
+        override fun getMaterial(player: Player): Material {
+            return Material.BARRIER
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            val backpacks = BackpackHandler.findBackpacksInInventory(player)
+            if (!backpacks.containsValue(backpack)) {
+                player.sendMessage("${ChatColor.RED}You don't have that backpack in your inventory!")
+                return
+            }
+
+            if (clickType.isLeftClick) {
+                backpack.clearItems()
             }
         }
     }

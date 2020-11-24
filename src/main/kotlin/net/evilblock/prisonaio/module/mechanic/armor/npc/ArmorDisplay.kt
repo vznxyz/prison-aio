@@ -64,7 +64,7 @@ class ArmorDisplay(location: Location, @JsonAdapter(ArmorSetSerializer::class) v
 
             for (i in 0 until 45) {
                 if (!buttons.containsKey(i)) {
-                    buttons[i] = GlassButton(8)
+                    buttons[i] = GlassButton(7)
                 }
             }
 

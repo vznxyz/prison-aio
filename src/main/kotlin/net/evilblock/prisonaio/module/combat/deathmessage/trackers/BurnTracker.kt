@@ -19,11 +19,11 @@ class BurnTracker : Listener {
             return
         }
 
-        val record: List<Damage>? = getDamageList(event.getPlayer())
+        val record: List<Damage> = getDamageList(event.getPlayer())
         var knocker: Damage? = null
         var knockerTime = 0L
 
-        if (record != null) {
+        if (record.isNotEmpty()) {
             for (damage in record) {
                 if (damage is BurnDamage || damage is BurnDamageByPlayer) {
                     continue

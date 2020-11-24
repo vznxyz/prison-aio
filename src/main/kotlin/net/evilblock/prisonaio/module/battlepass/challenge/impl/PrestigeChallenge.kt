@@ -76,10 +76,10 @@ class PrestigeChallenge(id: String, internal var prestige: Int) : Challenge(id) 
         }
 
         override fun startSetupPrompt(player: Player, id: String, lambda: (Challenge) -> Unit) {
-            ConversationUtil.startConversation(player, NumberPrompt { number ->
+            NumberPrompt().acceptInput { number ->
                 assert(number.toInt() > 0)
                 lambda.invoke(PrestigeChallenge(id, number.toInt()))
-            })
+            }.start(player)
         }
     }
 

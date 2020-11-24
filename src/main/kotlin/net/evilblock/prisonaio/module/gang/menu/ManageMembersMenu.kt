@@ -16,8 +16,8 @@ import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.ConversationUtil
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.PlayerPrompt
-import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.gang.Gang
 import net.evilblock.prisonaio.module.gang.GangMember
 import org.bukkit.Bukkit
@@ -77,9 +77,9 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
 
     override fun onClose(player: Player, manualClose: Boolean) {
         if (manualClose) {
-            PrisonAIO.instance.server.scheduler.runTaskLater(PrisonAIO.instance, {
-                JerryMenu(gang.guideNpc)
-            }, 1L)
+            Tasks.delayed(1L) {
+                JerryMenu(gang.guideNpc).openMenu(player)
+            }
         }
     }
 
@@ -192,8 +192,16 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                if (!gang.isLeader(player.uniqueId)) {
-                    player.sendMessage("${ChatColor.RED}You must be the leader of the gang to promote members.")
+                if (member.role.isAtLeast(GangMember.Role.CO_LEADER)) {
+                    player.sendMessage("${ChatColor.RED}That member can't be promoted any higher.")
+                    return
+                }
+
+                val promotedBy = gang.getMemberInfo(player.uniqueId)!!
+                val nextRole = GangMember.Role.values()[member.role.ordinal + 1]
+
+                if (nextRole.isAtLeast(promotedBy.role)) {
+                    player.sendMessage("${ChatColor.RED}You can't promote that member!")
                     return
                 }
 
@@ -202,27 +210,27 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
                     return
                 }
 
-                if (member.role.isAtLeast(GangMember.Role.CO_LEADER)) {
-                    player.sendMessage("${ChatColor.RED}That member can't be promoted any higher.")
-                    return
-                }
-
-                member.role = GangMember.Role.values()[member.role.ordinal + 1]
-                gang.sendMessagesToMembers("${ChatColor.YELLOW}${member.getUsername()} has been promoted to ${member.role.rendered} by ${player.name}!")
+                member.role = nextRole
+                gang.sendMessagesToMembers("${member.role.color}${member.getUsername()} ${ChatColor.YELLOW}has been promoted to ${member.role.color}${member.role.rendered} ${ChatColor.YELLOW}by ${promotedBy.role.color}${player.name}${ChatColor.YELLOW}!")
             } else if (clickType.isRightClick) {
                 if (clickType.isShiftClick) {
-                    if (!gang.isLeader(player.uniqueId)) {
-                        player.sendMessage("${ChatColor.RED}You must be the leader of the gang to kick members.")
+                    if (gang.getMemberInfo(player.uniqueId)?.role?.isAtLeast(GangMember.Role.CO_LEADER) == false) {
+                        player.sendMessage("${ChatColor.RED}You must be at least a co-leader to kick members from the gang.")
                         return
                     }
 
                     if (player.uniqueId == member.uuid) {
-                        player.sendMessage("${ChatColor.RED}You can't kick yourself from the gang.")
+                        player.sendMessage("${ChatColor.RED}You can't kick yourself from your gang.")
+                        return
+                    }
+
+                    if (member.role.isAtLeast(gang.getMemberInfo(player.uniqueId)!!.role)) {
+                        player.sendMessage("${ChatColor.RED}You can't kick a member that is the same role as you.")
                         return
                     }
 
                     if (gang.isLeader(member.uuid)) {
-                        player.sendMessage("${ChatColor.RED}You can't kick the leader from their own gang.")
+                        player.sendMessage("${ChatColor.RED}You can't kick the leader of your gang!")
                         return
                     }
 
@@ -237,8 +245,15 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
                         }
                     }.openMenu(player)
                 } else {
-                    if (!gang.isLeader(player.uniqueId)) {
-                        player.sendMessage("${ChatColor.RED}You must be the leader of the gang to demote members.")
+                    if (member.role == GangMember.Role.MEMBER) {
+                        player.sendMessage("${ChatColor.RED}That member can't be demoted any lower.")
+                    }
+
+                    val demotedBy = gang.getMemberInfo(player.uniqueId)!!
+                    val previousRole = GangMember.Role.values()[member.role.ordinal - 1]
+
+                    if (previousRole.isAtLeast(demotedBy.role)) {
+                        player.sendMessage("${ChatColor.RED}You can't demote that player!")
                         return
                     }
 
@@ -253,7 +268,7 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
                     }
 
                     member.role = GangMember.Role.values()[member.role.ordinal - 1]
-                    gang.sendMessagesToMembers("${ChatColor.YELLOW}${member.getUsername()} has been demoted to ${member.role.rendered} by ${player.name}!")
+                    gang.sendMessagesToMembers("${member.role.color}${member.getUsername()} ${ChatColor.YELLOW}has been demoted to ${member.role.color}${member.role.rendered} ${ChatColor.YELLOW}by ${demotedBy.role.color}${player.name}${ChatColor.YELLOW}!")
                 }
             }
         }

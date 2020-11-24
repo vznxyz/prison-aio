@@ -11,6 +11,7 @@ import me.clip.deluxetags.DeluxeTag
 import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.apache.commons.lang.WordUtils
@@ -58,6 +59,12 @@ object ChatFormatListeners : Listener {
 
         tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.MONEY_SYMBOL} ${ChatColor.GRAY}${NumberUtils.format(user.getMoneyBalance())}"))
         tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}${NumberUtils.format(user.getTokenBalance())}"))
+
+        val gang = GangHandler.getAssumedGang(user.uuid)
+        if (gang != null) {
+            tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.FLAG_SYMBOL} ${ChatColor.GRAY}${gang.name} (Gang)"))
+        }
+
         tooltipLines.add(FancyMessage(""))
         tooltipLines.add(FancyMessage("${ChatColor.YELLOW}Click to view ${event.player.name}'s profile"))
 

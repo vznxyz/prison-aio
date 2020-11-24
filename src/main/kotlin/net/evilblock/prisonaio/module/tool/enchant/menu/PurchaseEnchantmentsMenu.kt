@@ -154,12 +154,14 @@ class PurchaseEnchantmentsMenu(private val pickaxeItem: ItemStack, private val p
 
             if (user.hasTokenBalance(enchant.getCost(nextLevel))) {
                 description.add("")
-                description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Click to purchase")
+                description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Click to purchase one level")
                 description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Press ${ChatColor.AQUA}${ChatColor.BOLD}Q ${ChatColor.YELLOW}${ChatColor.BOLD}to buy max")
             } else {
                 if (!isMaxed) {
                     description.add("")
-                    description.add("${ChatColor.RED}${ChatColor.BOLD}Not Enough Tokens")
+                    description.add("${ChatColor.RED}${ChatColor.BOLD}Can't Afford")
+                    description.add("${ChatColor.RED}You don't have enough tokens")
+                    description.add("${ChatColor.RED}to purchase anymore levels.")
                 }
             }
 

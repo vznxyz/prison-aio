@@ -10,7 +10,9 @@ package net.evilblock.prisonaio.module.mechanic.trade
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.GlassButton
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -19,7 +21,10 @@ import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SkullMeta
+import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.scheduler.BukkitTask
 import java.util.*
+import kotlin.math.ceil
 
 class Trade (
     val sender: Player,
@@ -35,10 +40,12 @@ class Trade (
     var targetAccepted: Boolean = false
 
     var lockedIn: Boolean = false
-    var lockedInAt: Long = -1L
+    var lockedInTask: BukkitTask? = null
+
+    var completed: Boolean = false
+    var completedAt: Long = -1L
 
     var cancelled: Boolean = false
-    var completed: Boolean = false
 
     fun isSender(player: Player): Boolean {
         return player.uniqueId == sender.uniqueId
@@ -53,6 +60,43 @@ class Trade (
             senderOfferings
         } else {
             targetOfferings
+        }
+    }
+
+    private fun cancelLockIn() {
+        senderAccepted = false
+        targetAccepted = false
+
+        lockedIn = false
+        lockedInTask?.cancel()
+        lockedInTask = null
+        completedAt = -1L
+    }
+
+    private fun checkBothAccepted() {
+        if (!cancelled && !completed && !lockedIn) {
+            if (senderAccepted && targetAccepted) {
+                lockedIn = true
+                completedAt = System.currentTimeMillis() + 5_000L
+
+                lockedInTask = Tasks.asyncTimer(object : BukkitRunnable() {
+                    override fun run() {
+                        if (cancelled || completed) {
+                            cancel()
+                            return
+                        }
+
+                        if (lockedIn && senderAccepted && targetAccepted) {
+                            if (System.currentTimeMillis() >= completedAt) {
+                                TradeHandler.forgetActiveTrade(this@Trade)
+
+                                cancel()
+                                complete()
+                            }
+                        }
+                    }
+                }, 10L, 10L)
+            }
         }
     }
 
@@ -75,6 +119,12 @@ class Trade (
             sender.inventory.addItem(item)
             target.updateInventory()
         }
+
+        sender.sendMessage("${ChatColor.GREEN}You've completed your trade with ${Formats.formatPlayer(target)}${ChatColor.GREEN}!")
+        UserHandler.getUser(sender.uniqueId).statistics.addTradeCompleted()
+
+        target.sendMessage("${ChatColor.GREEN}You've completed your trade with ${Formats.formatPlayer(sender)}${ChatColor.GREEN}!")
+        UserHandler.getUser(target.uniqueId).statistics.addTradeCompleted()
     }
 
     fun cancel() {
@@ -93,8 +143,6 @@ class Trade (
         }
 
         target.updateInventory()
-
-        sendMessage("${TradeHandler.CHAT_PREFIX}The trade has been cancelled!")
     }
 
     private fun closeMenus() {
@@ -162,7 +210,7 @@ class Trade (
             }
 
             for (i in BORDER_SLOTS) {
-                buttons[i] = GlassButton(0)
+                buttons[i] = GlassButton(7)
             }
 
             return buttons
@@ -174,10 +222,8 @@ class Trade (
             }
 
             if (lockedIn) {
-                lockedIn = false
-                lockedInAt = -1L
-
-                sendMessage("${TradeHandler.CHAT_PREFIX} ${player.name} changed their offer! Both players will need to re-accept the trade.")
+                cancelLockIn()
+                sendMessage("${Formats.formatPlayer(player)} ${ChatColor.YELLOW}changed their offer! Both players will need to re-accept the trade.")
                 return false
             }
 
@@ -187,14 +233,20 @@ class Trade (
                     return false
                 }
 
-                senderOfferings.add(itemStack)
+                if (player.inventory.contains(itemStack)) {
+                    senderOfferings.add(itemStack)
+                    return true
+                }
             } else {
                 if (targetOfferings.size >= RIGHT_OFFERING_SLOTS.size) {
                     player.sendMessage("${ChatColor.RED}You've reached the maximum amount of items you can offer in one trade!")
                     return false
                 }
 
-                targetOfferings.add(itemStack)
+                if (player.inventory.contains(itemStack)) {
+                    targetOfferings.add(itemStack)
+                    return true
+                }
             }
 
             return false
@@ -202,7 +254,10 @@ class Trade (
 
         override fun onClose(player: Player, manualClose: Boolean) {
             if (!cancelled && !completed) {
+                TradeHandler.forgetActiveTrade(this@Trade)
+
                 cancel()
+                sendMessage("${Formats.formatPlayer(player)} ${ChatColor.RED}declined the trade!")
             }
         }
     }
@@ -210,7 +265,8 @@ class Trade (
     private inner class TradeStatusButton : Button() {
         override fun getName(player: Player): String {
             return if (lockedIn && senderAccepted && targetAccepted) {
-                "${ChatColor.GREEN}${ChatColor.BOLD}"
+                val remainingSeconds = (ceil((completedAt - System.currentTimeMillis()) / 1000.0)).toInt()
+                "${ChatColor.GREEN}${ChatColor.BOLD}Completing trade in $remainingSeconds seconds..."
             } else if (senderAccepted && !targetAccepted) {
                 "${ChatColor.BLUE}${ChatColor.BOLD}Waiting for ${target.name} to accept..."
             } else if (!senderAccepted && targetAccepted) {
@@ -261,9 +317,8 @@ class Trade (
         }
 
         override fun applyMetadata(player: Player, itemMeta: ItemMeta): ItemMeta? {
-            val item = super.getButtonItem(player)
-            val meta = item.itemMeta as SkullMeta
-            meta.owner = player.name
+            val meta = itemMeta as SkullMeta
+            meta.owner = participant.name
             return meta
         }
 
@@ -311,34 +366,46 @@ class Trade (
         }
 
         override fun getDamageValue(player: Player): Byte {
+            if (player.uniqueId == participant.uniqueId) {
+                val accepted = (isSender(player) && senderAccepted) || (isTarget(player) && targetAccepted)
+
+                return if (accepted) {
+                    5
+                } else {
+                    13
+                }
+            }
+
             return if (isSender(participant)) {
                 if (senderAccepted) {
-                    14
-                } else {
                     5
+                } else {
+                    14
                 }
             } else {
                 if (targetAccepted) {
-                    14
-                } else {
                     5
+                } else {
+                    14
                 }
             }
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (clickType.isLeftClick) {
-                if (cancelled || completed || lockedIn) {
+            if (clickType.isLeftClick && player.uniqueId == participant.uniqueId) {
+                if (cancelled || completed) {
                     return
                 }
 
                 if (isSender(player)) {
                     if (!senderAccepted) {
                         senderAccepted = true
+                        checkBothAccepted()
                     }
                 } else {
                     if (!targetAccepted) {
                         targetAccepted = true
+                        checkBothAccepted()
                     }
                 }
             }
@@ -352,6 +419,16 @@ class Trade (
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType == ClickType.SHIFT_LEFT && player.uniqueId == offeredBy.uniqueId) {
+                if (completed || cancelled) {
+                    return
+                }
+
+                if (lockedIn) {
+                    cancelLockIn()
+                    sendMessage("${Formats.formatPlayer(player)} ${ChatColor.YELLOW}changed their offer! Both players will need to re-accept the trade.")
+                    return
+                }
+
                 if (isSender(player)) {
                     if (!senderOfferings.contains(item)) {
                         return

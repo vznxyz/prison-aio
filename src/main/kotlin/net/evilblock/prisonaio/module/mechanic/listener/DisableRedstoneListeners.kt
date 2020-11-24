@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.mechanic.listener
 
+import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPistonExtendEvent
@@ -17,17 +18,23 @@ object DisableRedstoneListeners : Listener {
 
     @EventHandler
     fun onRedstoneEvent(event: BlockRedstoneEvent) {
-        event.newCurrent = 0
+        if (MechanicsModule.isRedstoneDisabled()) {
+            event.newCurrent = 0
+        }
     }
 
     @EventHandler
     fun onBlockPistonExtendEvent(event: BlockPistonRetractEvent) {
-        event.isCancelled = true
+        if (MechanicsModule.isRedstoneDisabled()) {
+            event.isCancelled = true
+        }
     }
 
     @EventHandler
     fun onBlockPistonExtendEvent(event: BlockPistonExtendEvent) {
-        event.isCancelled = true
+        if (MechanicsModule.isRedstoneDisabled()) {
+            event.isCancelled = true
+        }
     }
 
 }

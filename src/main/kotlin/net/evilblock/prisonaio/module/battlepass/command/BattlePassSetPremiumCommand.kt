@@ -41,9 +41,9 @@ object BattlePassSetPremiumCommand {
         }
 
         if (premium) {
-            sender.sendMessage("${ChatColor.GREEN}You have granted ${ChatColor.WHITE}${user.getUsername()} ${ChatColor.GREEN}the Premium BattlePass.")
+            sender.sendMessage("${ChatColor.GREEN}You granted ${ChatColor.WHITE}${user.getUsername()} ${ChatColor.GREEN}the Premium BattlePass.")
         } else {
-            sender.sendMessage("${ChatColor.GREEN}You have revoked ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s Premium BattlePass.")
+            sender.sendMessage("${ChatColor.GREEN}You revoked ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s Premium BattlePass.")
         }
     }
 

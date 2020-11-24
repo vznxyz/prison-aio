@@ -52,7 +52,7 @@ class EditArenaMenu(private val arena: EventGameArena) : Menu() {
             val description = arrayListOf<String>()
 
             description.add("")
-            description.addAll(TextSplitter.split(linePrefix = ChatColor.GRAY.toString(), text = "The name is how you want the arena to appear in chat and menu text."))
+            description.addAll(TextSplitter.split(text = "The name is how you want the arena to appear in chat and menu text."))
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit name")
 
@@ -96,7 +96,7 @@ class EditArenaMenu(private val arena: EventGameArena) : Menu() {
             val description = arrayListOf<String>()
 
             description.add("")
-            description.addAll(TextSplitter.split(linePrefix = ChatColor.GRAY.toString(), text = "Manage which type of events can use this arena."))
+            description.addAll(TextSplitter.split(text = "Manage which type of events can use this arena."))
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit event compatibility")
 
@@ -144,9 +144,9 @@ class EditArenaMenu(private val arena: EventGameArena) : Menu() {
         private inner class EventGameTypeButton(private val gameType: EventGameType) : Button() {
             override fun getName(player: Player): String {
                 return if (arena.isCompatible(gameType)) {
-                    "${ChatColor.GREEN}${ChatColor.BOLD}${arena.name}"
+                    "${ChatColor.GREEN}${ChatColor.BOLD}${gameType.displayName}"
                 } else {
-                    "${ChatColor.RED}${ChatColor.BOLD}${arena.name}"
+                    "${ChatColor.RED}${ChatColor.BOLD}${gameType.displayName}"
                 }
             }
 

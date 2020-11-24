@@ -12,6 +12,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldownHandler
 import net.evilblock.prisonaio.module.combat.apple.listener.GodAppleListeners
+import net.evilblock.prisonaio.module.combat.command.ClearDamageCacheCommand
 import net.evilblock.prisonaio.module.combat.deathmessage.DeathMessageHandler
 import net.evilblock.prisonaio.module.combat.enderpearl.EnderpearlCooldownHandler
 import net.evilblock.prisonaio.module.combat.enderpearl.listener.EnderpearlListeners
@@ -52,7 +53,8 @@ object CombatModule : PluginModule() {
         return listOf(
             BlockedCommandsAddCommand.javaClass,
             BlockedCommandsListCommand.javaClass,
-            BlockedCommandsRemoveCommand.javaClass
+            BlockedCommandsRemoveCommand.javaClass,
+            ClearDamageCacheCommand.javaClass
         )
     }
 

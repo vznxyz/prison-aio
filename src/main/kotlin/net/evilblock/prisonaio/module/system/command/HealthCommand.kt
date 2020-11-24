@@ -8,7 +8,9 @@
 package net.evilblock.prisonaio.module.system.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.nms.MinecraftReflection
+import net.evilblock.prisonaio.module.exchange.GrandExchangeHandler
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -20,7 +22,7 @@ object HealthCommand {
     private val TPS_FORMAT = DecimalFormat("##.##")
 
     @Command(
-        names = ["prison health"],
+        names = ["prison stats", "prison health", "system", "health"],
         description = "Prints information about the system",
         permission = "op"
     )
@@ -30,9 +32,12 @@ object HealthCommand {
         val offlineCachedUsers = UserHandler.getUsers().filter { it.cacheExpiry != null }.size
 
         sender.sendMessage("")
-        sender.sendMessage("${ChatColor.RED}${ChatColor.BOLD}PRISON HEALTH")
+        sender.sendMessage("${ChatColor.RED}${ChatColor.BOLD}System Health")
         sender.sendMessage("${ChatColor.GRAY}TPS: ${ChatColor.RED}${ChatColor.BOLD}${TPS_FORMAT.format(MinecraftReflection.getTPS())} ${ChatColor.DARK_GRAY}/ ${ChatColor.GRAY}Memory: ${ChatColor.RED}${ChatColor.BOLD}${getMemoryUsage()} ${ChatColor.GRAY}used of ${ChatColor.RED}${ChatColor.BOLD}${getTotalMemory()}")
         sender.sendMessage("${ChatColor.GRAY}Online: ${ChatColor.RED}${ChatColor.BOLD}${onlinePlayers} ${ChatColor.DARK_GRAY}/ ${ChatColor.GRAY}Cached: ${ChatColor.RED}${ChatColor.BOLD}$offlineCachedUsers")
+        sender.sendMessage("")
+        sender.sendMessage("${ChatColor.RED}${ChatColor.BOLD}Grand Exchange")
+        sender.sendMessage("${ChatColor.GRAY}Listings: ${ChatColor.RED}${ChatColor.BOLD}${NumberUtils.format(GrandExchangeHandler.getAllListings().size)} ${ChatColor.DARK_GRAY}/ ${ChatColor.GRAY}Active: ${ChatColor.RED}${ChatColor.BOLD}${NumberUtils.format(GrandExchangeHandler.getAllListings().filter { !it.isCompleted() }.size)}")
         sender.sendMessage("")
     }
 

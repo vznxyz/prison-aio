@@ -29,7 +29,7 @@ data class BlockType(val material: Material, val data: Byte, var percentage: Dou
         return 32 * material.id + 32 * data + (32 * percentage).toInt()
     }
 
-    object Serializer : JsonDeserializer<BlockType>, JsonSerializer<BlockType> {
+    class Serializer : JsonDeserializer<BlockType>, JsonSerializer<BlockType> {
 
         override fun serialize(src: BlockType, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
             val jsonObject = JsonObject()

@@ -50,7 +50,7 @@ class BlocksMinedRequirement(private var blocksMined: Int) : DeliveryManRewardRe
         }
 
         override fun startSetupProcedure(player: Player, reward: DeliveryManReward) {
-            ConversationUtil.startConversation(player, NumberPrompt { number ->
+            NumberPrompt().acceptInput { number ->
                 assert(number.toInt() > 0)
 
                 reward.requirements.add(BlocksMinedRequirement(number.toInt()))
@@ -62,7 +62,7 @@ class BlocksMinedRequirement(private var blocksMined: Int) : DeliveryManRewardRe
                 player.sendMessage("${ChatColor.GREEN}Successfully added requirement.")
 
                 EditDeliveryManRewardRequirementsMenu(reward).openMenu(player)
-            })
+            }.start(player)
         }
 
         override fun isCompatibleWithReward(reward: DeliveryManReward): Boolean {

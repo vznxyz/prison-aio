@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.user.listener
 
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -18,7 +19,7 @@ object DropPickaxeListeners : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun onPlayerDropItemEvent(event: PlayerDropItemEvent) {
-        if (event.itemDrop.itemStack.type.name.contains("_PICKAXE")) {
+        if (MechanicsModule.isPickaxe(event.itemDrop.itemStack)) {
             if (!event.player.hasMetadata("CONFIRM_DROP")) {
                 event.player.sendMessage("${ChatColor.RED}You must type ${ChatColor.BOLD}/drop confirm ${ChatColor.RED}to drop your pickaxe!")
                 event.isCancelled = true

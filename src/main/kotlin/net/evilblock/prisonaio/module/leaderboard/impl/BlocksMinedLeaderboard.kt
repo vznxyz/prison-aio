@@ -11,6 +11,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
+import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bson.Document
 import org.bukkit.ChatColor
@@ -24,8 +25,14 @@ object BlocksMinedLeaderboard : Leaderboard("blocks-mined", "${ChatColor.AQUA}${
         for (document in UserHandler.getCollection().find()) {
             val uuid = UUID.fromString(document.getString("uuid"))
 
+            if (LeaderboardsModule.exemptions.contains(uuid)) {
+                continue
+            }
+
+            val displayName = Cubed.instance.uuidCache.name(uuid)
             val blocksMined = (document["statistics"] as Document).getInteger("blocksMined")
-            entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), blocksMined))
+
+            entries.add(LeaderboardEntry(0, displayName, displayName, blocksMined))
         }
 
         return entries.sortedByDescending { it.value }.take(CACHED_ENTRIES_SIZE)

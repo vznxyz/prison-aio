@@ -85,6 +85,7 @@ object GangModule : PluginModule() {
             GangSetLeaderCommand.javaClass,
             GangVisitCommand.javaClass,
             GangForceDisbandCommand.javaClass,
+            GangForceJoinCommand.javaClass,
             GangForceKickCommand.javaClass,
             GangForceLeaderCommand.javaClass,
             GangForceResetCommand.javaClass,
@@ -134,10 +135,6 @@ object GangModule : PluginModule() {
 
     fun getJerryHologramLines(): List<String> {
         return config.getStringList("gang.jerry.hologram-lines").map { ChatColor.translateAlternateColorCodes('&', it) }
-    }
-
-    fun getJerryChangeLog(): List<String> {
-        return config.getStringList("gang.jerry.change-log").map { ChatColor.translateAlternateColorCodes('&', it) }
     }
 
     fun getJerryTextureValue(): String {

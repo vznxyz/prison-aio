@@ -10,6 +10,8 @@ package net.evilblock.prisonaio.module.combat.apple.listener
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldown
 import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldownHandler
+import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
+import net.evilblock.prisonaio.module.minigame.event.game.ktk.KillTheKingEvent
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
@@ -23,6 +25,13 @@ object GodAppleListeners : Listener {
     fun onPlayerItemConsume(event: PlayerItemConsumeEvent) {
         if (event.item == null || event.item.type != Material.GOLDEN_APPLE || event.item.durability.toInt() != 1) {
             return
+        }
+
+        if (EventGameHandler.isOngoingGame()) {
+            val ongoingGame = EventGameHandler.getOngoingGame()!!
+            if (ongoingGame is KillTheKingEvent && event.player.uniqueId == ongoingGame.king.uniqueId) {
+                return
+            }
         }
 
         var cooldown = GodAppleCooldownHandler.getCooldown(event.player.uniqueId)

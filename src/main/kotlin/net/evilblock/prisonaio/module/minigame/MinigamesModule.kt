@@ -16,9 +16,9 @@ import net.evilblock.prisonaio.module.minigame.coinflip.command.CoinFlipToggleCo
 import net.evilblock.prisonaio.module.minigame.coinflip.command.CoinFlipBrowseCommand
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameType
-import net.evilblock.prisonaio.module.minigame.event.EventConfig
 import net.evilblock.prisonaio.module.minigame.event.command.SetLobbyCommand
 import net.evilblock.prisonaio.module.minigame.event.command.ToggleCommand
+import net.evilblock.prisonaio.module.minigame.event.config.EventConfigHandler
 import net.evilblock.prisonaio.module.minigame.event.game.arena.EventGameArena
 import net.evilblock.prisonaio.module.minigame.event.game.arena.EventGameArenaHandler
 import net.evilblock.prisonaio.module.minigame.event.game.arena.command.EventArenaEditorCommand
@@ -31,6 +31,9 @@ import net.evilblock.prisonaio.module.minigame.event.game.command.admin.ForceJoi
 import net.evilblock.prisonaio.module.minigame.event.game.command.admin.ForceStartCommand
 import net.evilblock.prisonaio.module.minigame.event.game.command.admin.SetMaxPlayersCommand
 import net.evilblock.prisonaio.module.minigame.event.game.command.parameter.EventGameTypeParameterType
+import net.evilblock.prisonaio.module.minigame.event.game.ktk.KillTheKingListeners
+import net.evilblock.prisonaio.module.minigame.event.game.ktk.command.LoadKitCommand
+import net.evilblock.prisonaio.module.minigame.event.game.ktk.command.SaveKitCommand
 import net.evilblock.prisonaio.module.minigame.event.game.sumo.SumoEventGameListeners
 import net.evilblock.prisonaio.module.minigame.event.game.listener.EventGameListeners
 import org.bukkit.event.Listener
@@ -51,18 +54,22 @@ object MinigamesModule : PluginModule() {
 
     override fun onEnable() {
         CoinFlipHandler.initialLoad()
-        EventConfig.load()
+        EventConfigHandler.initialLoad()
         EventGameHandler.initialLoad()
         EventGameArenaHandler.initialLoad()
     }
 
     override fun onDisable() {
         CoinFlipHandler.cancelGames()
+        EventConfigHandler.saveData()
+        EventGameHandler.saveData()
+        EventGameArenaHandler.saveData()
     }
 
     override fun getListeners(): List<Listener> {
         return listOf(
             EventGameListeners,
+            KillTheKingListeners,
             SumoEventGameListeners
         )
     }
@@ -82,7 +89,9 @@ object MinigamesModule : PluginModule() {
             LeaveCommand.javaClass,
             SetLobbyCommand.javaClass,
             SetMaxPlayersCommand.javaClass,
-            ToggleCommand.javaClass
+            ToggleCommand.javaClass,
+            LoadKitCommand.javaClass,
+            SaveKitCommand.javaClass
         )
     }
 

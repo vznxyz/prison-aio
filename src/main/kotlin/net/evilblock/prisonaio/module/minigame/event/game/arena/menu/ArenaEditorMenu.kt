@@ -58,7 +58,7 @@ class ArenaEditorMenu : Menu() {
             val description = arrayListOf<String>()
 
             description.add("")
-            description.addAll(TextSplitter.split(linePrefix = ChatColor.GRAY.toString(), text = "Create a new arena by following the setup procedure."))
+            description.addAll(TextSplitter.split(text = "Create a new arena by following the setup procedure."))
             description.add("")
             description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to create a new arena")
 

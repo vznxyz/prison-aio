@@ -11,21 +11,28 @@ import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ColorUtil
 import org.bukkit.ChatColor
 import org.bukkit.Color
+import org.bukkit.inventory.ItemStack
 
 interface BackpackUpgrade {
+
+    fun getId(): String
 
     fun getName(): String
 
     fun getColor(): Color
 
+    fun getChatColor(): ChatColor
+
     fun getDescription(): String
 
-    fun getCost(level: Int)
+    fun getIcon(): ItemStack
 
-    fun getMaxLevel()
+    fun getCost(level: Int): Long
+
+    fun getMaxLevel(): Int
 
     fun lorified(): String {
-        return "${ColorUtil.toChatColor(getColor())}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}${getName()}"
+        return "${getChatColor()}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}${getName()}"
     }
 
 }

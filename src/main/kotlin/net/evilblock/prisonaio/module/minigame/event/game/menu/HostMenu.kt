@@ -43,7 +43,8 @@ class HostMenu : Menu() {
         override fun getDescription(player: Player): List<String> {
             val description: MutableList<String> = ArrayList()
             description.add("")
-            description.addAll(TextSplitter.split(linePrefix = ChatColor.GRAY.toString(), text = gameType.description))
+            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}HOW TO PLAY")
+            description.addAll(TextSplitter.split(text = gameType.description))
             description.add("")
 
             if (gameType.canHost(player)) {
@@ -64,6 +65,10 @@ class HostMenu : Menu() {
             return gameType.icon.type
         }
 
+        override fun getDamageValue(player: Player): Byte {
+            return gameType.icon.durability.toByte()
+        }
+
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 if (!gameType.canHost(player)) {
@@ -77,8 +82,10 @@ class HostMenu : Menu() {
 
                 try {
                     player.closeInventory()
-                    val game = EventGameHandler.startGame(player, gameType)
-                    game?.addPlayer(player)
+
+                    EventGameHandler.createGame(player, gameType) { game ->
+                        game.addPlayer(player)
+                    }
                 } catch (e: IllegalStateException) {
                     player.sendMessage("${ChatColor.RED}${e.message}")
                 }

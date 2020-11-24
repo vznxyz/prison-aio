@@ -27,13 +27,13 @@ object TokensCommand {
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player", defaultValue = "self") user: User) {
         val context = if (sender is Player && user.uuid == sender.uniqueId) {
-            "${ChatColor.RED}Your tokens balance: "
+            "${ChatColor.GOLD}Your tokens balance: "
         } else {
-            "${ChatColor.RED}${user.getUsername()}'s tokens balance: "
+            "${ChatColor.WHITE}${user.getUsername()}'s ${ChatColor.GOLD}tokens balance: "
         }
 
         FancyMessage(context)
-            .then("${ChatColor.GRAY}${Formats.formatTokens(user.getTokenBalance())}")
+            .then(Formats.formatTokens(user.getTokenBalance()))
             .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Exact balance: ${NumberFormat.getInstance().format(user.getTokenBalance())}"))
             .send(sender)
     }

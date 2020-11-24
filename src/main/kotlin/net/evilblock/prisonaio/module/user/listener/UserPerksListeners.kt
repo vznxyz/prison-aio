@@ -8,14 +8,29 @@
 package net.evilblock.prisonaio.module.user.listener
 
 import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.perk.Perk
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerChangedWorldEvent
+import org.bukkit.event.player.PlayerJoinEvent
 
 object UserPerksListeners : Listener {
 
     /**
-     * Preserves game-mode, allow-flight, and is-flying states when switching worlds.
+     * Restores preserved allow-flight and flying states when logging in.
+     */
+    @EventHandler
+    fun onPlayerJoinEvent(event: PlayerJoinEvent) {
+        if (UserHandler.getUser(event.player.uniqueId).perks.isPerkEnabled(Perk.FLY)) {
+            event.player.allowFlight = true
+            event.player.isFlying = true
+            event.player.updateInventory()
+        }
+    }
+
+    /**
+     * Preserves game-mode, allow-flight, and flying states when switching worlds.
      */
     @EventHandler
     fun onPlayerChangedWorldEvent(event: PlayerChangedWorldEvent) {

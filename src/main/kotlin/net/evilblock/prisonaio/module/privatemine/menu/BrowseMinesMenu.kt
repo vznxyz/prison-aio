@@ -69,7 +69,7 @@ abstract class BrowseMinesMenu : PaginatedMenu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            return TextSplitter.split(linePrefix = ChatColor.GRAY.toString(), text = "View the private mines that you have access to.")
+            return TextSplitter.split(text = "View the private mines that you have access to.")
         }
 
         override fun getMaterial(player: Player): Material {
@@ -87,7 +87,7 @@ abstract class BrowseMinesMenu : PaginatedMenu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            return TextSplitter.split(linePrefix = ChatColor.GRAY.toString(), text = "View the private mines that are open to the public. Owners can set a sales tax (max 10%) on any blocks you sell to the mine's shop!")
+            return TextSplitter.split(text = "View the private mines that are open to the public. Owners can set a sales tax (max 10%) on any blocks you sell to the mine's shop!")
         }
 
         override fun getMaterial(player: Player): Material {

@@ -28,15 +28,12 @@ import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.*
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import java.io.File
@@ -114,19 +111,17 @@ object EnchantsManager : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun onBlockBreakEvent(event: BlockBreakEvent) {
-        val map = handleItemSwitch(event.player, event.player.itemInHand, event)
-        if (map.isEmpty()) {
-            return
-        }
+        val pickaxe = PickaxeHandler.getPickaxeData(event.player.inventory.itemInMainHand)
+        if (pickaxe != null) {
+            val region = RegionHandler.findRegion(event.block.location)
+            if (!region.supportsAbilityEnchants()) {
+                return
+            }
 
-        val region = RegionHandler.findRegion(event.block.location)
-        if (!region.supportsAbilityEnchants()) {
-            return
-        }
-
-        for ((key, enchantLevel) in map) {
-            if (config.isEnchantEnabled(key)) {
-                key.onBreak(event, event.player.itemInHand, enchantLevel, region)
+            for ((enchant, level) in pickaxe.enchants) {
+                if (config.isEnchantEnabled(enchant)) {
+                    enchant.onBreak(event, event.player.itemInHand, level, region)
+                }
             }
         }
     }
@@ -137,17 +132,15 @@ object EnchantsManager : Listener {
             return
         }
 
-        val map = handleItemSwitch(event.player, event.item, event)
-        if (map.isEmpty()) {
-            return
-        }
+        val pickaxe = PickaxeHandler.getPickaxeData(event.player.inventory.itemInMainHand)
+        if (pickaxe != null) {
+            for ((enchant, level) in pickaxe.enchants) {
+                if (config.isEnchantEnabled(enchant)) {
+                    enchant.onInteract(event, event.item, level)
 
-        for ((key, value) in map) {
-            if (config.isEnchantEnabled(key)) {
-                key.onInteract(event, event.item, value)
-
-                if (event.isCancelled) {
-                    break
+                    if (event.isCancelled) {
+                        break
+                    }
                 }
             }
         }
@@ -155,37 +148,76 @@ object EnchantsManager : Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     fun onPlayerSellToShopEvent(event: PlayerSellToShopEvent) {
-        if (event.player.inventory.itemInMainHand != null) {
+        val itemInHand = event.player.inventory.itemInMainHand
+
+        val pickaxe = PickaxeHandler.getPickaxeData(itemInHand)
+        if (pickaxe != null) {
             val region = RegionHandler.findRegion(event.player.location)
             if (!region.supportsAbilityEnchants()) {
                 return
             }
 
-            val map = handleItemSwitch(event.player, event.player.inventory.itemInMainHand, event)
-
-            for ((enchant, level) in map) {
+            for ((enchant, level) in pickaxe.enchants) {
                 if (config.isEnchantEnabled(enchant)) {
-                    enchant.onSellAll(event.player, event.player.inventory.itemInMainHand, level, event)
+                    enchant.onSellAll(event.player, itemInHand, level, event)
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    fun onPlayerItemHeldEvent(event: PlayerItemHeldEvent) {
+        val newItem = event.player.inventory.getItem(event.newSlot)
+
+        var pickaxe = PickaxeHandler.getPickaxeData(newItem)
+        if (pickaxe == null) {
+            if (MechanicsModule.isPickaxe(newItem)) {
+                println("New pickaxe registered for ${event.player.name}")
+                pickaxe = PickaxeData().also {
+                    it.sync(newItem)
+                    PickaxeHandler.trackPickaxeData(it)
+
+                    event.player.inventory.setItem(event.newSlot, it.toItemStack(newItem))
+                    event.player.updateInventory()
+                }
+            }
+        }
+
+        val region = RegionHandler.findRegion(event.player.location)
+
+        if (Bukkit.isPrimaryThread()) {
+            for (enchant in registeredEnchants) {
+                if (!config.isEnchantEnabled(enchant)) {
+                    continue
+                }
+
+                if (event.player.hasMetadata("JE-" + enchant.id)) {
+                    if (pickaxe?.enchants?.containsKey(enchant) == true) {
+                        if (pickaxe.enchants[enchant] != event.player.getMetadata("JE-" + enchant.id)[0].asInt()) {
+                            enchant.onUnhold(event.player)
+                            event.player.removeMetadata("JE-" + enchant.id, PrisonAIO.instance)
+
+                            if (region.supportsPassiveEnchants()) {
+                                enchant.onHold(event.player, newItem, pickaxe.enchants[enchant]!!)
+                                event.player.setMetadata("JE-" + enchant.id, FixedMetadataValue(PrisonAIO.instance, pickaxe.enchants[enchant]))
+                            }
+                        }
+                    } else {
+                        enchant.onUnhold(event.player)
+                        event.player.removeMetadata("JE-" + enchant.id, PrisonAIO.instance)
+                    }
+                } else if (pickaxe?.enchants?.containsKey(enchant) == true && region.supportsPassiveEnchants()) {
+                    enchant.onHold(event.player, newItem, pickaxe.enchants[enchant]!!)
+                    event.player.setMetadata("JE-" + enchant.id, FixedMetadataValue(PrisonAIO.instance, pickaxe.enchants[enchant]))
                 }
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    fun onPlayerItemHeldEvent(event: PlayerItemHeldEvent) {
-        handleItemSwitch(event.player, event.player.inventory.getItem(event.newSlot), event)
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     fun onClick(event: InventoryClickEvent) {
         if (event.clickedInventory == null) {
             return
-        }
-
-//        update(event.currentItem)
-
-        if (event.clickedInventory.type == InventoryType.PLAYER && event.whoClicked.inventory.heldItemSlot == event.slot) {
-            handleItemSwitch(event.whoClicked as Player, event.cursor, event)
         }
 
         if (event.cursor == null || event.cursor.type != Material.ENCHANTED_BOOK) {
@@ -209,168 +241,54 @@ object EnchantsManager : Listener {
             return
         }
 
-        val pickaxeData = PickaxeHandler.getPickaxeData(event.currentItem) ?: return
-        val itemLevel: Int = pickaxeData.enchants.getOrDefault(enchant, 0)
+        var pickaxe = PickaxeHandler.getPickaxeData(event.currentItem)
+        if (pickaxe == null) {
+            if (MechanicsModule.isPickaxe(event.currentItem)) {
+                println("New pickaxe registered for ${event.whoClicked.name}")
+                pickaxe = PickaxeData().also {
+                    it.sync(event.currentItem)
+                    PickaxeHandler.trackPickaxeData(it)
+
+                    event.currentItem = it.toItemStack(event.currentItem)
+                    (event.whoClicked as Player).updateInventory()
+                }
+            }
+        }
+
+        if (pickaxe == null) {
+            return
+        }
+
+        val itemLevel: Int = pickaxe.enchants.getOrDefault(enchant, 0)
         val bookLevel = enchant.getItemLevel(event.cursor)
-        val level = bookLevel + itemLevel
-        val vanilla = enchant is VanillaOverride
+        val newLevel = bookLevel + itemLevel
+        val force = enchant is VanillaOverride
 
         if (enchant.isAddEnchantItem(event.cursor)) {
-            if (level > enchant.maxLevel && !vanilla) {
+            if (newLevel > enchant.maxLevel && !force) {
                 return
             }
 
-            val enchantLimit = pickaxeData.getEnchantLimit(enchant)
-            if (level > enchantLimit) {
+            val enchantLimit = pickaxe.getEnchantLimit(enchant)
+            if (enchantLimit != -1 && newLevel > enchantLimit) {
                 event.whoClicked.sendMessage("$CHAT_PREFIX${ChatColor.RED}You must prestige your pickaxe to purchase anymore ${ChatColor.BOLD}${enchant.getStrippedEnchant()} ${ChatColor.RED}levels.")
                 return
             }
 
-            if (upgradeEnchant(event.whoClicked as Player, pickaxeData, event.currentItem, enchant, bookLevel, vanilla)) {
+            if (upgradeEnchant(event.whoClicked as Player, pickaxe, event.currentItem, enchant, bookLevel, force)) {
                 event.cursor = null
                 event.isCancelled = true
             }
         } else {
-            if (itemLevel >= bookLevel || bookLevel > enchant.maxLevel && !vanilla) {
+            if (itemLevel >= bookLevel || bookLevel > enchant.maxLevel && !force) {
                 return
             }
 
-            if (upgradeEnchant(event.whoClicked as Player, pickaxeData, event.currentItem, enchant, bookLevel - itemLevel, vanilla)) {
+            if (upgradeEnchant(event.whoClicked as Player, pickaxe, event.currentItem, enchant, bookLevel - itemLevel, force)) {
                 event.cursor = null
                 event.isCancelled = true
             }
         }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    fun onPlayerItemBreakEvent(event: PlayerItemBreakEvent) {
-        handleItemSwitch(event.player, event.player.inventory.itemInMainHand, event)
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    fun onPlayerDropItemEvent(event: PlayerDropItemEvent) {
-        handleItemSwitch(event.player, event.player.inventory.itemInMainHand, event)
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun onPlayerAttemptPickupItemEvent(event: PlayerAttemptPickupItemEvent) {
-        if (event.player.inventory.firstEmpty() == event.player.inventory.heldItemSlot) {
-            handleItemSwitch(event.player, event.item.itemStack, event)
-        }
-    }
-
-//    @JvmStatic
-//    fun update(newItem: ItemStack?) {
-//        if (newItem != null && newItem.type.toString().endsWith("_PICKAXE")) {
-//            if (newItem.hasItemMeta() && !newItem.itemMeta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
-//                val im = newItem.itemMeta
-//                im.addItemFlags(ItemFlag.HIDE_ENCHANTS)
-//                newItem.itemMeta = im
-//            }
-//        }
-//    }
-
-    @JvmStatic
-    fun handleItemSwitch(player: Player, newItem: ItemStack?, event: Event?): Map<AbstractEnchant, Int> {
-//        update(newItem)
-
-        var pickaxeData = PickaxeHandler.getPickaxeData(newItem)
-        var newItem = newItem
-        if (newItem != null) {
-            if (pickaxeData == null && MechanicsModule.isPickaxe(newItem)) {
-                pickaxeData = PickaxeData()
-
-                PickaxeHandler.trackPickaxeData(pickaxeData)
-
-                println("Registering new pickaxe for player ${player.name}")
-                pickaxeData.sync(newItem)
-                pickaxeData.applyMeta(newItem)
-
-                newItem = pickaxeData.applyNBT(newItem)
-
-                for ((enchant, level) in pickaxeData.enchants) {
-                    if (enchant is VanillaOverride) {
-                        newItem.addUnsafeEnchantment((enchant as VanillaOverride).override, level.coerceAtMost(32000))
-                    }
-                }
-
-                if (event != null) {
-                    when (event) {
-                        is BlockBreakEvent -> {
-                            event.player.inventory.itemInMainHand = newItem
-                        }
-                        is PlayerItemBreakEvent -> {
-                            event.player.inventory.itemInMainHand = newItem
-                        }
-                        is PlayerInteractEvent -> {
-                            event.player.inventory.itemInMainHand = newItem
-                        }
-                        is PlayerDropItemEvent -> {
-                            event.itemDrop.itemStack = newItem
-                        }
-                        is PlayerAttemptPickupItemEvent -> {
-                            event.item.itemStack = newItem
-                        }
-                        is PlayerItemHeldEvent -> {
-                            event.player.inventory.setItem(event.newSlot, newItem)
-                        }
-                        is InventoryClickEvent -> {
-                            event.cursor = newItem
-                        }
-                        is PlayerSellToShopEvent -> {
-                            event.player.inventory.itemInMainHand = newItem
-                        }
-                    }
-
-                    player.updateInventory()
-                }
-            }
-
-            if (pickaxeData != null) {
-                val cubedLevel = pickaxeData.enchants.getOrDefault(Cubed, 0)
-                if (cubedLevel > 3) {
-                    removeEnchant(pickaxeData, newItem, Cubed)
-                    addEnchant(player, pickaxeData, newItem, Cubed, 3, false)
-
-                    player.updateInventory()
-
-                    PrisonAIO.instance.systemLog("Removed Cubed $cubedLevel from ${player.name}'s pickaxe")
-                }
-            }
-        }
-
-        val region = RegionHandler.findRegion(player.location)
-
-        val map = pickaxeData?.enchants ?: emptyMap<AbstractEnchant, Int>()
-        if (Bukkit.isPrimaryThread()) {
-            for (enchant in registeredEnchants) {
-                if (!config.isEnchantEnabled(enchant)) {
-                    continue
-                }
-
-                if (player.hasMetadata("JE-" + enchant.id)) {
-                    if (map.containsKey(enchant)) {
-                        if (map[enchant] != player.getMetadata("JE-" + enchant.id)[0].asInt()) {
-                            enchant.onUnhold(player)
-                            player.removeMetadata("JE-" + enchant.id, PrisonAIO.instance)
-
-                            if (region.supportsPassiveEnchants()) {
-                                enchant.onHold(player, newItem, map[enchant]!!)
-                                player.setMetadata("JE-" + enchant.id, FixedMetadataValue(PrisonAIO.instance, map[enchant]))
-                            }
-                        }
-                    } else {
-                        enchant.onUnhold(player)
-                        player.removeMetadata("JE-" + enchant.id, PrisonAIO.instance)
-                    }
-                } else if (map.containsKey(enchant) && region.supportsPassiveEnchants()) {
-                    enchant.onHold(player, newItem, map[enchant]!!)
-                    player.setMetadata("JE-" + enchant.id, FixedMetadataValue(PrisonAIO.instance, map[enchant]))
-                }
-            }
-        }
-
-        return map
     }
 
     @JvmStatic

@@ -42,7 +42,7 @@ class GangMember(
         }
 
         fun isAtLeast(role: Role): Boolean {
-            return role.ordinal >= this.ordinal
+            return this.ordinal >= role.ordinal
         }
     }
 

@@ -15,9 +15,12 @@ import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.listener.ChallengeListeners
 import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.command.*
+import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
 object BattlePassModule : PluginModule() {
+
+    val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}JunkiePass${ChatColor.GRAY}] "
 
     override fun getName(): String {
         return "BattlePass"

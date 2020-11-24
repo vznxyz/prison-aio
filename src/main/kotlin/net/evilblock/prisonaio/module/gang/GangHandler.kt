@@ -20,10 +20,9 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.cubed.util.hook.WorldEditUtils
-import net.evilblock.prisonaio.module.gang.booster.task.GangBoosterExpirationTask
+import net.evilblock.prisonaio.module.gang.booster.task.GangBoosterLogic
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
 import net.evilblock.prisonaio.module.region.RegionHandler
-import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.*
@@ -32,6 +31,7 @@ import org.bukkit.block.Skull
 import org.bukkit.entity.Player
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.collections.set
@@ -74,7 +74,7 @@ object GangHandler : PluginHandler {
         loadWorld()
         loadGrid()
 
-        Tasks.asyncTimer(GangBoosterExpirationTask, 20L, 20L)
+        Tasks.asyncTimer(GangBoosterLogic, 20L, 20L)
 
         Tasks.asyncTimer(0, 20L * 60L) {
             for (gang in grid.values) {
@@ -174,14 +174,21 @@ object GangHandler : PluginHandler {
             .toSet()
     }
 
+    fun getGangAccessCache(): MutableMap<UUID, HashSet<Gang>> {
+        return gangAccess
+    }
+
     /**
      * Returns a set of [Gang]s that the given [playerUuid] can join.
      */
     fun getAccessibleGangs(playerUuid: UUID): Set<Gang> {
-        return gangAccess.getOrDefault(playerUuid, hashSetOf())
-            .sortedBy {it.leader == playerUuid }
-            .reversed()
-            .toSet()
+        val cache = gangAccess.getOrDefault(playerUuid, hashSetOf())
+
+        return if (cache.isNotEmpty()) {
+            cache.sortedBy { it.leader == playerUuid }.reversed().toSet()
+        } else {
+            cache
+        }
     }
 
     fun updateGangAccess(uuid: UUID, gang: Gang, joinable: Boolean) {
@@ -507,8 +514,8 @@ object GangHandler : PluginHandler {
         val dataFile = getInternalDataFile()
         if (dataFile.exists()) {
             Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
-                val gridType = object : TypeToken<List<Gang>>() {}.type
-                val gridList = Cubed.gson.fromJson(reader, gridType) as List<Gang>
+                val gridType = object : TypeToken<ArrayList<Gang>>() {}.type
+                val gridList = Cubed.gson.fromJson(reader, gridType) as ArrayList<Gang>
 
                 for (gang in gridList) {
                     // initialize transient data
@@ -551,11 +558,5 @@ object GangHandler : PluginHandler {
     private fun gridCoordsToBlockCoords(pos: Pair<Int, Int>): Pair<Int, Int> {
         return Pair(pos.first * GangModule.getGridGutterWidth(), pos.second * GangModule.getGridGutterWidth())
     }
-
-    internal val BLOCKED_NAMES = listOf(
-        "f+[a4]+g+[o0]+t+".toRegex(),
-        "n+[i1l|]+gg+[e3]+r+".toRegex(),
-        "b+[e3]+[a4]+n+[e3]+r+".toRegex()
-    )
 
 }

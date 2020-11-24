@@ -32,6 +32,16 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
 
     private var page: Int = 1
 
+    init {
+        if (daily) {
+            autoUpdate = true
+        }
+    }
+
+    override fun getAutoUpdateTicks(): Long {
+        return 500L
+    }
+
     override fun getTitle(player: Player): String {
         return "${ChatColor.GOLD}${ChatColor.BOLD}${if (daily) "Daily" else "Premium"} Challenges"
     }
@@ -54,10 +64,14 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
             buttons[SLOTS[index]] = ChallengeButton(challenge)
         }
 
-        buttons[45] = PreviousPageButton()
-        buttons[53] = NextPageButton()
+        if (daily) {
+            buttons[4] = InfoButton()
+        }
 
         buttons[49] = BackButton { BattlePassMenu(user).openMenu(player) }
+
+        buttons[45] = PreviousPageButton()
+        buttons[53] = NextPageButton()
 
         for (i in 0 until 54) {
             if (!buttons.containsKey(i)) {
@@ -91,7 +105,7 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
                 description.add(challenge.getProgressText(player, user))
             }
 
-            if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassProgress.hasCompletedChallenge(challenge)) {
+            if (user.battlePassProgress.hasCompletedChallenge(challenge)) {
                 description.add("")
                 description.add("${ChatColor.GREEN}You've completed this challenge!")
             }
@@ -100,12 +114,26 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
         }
 
         override fun applyMetadata(player: Player, itemMeta: ItemMeta): ItemMeta? {
-            if ((challenge.daily && DailyChallengeHandler.getSession().getProgress(player.uniqueId).hasCompletedChallenge(challenge)) || user.battlePassProgress.hasCompletedChallenge(challenge)) {
+            if (user.battlePassProgress.hasCompletedChallenge(challenge)) {
                 itemMeta.addEnchant(Enchantment.DURABILITY, 1, true)
                 itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
             }
 
             return itemMeta
+        }
+
+        override fun getMaterial(player: Player): Material {
+            return Material.BOOK
+        }
+    }
+
+    private inner class InfoButton : Button() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.GOLD}${ChatColor.BOLD}Daily Challenges"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            return TextSplitter.split(text = "New daily challenges will be picked in ${DailyChallengeHandler.getSession().getTimeRemaining()}.", linePrefix = ChatColor.GRAY.toString())
         }
 
         override fun getMaterial(player: Player): Material {

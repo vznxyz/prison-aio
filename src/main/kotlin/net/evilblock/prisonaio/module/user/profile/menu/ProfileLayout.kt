@@ -17,6 +17,7 @@ import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
+import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.profile.ProfileComment
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileCommentsMenu
@@ -163,6 +164,11 @@ class ProfileLayout(
 
             val formattedTokensBalance = NumberUtils.format(user.getTokenBalance())
             description.add("${ChatColor.RED}${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}$formattedTokensBalance")
+
+            val gang = GangHandler.getAssumedGang(user.uuid)
+            if (gang != null) {
+                description.add("${ChatColor.RED}${Constants.FLAG_SYMBOL} ${ChatColor.GRAY}${gang.name} (Gang)")
+            }
 
             return description
         }

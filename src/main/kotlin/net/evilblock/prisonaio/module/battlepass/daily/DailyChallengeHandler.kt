@@ -16,6 +16,8 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import java.io.File
 
 object DailyChallengeHandler : PluginHandler {
@@ -66,7 +68,8 @@ object DailyChallengeHandler : PluginHandler {
         currentSession.clear()
         currentSession = DailyChallengeSession()
 
-        PrisonAIO.instance.systemLog("Generated new Daily Challenges session!")
+        Bukkit.broadcastMessage("${BattlePassModule.CHAT_PREFIX}${ChatColor.GRAY}A new Daily Challenges set has been generated!")
+        PrisonAIO.instance.systemLog("A new Daily Challenges session has been generated!")
     }
 
     private val DATA_TYPE = object : TypeToken<DailyChallengeSession>() {}.type

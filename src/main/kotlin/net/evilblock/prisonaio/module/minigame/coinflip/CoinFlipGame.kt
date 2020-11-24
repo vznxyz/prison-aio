@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.minigame.coinflip
 
+import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.user.User
@@ -28,9 +29,11 @@ class CoinFlipGame(
 
     var stage: Stage = Stage.WAITING_FOR_OPPONENT
     var stageTicks: Int = 0
-    var winner: User? = null
 
     val watchers: MutableSet<UUID> = hashSetOf()
+
+    var winner: User? = null
+    var loser: User? = null
 
     private var rollIndex = 0
     private var rollSequence = arrayListOf(3, 3, 3, 3, 4)
@@ -67,23 +70,63 @@ class CoinFlipGame(
         if (winner == null) {
             sendMessage("${CoinFlipHandler.CHAT_PREFIX}There was no winner, so both players have been refunded!")
 
-            currency.give(creator.uuid, currencyAmount)
+            try {
+                currency.give(creator.uuid, currencyAmount)
+            } catch (e: Exception) {
+                val errorId = ErrorHandler.generateErrorLog(
+                    errorType = "cfFinishGame",
+                    event = generateDataMap(),
+                    exception = e
+                )
+
+                CoinFlipHandler.logFile.commit("Failed to refund creator ${creator.getUsername()} (${creator.uuid}) of game ($uuid). See exception at /plugins/Cubed/errors/${errorId}.txt")
+            }
 
             if (opponent != null) {
-                currency.give(opponent!!.uuid, currencyAmount)
+                try {
+                    currency.give(opponent!!.uuid, currencyAmount)
+                } catch (e: Exception) {
+                    val errorId = ErrorHandler.generateErrorLog(
+                        errorType = "cfFinishGame",
+                        event = generateDataMap(),
+                        exception = e
+                    )
+
+                    CoinFlipHandler.logFile.commit("Failed to refund opponent ${opponent!!.getUsername()} (${opponent!!.uuid}) of game ($uuid). See exception at /plugins/Cubed/errors/${errorId}.txt")
+                }
             }
         } else {
             sendMessage("${CoinFlipHandler.CHAT_PREFIX}${ChatColor.GREEN}${ChatColor.BOLD}${winner!!.getUsername()} ${ChatColor.GRAY}won the game for ${currency.format(NumberUtils.numberOperation(currencyAmount, currencyAmount, true))}${ChatColor.GRAY}!")
 
-            winner!!.statistics.addCoinflipWin()
-            winner!!.statistics.addCoinflipProfit(currency.toType(), currencyAmount)
+            try {
+                winner!!.statistics.addCoinflipWin()
+                winner!!.statistics.addCoinflipProfit(currency.toType(), currencyAmount)
 
-            currency.give(winner!!.uuid, currencyAmount)
-            currency.give(winner!!.uuid, currencyAmount)
+                currency.give(winner!!.uuid, currencyAmount)
+                currency.give(winner!!.uuid, currencyAmount)
+            } catch (e: Exception) {
+                val errorId = ErrorHandler.generateErrorLog(
+                    errorType = "cfFinishGame",
+                    event = generateDataMap(),
+                    exception = e
+                )
+
+                CoinFlipHandler.logFile.commit("Failed to payout winner ${winner!!.getUsername()} (${winner!!.uuid}) of game ($uuid). See exception at /plugins/Cubed/errors/${errorId}.txt")
+            }
 
             if (opponent != null) {
-                opponent!!.statistics.addCoinflipLoss()
-                opponent!!.statistics.subtractCoinflipProfit(currency.toType(), currencyAmount)
+                try {
+                    opponent!!.statistics.addCoinflipLoss()
+                    opponent!!.statistics.subtractCoinflipProfit(currency.toType(), currencyAmount)
+                } catch (e: Exception) {
+                    val errorId = ErrorHandler.generateErrorLog(
+                        errorType = "cfFinishGame",
+                        event = generateDataMap(),
+                        exception = e
+                    )
+
+                    CoinFlipHandler.logFile.commit("Failed to update stats of loser ${opponent!!.getUsername()} (${winner!!.uuid}) of game ($uuid). See exception at /plugins/Cubed/errors/${errorId}.txt")
+                }
             }
         }
 
@@ -109,6 +152,12 @@ class CoinFlipGame(
                         creator
                     } else {
                         opponent!!
+                    }
+
+                    loser = if (creator == winner) {
+                        opponent
+                    } else {
+                        creator
                     }
 
                     if (winner == opponent!!) {
@@ -149,6 +198,23 @@ class CoinFlipGame(
             }
 
             Bukkit.getPlayer(watcher)?.sendMessage(message)
+        }
+    }
+
+    private fun generateDataMap(): Map<String, String> {
+        return hashMapOf(
+            "gameId" to uuid.toString(),
+            "currencyType" to currency.toType().name,
+            "currencyAmount" to currencyAmount.toString(),
+            "creator" to creator.uuid.toString()
+        ).also {
+            if (opponent != null) {
+                it["opponent"] = opponent!!.uuid.toString()
+            }
+
+            if (winner != null) {
+                it["winner"] = winner!!.uuid.toString()
+            }
         }
     }
 

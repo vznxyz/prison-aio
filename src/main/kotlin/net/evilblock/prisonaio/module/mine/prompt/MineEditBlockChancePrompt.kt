@@ -7,17 +7,17 @@
 
 package net.evilblock.prisonaio.module.mine.prompt
 
-import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
 import net.evilblock.prisonaio.module.mine.block.BlockType
 import net.evilblock.prisonaio.module.mine.menu.MineManageBlocksMenu
+import net.evilblock.prisonaio.module.mine.variant.normal.NormalMine
 import org.bukkit.ChatColor
 import org.bukkit.conversations.ConversationContext
 import org.bukkit.conversations.Prompt
 import org.bukkit.conversations.StringPrompt
 import org.bukkit.entity.Player
 
-class MineEditBlockChancePrompt(private val mine: Mine, private val blockType: BlockType) : StringPrompt() {
+class MineEditBlockChancePrompt(private val mine: NormalMine, private val blockType: BlockType) : StringPrompt() {
 
     override fun getPromptText(context: ConversationContext): String {
         return "${ChatColor.GREEN}Please input a new percentage value."

@@ -10,9 +10,13 @@ package net.evilblock.prisonaio.module.shop.item.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.GlassButton
+import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.menus.SelectItemStackMenu
+import net.evilblock.cubed.util.Duration
 import net.evilblock.cubed.util.TextSplitter
+import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.cubed.util.bukkit.prompt.DurationPrompt
 import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.prisonaio.module.shop.item.ShopItem
@@ -39,10 +43,11 @@ class EditShopItemMenu(private val shop: Shop, private val item: ShopItem) : Men
         buttons[1] = EditItemButton()
         buttons[3] = ToggleGiveItemButton()
         buttons[5] = EditCommandsButton()
+        buttons[7] = EditCooldownButton()
 
         for (i in 0 until 9) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = GlassButton(15)
+                buttons[i] = GlassButton(7)
             }
         }
 
@@ -157,6 +162,66 @@ class EditShopItemMenu(private val shop: Shop, private val item: ShopItem) : Men
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 EditShopItemCommandsMenu(shop, item).openMenu(player)
+            }
+        }
+    }
+
+    private inner class EditCooldownButton : Button() {
+        override fun getName(player: Player): String {
+            val details = if (item.hasPurchaseCooldown()) {
+                TimeUtil.formatIntoAbbreviatedString((item.purchaseCooldown!!.get() / 1000.0).toInt())
+            } else {
+                "Not set"
+            }
+
+            return "${ChatColor.AQUA}${ChatColor.BOLD}Edit Cooldown ${ChatColor.GRAY}($details)"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            return arrayListOf<String>().also { desc ->
+                desc.add("")
+                desc.addAll(TextSplitter.split(text = "Set a cooldown between purchases of this shop item."))
+                desc.add("")
+                desc.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit cooldown")
+
+                if (item.hasPurchaseCooldown()) {
+                    desc.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to unset cooldown")
+                }
+            }
+        }
+
+        override fun getMaterial(player: Player): Material {
+            return Material.WATCH
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                DurationPrompt { duration ->
+                    if (duration < 0) {
+                        player.sendMessage("${ChatColor.RED}Duration must be more than 0.")
+                        return@DurationPrompt
+                    }
+
+                    item.purchaseCooldown = Duration(duration)
+
+                    Tasks.async {
+                        ShopHandler.saveData()
+                    }
+
+                    this@EditShopItemMenu.openMenu(player)
+                }.start(player)
+            } else if (clickType.isRightClick) {
+                ConfirmMenu("Unset purchase cooldown?") { confirmed ->
+                    if (confirmed) {
+                        item.purchaseCooldown = null
+
+                        Tasks.async {
+                            ShopHandler.saveData()
+                        }
+                    }
+
+                    this@EditShopItemMenu.openMenu(player)
+                }.openMenu(player)
             }
         }
     }

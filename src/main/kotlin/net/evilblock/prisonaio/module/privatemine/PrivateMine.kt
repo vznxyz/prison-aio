@@ -104,7 +104,23 @@ class PrivateMine(
     }
 
     override fun onBlockBreak(player: Player, block: Block, cancellable: Cancellable) {
-        cancellable.isCancelled = !innerCuboid.contains(block)
+        if (!innerCuboid.contains(block)) {
+            cancellable.isCancelled = true
+            return
+        }
+
+        val currentMine = PrivateMineHandler.getCurrentMine(player)
+        if (currentMine != this) {
+            cancellable.isCancelled = true
+
+            if (currentMine == null) {
+                player.sendMessage("${ChatColor.RED}You can't break blocks there!")
+            } else {
+                player.sendMessage("${ChatColor.RED}You can only break blocks inside of ${currentMine.getOwnerName()}'s Private Mine!")
+            }
+
+            return
+        }
     }
 
     fun getOwnerName(): String {

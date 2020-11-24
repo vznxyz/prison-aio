@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.mechanic.trade
 
 import mkremins.fanciful.FancyMessage
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -16,14 +17,11 @@ class TradeRequest(val sender: Player, val target: Player) {
     val createdAt: Long = System.currentTimeMillis()
 
     fun send() {
-        sender.sendMessage("${ChatColor.LIGHT_PURPLE}Trade request sent! Waiting for ${ChatColor.BLUE}${target.name} ${ChatColor.LIGHT_PURPLE}to accept...")
+        sender.sendMessage("${ChatColor.GRAY}You sent a trade request to ${Formats.formatPlayer(target)}${ChatColor.GRAY}!")
 
-        target.sendMessage("")
-        target.sendMessage(" ${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Trade Request")
-        target.sendMessage(" ${ChatColor.GRAY}You've received a trade request from ${ChatColor.BLUE}${sender.name}${ChatColor.GRAY}!")
-
-        FancyMessage()
-            .then(" ${ChatColor.GRAY}[")
+        FancyMessage("${ChatColor.GRAY}New trade request from ${Formats.formatPlayer(sender)}${ChatColor.GRAY}.")
+            .then(" ")
+            .then("${ChatColor.GRAY}[")
             .then("${ChatColor.GREEN}${ChatColor.BOLD}ACCEPT")
             .command("/trade accept ${sender.name}")
             .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to accept the trade request from ${sender.name}."))
@@ -35,8 +33,6 @@ class TradeRequest(val sender: Player, val target: Player) {
             .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to decline the trade request from ${sender.name}."))
             .then("${ChatColor.GRAY}]")
             .send(target)
-
-        target.sendMessage("")
     }
 
     fun decline() {

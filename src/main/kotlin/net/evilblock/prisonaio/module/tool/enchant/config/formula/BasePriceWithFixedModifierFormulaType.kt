@@ -103,7 +103,7 @@ object BasePriceWithFixedModifierFormulaType : PriceFormulaType("Base Price + Fi
 
             override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
                 if (clickType.isLeftClick) {
-                    NumberPrompt { number ->
+                    NumberPrompt().acceptInput { number ->
                         formula.basePrice = number.toInt()
 
                         Tasks.async {
@@ -135,7 +135,7 @@ object BasePriceWithFixedModifierFormulaType : PriceFormulaType("Base Price + Fi
 
             override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
                 if (clickType.isLeftClick) {
-                    NumberPrompt { number ->
+                    NumberPrompt().acceptInput { number ->
                         formula.fixedRate = number.toInt()
 
                         Tasks.async {

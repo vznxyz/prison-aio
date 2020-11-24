@@ -13,6 +13,7 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.source.chat.filter.ChatFilterHandler
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -25,11 +26,9 @@ object GangCreateCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "name", wildcard = true) name: String) {
-        for (blockedName in GangHandler.BLOCKED_NAMES) {
-            if (blockedName.matches(name)) {
-                player.sendMessage("${ChatColor.RED}The name you input contains inappropriate content. Please try a different name.")
-                return
-            }
+        if (ChatFilterHandler.filterMessage(name) != null) {
+            player.sendMessage("${ChatColor.RED}The name you input contains inappropriate content. Please try a different name.")
+            return
         }
 
         if (!name.matches(EzPrompt.IDENTIFIER_REGEX)) {

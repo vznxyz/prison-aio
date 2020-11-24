@@ -14,6 +14,7 @@ enum class RegionBitmask(
 ) {
 
     SAFE_ZONE(1, "SafeZone", "A region where players take no damage at all"),
-    DANGER_ZONE(2, "Dangerous", "A region where natural damage and PvP is enabled")
+    DANGER_ZONE(2, "Dangerous", "A region where natural damage and PvP is enabled"),
+    ALLOW_BUILD(4, "Allow Build", "A region where players can place/destroy blocks")
 
 }

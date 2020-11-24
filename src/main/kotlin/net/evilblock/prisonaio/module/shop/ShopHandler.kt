@@ -19,7 +19,11 @@ import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
 import net.evilblock.prisonaio.module.shop.event.DetermineShopEvent
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceipt
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
+import net.evilblock.prisonaio.module.shop.service.ShopCooldownsExpiryService
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.setting.UserSetting
+import net.evilblock.prisonaio.service.ServiceRegistry
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -54,6 +58,8 @@ object ShopHandler: PluginHandler {
                 }
             }
         }
+
+        ServiceRegistry.register(ShopCooldownsExpiryService, 20L)
     }
 
     override fun saveData() {
@@ -73,7 +79,7 @@ object ShopHandler: PluginHandler {
         return getShopById(getModule().config.getString("default-shop", "main"))
     }
 
-    fun sellItems(player: Player, items: MutableCollection<ItemStack>, autoSell: Boolean): Collection<ItemStack> {
+    fun sellItems(player: Player, items: MutableCollection<ItemStack>, autoSell: Boolean) {
         val determineShopEvent = DetermineShopEvent(player)
         determineShopEvent.call()
 
@@ -81,7 +87,7 @@ object ShopHandler: PluginHandler {
             val receipt = determineShopEvent.shop!!.sellItems(player, items, autoSell)
             if (receipt.result == TransactionResult.SUCCESS) {
                 items.removeAll(receipt.items.map { it.item })
-                return items
+                return
             }
         }
 
@@ -90,8 +96,7 @@ object ShopHandler: PluginHandler {
             if (!autoSell) {
                 player.sendMessage("${ChatColor.RED}Couldn't find any shops to sell to.")
             }
-
-            return emptyList()
+            return
         }
 
         for (shop in accessibleShops) {
@@ -104,8 +109,6 @@ object ShopHandler: PluginHandler {
                 }
             }
         }
-
-        return items
     }
 
     fun sellInventory(player: Player, autoSell: Boolean) {
@@ -114,6 +117,7 @@ object ShopHandler: PluginHandler {
         Tasks.async {
             val backpacks = BackpackHandler.findBackpacksInInventory(player)
             val accessibleShops = getAccessibleShops(player)
+            val sendMessages = UserHandler.getUser(player.uniqueId).settings.getSettingOption(UserSetting.SHOP_RECEIPTS).getValue() as Boolean
             var soldAnything = false
             var firstOfChain = true
 
@@ -125,17 +129,20 @@ object ShopHandler: PluginHandler {
                 if (receipt.result == TransactionResult.SUCCESS) {
                     Tasks.sync {
                         for (receiptItem in receipt.items) {
-                            player.inventory.remove(receiptItem.item)
+                            player.inventory.removeItem(receiptItem.item)
                         }
 
                         player.updateInventory()
                     }
 
-                    receipt.sendCompact(player, true)
-                    sellBackpacksContents(player, backpacks, accessibleShops, false)
+                    if (sendMessages) {
+                        receipt.sendCompact(player, true)
+                    }
+
+                    sellBackpacksContents(player, backpacks, accessibleShops, sendMessages, false)
                     return@async
                 } else if (receipt.result == TransactionResult.NO_ITEMS) {
-                    if (sellBackpacksContents(player, backpacks, accessibleShops, true)) {
+                    if (sellBackpacksContents(player, backpacks, accessibleShops, sendMessages, true)) {
                         return@async
                     }
                 }
@@ -146,7 +153,7 @@ object ShopHandler: PluginHandler {
                 return@async
             }
 
-            if (sellBackpacksContents(player, backpacks, accessibleShops, firstOfChain)) {
+            if (sellBackpacksContents(player, backpacks, accessibleShops, sendMessages, firstOfChain)) {
                 soldAnything = true
                 firstOfChain = false
             }
@@ -160,11 +167,14 @@ object ShopHandler: PluginHandler {
 
                     Tasks.sync {
                         for (receiptItem in receipt.items) {
-                            player.inventory.remove(receiptItem.item)
+                            player.inventory.removeItem(receiptItem.item)
                         }
                     }
 
-                    receipt.sendCompact(player, firstOfChain)
+                    if (sendMessages) {
+                        receipt.sendCompact(player, firstOfChain)
+                    }
+
                     firstOfChain = false
 
                     if (items.isEmpty()) {
@@ -181,7 +191,7 @@ object ShopHandler: PluginHandler {
         }
     }
 
-    private fun sellBackpacksContents(player: Player, backpacks: Map<ItemStack, Backpack>, shops: List<Shop>, _firstOfChain: Boolean): Boolean {
+    private fun sellBackpacksContents(player: Player, backpacks: Map<ItemStack, Backpack>, shops: List<Shop>, sendMessages: Boolean, _firstOfChain: Boolean): Boolean {
         var soldAnything = false
         var firstOfChain = _firstOfChain
 
@@ -195,7 +205,10 @@ object ShopHandler: PluginHandler {
                         backpack.removeItem(soldItem.item)
                     }
 
-                    receipt.sendCompact(player, firstOfChain)
+                    if (sendMessages) {
+                        receipt.sendCompact(player, firstOfChain)
+                    }
+
                     firstOfChain = false
                 }
             }
@@ -224,7 +237,7 @@ object ShopHandler: PluginHandler {
     }
 
     fun getReceipts(): Map<UUID, MutableSet<ShopReceipt>> {
-        return receipts.toMap()
+        return receipts
     }
 
     fun getReceiptById(player: Player, uuid: UUID): ShopReceipt? {

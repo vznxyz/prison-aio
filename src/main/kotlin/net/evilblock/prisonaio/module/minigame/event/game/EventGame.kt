@@ -13,8 +13,10 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
 import net.evilblock.prisonaio.module.minigame.event.*
+import net.evilblock.prisonaio.module.minigame.event.config.EventConfigHandler
 import net.evilblock.prisonaio.module.minigame.event.game.arena.EventGameArena
 import net.evilblock.prisonaio.module.minigame.event.game.menu.MapVoteMenu
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Sound
@@ -69,10 +71,6 @@ abstract class EventGame(val host: UUID, val gameType: EventGameType, arenaOptio
     }
 
     open fun startGame() {
-        for (player in getPlayersAndSpectators()) {
-            player.teleport(votedArena!!.spectatorLocation)
-        }
-
         object : BukkitRunnable() {
             override fun run() {
                 if (state !== EventGameState.WAITING) {
@@ -119,7 +117,7 @@ abstract class EventGame(val host: UUID, val gameType: EventGameType, arenaOptio
                 }
 
                 if (System.currentTimeMillis() >= expiresAt) {
-                    sendMessages(ChatColor.DARK_RED.toString() + "The event has been cancelled because it couldn't get enough players!")
+                    sendMessages(ChatColor.DARK_RED.toString() + "The event has been cancelled because not enough players joined!")
                     endGame()
 
                     EventGameHandler.endGame()
@@ -202,12 +200,12 @@ abstract class EventGame(val host: UUID, val gameType: EventGameType, arenaOptio
 
         EventUtils.resetPlayer(player)
 
-        if (EventConfig.lobbyLocation != null) {
-            player.teleport(EventConfig.lobbyLocation)
+        if (EventConfigHandler.config.lobbyLocation != null) {
+            player.teleport(EventConfigHandler.config.lobbyLocation)
         }
 
         if (!usedMessage.contains(player.uniqueId)) {
-            sendMessages("${player.displayName} ${ChatColor.GRAY}has joined the ${ChatColor.RED}${ChatColor.BOLD}${gameType.displayName} ${ChatColor.GRAY}event! (${ChatColor.RED}${players.size}/${maxPlayers}${ChatColor.GRAY})")
+            sendMessages("${Formats.formatPlayer(player)} ${ChatColor.GRAY}has joined the ${ChatColor.RED}${ChatColor.BOLD}${gameType.displayName} ${ChatColor.GRAY}event! (${ChatColor.RED}${players.size}/${maxPlayers}${ChatColor.GRAY})")
         }
 
         if (votedArena == null && arenaOptions.size > 1) {
@@ -224,8 +222,8 @@ abstract class EventGame(val host: UUID, val gameType: EventGameType, arenaOptio
 
         EventUtils.resetPlayer(player)
 
-        if (EventConfig.lobbyLocation != null) {
-            player.teleport(EventConfig.lobbyLocation)
+        if (EventConfigHandler.config.lobbyLocation != null) {
+            player.teleport(EventConfigHandler.config.lobbyLocation)
         }
 
         if (votedArena == null && arenaOptions.size > 1) {
@@ -241,7 +239,7 @@ abstract class EventGame(val host: UUID, val gameType: EventGameType, arenaOptio
 
         if (state === EventGameState.WAITING && !usedMessage.contains(player.uniqueId)) {
             usedMessage.add(player.uniqueId)
-            sendMessages("${player.displayName} ${ChatColor.GRAY}has left the ${ChatColor.RED}${ChatColor.BOLD}${gameType.displayName} ${ChatColor.GRAY}event! (${ChatColor.RED}${players.size}/$maxPlayers${ChatColor.GRAY})")
+            sendMessages("${Formats.formatPlayer(player)} ${ChatColor.GRAY}has left the ${ChatColor.RED}${ChatColor.BOLD}${gameType.displayName} ${ChatColor.GRAY}event! (${ChatColor.RED}${players.size}/$maxPlayers${ChatColor.GRAY})")
         }
     }
 
@@ -259,6 +257,14 @@ abstract class EventGame(val host: UUID, val gameType: EventGameType, arenaOptio
         }
     }
 
+    open fun handleRespawn(player: Player) {
+
+    }
+
+    open fun handleDamage(victim: Player?, damager: Player?, event: EntityDamageByEntityEvent) {
+        event.isCancelled = true
+    }
+
     fun addSpectator(player: Player) {
         if (CombatTimerHandler.isOnTimer(player)) {
             player.sendMessage("${ChatColor.RED}You can't join the event while combat tagged!")
@@ -273,7 +279,12 @@ abstract class EventGame(val host: UUID, val gameType: EventGameType, arenaOptio
         spectators.add(player.uniqueId)
 
         EventUtils.resetPlayer(player)
+
         player.teleport(votedArena!!.spectatorLocation)
+
+        for (player in players) {
+
+        }
     }
 
     fun removeSpectator(player: Player) {
@@ -338,10 +349,6 @@ abstract class EventGame(val host: UUID, val gameType: EventGameType, arenaOptio
         for (player in getPlayersAndSpectators()) {
             player.playSound(player.location, sound, volume, pitch)
         }
-    }
-
-    open fun handleDamage(victim: Player?, damager: Player?, event: EntityDamageByEntityEvent) {
-        event.isCancelled = true
     }
 
     abstract fun findWinningPlayer(): Player?

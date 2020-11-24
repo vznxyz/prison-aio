@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.tool.enchant.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.tool.enchant.menu.PurchaseEnchantmentsMenu
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
@@ -22,15 +23,17 @@ object EnchantCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        if (player.inventory.itemInMainHand == null || !player.inventory.itemInHand.type.name.endsWith("_PICKAXE")) {
+        if (player.inventory.itemInMainHand == null || !MechanicsModule.isPickaxe(player.inventory.itemInMainHand)) {
             player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}You must be holding the pickaxe you would like to enchant.")
             return
         }
 
-        EnchantsManager.handleItemSwitch(player, player.inventory.itemInMainHand, null)
-
-        val pickaxeData = PickaxeHandler.getPickaxeData(player.inventory.itemInMainHand) ?: return
-        PurchaseEnchantmentsMenu(player.inventory.itemInMainHand, pickaxeData).openMenu(player)
+        val pickaxeData = PickaxeHandler.getPickaxeData(player.inventory.itemInMainHand)
+        if (pickaxeData == null) {
+            player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe isn't registered! Try switching hands!")
+        } else {
+            PurchaseEnchantmentsMenu(player.inventory.itemInMainHand, pickaxeData).openMenu(player)
+        }
     }
 
 }

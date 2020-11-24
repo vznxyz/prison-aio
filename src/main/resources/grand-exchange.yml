@@ -1,0 +1,5 @@
+settings:
+  # The maximum amount of items a player can have listed at one time
+  player-max-concurrent-listings: 20
+  # The amount of tokens it costs a player to feature a listing
+  feature-listing-price: 1000000

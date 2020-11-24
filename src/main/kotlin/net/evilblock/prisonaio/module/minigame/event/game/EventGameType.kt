@@ -22,10 +22,17 @@ enum class EventGameType(
 
     SUMO(
         "Sumo",
-        "Try and knock your opponent(s) off of the platform!",
-        ItemStack(Material.STICK),
+        "Try and knock your opponent off of the platform!",
+        ItemStack(Material.FEATHER),
         32,
-        64
+        128
+    ),
+    KILL_THE_KING(
+        "Kill the King",
+        "One player is the king, the rest try to kill him!",
+        ItemStack(Material.GOLDEN_APPLE, 1, 1),
+        64,
+        256
     );
 
     fun canHost(player: Player): Boolean {

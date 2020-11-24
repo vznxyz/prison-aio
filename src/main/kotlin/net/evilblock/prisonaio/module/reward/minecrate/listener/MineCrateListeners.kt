@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.reward.minecrate.listener
 
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.tool.enchant.type.Luck
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.gang.GangModule
@@ -19,6 +18,7 @@ import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrate
+import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
 import org.bukkit.ChatColor
@@ -80,9 +80,9 @@ object MineCrateListeners : Listener {
 
         // apply luck multiplier
         if (event.region.supportsPassiveEnchants()) {
-            val map = EnchantsManager.handleItemSwitch(event.player, event.player.itemInHand, event)
-            if (map.isNotEmpty() && map.containsKey(Luck)) {
-                val luckLevel = map.getValue(Luck)
+            val pickaxe = PickaxeHandler.getPickaxeData(event.player.inventory.itemInMainHand)
+            if (pickaxe != null && pickaxe.enchants.containsKey(Luck)) {
+                val luckLevel = pickaxe.enchants.getValue(Luck)
                 chanceModifier += (luckLevel * 2)
             }
         }

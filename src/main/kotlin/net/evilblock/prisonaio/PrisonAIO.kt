@@ -20,10 +20,12 @@ import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.gang.GangModule
 import net.evilblock.prisonaio.module.chat.ChatModule
 import net.evilblock.prisonaio.module.combat.CombatModule
+import net.evilblock.prisonaio.module.exchange.GrandExchangeModule
 import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.system.SystemModule
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
+import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MinesModule
 import net.evilblock.prisonaio.module.mine.block.BlockType
 import net.evilblock.prisonaio.module.minigame.MinigamesModule
@@ -39,13 +41,15 @@ import net.evilblock.prisonaio.module.storage.StorageModule
 import net.evilblock.prisonaio.module.tool.enchant.config.formula.PriceFormulaType
 import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
-import net.evilblock.prisonaio.util.economy.EconomyProvider
-import net.milkbowl.vault.economy.Economy
+import net.evilblock.prisonaio.service.ServicesThread
 import org.bukkit.Location
 import org.bukkit.generator.ChunkGenerator
-import org.bukkit.plugin.ServicePriority
 
 class PrisonAIO : PluginFramework() {
+
+    companion object {
+        @JvmStatic lateinit var instance: PrisonAIO
+    }
 
     var fullyLoaded = false
     val enabledModules: MutableList<PluginModule> = arrayListOf()
@@ -54,17 +58,17 @@ class PrisonAIO : PluginFramework() {
         instance = this
 
         server.pluginManager.registerEvents(PrematureLoadListeners, this)
-        server.servicesManager.register(Economy::class.java, EconomyProvider(), this, ServicePriority.Lowest)
 
         Cubed.instance.configureOptions(CubedOptions(requireRedis = true, requireMongo = true))
 
         // register this plugins gson type adapters
         Cubed.instance.useGsonBuilderThenRebuild { builder ->
-            builder.registerTypeAdapter(QuestProgress::class.java, QuestProgress.Serializer)
-            builder.registerTypeAdapter(BlockType::class.java, BlockType.Serializer)
-            builder.registerTypeAdapter(DeliveryManRewardRequirement::class.java, DeliveryManRewardRequirement.Serializer)
+            builder.registerTypeAdapter(QuestProgress::class.java, QuestProgress.Serializer())
+            builder.registerTypeAdapter(BlockType::class.java, BlockType.Serializer())
+            builder.registerTypeAdapter(DeliveryManRewardRequirement::class.java, DeliveryManRewardRequirement.Serializer())
             builder.registerTypeAdapter(UserSettingOption::class.java, AbstractTypeSerializer<UserSettingOption>())
             builder.registerTypeAdapter(Challenge::class.java, AbstractTypeSerializer<Challenge>())
+            builder.registerTypeAdapter(Mine::class.java, AbstractTypeSerializer<Mine>())
             builder.registerTypeAdapter(PriceFormulaType.PriceFormula::class.java, AbstractTypeSerializer<PriceFormulaType.PriceFormula>())
         }
 
@@ -82,6 +86,7 @@ class PrisonAIO : PluginFramework() {
             GangModule,
             PrivateMinesModule,
             BattlePassModule,
+            GrandExchangeModule,
             UsersModule,
             ChatModule,
             RewardsModule,
@@ -92,8 +97,10 @@ class PrisonAIO : PluginFramework() {
 
         super.onEnable()
 
-        Tasks.delayed(1L) {
+        Tasks.delayed(20L) {
             fullyLoaded = true
+
+            ServicesThread().start()
         }
     }
 
@@ -101,16 +108,8 @@ class PrisonAIO : PluginFramework() {
         return enabledModules
     }
 
-    fun getSpawnLocation(): Location {
-        return server.worlds[0].spawnLocation
-    }
-
     override fun getDefaultWorldGenerator(worldName: String?, id: String?): ChunkGenerator {
         return EmptyChunkGenerator()
-    }
-
-    companion object {
-        @JvmStatic lateinit var instance: PrisonAIO
     }
 
 }

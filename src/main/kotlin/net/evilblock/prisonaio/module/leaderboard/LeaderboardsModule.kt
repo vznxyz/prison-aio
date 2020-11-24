@@ -13,13 +13,11 @@ import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.leaderboard.command.RefreshCommand
-import net.evilblock.prisonaio.module.leaderboard.command.IndexCommand
-import net.evilblock.prisonaio.module.leaderboard.command.ResultsCommand
-import net.evilblock.prisonaio.module.leaderboard.command.SpawnLeaderboardCommand
+import net.evilblock.prisonaio.module.leaderboard.command.*
 import net.evilblock.prisonaio.module.leaderboard.event.LeaderboardsRefreshedEvent
 import net.evilblock.prisonaio.module.leaderboard.impl.*
 import net.evilblock.prisonaio.module.leaderboard.npc.LeaderboardNpcEntity
+import java.util.*
 
 object LeaderboardsModule : PluginModule() {
 
@@ -32,6 +30,8 @@ object LeaderboardsModule : PluginModule() {
 		TopTimePlayedLeaderboard,
 		TopTokensLeaderboard
 	)
+
+	val exemptions: MutableSet<UUID> = hashSetOf()
 
 	override fun getName(): String {
 		return "Leaderboards"
@@ -46,19 +46,25 @@ object LeaderboardsModule : PluginModule() {
 	}
 
 	override fun onEnable() {
-		Tasks.asyncDelayed(60L) {
+		Tasks.asyncTimer(60L, 20L * 60L * 2L) {
 			refreshLeaderboards()
 		}
 
-		Tasks.asyncTimer(20L * 60L * 2L, 20L * 60L * 2L) {
-			refreshLeaderboards()
-		}
+		loadExemptions()
+	}
+
+	override fun onReload() {
+		super.onReload()
+
+		loadExemptions()
 	}
 
 	override fun getCommands(): List<Class<*>> {
 		return listOf(
-			RefreshCommand.javaClass,
+			ExemptionAddCommand.javaClass,
+			ExemptionRemoveCommand.javaClass,
 			IndexCommand.javaClass,
+			RefreshCommand.javaClass,
 			ResultsCommand.javaClass,
 			SpawnLeaderboardCommand.javaClass
 		)
@@ -92,6 +98,25 @@ object LeaderboardsModule : PluginModule() {
 
 	fun getLeaderboardNpcs(): List<LeaderboardNpcEntity> {
 		return EntityManager.getEntities().filterIsInstance(LeaderboardNpcEntity::class.java)
+	}
+
+	fun readFallbackTextureId(): String {
+		return config.getString("fallback-texture-id", "leaderboards")
+	}
+
+	private fun loadExemptions() {
+		exemptions.clear()
+
+		if (config.contains("exemptions")) {
+			for (value in config.getStringList("exemptions")) {
+				exemptions.add(UUID.fromString(value))
+			}
+		}
+	}
+
+	fun saveExemptions() {
+		config.set("exemptions", exemptions.map { it.toString() })
+		saveConfig()
 	}
 
 }

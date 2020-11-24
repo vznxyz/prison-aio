@@ -19,17 +19,18 @@ import net.evilblock.prisonaio.module.mechanic.armor.command.SpawnDisplayCommand
 import net.evilblock.prisonaio.module.mechanic.armor.listener.AbilityArmorListeners
 import net.evilblock.prisonaio.module.mechanic.backpack.Backpack
 import net.evilblock.prisonaio.module.mechanic.backpack.BackpackHandler
-import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackDebugCommand
-import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackGiveCommand
-import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackViewCommand
-import net.evilblock.prisonaio.module.mechanic.backpack.command.BackpackWipeCommand
+import net.evilblock.prisonaio.module.mechanic.backpack.command.*
 import net.evilblock.prisonaio.module.mechanic.backpack.command.parameter.BackpackParameterType
 import net.evilblock.prisonaio.module.mechanic.backpack.listener.BackpackListeners
+import net.evilblock.prisonaio.module.mechanic.jumppad.JumpPadListeners
+import net.evilblock.prisonaio.module.mechanic.jumppad.command.JumpPadCommand
 import net.evilblock.prisonaio.module.mechanic.listener.*
 import net.evilblock.prisonaio.module.mechanic.trade.command.TradeAcceptCommand
 import net.evilblock.prisonaio.module.mechanic.trade.command.TradeCommand
+import net.evilblock.prisonaio.module.mechanic.trade.command.TradeDeclineCommand
 import net.evilblock.prisonaio.module.mechanic.trade.command.admin.TradeToggleCommand
 import net.evilblock.prisonaio.module.mechanic.trade.listener.TradeListeners
+import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
@@ -87,12 +88,13 @@ object MechanicsModule : PluginModule() {
             MiningMechanicsListeners,
             MobMechanicsListeners,
             PlayerDeathListeners,
-            PreventDropsInSpawnListeners,
+            SpawnListeners,
             StreamListeners,
             VanillaMechanicsListeners,
             BackpackListeners,
             AbilityArmorListeners,
-            TradeListeners
+            TradeListeners,
+            JumpPadListeners
         )
     }
 
@@ -100,14 +102,17 @@ object MechanicsModule : PluginModule() {
         return listOf(
             BackpackDebugCommand.javaClass,
             BackpackGiveCommand.javaClass,
+            BackpackSafeSaveCommand.javaClass,
             BackpackViewCommand.javaClass,
             BackpackWipeCommand.javaClass,
             GiveArmorPieceCommand.javaClass,
             GiveArmorSetCommand.javaClass,
             SpawnDisplayCommand.javaClass,
             TradeAcceptCommand.javaClass,
+            TradeDeclineCommand.javaClass,
             TradeToggleCommand.javaClass,
-            TradeCommand.javaClass
+            TradeCommand.javaClass,
+            JumpPadCommand.javaClass
         )
     }
 
@@ -169,6 +174,10 @@ object MechanicsModule : PluginModule() {
         return config.getBoolean("vanilla-mechanics.disable-brewing-mechanics", true)
     }
 
+    fun isRedstoneDisabled(): Boolean {
+        return config.getBoolean("vanilla-mechanics.disable-redstone", true)
+    }
+
     /**
      * Gets a copy of the auto-smelt block list.
      */
@@ -212,7 +221,31 @@ object MechanicsModule : PluginModule() {
     }
 
     fun isPickaxe(itemStack: ItemStack?): Boolean {
-        return itemStack != null && itemStack.type != Material.AIR && PICK_IDS.contains(itemStack.type.id)
+        if (itemStack == null) {
+            return false
+        }
+
+        if (itemStack.type == Material.AIR) {
+            return false
+        }
+
+        if (!PICK_TYPES.contains(itemStack.type)) {
+            return false
+        }
+
+        return true
+    }
+
+    fun getJumpPadDefaultLines(): List<String> {
+        return config.getStringList("jump-pad.default-lines").map { ChatColor.translateAlternateColorCodes('&', it) }
+    }
+
+    fun getJumpPadVelocityX(): Double {
+        return config.getDouble("jump-pad.velocity.x", 2.5)
+    }
+
+    fun getJumpPadVelocityY(): Double {
+        return config.getDouble("jump-pad.velocity.y", 1.0)
     }
 
     private val TOOL_IDS = arrayListOf(
@@ -223,6 +256,11 @@ object MechanicsModule : PluginModule() {
         268, 269, 270 // wood tools
     )
 
-    private val PICK_IDS = arrayListOf(270, 274, 257, 285, 278)
+    private val PICK_TYPES = arrayListOf(
+        Material.DIAMOND_PICKAXE,
+        Material.GOLD_PICKAXE,
+        Material.STONE_PICKAXE,
+        Material.WOOD_PICKAXE
+    )
 
 }

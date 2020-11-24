@@ -13,6 +13,8 @@ vanilla-mechanics:
   disable-farming-mechanics: true
   # If brewing mechanics are disabled
   disable-brewing-mechanics: true
+  # If redstone is disabled
+  disable-redstone: true
 
 # The auto-smelt configuration section
 auto-smelt:
@@ -57,3 +59,11 @@ fortune:
     - "ENDER_STONE"
     - "BEDROCK"
     - "OBSIDIAN"
+
+jump-pad:
+  default-lines:
+    - "&9» &a&lJUMP PAD &9«"
+    - "&7Try running over it!"
+  velocity:
+    x: 2.5
+    y: 1.0

@@ -1,7 +1,8 @@
 package net.evilblock.prisonaio.module.minigame.event.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.prisonaio.module.minigame.event.EventConfig
+import net.evilblock.prisonaio.module.minigame.event.config.EventConfig
+import net.evilblock.prisonaio.module.minigame.event.config.EventConfigHandler
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -16,8 +17,8 @@ object SetLobbyCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        EventConfig.lobbyLocation = player.location
-        EventConfig.save()
+        EventConfigHandler.config.lobbyLocation = player.location
+        EventConfigHandler.saveData()
 
         player.sendMessage("${ChatColor.GREEN}Updated the events lobby location!")
     }

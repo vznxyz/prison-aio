@@ -7,21 +7,27 @@
 
 package net.evilblock.prisonaio.module.mechanic.backpack
 
+import com.google.gson.*
+import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.nms.NBTUtil
 import net.evilblock.prisonaio.module.mechanic.backpack.upgrade.BackpackUpgrade
 import net.evilblock.prisonaio.module.mechanic.backpack.menu.BackpackMenu
+import net.evilblock.prisonaio.module.mechanic.backpack.upgrade.impl.CapacityUpgrade
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.lang.reflect.Type
 import java.util.*
 
 class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").substring(0, 13)) {
 
     internal val contents: MutableList<ItemStack> = arrayListOf()
+
+    @JsonAdapter(BackpackUpgradesMapSerializer::class)
     internal val upgrades: MutableMap<BackpackUpgrade, Int> = hashMapOf()
 
     fun addItem(add: ItemStack): ItemStack? {
@@ -127,12 +133,24 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
         }
     }
 
+    fun clearItems() {
+        contents.clear()
+    }
+
     fun hasUpgrade(upgrade: BackpackUpgrade): Boolean {
         return upgrades.containsKey(upgrade)
     }
 
+    fun addUpgrade(upgrade: BackpackUpgrade) {
+        upgrades[upgrade] = 1
+    }
+
     fun getUpgradeLevel(upgrade: BackpackUpgrade): Int {
         return upgrades.getOrDefault(upgrade, 0)
+    }
+
+    fun addUpgradeLevel(upgrade: BackpackUpgrade) {
+        upgrades[upgrade] = getUpgradeLevel(upgrade) + 1
     }
 
     fun getItemsSize(): Int {
@@ -140,7 +158,11 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
     }
 
     fun getMaxItemsSize(): Int {
-        return 1440
+        return if (hasUpgrade(CapacityUpgrade)) {
+            1440 + getUpgradeLevel(CapacityUpgrade)
+        } else {
+            1440
+        }
     }
 
     fun open(player: Player) {
@@ -168,7 +190,7 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
             val lore = arrayListOf<String>()
             lore.add("${ChatColor.GRAY}Items: ${ChatColor.RED}${NumberUtils.format(getItemsSize())}${ChatColor.GRAY}/${ChatColor.RED}${NumberUtils.format(getMaxItemsSize())}")
             lore.add("")
-            lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
+            lore.add("${ChatColor.RED}${ChatColor.BOLD}Upgrades")
 
             if (upgrades.isEmpty()) {
                 lore.add("${ChatColor.GRAY}None")
@@ -187,6 +209,27 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
             meta.lore = lore
 
             itemStack.itemMeta = meta
+        }
+    }
+
+    object BackpackUpgradesMapSerializer : JsonSerializer<Map<BackpackUpgrade, Int>>, JsonDeserializer<Map<BackpackUpgrade, Int>> {
+        override fun serialize(map: Map<BackpackUpgrade, Int>, type: Type, context: JsonSerializationContext): JsonElement {
+            return JsonObject().also {
+                for ((upgrade, level) in map) {
+                    it.addProperty(upgrade.getId(), level)
+                }
+            }
+        }
+
+        override fun deserialize(json: JsonElement, type: Type, context: JsonDeserializationContext): Map<BackpackUpgrade, Int> {
+            return hashMapOf<BackpackUpgrade, Int>().also {
+                for ((key, value) in json.asJsonObject.entrySet()) {
+                    val upgrade = BackpackHandler.getUpgradeById(key)
+                    if (upgrade != null) {
+                        it[upgrade] = value.asInt
+                    }
+                }
+            }
         }
     }
 

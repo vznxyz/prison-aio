@@ -29,11 +29,6 @@ import java.text.NumberFormat
 
 class BlocksMinedAtMineChallenge(id: String, @JsonAdapter(MineReferenceSerializer::class) private var mine: Mine, internal var blocksMined: Int) : Challenge(id) {
 
-    constructor(id: String, name: String, mine: Mine, blocksMined: Int, xp: Int) : this(id, mine, blocksMined) {
-        this.name = name
-        this.rewardXp = xp
-    }
-
     override fun getText(): String {
         return "Mine ${NumberFormat.getInstance().format(blocksMined)} blocks at the ${mine.id} Mine"
     }
@@ -101,9 +96,8 @@ class BlocksMinedAtMineChallenge(id: String, @JsonAdapter(MineReferenceSerialize
                     }
 
                     Tasks.delayed(1L) {
-                        NumberPrompt { number ->
+                        NumberPrompt().acceptInput { number ->
                             assert(number.toInt() > 0)
-
                             lambda.invoke(BlocksMinedAtMineChallenge(id, mine.get(), number.toInt()))
                         }.start(player)
                     }

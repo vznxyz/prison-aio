@@ -12,6 +12,7 @@ import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.leaderboard.Leaderboard
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardEntry
+import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
 import java.util.*
@@ -24,11 +25,17 @@ object TopTokensLeaderboard : Leaderboard("top-tokens", "${ChatColor.GOLD}${Chat
         for (document in UserHandler.getCollection().find()) {
             val uuid = UUID.fromString(document.getString("uuid"))
 
+            if (LeaderboardsModule.exemptions.contains(uuid)) {
+                continue
+            }
+
+            val displayName = Cubed.instance.uuidCache.name(uuid)
+
             val balance = document["tokenBalance"] ?: document["tokensBalance"]
             if (balance is Int) {
-                entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), balance.toLong()))
+                entries.add(LeaderboardEntry(0, displayName, displayName, balance.toLong()))
             } else {
-                entries.add(LeaderboardEntry(0, Cubed.instance.uuidCache.name(uuid), balance as Long))
+                entries.add(LeaderboardEntry(0, displayName, displayName, balance as Long))
             }
         }
 

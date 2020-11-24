@@ -20,6 +20,8 @@ import org.bukkit.projectiles.ProjectileSource
 
 abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : AbstractTypeSerializable {
 
+    var persistent: Boolean = true
+
     abstract fun getRegionName(): String
 
     abstract fun getPriority(): Int
@@ -129,7 +131,7 @@ abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : Abs
     }
 
     open fun onPlayerDeath(player: Player, event: PlayerDeathEvent) {
-
+        event.keepInventory = true
     }
 
     open fun onLeaveRegion(player: Player) {
