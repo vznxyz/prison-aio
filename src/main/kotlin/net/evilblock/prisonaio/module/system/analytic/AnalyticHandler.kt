@@ -33,8 +33,9 @@ object AnalyticHandler : PluginHandler {
     override fun initialLoad() {
         super.initialLoad()
 
-        if (getInternalDataFile().exists()) {
-            Files.newReader(getInternalDataFile(), Charsets.UTF_8).use { reader ->
+        val dataFile = getInternalDataFile()
+        if (dataFile.exists()) {
+            Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
                 val dataType = object : TypeToken<Map<Analytic, Any?>>() {}.type
                 val data = Cubed.gson.fromJson(reader, dataType) as Map<Analytic, Any?>
 

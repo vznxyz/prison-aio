@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.region.listener
 
+import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
@@ -47,12 +48,14 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onPlayerMoveEvent(event: PlayerMoveEvent) {
-        val fromRegion = RegionHandler.findRegion(event.from)
-        val toRegion = RegionHandler.findRegion(event.to)
+        if (EventUtils.hasPlayerMoved(event)) {
+            val fromRegion = RegionHandler.findRegion(event.from)
+            val toRegion = RegionHandler.findRegion(event.to)
 
-        if (fromRegion != toRegion) {
-            fromRegion.onLeaveRegion(event.player)
-            toRegion.onEnterRegion(event.player)
+            if (fromRegion != toRegion) {
+                fromRegion.onLeaveRegion(event.player)
+                toRegion.onEnterRegion(event.player)
+            }
         }
     }
 

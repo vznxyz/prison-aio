@@ -31,6 +31,7 @@ import org.bukkit.block.Skull
 import org.bukkit.entity.Player
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -46,9 +47,9 @@ object GangHandler : PluginHandler {
     private var gridIndex = 0
     private val grid: HashMap<Int, Gang> = hashMapOf()
 
-    private val gangsByName: HashMap<String, Gang> = hashMapOf()
-    private val gangAccess: HashMap<UUID, HashSet<Gang>> = hashMapOf()
-    private val gangVisiting: HashMap<UUID, Gang> = hashMapOf()
+    private val gangByName: MutableMap<String, Gang> = ConcurrentHashMap()
+    private val gangAccess: MutableMap<UUID, MutableSet<Gang>> = ConcurrentHashMap()
+    private val gangVisiting: MutableMap<UUID, Gang> = ConcurrentHashMap()
 
     var asyncWorld: AsyncWorld? = null
 
@@ -92,6 +93,41 @@ object GangHandler : PluginHandler {
         asyncWorld = getAsyncGridWorld()
     }
 
+
+
+    /**
+     * Loads the grid data from the file system.
+     */
+    private fun loadGrid() {
+        val dataFile = getInternalDataFile()
+        if (dataFile.exists()) {
+            Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
+                val gridType = object : TypeToken<ArrayList<Gang>>() {}.type
+                val gridList = Cubed.gson.fromJson(reader, gridType) as ArrayList<Gang>
+
+                for (gang in gridList) {
+                    // initialize transient data
+                    gang.initializeData()
+
+                    // synchronize this gang data into our caches
+                    synchronizeCaches(gang)
+
+                    // update region block cache
+                    RegionHandler.updateBlockCache(gang)
+
+                    // set highest grid index so we know where to create the next gang
+                    if (gang.gridIndex > this.gridIndex) {
+                        this.gridIndex = gang.gridIndex
+                    }
+                }
+            }
+        }
+    }
+
+    fun saveGrid() {
+        Files.write(Cubed.gson.toJson(grid.values), getInternalDataFile(), Charsets.UTF_8)
+    }
+
     /**
      * Gets the [World] that hosts the grid.
      */
@@ -120,7 +156,7 @@ object GangHandler : PluginHandler {
      * Gets the [Gang] with the given [name].
      */
     fun getGangByName(name: String): Gang? {
-        return gangsByName[name.toLowerCase()]
+        return gangByName[name.toLowerCase()]
     }
 
     /**
@@ -174,7 +210,7 @@ object GangHandler : PluginHandler {
             .toSet()
     }
 
-    fun getGangAccessCache(): MutableMap<UUID, HashSet<Gang>> {
+    fun getGangAccessCache(): MutableMap<UUID, MutableSet<Gang>> {
         return gangAccess
     }
 
@@ -192,7 +228,9 @@ object GangHandler : PluginHandler {
     }
 
     fun updateGangAccess(uuid: UUID, gang: Gang, joinable: Boolean) {
-        gangAccess.putIfAbsent(uuid, HashSet())
+        if (!gangAccess.containsKey(uuid)) {
+            gangAccess[uuid] = ConcurrentHashMap.newKeySet()
+        }
 
         if (joinable) {
             gangAccess[uuid]!!.add(gang)
@@ -248,7 +286,7 @@ object GangHandler : PluginHandler {
     }
 
     fun hasBypass(player: Player): Boolean {
-        return player.hasPermission(Permissions.GANGS_ADMIN) && player.gameMode == GameMode.CREATIVE && RegionBypass.hasBypass(player)
+        return player.hasPermission(Permissions.GANGS_ADMIN) && RegionBypass.hasBypass(player)
     }
 
     fun attemptJoinSession(player: Player, gang: Gang) {
@@ -273,21 +311,20 @@ object GangHandler : PluginHandler {
 
     private fun synchronizeCaches(gang: Gang) {
         grid[gang.gridIndex] = gang
-        gangsByName[gang.name.toLowerCase()] = gang
+        gangByName[gang.name.toLowerCase()] = gang
 
         for (member in gang.getMembers().values) {
-            gangAccess.putIfAbsent(member.uuid, HashSet())
-            gangAccess[member.uuid]!!.add(gang)
+            updateGangAccess(member.uuid, gang, true)
         }
     }
 
     fun forgetGang(gang: Gang) {
         grid.remove(gang.gridIndex)
-        gangsByName.remove(gang.name.toLowerCase())
+        gangByName.remove(gang.name.toLowerCase())
     }
 
     fun renameGang(gang: Gang, name: String) {
-        gangsByName.remove(gang.name.toLowerCase())
+        gangByName.remove(gang.name.toLowerCase())
         gang.name = name
         synchronizeCaches(gang)
     }
@@ -316,11 +353,11 @@ object GangHandler : PluginHandler {
 
             val scanResults = startSchematicScan(schematicData.pasteLocation)
 
-            if (scanResults.playerSpawnLocation == null) {
+            if (scanResults.spawnLocation == null) {
                 throw IllegalStateException("Missing player spawn location")
             }
 
-            if (scanResults.jerrySpawnLocation == null) {
+            if (scanResults.guideLocation == null) {
                 throw IllegalStateException("Missing jerry spawn location")
             }
 
@@ -334,7 +371,7 @@ object GangHandler : PluginHandler {
             val gangLeader = GangMember(leader)
             gangLeader.role = GangMember.Role.LEADER
 
-            val gang = Gang(gridIndex, name, leader, scanResults.playerSpawnLocation!!, scanResults.jerrySpawnLocation!!, schematicData.cuboid)
+            val gang = Gang(gridIndex, name, leader, scanResults.spawnLocation!!, scanResults.guideLocation!!, schematicData.cuboid)
             gang.initializeData()
             gang.addMember(gangLeader)
 
@@ -370,11 +407,11 @@ object GangHandler : PluginHandler {
 
             val scanResults = startSchematicScan(schematicData.pasteLocation)
 
-            if (scanResults.playerSpawnLocation == null) {
+            if (scanResults.spawnLocation == null) {
                 throw IllegalStateException("Missing player spawn location")
             }
 
-            if (scanResults.jerrySpawnLocation == null) {
+            if (scanResults.guideLocation == null) {
                 throw IllegalStateException("Missing jerry spawn location")
             }
 
@@ -387,8 +424,8 @@ object GangHandler : PluginHandler {
 
             RegionHandler.clearBlockCache(gang)
 
-            gang.homeLocation = scanResults.playerSpawnLocation!!
-            gang.guideNpc.updateLocation(scanResults.jerrySpawnLocation!!)
+            gang.homeLocation = scanResults.spawnLocation!!
+            gang.guideNpc.updateLocation(scanResults.guideLocation!!)
             gang.setCuboid(schematicData.cuboid)
 
             RegionHandler.updateBlockCache(gang)
@@ -462,8 +499,8 @@ object GangHandler : PluginHandler {
      * Container for storing the result of a pasted schematic scan.
      */
     data class SchematicScanResults(
-        var playerSpawnLocation: Location? = null,
-        var jerrySpawnLocation: Location? = null,
+        var spawnLocation: Location? = null,
+        var guideLocation: Location? = null,
         var blocks: HashSet<Block> = hashSetOf()
     )
 
@@ -488,12 +525,12 @@ object GangHandler : PluginHandler {
                         val skull = block.state as Skull
                         when (skull.skullType) {
                             SkullType.PLAYER -> {
-                                spawnPointScan.playerSpawnLocation = block.location.add(0.5, 2.0, 0.5)
-                                spawnPointScan.playerSpawnLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
+                                spawnPointScan.spawnLocation = block.location.add(0.5, 2.0, 0.5)
+                                spawnPointScan.spawnLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
                             }
                             SkullType.CREEPER -> {
-                                spawnPointScan.jerrySpawnLocation = block.location.add(0.5, 0.0, 0.5)
-                                spawnPointScan.jerrySpawnLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
+                                spawnPointScan.guideLocation = block.location.add(0.5, 0.0, 0.5)
+                                spawnPointScan.guideLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
                             }
                             else -> continue@zLoop
                         }
@@ -505,39 +542,6 @@ object GangHandler : PluginHandler {
         }
 
         return spawnPointScan
-    }
-
-    /**
-     * Loads the grid data from the file system.
-     */
-    private fun loadGrid() {
-        val dataFile = getInternalDataFile()
-        if (dataFile.exists()) {
-            Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
-                val gridType = object : TypeToken<ArrayList<Gang>>() {}.type
-                val gridList = Cubed.gson.fromJson(reader, gridType) as ArrayList<Gang>
-
-                for (gang in gridList) {
-                    // initialize transient data
-                    gang.initializeData()
-
-                    // synchronize this gang data into our caches
-                    synchronizeCaches(gang)
-
-                    // update region block cache
-                    RegionHandler.updateBlockCache(gang)
-
-                    // set highest grid index so we know where to create the next gang
-                    if (gang.gridIndex > this.gridIndex) {
-                        this.gridIndex = gang.gridIndex
-                    }
-                }
-            }
-        }
-    }
-
-    fun saveGrid() {
-        Files.write(Cubed.gson.toJson(grid.values), getInternalDataFile(), Charsets.UTF_8)
     }
 
     private fun indexToGrid(index: Int): Pair<Int, Int> {

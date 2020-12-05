@@ -1,6 +1,5 @@
-package net.evilblock.cubed.util.bukkit.particle
+package net.evilblock.prisonaio.util.particle
 
-import net.evilblock.prisonaio.util.particle.ParticleMeta
 import net.minecraft.server.v1_12_R1.PacketPlayOutWorldParticles
 import org.bukkit.Location
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer

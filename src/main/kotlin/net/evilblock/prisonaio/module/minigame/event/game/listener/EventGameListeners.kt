@@ -31,7 +31,7 @@ object EventGameListeners : Listener {
         if (EventGameHandler.isOngoingGame()) {
             val game = EventGameHandler.getOngoingGame()!!
             if (game.isPlaying(event.player.uniqueId)) {
-                if (event.player.gameMode == GameMode.CREATIVE && RegionBypass.hasBypass(event.player)) {
+                if (RegionBypass.hasBypass(event.player)) {
                     RegionBypass.attemptNotify(event.player)
                     return
                 }

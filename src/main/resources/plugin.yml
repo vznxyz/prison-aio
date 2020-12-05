@@ -7,5 +7,6 @@ depend:
   - Cubed
   - Source
   - Vault
+  - PlotSquared
 softdepend:
   - DeluxeTags

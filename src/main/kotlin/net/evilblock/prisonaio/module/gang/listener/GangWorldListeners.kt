@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.gang.listener
 
+import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.gang.GangHandler
 import org.bukkit.Bukkit
@@ -63,12 +64,14 @@ object GangWorldListeners : Listener {
 
     @EventHandler
     fun onPlayerMoveEvent(event: PlayerMoveEvent) {
-        if (event.player.world == GangHandler.getGridWorld() && event.to.y <= -20) {
-            val visitingGang = GangHandler.getVisitingGang(event.player)
-            if (visitingGang == null) {
-                event.player.teleport(Bukkit.getWorlds()[0].spawnLocation)
-            } else {
-                event.player.teleport(visitingGang.homeLocation)
+        if (EventUtils.hasPlayerMoved(event)) {
+            if (event.player.world == GangHandler.getGridWorld() && event.to.y <= -20) {
+                val visitingGang = GangHandler.getVisitingGang(event.player)
+                if (visitingGang == null) {
+                    event.player.teleport(Bukkit.getWorlds()[0].spawnLocation)
+                } else {
+                    event.player.teleport(visitingGang.homeLocation)
+                }
             }
         }
     }

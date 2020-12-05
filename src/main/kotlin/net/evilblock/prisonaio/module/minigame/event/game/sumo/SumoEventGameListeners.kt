@@ -1,5 +1,6 @@
 package net.evilblock.prisonaio.module.minigame.event.game.sumo
 
+import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -9,7 +10,7 @@ object SumoEventGameListeners : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun onPlayerMoveEvent(event: PlayerMoveEvent) {
-        if (EventGameHandler.isOngoingGame() && EventGameHandler.getOngoingGame() is SumoEventGame) {
+        if (EventUtils.hasPlayerMoved(event) && EventGameHandler.isOngoingGame() && EventGameHandler.getOngoingGame() is SumoEventGame) {
             val ongoingGame = EventGameHandler.getOngoingGame() as SumoEventGame
             if (ongoingGame.isCurrentlyFighting(event.player)) {
                 if (System.currentTimeMillis() < ongoingGame.startedAt!! + 6000L) {

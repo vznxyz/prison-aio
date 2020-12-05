@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.util.plot
 
 import com.intellectualcrafters.plot.PS
 import com.intellectualcrafters.plot.`object`.Plot
+import com.intellectualcrafters.plot.`object`.PlotId
 import org.bukkit.Location
 
 object PlotUtil {

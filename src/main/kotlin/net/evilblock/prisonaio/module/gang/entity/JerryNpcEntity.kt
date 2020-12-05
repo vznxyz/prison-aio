@@ -22,9 +22,8 @@ class JerryNpcEntity(location: Location) : NpcEntity(listOf(""), location) {
     internal lateinit var gang: Gang
 
     override fun onRightClick(player: Player) {
-        var canOpen = false
-        if (player.isOp && player.gameMode == GameMode.CREATIVE && RegionBypass.hasBypass(player)) {
-            canOpen = true
+        var canOpen = RegionBypass.hasBypass(player)
+        if (canOpen) {
             RegionBypass.attemptNotify(player)
         }
 

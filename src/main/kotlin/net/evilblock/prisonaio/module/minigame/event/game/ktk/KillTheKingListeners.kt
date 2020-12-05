@@ -1,5 +1,6 @@
 package net.evilblock.prisonaio.module.minigame.event.game.ktk
 
+import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.combat.deathmessage.DeathMessageHandler
 import net.evilblock.prisonaio.module.combat.deathmessage.objects.Damage
@@ -50,17 +51,19 @@ object KillTheKingListeners : Listener {
 
     @EventHandler(ignoreCancelled = true)
     fun onPlayerMoveEvent(event: PlayerMoveEvent) {
-        if (EventGameHandler.isOngoingGame() && EventGameHandler.getOngoingGame() is KillTheKingEvent) {
-            val ongoingGame = EventGameHandler.getOngoingGame() as KillTheKingEvent
-            if (ongoingGame.state == EventGameState.RUNNING && ongoingGame.isPlaying(event.player.uniqueId)) {
-                if (System.currentTimeMillis() < ongoingGame.startedAt!! + 6000L) {
-                    val teleportTo = event.from.clone()
-                    teleportTo.yaw = event.to.yaw
-                    teleportTo.pitch = event.to.pitch
+        if (EventUtils.hasPlayerMoved(event)) {
+            if (EventGameHandler.isOngoingGame() && EventGameHandler.getOngoingGame() is KillTheKingEvent) {
+                val ongoingGame = EventGameHandler.getOngoingGame() as KillTheKingEvent
+                if (ongoingGame.state == EventGameState.RUNNING && ongoingGame.isPlaying(event.player.uniqueId)) {
+                    if (System.currentTimeMillis() < ongoingGame.startedAt!! + 6000L) {
+                        val teleportTo = event.from.clone()
+                        teleportTo.yaw = event.to.yaw
+                        teleportTo.pitch = event.to.pitch
 
-                    event.isCancelled = true
-                    event.player.teleport(teleportTo)
-                    return
+                        event.isCancelled = true
+                        event.player.teleport(teleportTo)
+                        return
+                    }
                 }
             }
         }

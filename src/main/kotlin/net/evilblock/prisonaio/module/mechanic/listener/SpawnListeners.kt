@@ -27,7 +27,7 @@ object SpawnListeners : Listener {
     fun onBoatPlace(event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_BLOCK) {
             if (event.player.inventory.itemInMainHand.type == Material.BOAT) {
-                if (RegionBypass.hasBypass(event.player) && event.player.gameMode == GameMode.CREATIVE) {
+                if (RegionBypass.hasBypass(event.player)) {
                     RegionBypass.attemptNotify(event.player)
                 } else {
                     event.isCancelled = true

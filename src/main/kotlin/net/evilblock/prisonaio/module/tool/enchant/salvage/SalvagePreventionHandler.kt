@@ -41,8 +41,9 @@ object SalvagePreventionHandler : PluginHandler {
     override fun initialLoad() {
         super.initialLoad()
 
-        if (getInternalDataFile().exists()) {
-            Files.newReader(getInternalDataFile(), Charsets.UTF_8).use { reader ->
+        val dataFile = getInternalDataFile()
+        if (dataFile.exists()) {
+            Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
                 val listType = object : TypeToken<List<ItemStack>>() {}.type
                 val list = Cubed.gson.fromJson(reader, listType) as List<ItemStack>
 

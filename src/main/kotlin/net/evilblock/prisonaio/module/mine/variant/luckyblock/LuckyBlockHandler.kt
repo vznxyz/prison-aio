@@ -39,12 +39,15 @@ object LuckyBlockHandler : PluginHandler {
     override fun initialLoad() {
         super.initialLoad()
 
-        Files.newReader(getInternalDataFile(), Charsets.UTF_8).use { reader ->
-            val type = object : TypeToken<List<LuckyBlock>>() {}.type
-            val list = Cubed.gson.fromJson(reader.readLine(), type) as List<LuckyBlock>
+        val dataFile = getInternalDataFile()
+        if (dataFile.exists()) {
+            Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
+                val type = object : TypeToken<List<LuckyBlock>>() {}.type
+                val list = Cubed.gson.fromJson(reader.readLine(), type) as List<LuckyBlock>
 
-            for (luckyblock in list) {
-                trackBlockType(luckyblock)
+                for (luckyblock in list) {
+                    trackBlockType(luckyblock)
+                }
             }
         }
 

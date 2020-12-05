@@ -30,6 +30,10 @@ class LuckyBlockEntity(
     location: Location
 ) : Entity(location) {
 
+    override fun getTypeName(): String {
+        return "LB-Float-Head"
+    }
+
     override fun getDebugViewLocation(): Location {
         return location.clone().add(0.5, 0.0, 0.5)
     }

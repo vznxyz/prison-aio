@@ -27,8 +27,8 @@ object RegionBypass : Listener {
     private val noticeSent = hashSetOf<UUID>()
 
     @JvmStatic
-    fun hasBypass(player: Player): Boolean {
-        return player.hasMetadata(METADATA_KEY)
+    fun hasBypass(player: Player, checkGameMode: Boolean = true): Boolean {
+        return player.hasMetadata(METADATA_KEY) && (!checkGameMode || player.gameMode == GameMode.CREATIVE)
     }
 
     @JvmStatic

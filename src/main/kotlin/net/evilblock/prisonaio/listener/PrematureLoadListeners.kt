@@ -17,7 +17,7 @@ object PrematureLoadListeners : Listener {
 
     @EventHandler
     fun onAsyncPlayerPreLoginEvent(event: AsyncPlayerPreLoginEvent) {
-        if (!PrisonAIO.instance.fullyLoaded) {
+        if (!PrisonAIO.instance.loaded) {
             event.loginResult = AsyncPlayerPreLoginEvent.Result.KICK_OTHER
             event.kickMessage = "${ChatColor.RED}${ChatColor.BOLD}You can't join the server yet!"
         }

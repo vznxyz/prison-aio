@@ -50,6 +50,7 @@ object MinesModule : PluginModule() {
     }
 
     override fun onAutoSave() {
+        LuckyBlockHandler.saveData()
         MineHandler.saveData()
     }
 

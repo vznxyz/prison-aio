@@ -52,7 +52,7 @@ object AnvilMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onInteractAnvil(event: PlayerInteractEvent) {
         if (MechanicsModule.areAnvilMechanicsDisabled()) {
-            if (RegionBypass.hasBypass(event.player) && event.player.gameMode == GameMode.CREATIVE) {
+            if (RegionBypass.hasBypass(event.player)) {
                 RegionBypass.attemptNotify(event.player)
                 return
             }
@@ -70,7 +70,7 @@ object AnvilMechanicsListeners : Listener {
     @EventHandler(ignoreCancelled = true)
     fun onPlaceAnvil(event: BlockPlaceEvent) {
         if (MechanicsModule.areAnvilMechanicsDisabled()) {
-            if (RegionBypass.hasBypass(event.player) && event.player.gameMode == GameMode.CREATIVE) {
+            if (RegionBypass.hasBypass(event.player)) {
                 RegionBypass.attemptNotify(event.player)
                 return
             }

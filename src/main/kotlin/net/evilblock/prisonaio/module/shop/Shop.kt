@@ -224,4 +224,12 @@ class Shop(var id: String) {
         TemplateMenu(template = menuTemplate!!, autoUpdate = true, autoUpdateInterval = 500L).openMenu(player)
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is Shop && other.id == id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
 }

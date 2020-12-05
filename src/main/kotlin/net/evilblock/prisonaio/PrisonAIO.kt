@@ -21,6 +21,8 @@ import net.evilblock.prisonaio.module.gang.GangModule
 import net.evilblock.prisonaio.module.chat.ChatModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import net.evilblock.prisonaio.module.exchange.GrandExchangeModule
+import net.evilblock.prisonaio.module.generator.Generator
+import net.evilblock.prisonaio.module.generator.GeneratorsModule
 import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.system.SystemModule
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
@@ -42,7 +44,6 @@ import net.evilblock.prisonaio.module.tool.enchant.config.formula.PriceFormulaTy
 import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import net.evilblock.prisonaio.service.ServicesThread
-import org.bukkit.Location
 import org.bukkit.generator.ChunkGenerator
 
 class PrisonAIO : PluginFramework() {
@@ -51,7 +52,9 @@ class PrisonAIO : PluginFramework() {
         @JvmStatic lateinit var instance: PrisonAIO
     }
 
-    var fullyLoaded = false
+    var loaded: Boolean = false
+    var running: Boolean = false
+
     val enabledModules: MutableList<PluginModule> = arrayListOf()
 
     override fun onEnable() {
@@ -70,6 +73,7 @@ class PrisonAIO : PluginFramework() {
             builder.registerTypeAdapter(Challenge::class.java, AbstractTypeSerializer<Challenge>())
             builder.registerTypeAdapter(Mine::class.java, AbstractTypeSerializer<Mine>())
             builder.registerTypeAdapter(PriceFormulaType.PriceFormula::class.java, AbstractTypeSerializer<PriceFormulaType.PriceFormula>())
+            builder.registerTypeAdapter(Generator::class.java, AbstractTypeSerializer<Generator>())
         }
 
         enabledModules.addAll(arrayListOf(
@@ -92,16 +96,21 @@ class PrisonAIO : PluginFramework() {
             RewardsModule,
             MinigamesModule,
             LeaderboardsModule,
-            CombatModule
+            CombatModule,
+            GeneratorsModule
         ))
 
         super.onEnable()
 
         Tasks.delayed(20L) {
-            fullyLoaded = true
+            loaded = true
 
             ServicesThread().start()
         }
+    }
+
+    override fun onDisable() {
+        super.onDisable()
     }
 
     override fun getModules(): List<PluginModule> {
