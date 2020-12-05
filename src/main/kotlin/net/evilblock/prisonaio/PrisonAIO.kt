@@ -38,6 +38,8 @@ import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.region.RegionsModule
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.requirement.DeliveryManRewardRequirement
+import net.evilblock.prisonaio.module.robot.Robot
+import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.shop.ShopsModule
 import net.evilblock.prisonaio.module.storage.StorageModule
 import net.evilblock.prisonaio.module.tool.enchant.config.formula.PriceFormulaType
@@ -74,6 +76,7 @@ class PrisonAIO : PluginFramework() {
             builder.registerTypeAdapter(Mine::class.java, AbstractTypeSerializer<Mine>())
             builder.registerTypeAdapter(PriceFormulaType.PriceFormula::class.java, AbstractTypeSerializer<PriceFormulaType.PriceFormula>())
             builder.registerTypeAdapter(Generator::class.java, AbstractTypeSerializer<Generator>())
+            builder.registerTypeAdapter(Robot::class.java, AbstractTypeSerializer<Robot>())
         }
 
         enabledModules.addAll(arrayListOf(
@@ -97,7 +100,8 @@ class PrisonAIO : PluginFramework() {
             MinigamesModule,
             LeaderboardsModule,
             CombatModule,
-            GeneratorsModule
+            GeneratorsModule,
+            RobotsModule
         ))
 
         super.onEnable()

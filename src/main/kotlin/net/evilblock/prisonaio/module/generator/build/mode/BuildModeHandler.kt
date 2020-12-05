@@ -146,8 +146,8 @@ object BuildModeHandler : Listener {
                     stopTracking(event.player)
 
                     val generator = modeData.type.createInstance(modeData.plot, event.player.uniqueId, modeData.getBounds(), modeData.rotation)
-                    generator.initializeData()
                     generator.level = modeData.level.number
+                    generator.initializeData()
                     generator.startBuild()
 
                     GeneratorHandler.trackGenerator(generator)

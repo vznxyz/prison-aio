@@ -1,0 +1,145 @@
+tiers:
+  0:
+    name: '&c&lRobot'
+    base-money: 50
+    base-tokens: 1
+    texture-value: "ewogICJ0aW1lc3RhbXAiIDogMTU5MjU2NzkyMzY5OSwKICAicHJvZmlsZUlkIiA6ICI2ZmQyNGJlNDk4ZjA0MDJlOTZhYWQ2MWUzY2VmYjZmMCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbmdlbGFsbHhfIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdhMGFlNjdjYWJiNmU0YmYwYWM2ZjIxMzRiNzkzYjBmMTc1ZGNkNGJhZTU2MmI3ZTcwYmFjN2JkYmQ5OTE0YzgiCiAgICB9CiAgfQp9"
+    texture-signature: "jrU0esNvJWSIdnLX9lPMxy/qB9lxMZEBj/WNDkK0vW6VhTMYsfxfdYHSqBtBxo7sA0OXh2JuUKgAX7jxSb7An/c0UEG1wom6ZQDH3oi6yfUryifgHMjaqSxRdabl8xrmAJZtYnNlxDVw1B5Mo3J8B36irT6mJwHz/FdWA/qBSqQYq7DIJ7UjB8vKXvE+V6G95TD8BkIKOliDtqHkR7g4ddnW3+QBrl9l+q2L2xNtT1Z4VIoTEPgwgImAUO76/gWSrkeWIGdVLehB7PN9/g4KsYVcquSWhH/LH90djGKZGrNqgPa6vbBqv7SUN9fDf/7KH/CqmN8bBjbZbR+Zqg1KEP4jzeT0MPCHG9HZb1D/8WDHYc0U4ki8Ci10CvG7tdIzO2QVNO0Pupjv8dR5+5Hph2AfGn/82GLpY5OEsWXAEJ6c3NRDG9ukXjzghuDEMac68wqH6+1tlLMHecMEo2U1xpL1cWXciOPqhsEzBmOzVDRlk0QxWZYzrenWDbMAWLmbofBUYSVwpsqrLdbNNDdJg5Lpfk1npjC4KYNKdLPL3G9erfDqnLNm85IcgBVHD0mUyxFhr510nkRCor2WfeD/log+WexXBh1aA7Dui5XqdazbuIhdUOKBMVxBR05vN7zkklY5Bkk/XXTsM/J/Ogu0rGMi4tBdJpNw57RjnFR5nlE="
+    armor-color: 10502209
+  1:
+    name: '&c&lRedstone Robot'
+    base-money: 100
+    base-tokens: 2
+    texture-value: "eyJ0aW1lc3RhbXAiOjE1Njk4NDYwNjEwNjEsInByb2ZpbGVJZCI6IjgyYzYwNmM1YzY1MjRiNzk4YjkxYTEyZDNhNjE2OTc3IiwicHJvZmlsZU5hbWUiOiJOb3ROb3RvcmlvdXNOZW1vIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9lZmU3ZmQwYzJmNjk3MmVkZTA2YmVhM2UyNjRkM2U5M2QwMzYwNGQ2ZGQwYTc0NTI3MjE1YTg0Y2ZjZmYxMjE1In19fQ=="
+    texture-signature: "RPV6fpp0WE7svbd0ybQ73v+V04alr4B1lE4ZJGOL7xf0s63Osv4A18h+4TCpuXfdxNWnJhJYTBZKXlr6f3k1bGZr1p05KyFTpK5hMighupBCkbF/yiwq3fY6DDNhSqNsG2VIIr4kQt1L63VhJ+NKpGVIe5pwTvhb7lru9W1DLRjpMDBr50kGWqyKktfEj5eyarm6ztRfRLJFgdIIOihe2wefDNuLypU4ANPPdGi4rPJlsYJOCX9VUkaTX8DEl6f3ykhAe7yt3P4ZNP0YacBJLjzCbIdyfvylz3c1V8/NkItdqj8OPdRSQgPEkhCMjdfZusoWWDmeuRWukNpSDIVgck9h8fE/s1oAx3pw0JLD4o3Rp8knpffne4aUYUJuNI3DzUlGqsA7vo9G4GrxBrb3Bx5Fy3jnkD4t/LZsRg+qImxZTIEA1yOxa0ij6OA34m3Rm8N6K0tcR6R9UIOurITpeM2l+5zqZRH2YOYETIDMqISiVlp2IM+c+TrClfAuLzNMz2/IlIMomyGAKqBaeUq+whJB0oj+HgzUIzVxhxXewbi9roBnyd9v4BtdzTjO0vfN0Bi0RQyIGy2tUSyYaLXJ2U1Cqh701L2vpZxIiGJFP4l5X+g6Noch7LPXrE/ich3XB+b0c9ZOggKfK628BnHIVQgfv81sZ7RT5TZ90e/bTa0="
+    armor-color: 15143701
+  2:
+    name: '&9&lLapis Robot'
+    base-money: 1000
+    base-tokens: 3
+    texture-value: "eyJ0aW1lc3RhbXAiOjE1ODIxMjA2MTg2NDIsInByb2ZpbGVJZCI6ImIwZDRiMjhiYzFkNzQ4ODlhZjBlODY2MWNlZTk2YWFiIiwicHJvZmlsZU5hbWUiOiJNaW5lU2tpbl9vcmciLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2VhMGUyOWFkMmYzY2ViMDUwODdjNjllN2FhN2ZmNzY1ZjkzNWQ5ZGVmNmFlODU0YWE4ODE2MjRkNjk1NzY4YSJ9fX0="
+    texture-signature: "CFjDldDJQZLY5lYOBPFr9g8ThijBYDnU9XukUTQr5aJNuoBtymB0A+DIdxmzJdDivt/39NAJp9e4XwPpXn7fr73UdrrUXaE7pz3XCvQyNsYau0zWXQM4ERiimHdUQaSd/tOxcX/mQxz2SgP/wO6jE+aVw2P1MleslT3gmtBNLFggcOr0cDAWY3T7TzdmzVmguJLC3upCH45crCs+el3UJc18rZBLWLCqvBD5++glKTYgmB6iyc4txMQrpIUeujOPbctAS5dNBz3Qd3A0MzN2E/ASlIR+GQsNd6ttTDXmgfU9gMRzwRLaTaiSkMV1pARKFBxRDoadWKKg8JBcT4j2afN5x1YnQPSt5HRSu0AlmT5Hnt4dgU53nzbLgmFLg1Xf3zI+oFIUHs+eC9dEd0JNsECsqWowS7ePASFYATJ1Oa9wc47ohwHKJp+Bn2OY7fL89+a1WTxwpGZnR0xEuGOw0Bp9IIvwqqOl/zQ2AjZgL6bPr1SYRykUBaKkoddJVo38Ly4OIcPd8omyCdZHLpUbfJcyuYvmQ4rFQHP1dsOiWRMDpYvZWYNRRxqmQxTdrkz4TDrJ3ALopqfdEhjd6dY5+Qv1hiC8MRM5fTdd0GSIRcJ331GCPrEJT8EXTiAHJgj2qg575+6ufMLGX/WSIR+4i4e/ACojxrxvOb9WZL25SB0="
+    armor-color: 1257191
+  3:
+    name: '&6&lGold Robot'
+    base-money: 10000
+    base-tokens: 4
+    texture-value: "eyJ0aW1lc3RhbXAiOjE1NjcyNjc3MDQ0MzgsInByb2ZpbGVJZCI6IjQ0MDNkYzU0NzViYzRiMTVhNTQ4Y2ZkYTZiMGViN2Q5IiwicHJvZmlsZU5hbWUiOiJHR0dhbWVyc1lUIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS84NzAyM2U2YmRmNzBmMTUxZWI1N2RmYTIyYTU4MDBiYmM0ZTg5MWI2ZjU1Y2YyOWFhNTMxOTkwMjUyMDRkZTAifX19"
+    texture-signature: "kPC0B1vs5ygx6keUGMptTKnsxmOjqFWqQa1Q9ENnAHTWwIbQWlm4yGQnTu1NgIAIXe+kwHWzmjtosAZ+JGd5B0mC2XxiTLWAd0yDoGhD683rEW+U8ts0oNlqrJeeRh2hXZJm2WcZaCdDAufvvtQmBY7S+K718KJ1PT4i0QXT1HH0n65WoLmbY5MNn3VceNZR+WxTGdZZLMn6547V7Bs5JTq81VP4hUIsDehU0fMmFfDWilv8pVotccxClUB06A8a2xLQGJKcrC6V5mlEq5v+Cdd9OPDF7gPUoZ7IyqnUuS2GKlhv68sgiI+Lic135BPSvRIsfJfELim+U3yPGqS91XftI0akdjeSRkhYfhqArFtddvvfVxjcn57AzbYNOvh5NzdmXA641rqh4EfiwmJLM658kP6HuLDNl1Sfld6ccn+pDvkljJylR+xFhSYENodWkTiPubGfPlBL5hJUsKVzgQ4MR/ntCAPIOE4bTS6CZq5rXl4oGD1pxrG81SZUII8PRw2OGsfijlyUH5Pm0Ji3Zj96glydI87LUlOvmO07gHKGLDI/v9Dr8S+n79hsznW4u+6cpkhukQ2xSZO1w6M3eQ7+SD1W9OhhgqC2SmruKfxkdS8StzoenS3vksrUirg9xGvcxl7wyKpJKwKZxk5NkIozRY0XZjvnZ+O9J/9iiBo="
+    armor-color: 16763909
+  4:
+    name: '&b&lDiamond Robot'
+    base-money: 50000
+    base-tokens: 5
+    texture-value: "ewogICJ0aW1lc3RhbXAiIDogMTU4ODgxNzQ2NTcxNiwKICAicHJvZmlsZUlkIiA6ICJhNzdkNmQ2YmFjOWE0NzY3YTFhNzU1NjYxOTllYmY5MiIsCiAgInByb2ZpbGVOYW1lIiA6ICIwOEJFRDUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmJiYzcwYWEyZjBmZjdkMzlhOTNlYzE5ODY5Nzg3YmFhN2U1ZmQxZWFkYTFjYzNhMGNkYzE5MDQzZGJlMzZhIgogICAgfQogIH0KfQ=="
+    texture-signature: "yiXpBU5OCGe6UxckQpFRk6xwQYcY6lRHLFx44+dEDnXmgqDSGmoiaryXOXpFrRZX6BzRp/GKncFHUL2WGTlQYOS5eBHFumf8jZ/2ef2M1Tm94FjTnF8Klx69/vzRz7fVk6HpSHj+JKN+t6rrQJDWAT7NGqebPkumBuqzmv3IifkP5o5QNqOlrTJl3X3nIxjd57LiKbFDDpcMPV7zJ/gBvIs4Hu6ErC6fwRwgmkoBKk0PcGi8yTW0UhOFvNRxTud/aVcxIC+qzKI5Gpgww5Og4x0wqNIROFkBvi6NZQvLwrngyPQJHGGLIu2RJ3VEPgrdEWDZzNiGuNxMyhEGOJ2vphX2JLGfp/c7wKupo3n/nFZtEFhFuwh6AJMjcEVe7lI62ZJKq3EF4PlGRxteGMa75ftT0bjf2ARzN67seSAONROe9oQzekbGzRT6e5w33UXBvxL0uOI74kfSD9SrK7QRFMiYZ0BXn4C2A0ekAQjlYWzYtwhR/wEZ5BNWi98OniE/b/M8hn/d0Ww/GRR8jLhH6ZvM8bOa7GDAHac5TQ2q1BZdGgbwkm/NQVs6jloD6iidjKecnu5mQpqIrbJ3UOAhI42HR92mYwynIbZZGp0TzNA5CeAzARWUZIqgbWwdV6dumrymk8dSxzV0CKdyLw82xRSzH8Vo8s9muzp82jQlhKs="
+    armor-color: 4063220
+  5:
+    name: '&a&lEmerald Robot'
+    base-money: 20000
+    base-tokens: 6
+    texture-value: "eyJ0aW1lc3RhbXAiOjE1NzE0MTE3Mjc5ODMsInByb2ZpbGVJZCI6Ijc1MTQ0NDgxOTFlNjQ1NDY4Yzk3MzlhNmUzOTU3YmViIiwicHJvZmlsZU5hbWUiOiJUaGFua3NNb2phbmciLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzYwNmZmMzM1ZjY4NDNjNDg3ZTVlMWFhYzFmZWU3ZmVlMmNiNTQ5MGFkMWI3NzhiODliMDVmNGNjOTAyM2EzZDAifX19"
+    texture-signature: "GRZkcPLRNSAOLctIQGqywb5WCLPQy0UZLVfDRGiVcoI/HkV43qHk+75V9iNTuiO/LNfFeMDcIVcWYA2R5o1EJFLmK/Cr1jKCEwyilMndWkd0plTXmbnjpylpvV6e6ceIEzrxYOLu6WiFvOg4faM7CHX+NNbWp649c8fD4cWf2LxT7E1mP5qkaC3RUpGaDoFVedSCvYkdMA0EGBvHL1aPVQefHMLFF44cI/csCw2VhyfoBjGg99mI5x8GfWKWsdzAlM6vF0NhTruawOWJJa8xJhCttY0Txl0juGnYN7oVP3igG7nXEMKzNwF11sYOtQwvZ7oVP7n6hP5kzCIKX0SEX4bS2LwpMVDQ5o42K3tOGfd7zmvaVZz9I/FyfqhGj2M1k84gTQTCXiqFN8X/itGK64iHiE9PxEhC8M1INAZ/hqg0rrEr9W1qhpMGavrBEkQBT+80+QAnK7jp4V+KhQvnzERZmCYITwGRVjXF5kXRwDd5MskZO3qfgqlvgNk4ulR6EBOn7c89t1mMBVvf5qvCxhiTA6vqjWuYfOvtjqng9SaamN99joQXGf5hSWZBl1qtBCtIWzOzBKDo6ZnaYgjJC13N6nAOcPvvDf+oGFVaHGXulR/XHAzo58kHSgCND2DYYzkNTml/K5RiFEZRfQ+frCaJI1gOCxARmR4krBGq2Pc="
+    armor-color: 1494291
+  6:
+    name: '&5&lObsidian Robot'
+    base-money: 500000
+    base-tokens: 7
+    texture-value: "ewogICJ0aW1lc3RhbXAiIDogMTU4ODMzNDIxNzUzMywKICAicHJvZmlsZUlkIiA6ICIwNGI3MDhhMzM1NjY0ZjJmODVlYzVlZWYyN2QxNGRhZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJWaW9sZXRza3l6eiIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85NDZkYjJjZWE5MTI2MzVhYmNjMWM3MDA2YmYxZDAxNTgwM2M3N2NmNWQ5YzI0YTNjOGJjNWU3NDYxM2UwZjA2IgogICAgfQogIH0KfQ=="
+    texture-signature: "IwgYX+K7G8nXlJoab2oJlIbW5uxMzLEAISyMD92Cz5yclybMiwFz1IAl3dlfu1lIFTiw3nGdLWkFRtEEA8n94pZvw7O0GTwY2b5TIfyLgsuSRe6sgKqr3Lu1PBkGfo1d8M5khdjPm9xK89aquKK083O9dmy9a0mp5rwB5wt1/llSpdR9gYmfo/0Qvzsz/Pc+nOG+26gBEfH++MDCgw6usnLq8UbKXeD4w1GvGjFtoBlee0ytNUDMEcsCDNHQQTmXoxSZEa3cDdQEIoSoz5XpPu6N6CuER1dqGotDKwyBP5B421jP3yQRe+NZ1IS+nDr5sE9SEnCw0rvhbw72gzxWFasXzdR4Vh5JasbUJ8Fi7cmPxTt2A6oFOAdohd8cOXYiz3ndnXRqhanTvF0tKfAV69k5xOURrFzEbbHG5HgHeyoFJgtPq9y5fZpJ/bQ7AbymAk5bP0BnKjSQj2LwXleokorMVh4NFJMyWClhoFAWIaIVWnqdg8zaYIhKiIRMvBU3NT92q+tRcL0IA40gkoD3m6cqw0XJkwvSqRebG7HxhnPNAO2CogyzQYLQoxXDC81BuHc0ZO8l0pzfrfO1f/ehiYPHFMFRzwFQmrgh60G/72LDd3S5KrQxVgZjyO/BhH3jgAEGHKTOSIZIzrisxITBzFgdU6nM7C6hCg2p6vdPytk="
+    armor-color: 9636753
+  '7':
+    name: '&8&lBedrock Robot'
+    base-money: 1250000
+    base-tokens: 8
+    texture-value: "eyJ0aW1lc3RhbXAiOjE1ODU1OTM2MjA4NTIsInByb2ZpbGVJZCI6ImU3OTNiMmNhN2EyZjQxMjZhMDk4MDkyZDdjOTk0MTdiIiwicHJvZmlsZU5hbWUiOiJUaGVfSG9zdGVyX01hbiIsInNpZ25hdHVyZVJlcXVpcmVkIjp0cnVlLCJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGZmOGUxM2ZiMGZhOGRkZDk3NjAwMzQ1ZWY3YzhiYjk0NGVkYzNhNjJmYjM4NDE2MmExNjhmMDY5YjAwMjU2NiJ9fX0="
+    texture-signature: "AG8y50hpWLWunvfYVgp0fpmqROewzoFsZqH1HLDqc3PTW3uGAIBpHUWuMatCcS9Z/5QZCqotVanWiCGq5/6oRCATCWaxmzxyYzOg//rMyer1fMhwnmyzvBJUH0YddvKMoyy2BlF9sg+6fBh7qcV6u9cLF/fDvnGvtcz+Gxqs5h19p5LYOmJfUVU2hIALlLEb1UF9AKuS9q5xc6Ss6GgMC6g8318URX3iqIZktWAOSAoFZMC0pmE3TRM4SDbnXkPQd2aZlOGFqQdtrzBYNDmR06Vm55UnWJp6ozIvZp95OJLM+fjNb/V1c69qa7HcXBFoxgPuNmlw5ztVuceqM6HSsl5OSrqjEeJqaoKqMiI8eiCW5U2h9HGotdsyKHJDwx+r7ivnufOuLeYMp6Io1rAWqsDT1FKwMKFO1fuwmjjsKGr5eT8D/vortACs1g4G3Ul4PkGC3ZESBQ7YJxKxt3nK39e2usSCUD3fx4OTLu+Ifn61lI1kHDUOWNKCU7yExhXa+N2CjsyCefAFoINGtziKUfqK6dnGS8rgMn8ikwxPhnE2sQ+e3c+iez+7tIL17hdz5HScBzZOEOBiuaw3WkRgJ4PXd2ShGE7jOAt8yZleTX2a/UC/+PXzpT7BNAzo0wxc6dNhkyy70cBnChDsfwJJTVUu/rMKNRcMs7TmtUleVrU="
+    armor-color: 1578774
+  '8':
+    name: '&d&lJ&a&lu&e&ln&b&lk&a&li&d&le Robot'
+    base-money: 3000000
+    base-tokens: 9
+    texture-value: "eyJ0aW1lc3RhbXAiOjE1NjQ1MTA4MjQ0MTQsInByb2ZpbGVJZCI6IjVkZTZlMTg0YWY4ZDQ5OGFiYmRlMDU1ZTUwNjUzMzE2IiwicHJvZmlsZU5hbWUiOiJBc3Nhc2luSmlhbmVyMjUiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzJjNmVmYzViZDBhOGY2MjMxNTRiZDYzMDZkZmE1M2E2Yjc0ZGM5NzI2MzhlY2JkNzkwNzI2ZTA4YzFiZTJhMGIifX19"
+    texture-signature: "IZhUAkfbB9alE3y76wL5dyl1+/LFu1WwkNuLmYvpcaRy0hQL3N0kXrH9lox3KE0AecRfDeFK4DMsshbfvmvm40tPOWNyD3By6v8+kTvWJHN3BOCYqqDcwtG0EkNroVdmlmVyEb7omSF1DhFObnU5PvQ0kuIvU5cbAQ6xj8757rsZ0rHmq7rgR2yBFGkXo2StpqgCaSN/6mq7uBdRiV8OsIraI/tRkha0L06hVCm+w6Nczf/CSuI9OUp5ocICfmFuPpKIfgfI1QavxfEPQmGFSgAZKFAIVfZOhP8z3R0W7wcP2kRdMh5Hu5/ia7hoD321Q01A7G9I79rSORHTUxZBin+aczVNxOWJq59AN+zsHpeIpWBMcOOTZ9T0NsLYssYD6vFMOis19wlTxNC2RDe24TB+NbdIp61HuDXYm89Xb3cyunZ0FzpUq6AIUJMGJxIYWZOgHjslibjMQ94aUA7zWYx2Omqnbcti5zWIf5hvHk8CYGcaSWN2QWtdTjqoVlfypq+EGUWRlnrPJAIoNx1lLYdD3SaJmnusWMBygxekcKywmXReHulqI5wndvw04jXhW79GXv59bATnnjDkQ9Ep8lruv9wDhAkdGTNLfTYIZiha4ve4k5XnHaB+osUesYN1i9eCf78WXEStjQd7VQUaAf7SG+8EyLM1BjUb0VkqOqs="
+    armor-color: 1578774
+  '9':
+    name: '&d&lJ&a&lu&e&ln&b&lk&a&li&d&le&4&l+ &d&lRobot'
+    base-money: 5780000
+    base-tokens: 10
+    texture-value: "ewogICJ0aW1lc3RhbXAiIDogMTU5MDE3Nzg1Nzg3MywKICAicHJvZmlsZUlkIiA6ICIyNmM1MmQzZjgxMzQ0ZjUzYmNhYzA0Mjc4ODBiZDVjNCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbWJpZ3VvdXNCaXZhbHZlIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdmZDU2ZTIwYzVkYzU2OGQzYzZmNzRmNTc0MDc0MDgyZjZmNGRhMTZiNjVmM2NmMGU4OTkwMmY3MGY2OTFkZDYiCiAgICB9CiAgfQp9"
+    texture-signature: "Uv0XWzj5unuaOMrdC779HcUlo0vnmUG0EciwOMRcGJIFIwcXgF3mPFGRKL4rnulEiZ9dNPMf4akko0y6ZVCntXUzrqqQp9XPBXFF4nX0jSRgms5LWNxj8YByxJEhqwH5fcmKk1TOJjy2IJiflbEGJfckP6pAouDG7BVBjqHjUz7Ae7hN2tycT+jwrXKf2M+rGbuKO61xfXybzAh8rlTKPVxm4HdVtf5o6ita2Eau/zQW1D5wejPqEhUr4PHruSbPSSh4uZP5AnkANv1WYztqusWwSM55wu8A5D+9R8ZNMxkfC3vFBOPV8X+VZp1EWoj0whKQSsT+t/jNNwvN1te0y4zqpnxIIH/9Qugy/N4O2QfvxIKrJCoPqj0NlBMlywmnplKbw8EXu+TI1hCIzpN8WTjNWJOFbZ/Nir7wYLHaG6hLcOxBrG59Apju3WeNCT7Wf15MxxbWDUKpslwN2cqbC+1PlARisiaHNlfEw528qxbIzeW8DXWeqxVNL5g2pKPCOKl372rhVVewyM8THywsgFAEndws0L5ioOkDvn4KRrEfFrzX0I+ctgQFehXy7k8eneRn+Hw5OpginlYppAGOVmd9mw3tRHpf/MtV8QjOCJYpnboz5KlzqxrhLCwTZsEFZCyH8/7K0qnOjw6SkTtTmA3uK4UU/J39JM0WGn+kpv0="
+    armor-color: 1578774
+  '10':
+    name: '&4&lWarden Robot'
+    base-money: 7500000
+    base-tokens: 11
+    texture-value: "eyJ0aW1lc3RhbXAiOjE1NzE4Nzk3MzE0NDUsInByb2ZpbGVJZCI6ImMxYWYxODI5MDYwZTQ0OGRhNjYwOWRmZGM2OGEzOWE4IiwicHJvZmlsZU5hbWUiOiJCQVJLeDQiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzU3ZWYwYTY5NDY0YWZjZDRjNmE5NGI2ZGYxZGI1NzJhZTg0ZTI0OTMzZWI0ZmExYWFjY2QzMjA4NjA4ZDI4ZjAifX19"
+    texture-signature: "WJv9MuhgCjdUESEN7e+AsSkPki5DUlrgud/kZJfOdOCT3AB04ohqULSULc6R2n2BFzb5+Gl7rbwaao7AGG5b6wAnkNoaT8yyXm3Cdzgym9r6ghZEK2DhiwIfnu0WIaUEbrOsyM3jFZmHuGH1Dsm/9BhuzLOt8N97LWKn+aBemP5p0oi5ZSVB5AzqQ/6tySLq6LqNm7VVUE/k39LGJi548kXUik+0Mr0I59aECAYxZnI5ceV0j9glydtV7FfiXUWqO+k4dVSfRUt2pUCPfnN2KsEV1onVOHnM5iAwS0MpBWSRYh4XCUTqKNgtAM8j4UUP09EsSlBIjUQBfzzJvF7OUasudkN0iW7qylpMlUS4nuOmeqL2a+ZYsMkzuM4wNQEkeD17ux0MpOfux4ASvebkv2cmEHN48ISt1+L77DPU3Jtt38xmJBZzFmu/KqBTezvsNd8gM03g25FD+B+WyMF+UEdHe2EKACMihVdbt6pPaNTzB8d1/Dz+ACxx3cdgLLmum88efev3U6YdAsbwrcgjfK6CP92Vu61yuLlaa3urD3CC8kjokx+nwAqNkarZsR6pZPO8eogZ2aR7orAPlRR20zCdqDNq9EJsLZUcpjsMqJBtunWwL2i++9NWQDx/P7yaQhPE5kw2zPPwHajZyZ/SL6n7uHBzzk5rPVZpQUXdYr0="
+    armor-color: 16777215
+upgrades:
+  currency: TOKENS
+  efficiency:
+    max-level: 10
+    base-price: 5000
+    base-price-scaling:
+      '1': 5000
+      '2': 10000
+      '3': 30000
+      '4': 40000
+      '5': 60000
+      '6': 75000
+      '7': 100000
+      '8': 125000
+      '9': 175000
+      '10': 200000
+    price-multiplier: 1.0
+    speed-multiplier: 0.08
+  fortune:
+    max-level: 10
+    base-price: 25000
+    base-price-scaling:
+      '1': 1500
+      '2': 3500
+      '3': 10000
+      '4': 30000
+      '5': 65000
+      '6': 175000
+      '7': 235000
+      '8': 300000
+      '9': 500000
+      '10': 690000
+    price-multiplier: 1.5
+    base-money: 2500
+    money-multiplier: 0.12
+    base-tokens: 1
+    tokens-multiplier: 0.01
+cosmetics:
+  skins:
+    iron-man:
+      name: '&c&lIron Man'
+      description:
+        - '&7Give your robot an appearance'
+        - '&7resembling Iron Man.'
+      armor-color: 13635863
+      texture: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjUyY2E5NzgzNGUwMTQ1ODY5MWM5MDU0NDU3ODZkMTI2MmQ4NDM2NjNkNjEyOGYzYmMwYzUzMTliOGE2OWU0In19fQ=='
+    meezoid:
+      name: '&5&lMeeZoid'
+      description:
+        - '&7Give your robot an appearance'
+        - '&7resembling MeeZoid.'
+      armor-color: 1049367
+      texture: 'eyJ0aW1lc3RhbXAiOjE1ODQ5MzA4MzM2MDQsInByb2ZpbGVJZCI6ImZhZTE0ZmVkYjFiOTQ5Mzg4YjZjMjUwZTdkYjgxOGExIiwicHJvZmlsZU5hbWUiOiJNZWVab2lkIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81MGViMTQwODg1YzM2ZTRkYTE1NDg0MjRmODE0MDhjYWQxMGQzMGFmZWI1YjI5YTE2MTAxZTNkZjAzMzEzZDk3In0sIkNBUEUiOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9lN2RmZWExNmRjODNjOTdkZjAxYTEyZmFiYmQxMjE2MzU5YzBjZDBlYTQyZjk5OTliNmU5N2M1ODQ5NjNlOTgwIn19fQ'
+    hatefoo:
+      name: '&4&lHateFoo'
+      description:
+        - '&7Give your robot an appearance'
+        - '&7resembling HateFoo.'
+      armor-color: 13369350
+      texture: 'eyJ0aW1lc3RhbXAiOjE1ODUxOTQ0MTIxMDQsInByb2ZpbGVJZCI6IjMxY2JjMTQyNzNkNDQwODVhMjZiYzc4MmU3ZWU1Mzc5IiwicHJvZmlsZU5hbWUiOiJIYXRlRm9vIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9iYWI4Y2FlOWNmNjAwZTFiNzJjYWIzZWY5ZmQ2ZWVlZmVjNzE3YWQ0NWQ3NTgxMTBhNzMyZjEwNzE1NWYyZTk5In0sIkNBUEUiOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9lN2RmZWExNmRjODNjOTdkZjAxYTEyZmFiYmQxMjE2MzU5YzBjZDBlYTQyZjk5OTliNmU5N2M1ODQ5NjNlOTgwIn19fQ'
+settings:
+  animations-enabled: false
+  max-tiers: 10
+  max-robots-per-plot: 50
+mechanic:
+  texture-value: "eyJ0aW1lc3RhbXAiOjE1NjQ0ODUxODM3MzgsInByb2ZpbGVJZCI6IjkxZjA0ZmU5MGYzNjQzYjU4ZjIwZTMzNzVmODZkMzllIiwicHJvZmlsZU5hbWUiOiJTdG9ybVN0b3JteSIsInNpZ25hdHVyZVJlcXVpcmVkIjp0cnVlLCJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWI3MzBkNTM5ZWFkNTM0ODFkNWIyNGUwNThlMTE5ZjZlZTNlMTJjZDIyNDgwYzQwOTJiOWQ3ZTkzODYxYWNiMCJ9fX0="
+  texture-signature: "yMOdcEkzRV7lgzrO5gdVmzzr52YG793GFXgj1O+f0VEWPaJE7lJaJ0BuQMupI3MoiAFCUMib7ePBs+p6WTVu1JxdlI3QXzl06Cc09bc8c25Ysohy3/eVWlwOIK2H311+VoyoSHKLTGAFoudo70h3pcpzTifbG0vFtBBsQnDkOoDGz5Kfgry3bUvDcppxa95o5NBzlIoVo6DREzEJrq7rlnpoTElG+87CuVe/7GnxU788FKtRG18BaqIPnexyJD+UD2gtKeiFDCekWu2LBofA3WAt/T+mwgdxkRSjI7HKbOQIgAlvzgclURBiaXvfJdO6JktZ57eyDoUf6sU+aFjFkm/NH1z+zOOA6W8qAXHWmnvod79c1m8W/lrb+2sRnf2GtVwZlAOtOGXw5G5lb+hDC7wUokp6SeyQXuntSGoSH9mPv4QToFG9c9pMa+wyrTxMnJF6lqfwioE7T08C/0cAy5OXYXmnzyakydRMdYT/MEPLD8ahnxkheAm2c26QL/vl/TkMFfz2MifCW/9spFmKKgdd1DlS90tULQqVXtIxppkyBU+aBmFA6i7kCHHlartdW64Ox+Ns/+FXDcQeAbN2yFyPuDwhRtYSZoqOrB7SmvZayZKwpFE71cdqXrLnqWbxiprRemBjWqJIoePnbBnrLhVonLt8K8cgcccYu+UshdQ="
