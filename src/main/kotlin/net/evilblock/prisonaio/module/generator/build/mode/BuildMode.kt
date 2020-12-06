@@ -144,6 +144,16 @@ class BuildMode(
         }
     }
 
+    fun updateRotation(newRotation: Rotation) {
+        rotation = newRotation
+        schematic = GeneratorHandler.getSchematic(level.schematic, newRotation)!!
+
+        if (!previewing) {
+            clearPacket()
+            sendPacket()
+        }
+    }
+
     fun togglePreview() {
         clearPacket()
 

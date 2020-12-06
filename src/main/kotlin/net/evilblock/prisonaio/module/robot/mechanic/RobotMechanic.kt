@@ -97,7 +97,7 @@ class RobotMechanic(location: Location) : NpcEntity(lines = arrayListOf("${ChatC
 
             for (i in 0 until 9) {
                 if (!buttons.containsKey(i)) {
-                    buttons[i] = GlassButton(15)
+                    buttons[i] = GlassButton(7)
                 }
             }
 
@@ -164,11 +164,11 @@ class RobotMechanic(location: Location) : NpcEntity(lines = arrayListOf("${ChatC
                                     continue
                                 }
 
-                                if (!RobotUtils.isRobotItem(item) || RobotHandler.getTier(item) > 6) {
+                                if (!RobotUtils.isRobotItem(item) || RobotUtils.getRobotItemTier(item) > 6) {
                                     continue
                                 }
 
-                                val itemTier = RobotHandler.getTier(item)
+                                val itemTier = RobotUtils.getRobotItemTier(item)
                                 owed[itemTier] = owed.getOrDefault(itemTier, 0) + item.amount
 
                                 player.inventory.setItem(index, null)
@@ -253,7 +253,7 @@ class RobotMechanic(location: Location) : NpcEntity(lines = arrayListOf("${ChatC
 
             for (i in BLACK_SLOTS) {
                 if (!buttons.containsKey(i)) {
-                    buttons[i] = GlassButton(15)
+                    buttons[i] = GlassButton(7)
                 }
             }
 
@@ -318,8 +318,8 @@ class RobotMechanic(location: Location) : NpcEntity(lines = arrayListOf("${ChatC
                     var uncollectedTokens = BigInteger("0")
 
                     for (robot in robots.map { it as MinerRobot }) {
-                        uncollectedMoney += BigDecimal(robot.moneyOwed)
-                        uncollectedTokens += BigInteger(robot.tokensOwed.toString())
+                        uncollectedMoney += robot.moneyOwed
+                        uncollectedTokens += robot.tokensOwed.toBigInteger()
                     }
 
                     description.add("${ChatColor.GRAY}There are ${ChatColor.RED}${ChatColor.BOLD}${robots.size} ${ChatColor.GRAY}robots on $possessiveContext plot.")
@@ -367,8 +367,8 @@ class RobotMechanic(location: Location) : NpcEntity(lines = arrayListOf("${ChatC
                         val tokensOwed = robot.tokensOwed
 
                         if (robot.collectEarnings(player, sendMessages = false)) {
-                            moneyCollected += BigDecimal(moneyOwed)
-                            tokensCollected += BigInteger(tokensOwed.toString())
+                            moneyCollected += moneyOwed
+                            tokensCollected += tokensOwed.toBigInteger()
                         }
                     }
 
@@ -404,7 +404,7 @@ class RobotMechanic(location: Location) : NpcEntity(lines = arrayListOf("${ChatC
                     it.add("${ChatColor.GRAY}Robots lose all stats when they")
                     it.add("${ChatColor.GRAY}are picked up.")
                     it.add("")
-                    it.addAll(TextSplitter.split(text = "Click here to pickup all the robots on $possessiveContext plot.", linePrefix = ChatColor.GRAY.toString()))
+                    it.addAll(TextSplitter.split(text = "Click here to pickup all of the robots on $possessiveContext plot.", linePrefix = ChatColor.GRAY.toString()))
                 }
             }
 
@@ -448,7 +448,7 @@ class RobotMechanic(location: Location) : NpcEntity(lines = arrayListOf("${ChatC
                                         }
 
                                         for (lostItem in lostItems.values) {
-                                            val tier = RobotHandler.getTier(lostItem).coerceAtLeast(0)
+                                            val tier = RobotUtils.getRobotItemTier(lostItem).coerceAtLeast(0)
                                             RobotsModule.getPluginFramework().logger.warning("Failed to give ${player.name} ${lostItem.amount}x Tier $tier Robot(s)")
                                         }
                                     } else {

@@ -10,14 +10,10 @@ package net.evilblock.prisonaio.module.region.listener
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.region.RegionHandler
-import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
-import net.evilblock.prisonaio.util.Permissions
+import net.evilblock.prisonaio.module.region.global.GlobalRegion
 import net.evilblock.prisonaio.util.plot.PlotUtil
-import org.bukkit.ChatColor
-import org.bukkit.GameMode
 import org.bukkit.entity.Player
-import org.bukkit.event.Cancellable
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -29,22 +25,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.*
 
 object RegionListeners : Listener {
-
-    fun bypassCheck(player: Player, cancellable: Cancellable): Boolean {
-        if (player.gameMode == GameMode.CREATIVE && (player.hasPermission(Permissions.REGION_BYPASS) || player.isOp)) {
-            return if (RegionBypass.hasBypass(player)) {
-                RegionBypass.attemptNotify(player)
-                cancellable.isCancelled = false
-                true
-            } else {
-                player.sendMessage("${ChatColor.RED}${ChatColor.BOLD}WARNING: ${ChatColor.GRAY}You can't use creative mode unless you have region bypass enabled.")
-                cancellable.isCancelled = true
-                true
-            }
-        }
-
-        return false
-    }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onPlayerMoveEvent(event: PlayerMoveEvent) {
@@ -72,28 +52,33 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
-        if (bypassCheck(event.player, event)) {
+        if (RegionHandler.bypassCheck(event.player, event)) {
             return
         }
 
-        if (PlotUtil.getPlot(event.blockPlaced.location) != null) {
-            return
+        val region = RegionHandler.findRegion(event.blockPlaced.location)
+        if (region is GlobalRegion) {
+            if (PlotUtil.getPlot(event.blockPlaced.location) != null) {
+                return
+            }
         }
 
-        RegionHandler.findRegion(event.block.location).onBlockPlace(event.player, event.blockPlaced, event)
+        region.onBlockPlace(event.player, event.blockPlaced, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBlockBreakEvent(event: BlockBreakEvent) {
-        if (bypassCheck(event.player, event)) {
-            return
-        }
-
-        if (PlotUtil.getPlot(event.block.location) != null) {
+        if (RegionHandler.bypassCheck(event.player, event)) {
             return
         }
 
         val region = RegionHandler.findRegion(event.block.location)
+        if (region is GlobalRegion) {
+            if (PlotUtil.getPlot(event.block.location) != null) {
+                return
+            }
+        }
+
         region.onBlockBreak(event.player, event.block, event)
 
         if (!event.isCancelled) {
@@ -104,32 +89,39 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBucketEmptyEvent(event: PlayerBucketEmptyEvent) {
-        if (bypassCheck(event.player, event)) {
+        if (RegionHandler.bypassCheck(event.player, event)) {
             return
         }
 
         val emptiedAt = event.blockClicked.getRelative(event.blockFace)
 
-        if (PlotUtil.getPlot(emptiedAt.location) != null) {
-            return
+
+        val region = RegionHandler.findRegion(emptiedAt.location)
+        if (region is GlobalRegion) {
+            if (PlotUtil.getPlot(emptiedAt.location) != null) {
+                return
+            }
         }
 
-        RegionHandler.findRegion(emptiedAt.location).onBucketEmpty(event.player, emptiedAt, event)
+        region.onBucketEmpty(event.player, emptiedAt, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBucketFillEvent(event: PlayerBucketFillEvent) {
-        if (bypassCheck(event.player, event)) {
+        if (RegionHandler.bypassCheck(event.player, event)) {
             return
         }
 
         val filledFrom = event.blockClicked.getRelative(event.blockFace)
 
-        if (PlotUtil.getPlot(filledFrom.location) != null) {
-            return
+        val region = RegionHandler.findRegion(filledFrom.location)
+        if (region is GlobalRegion) {
+            if (PlotUtil.getPlot(filledFrom.location) != null) {
+                return
+            }
         }
 
-        RegionHandler.findRegion(filledFrom.location).onBucketFill(event.player, filledFrom, event)
+        region.onBucketFill(event.player, filledFrom, event)
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
@@ -145,7 +137,7 @@ object RegionListeners : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun onPlayerInteractEvent(event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_BLOCK) {
-            if (bypassCheck(event.player, event)) {
+            if (RegionHandler.bypassCheck(event.player, event)) {
                 return
             }
         }

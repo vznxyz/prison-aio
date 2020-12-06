@@ -74,7 +74,7 @@ class GangBoostersMenu(private val gang: Gang) : Menu() {
 
         for (i in 0..44) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = GlassButton(15)
+                buttons[i] = GlassButton(7)
             }
         }
 

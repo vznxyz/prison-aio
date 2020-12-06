@@ -3,7 +3,7 @@ package net.evilblock.prisonaio.module.robot.impl.statistic
 import java.math.BigInteger
 import kotlin.collections.ArrayList
 
-class MinerRobotTimedEarnings {
+class MinerRobotEarningsV1 {
 
     private var earnings: Long = 0
 

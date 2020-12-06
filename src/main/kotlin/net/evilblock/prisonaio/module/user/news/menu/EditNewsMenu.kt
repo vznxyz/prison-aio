@@ -42,7 +42,7 @@ class EditNewsMenu(private val news: News) : Menu() {
 
         for (i in 0..8) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = GlassButton(15)
+                buttons[i] = GlassButton(7)
             }
         }
 

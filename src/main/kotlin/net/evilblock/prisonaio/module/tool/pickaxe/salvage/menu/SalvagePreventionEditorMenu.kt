@@ -5,14 +5,14 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.tool.enchant.salvage.menu
+package net.evilblock.prisonaio.module.tool.pickaxe.salvage.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.buttons.HelpButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.bukkit.ItemBuilder
-import net.evilblock.prisonaio.module.tool.enchant.salvage.SalvagePreventionHandler
+import net.evilblock.prisonaio.module.tool.pickaxe.salvage.SalvagePreventionHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player

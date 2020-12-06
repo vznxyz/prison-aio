@@ -221,7 +221,7 @@ object RotateUtil {
         while (yaw < 0) {
             yaw += 360f
         }
-        return Rotation.values()[(yaw / 90f).roundToInt() % 4]
+        return Rotation.values()[(yaw / 90F).roundToInt() % 4]
     }
 
 }

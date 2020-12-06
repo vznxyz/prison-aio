@@ -15,7 +15,7 @@ import net.evilblock.prisonaio.module.generator.schematic.rotate.Rotation
 import java.lang.reflect.Type
 import java.util.*
 
-class TokenGenerator(plot: Plot, owner: UUID, bounds: Cuboid, rotation: Rotation) : Generator(plot.id, owner, bounds, rotation) {
+class TokenGenerator(plot: Plot, owner: UUID, bounds: Cuboid, rotation: Rotation) : Generator(UUID.randomUUID(), plot.id, owner, bounds, rotation) {
 
     override fun getAbstractType(): Type {
         return TokenGenerator::class.java

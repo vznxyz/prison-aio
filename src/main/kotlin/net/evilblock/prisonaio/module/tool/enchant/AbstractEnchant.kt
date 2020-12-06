@@ -8,7 +8,6 @@
 package net.evilblock.prisonaio.module.tool.enchant
 
 import net.evilblock.cubed.util.bukkit.Constants
-import net.evilblock.cubed.util.bukkit.ColorUtil
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import net.evilblock.prisonaio.module.tool.ToolsModule
@@ -62,7 +61,7 @@ abstract class AbstractEnchant(val id: String, val enchant: String, val maxLevel
     }
 
     fun lorified(): String {
-        return "${ColorUtil.toChatColor(iconColor)}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}$enchant"
+        return "$textColor${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}$enchant"
     }
 
     fun canMaterialBeEnchanted(material: Material): Boolean {

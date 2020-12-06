@@ -16,9 +16,14 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.practice.region.util.CoordSet2D
 import net.evilblock.practice.region.util.CoordSet3D
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.global.GlobalRegion
+import net.evilblock.prisonaio.util.Permissions
+import org.bukkit.ChatColor
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
 import java.io.File
 
 object RegionHandler : PluginHandler {
@@ -78,7 +83,7 @@ object RegionHandler : PluginHandler {
 
     fun findRegion(location: Location): Region {
         return regions3D[CoordSet3D(location.world, location.x.toInt(), location.y.toInt(), location.z.toInt())]
-            ?: regions2D[CoordSet2D(location.world, location.x.toInt(), location.y.toInt())]
+            ?: regions2D[CoordSet2D(location.world, location.x.toInt(), location.z.toInt())]
             ?: defaultRegion
     }
 
@@ -162,6 +167,22 @@ object RegionHandler : PluginHandler {
 
     fun getDefaultRegion(): Region {
         return defaultRegion
+    }
+
+    fun bypassCheck(player: Player, cancellable: Cancellable): Boolean {
+        if (player.gameMode == GameMode.CREATIVE && (player.hasPermission(Permissions.REGION_BYPASS) || player.isOp)) {
+            return if (RegionBypass.hasBypass(player)) {
+                RegionBypass.attemptNotify(player)
+                cancellable.isCancelled = false
+                true
+            } else {
+                player.sendMessage("${ChatColor.RED}${ChatColor.BOLD}WARNING: ${ChatColor.GRAY}You can't use creative mode unless you have region bypass enabled.")
+                cancellable.isCancelled = true
+                true
+            }
+        }
+
+        return false
     }
 
 }

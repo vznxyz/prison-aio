@@ -58,8 +58,7 @@ object GangHandler : PluginHandler {
     }
 
     override fun getInternalDataFile(): File {
-        val worldFolder = getGridWorld().worldFolder
-        return File(worldFolder, "gangs.json")
+        return File(File(getModule().getPluginFramework().dataFolder, "internal"), "gangs.json")
     }
 
     override fun saveData() {

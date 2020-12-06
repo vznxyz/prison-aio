@@ -22,6 +22,7 @@ import net.evilblock.prisonaio.module.generator.schematic.rotate.RotateUtil
 import net.evilblock.prisonaio.module.generator.schematic.rotate.RotatedSchematic
 import net.evilblock.prisonaio.module.generator.schematic.rotate.Rotation
 import net.evilblock.prisonaio.module.generator.service.GeneratorTickService
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.service.ServiceRegistry
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -97,6 +98,9 @@ object GeneratorHandler : PluginHandler {
         } else {
             generatorsByPlot[generator.plotId] = ConcurrentHashMap.newKeySet<Generator>().also { it.add(generator) }
         }
+
+        RegionHandler.trackRegion(generator)
+        RegionHandler.updateBlockCache(generator)
     }
 
     fun forgetGenerator(generator: Generator) {
@@ -105,6 +109,9 @@ object GeneratorHandler : PluginHandler {
         if (generatorsByPlot.containsKey(generator.plotId)) {
             generatorsByPlot[generator.plotId]!!.remove(generator)
         }
+
+        RegionHandler.forgetRegion(generator)
+        RegionHandler.clearBlockCache(generator)
     }
 
     fun getSchematic(file: String, rotation: Rotation): RotatedSchematic? {

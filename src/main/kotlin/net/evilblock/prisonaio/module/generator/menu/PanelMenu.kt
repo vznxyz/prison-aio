@@ -79,9 +79,9 @@ class PanelMenu(private val plot: Plot) : Menu() {
             val hasGeneratorType = GeneratorHandler.getGeneratorsByPlot(plot).any { it.getGeneratorType() == type }
 
             return if (hasGeneratorType) {
-                "${ChatColor.RED}${ChatColor.BOLD}Purchase ${type.getColoredName()} Generator ${ChatColor.GRAY}(Reached Limit)"
+                "${type.getColoredName()} Generator ${ChatColor.GRAY}(Reached Limit)"
             } else {
-                "${ChatColor.GREEN}${ChatColor.BOLD}Purchase ${type.getColoredName()} Generator ${ChatColor.GRAY}(Level 1)"
+                "${type.getColoredName()} Generator ${ChatColor.GRAY}(Level 1)"
             }
         }
 
@@ -89,12 +89,14 @@ class PanelMenu(private val plot: Plot) : Menu() {
             return arrayListOf<String>().also { desc ->
                 val hasGeneratorType = GeneratorHandler.getGeneratorsByPlot(plot).any { it.getGeneratorType() == type }
                 if (hasGeneratorType) {
-                    desc.addAll(TextSplitter.split(text = "You have reached the limit of ${type.displayName} generators you can have on a plot!"))
+                    desc.addAll(TextSplitter.split(text = "You have reached the limit of ${type.getProperName(true)} you can have on a plot!"))
                 } else {
                     val firstLevel = type.getLevels().first()
 
-                    desc.add("${ChatColor.GRAY}Cost: ${Formats.formatTokens(firstLevel.cost)}")
-                    desc.add("${ChatColor.GRAY}Build Time: ${ChatColor.RED}${ChatColor.BOLD}${TimeUtil.formatIntoAbbreviatedString(firstLevel.buildTime)}")
+                    desc.add("${ChatColor.GRAY}Price: ${Formats.formatTokens(firstLevel.cost)}")
+                    desc.add("${ChatColor.GRAY}Time: ${ChatColor.RED}${ChatColor.BOLD}${TimeUtil.formatIntoAbbreviatedString(firstLevel.buildTime)}")
+                    desc.add("")
+                    desc.add("${ChatColor.YELLOW}Click to purchase a ${type.getProperName()}")
                 }
             }
         }
@@ -110,7 +112,7 @@ class PanelMenu(private val plot: Plot) : Menu() {
             if (clickType.isLeftClick) {
                 val hasGeneratorType = GeneratorHandler.getGeneratorsByPlot(plot).any { it.getGeneratorType() == type }
                 if (hasGeneratorType) {
-                    player.sendMessage("${ChatColor.RED}You have reached the limit of ${type.displayName} generators you can have on a plot!")
+                    player.sendMessage("${ChatColor.RED}You have reached the limit of ${type.getProperName(true)} you can have on a plot!")
                     return
                 }
 

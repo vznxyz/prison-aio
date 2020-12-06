@@ -16,6 +16,7 @@ import net.evilblock.prisonaio.module.generator.build.GeneratorBuild
 import net.evilblock.prisonaio.module.generator.build.GeneratorBuildLevel
 import net.evilblock.prisonaio.module.generator.entity.GeneratorVillagerEntity
 import net.evilblock.prisonaio.module.generator.schematic.rotate.Rotation
+import net.evilblock.prisonaio.module.region.Region
 import java.util.*
 
 /**
@@ -23,13 +24,12 @@ import java.util.*
  * It encompasses all of a generator's information, including the construction process.
  */
 abstract class Generator(
+    val instanceId: UUID,
     val plotId: PlotId,
     val owner: UUID,
     val bounds: Cuboid,
     val rotation: Rotation
-) : AbstractTypeSerializable {
-
-    val instanceId: UUID = UUID.randomUUID()
+) : Region(id = "GEN-$instanceId"), AbstractTypeSerializable {
 
     var level: Int = 0
     var lastTick: Long = System.currentTimeMillis()
@@ -38,6 +38,22 @@ abstract class Generator(
 
     @Transient
     lateinit var villagerEntity: GeneratorVillagerEntity
+
+    init {
+        persistent = false
+    }
+
+    override fun getRegionName(): String {
+        return "Generator #$instanceId"
+    }
+
+    override fun getPriority(): Int {
+        return 50
+    }
+
+    override fun getCuboid(): Cuboid? {
+        return bounds
+    }
 
     fun initializeData() {
         build.generator = this

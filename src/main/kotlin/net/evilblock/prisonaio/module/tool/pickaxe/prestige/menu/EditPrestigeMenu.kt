@@ -14,7 +14,7 @@ import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.tool.enchant.menu.SelectEnchantMenu
-import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestige
+import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeInfo
 import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
@@ -23,7 +23,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 
-class EditPrestigeMenu(private val prestige: PickaxePrestige) : Menu() {
+class EditPrestigeMenu(private val prestige: PickaxePrestigeInfo) : Menu() {
 
     init {
         autoUpdate = true

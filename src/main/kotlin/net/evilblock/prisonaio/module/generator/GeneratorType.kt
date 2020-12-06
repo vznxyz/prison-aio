@@ -24,15 +24,64 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
-enum class GeneratorType(val displayName: String, val color: ChatColor, val icon: ItemStack) {
+enum class GeneratorType(
+    val displayName: String,
+    val color: ChatColor,
+    val icon: ItemStack,
+    val description: String
+) {
 
-    CORE("Core", ChatColor.RED, ItemStack(Material.BEACON)),
-    MONEY("Money", ChatColor.GREEN, ItemStack(Material.GOLD_INGOT)),
-    TOKEN("Token", ChatColor.YELLOW, ItemStack(Material.MAGMA_CREAM)),
-    KEY("Key", ChatColor.GOLD, ItemStack(Material.TRIPWIRE_HOOK));
+    CORE(
+        "Core",
+        ChatColor.RED,
+        ItemStack(Material.BEACON),
+        "This is the heart of all your Generators. Upgrading your Core unlocks new Generator Upgrades."
+    ),
+    MONEY(
+        "Money",
+        ChatColor.GREEN,
+        ItemStack(Material.GOLD_INGOT),
+        "Generates an amount of money that increases based on the Generator's level."
+    ),
+    TOKEN(
+        "Token",
+        ChatColor.YELLOW,
+        ItemStack(Material.MAGMA_CREAM),
+        "Generates an amount of tokens that increases based on the Generator's level."
+    ),
+    KEY(
+        "Key",
+        ChatColor.GOLD,
+        ItemStack(Material.TRIPWIRE_HOOK),
+        "Generates random crate keys, with a rarity chance that in creases based on the Generator's level."
+    );
 
-    fun getColoredName(): String {
-        return color.toString() + ChatColor.BOLD + displayName
+    fun getProperName(plural: Boolean = false): String {
+        return buildString {
+            append(displayName)
+
+            if (this@GeneratorType != CORE) {
+                append(" Generator")
+            }
+
+            if (plural) {
+                append("s")
+            }
+        }
+    }
+
+    fun getColoredName(plural: Boolean = false): String {
+        return buildString {
+            append(color.toString() + ChatColor.BOLD + displayName)
+
+            if (this@GeneratorType != CORE) {
+                append(" Generator")
+            }
+
+            if (plural) {
+                append("s")
+            }
+        }
     }
 
     fun getLevels(): Array<GeneratorBuildLevel> {

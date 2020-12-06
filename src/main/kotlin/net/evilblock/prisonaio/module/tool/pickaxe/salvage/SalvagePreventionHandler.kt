@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.tool.enchant.salvage
+package net.evilblock.prisonaio.module.tool.pickaxe.salvage
 
 import com.google.common.base.Charsets
 import com.google.common.io.Files

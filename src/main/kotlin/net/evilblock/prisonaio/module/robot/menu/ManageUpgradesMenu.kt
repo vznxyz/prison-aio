@@ -2,6 +2,8 @@ package net.evilblock.prisonaio.module.robot.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.util.NumberUtils
+import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -15,7 +17,6 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
-import java.text.NumberFormat
 
 class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
 
@@ -45,7 +46,6 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
     }
 
     private inner class UpgradeButton(private val upgrade: Upgrade) : Button() {
-
         override fun getName(player: Player): String {
             val currentLevel = if (robot.hasUpgradeApplied(upgrade)) {
                 robot.getUpgradeLevel(upgrade)
@@ -54,10 +54,9 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
             }
 
             return if (currentLevel >= upgrade.getMaxLevel()) {
-                ChatColor.GREEN.toString() + ChatColor.BOLD + upgrade.getName()
+                upgrade.getColoredName() + ChatColor.GRAY + " (Lvl " + currentLevel + ")"
             } else {
-                val nextLevel = currentLevel + 1
-                ChatColor.GREEN.toString() + ChatColor.BOLD + upgrade.getName() + ChatColor.GRAY + " (Lvl " + currentLevel + " -> " + nextLevel + ")"
+                upgrade.getColoredName() + ChatColor.GRAY + " (Lvl " + currentLevel + " -> " + (currentLevel + 1) + ")"
             }
         }
 
@@ -67,7 +66,6 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
             }
 
             val description = arrayListOf<String>()
-            description.add("")
             description.addAll(upgrade.getDescription())
             description.add("")
 
@@ -82,29 +80,28 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
 
             val nextLevelPrice = upgrade.getPrice(player, robot.tier, nextLevel)
             val formattedPrice = currency.format(nextLevelPrice)
-            val formattedMaxLevel = NumberFormat.getInstance().format(upgrade.getMaxLevel().toLong())
 
-            description.add("${ChatColor.GRAY}Price: ${ChatColor.GREEN}$formattedPrice")
-            description.add("${ChatColor.GRAY}Max Level: ${ChatColor.GOLD}${ChatColor.BOLD}$formattedMaxLevel")
+            description.add("${ChatColor.GRAY}Level: ${upgrade.getColor()}${ChatColor.BOLD}${NumberUtils.format(currentLevel)}${ChatColor.GRAY}/${ChatColor.BOLD}${NumberUtils.format(upgrade.getMaxLevel())}")
 
             val isMaxed = currentLevel >= upgrade.getMaxLevel()
-            if (isMaxed) {
-                description.add("${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Maxed")
+            if (!isMaxed) {
+                description.add("${ChatColor.GRAY}Next Level Price: $formattedPrice")
             }
 
-            val canAfford = currency.has(player.uniqueId, nextLevelPrice)
-            if (canAfford) {
-                description.add("")
-                description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Click to purchase")
-                description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Press ${ChatColor.AQUA}${ChatColor.BOLD}Q ${ChatColor.YELLOW}${ChatColor.BOLD}to Buy Max")
-            } else {
-                if (!isMaxed) {
-                    description.add("")
+            description.add("")
 
+            if (isMaxed) {
+                description.add("${ChatColor.RED}${ChatColor.BOLD}Maximum level reached!")
+            } else {
+                val canAfford = currency.has(player.uniqueId, nextLevelPrice)
+                if (canAfford) {
+                    description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Click to purchase next level")
+                    description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Press ${ChatColor.AQUA}${ChatColor.BOLD}Q ${ChatColor.YELLOW}${ChatColor.BOLD}to purchase max levels")
+                } else {
                     if (currency == Currency.Type.MONEY) {
-                        description.add("${ChatColor.RED}${ChatColor.BOLD}Not Enough Money")
+                        description.addAll(TextSplitter.split(text = "You don't have enough money to purchase any more levels!", linePrefix = ChatColor.RED.toString()))
                     } else {
-                        description.add("${ChatColor.RED}${ChatColor.BOLD}Not Enough Tokens")
+                        description.addAll(TextSplitter.split(text = "You don't have enough tokens to purchase any more levels!", linePrefix = ChatColor.RED.toString()))
                     }
                 }
             }
@@ -129,7 +126,7 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
 
             val nextLevel = currentLevel + 1
             if (nextLevel > upgrade.getMaxLevel()) {
-                player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You can't purchase anymore ${ChatColor.BOLD}${upgrade.getName()} ${ChatColor.RED}levels because this robot has reached the max level.")
+                player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You can't purchase anymore ${ChatColor.BOLD}${upgrade.getName()} ${ChatColor.RED}levels!")
                 return
             }
 
@@ -139,9 +136,9 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
             val canAfford = currency.has(player.uniqueId, nextLevelPrice)
             if (!canAfford) {
                 if (currency == Currency.Type.MONEY) {
-                    player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You don't have enough money to purchase the ${ChatColor.BOLD}")
+                    player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You don't have enough money to purchase anymore ${ChatColor.BOLD}${upgrade.getName()} ${ChatColor.RED}levels!")
                 } else {
-                    player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You don't have enough tokens to purchase the ${ChatColor.BOLD}${upgrade.getName()} ${ChatColor.RED}enchantment.")
+                    player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You don't have enough tokens to purchase anymore ${ChatColor.BOLD}${upgrade.getName()} ${ChatColor.RED}levels!")
                 }
 
                 return
@@ -158,7 +155,7 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
                     robot.setUpgradeLevel(upgrade, nextLevel)
                 }
 
-                player.sendMessage("${RobotsModule.CHAT_PREFIX}Purchased ${ChatColor.RED}${ChatColor.BOLD}1 ${ChatColor.RED}${upgrade.getName()} ${ChatColor.GRAY}level for $formattedPrice${ChatColor.GRAY}.")
+                player.sendMessage("${RobotsModule.CHAT_PREFIX}You purchased ${ChatColor.RED}${ChatColor.BOLD}1 ${ChatColor.RED}${upgrade.getName()} ${ChatColor.GRAY}level for $formattedPrice${ChatColor.GRAY}.")
             } else if (clickType == ClickType.DROP) {
                 var levelsPurchased = 0
                 var totalCost = 0.0
@@ -174,12 +171,17 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
                     }
                 }
 
-                if (totalCost == 0.0) {
-                    player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You can't afford to purchase any ${ChatColor.BOLD}${upgrade.getName()} ${ChatColor.RED}levels.")
+                if (levelsPurchased == 0) {
+                    if (currency == Currency.Type.MONEY) {
+                        player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You don't have enough money to purchase anymore ${ChatColor.BOLD}${upgrade.getName()} ${ChatColor.RED}levels!")
+                    } else {
+                        player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You don't have enough tokens to purchase anymore ${ChatColor.BOLD}${upgrade.getName()} ${ChatColor.RED}levels!")
+                    }
+
                     return
                 }
 
-                val formattedPrice = currency.format(nextLevelPrice)
+                val formattedPrice = currency.format(totalCost)
 
                 currency.take(player.uniqueId, totalCost)
 
@@ -189,7 +191,7 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
 
                 robot.setUpgradeLevel(upgrade, currentLevel + levelsPurchased)
 
-                player.sendMessage("${RobotsModule.CHAT_PREFIX}Purchased ${ChatColor.RED}${ChatColor.BOLD}$levelsPurchased ${ChatColor.RED}${upgrade.getName()} ${ChatColor.GRAY}levels for $formattedPrice${ChatColor.GRAY}.")
+                player.sendMessage("${RobotsModule.CHAT_PREFIX}You purchased ${ChatColor.RED}${ChatColor.BOLD}$levelsPurchased ${ChatColor.RED}${upgrade.getName()} ${ChatColor.GRAY}levels for $formattedPrice${ChatColor.GRAY}.")
             }
         }
 

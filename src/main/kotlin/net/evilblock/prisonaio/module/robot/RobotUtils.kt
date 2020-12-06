@@ -5,10 +5,12 @@ import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
 import net.evilblock.cubed.util.nms.NBTUtil
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.TimeUnit
 
 object RobotUtils {
 
@@ -24,7 +26,7 @@ object RobotUtils {
 
     @JvmStatic
     fun makeMechanicEggItem(amount: Int): ItemStack {
-        val lore = TextSplitter.split(text = "Place this egg on any region that you own to spawn a Robot Mechanic, who is useful for combining and collecting from robots.", linePrefix = ChatColor.GRAY.toString())
+        val lore = TextSplitter.split(text = "Place this egg on any region that you own to spawn a Robot Mechanic, who is useful for combining and collecting from robots.")
 
         var item = ItemBuilder.of(Material.MONSTER_EGG)
                 .amount(amount)
@@ -49,46 +51,32 @@ object RobotUtils {
     }
 
     @JvmStatic
+    fun getRobotItemTier(itemStack: ItemStack): Int {
+        return NBTUtil.getString(NBTUtil.getOrCreateTag(ItemUtils.getNmsCopy(itemStack)), "RobotItem").toInt()
+    }
+
+    @JvmStatic
     fun makeRobotItem(amount: Int, tier: Int): ItemStack {
-        val lore = arrayListOf<String>()
-
-        lore.addAll(TextSplitter.split(
-                length = 40,
-                text = "Place this robot anywhere in a region you own to start collecting money and tokens.",
-                linePrefix = ChatColor.GRAY.toString()
-        ))
-
-        lore.add("")
-
-        if (tier > 0) {
-            lore.add("${ChatColor.RED}${ChatColor.BOLD}Tier $tier")
-
-            if (tier >= 7) {
-                lore.addAll(TextSplitter.split(
-                        length = 40,
-                        text = "This robot has reached the max tier possible through tier combination.",
-                        linePrefix = ChatColor.RED.toString()
-                ))
-            } else {
-                lore.addAll(TextSplitter.split(
-                        length = 40,
-                        text = "Combine this robot with another by dragging and dropping. The higher the tier, the more money and tokens the robot will collect without any upgrades.",
-                        linePrefix = ChatColor.GRAY.toString()
-                ))
-            }
+        val name = if (tier == 0) {
+            "${ChatColor.RED}${ChatColor.BOLD}Robot ${ChatColor.GRAY}(No Tier)"
         } else {
-            lore.add("${ChatColor.RED}${ChatColor.BOLD}Tier Combination")
+            "${ChatColor.RED}${ChatColor.BOLD}Robot ${ChatColor.GRAY}(Tier ${tier})"
+        }
 
-            lore.addAll(TextSplitter.split(
-                    length = 40,
-                    text = "You can combine two robots of the same tier, up to tier 7, by dragging and dropping them onto each other. The higher the tier, the more money and tokens the robot will collect without any upgrades.",
-                    linePrefix = ChatColor.GRAY.toString()
-            ))
+        val lore = arrayListOf<String>().also { desc ->
+            val moneyPerHour = (RobotsModule.getTierBaseMoney(tier) * 10.0) * TimeUnit.HOURS.toSeconds(1L)
+            val tokensPerHour = ((RobotsModule.getTierBaseTokens(tier) * 10.0) * TimeUnit.HOURS.toSeconds(1L)).toLong()
+
+            desc.addAll(TextSplitter.split(text = "Place this robot on your plot to start generating money and tokens!"))
+            desc.add("")
+            desc.add("${ChatColor.RED}${ChatColor.BOLD}Statistics")
+            desc.add("${ChatColor.GRAY}Money/HR: ${Formats.formatMoney(moneyPerHour)}")
+            desc.add("${ChatColor.GRAY}Tokens/HR: ${Formats.formatTokens(tokensPerHour)}")
         }
 
         val item = ItemBuilder(Material.ARMOR_STAND)
                 .amount(amount)
-                .name("${ChatColor.RED}${ChatColor.BOLD}Robot")
+                .name(name)
                 .setLore(lore)
                 .build()
 

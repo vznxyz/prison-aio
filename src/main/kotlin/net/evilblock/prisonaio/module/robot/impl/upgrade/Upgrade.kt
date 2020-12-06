@@ -14,6 +14,10 @@ interface Upgrade {
 
     fun getColor(): ChatColor
 
+    fun getColoredName(): String {
+        return "${getColor()}${ChatColor.BOLD}${getName()}"
+    }
+
     fun getIcon(): ItemStack
 
     fun getMaxLevel(): Int

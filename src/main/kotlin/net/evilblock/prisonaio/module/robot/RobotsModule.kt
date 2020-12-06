@@ -96,7 +96,7 @@ object RobotsModule : PluginModule() {
 
     @JvmStatic
     fun isAnimationsEnabled(): Boolean {
-        return config.getBoolean("settings.animations-enabled")
+        return config.getBoolean("settings.animations-enabled", false)
     }
 
     @JvmStatic
@@ -121,8 +121,8 @@ object RobotsModule : PluginModule() {
         return config.getDouble("tiers.${tier}.base-money", 0.0)
     }
 
-    fun getTierBaseTokens(tier: Int): Long {
-        return config.getLong("tiers.${tier}.base-tokens", 0L)
+    fun getTierBaseTokens(tier: Int): Double {
+        return config.getDouble("tiers.${tier}.base-tokens", 0.0)
     }
 
     fun getFortuneBaseMoney(): Double {
@@ -133,8 +133,8 @@ object RobotsModule : PluginModule() {
         return config.getDouble("upgrades.fortune.money-multiplier", 1.0)
     }
 
-    fun getFortuneBaseTokens(): Long {
-        return config.getLong("upgrades.fortune.base-tokens", 0L)
+    fun getFortuneBaseTokens(): Double {
+        return config.getDouble("upgrades.fortune.base-tokens", 1.0)
     }
 
     fun getFortuneTokensMultiplier(): Double {

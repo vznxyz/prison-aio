@@ -180,15 +180,15 @@ enum class UserSetting(
             )
         }
     ),
-    QUICK_ACCESS_ENCHANTS(
-        displayName = "Enchant Quick Access",
-        description = "This setting controls if the enchant menu should open when right-clicking with a pickaxe in hand.",
+    PICKAXE_MENU_QUICK_ACCESS(
+        displayName = "Pickaxe Menu Quick Access",
+        description = "This setting controls if the pickaxe menu should open when right-clicking with a pickaxe in hand.",
         icon = { ItemStack(Material.LEVER) },
-        defaultOption = { QuickAccessEnchantsOption(true) },
+        defaultOption = { PickaxeMenuQuickAccessOption(true) },
         options = {
             arrayListOf(
-                QuickAccessEnchantsOption(true),
-                QuickAccessEnchantsOption(false)
+                PickaxeMenuQuickAccessOption(true),
+                PickaxeMenuQuickAccessOption(false)
             )
         }
     ),

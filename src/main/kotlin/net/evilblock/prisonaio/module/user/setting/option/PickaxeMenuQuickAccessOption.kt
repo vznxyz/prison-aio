@@ -10,13 +10,13 @@ package net.evilblock.prisonaio.module.user.setting.option
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import java.lang.reflect.Type
 
-class QuickAccessEnchantsOption(private val enabled: Boolean) : UserSettingOption {
+class PickaxeMenuQuickAccessOption(private val enabled: Boolean) : UserSettingOption {
 
     override fun getName(): String {
         return if (enabled) {
-            "Enable quick access to the enchants menu"
+            "Enable quick access to the pickaxe menu"
         } else {
-            "Disable quick access to the enchants menu"
+            "Disable quick access to the pickaxe menu"
         }
     }
 
@@ -25,11 +25,11 @@ class QuickAccessEnchantsOption(private val enabled: Boolean) : UserSettingOptio
     }
 
     override fun getAbstractType(): Type {
-        return QuickAccessEnchantsOption::class.java
+        return PickaxeMenuQuickAccessOption::class.java
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is QuickAccessEnchantsOption && other.enabled == enabled
+        return other is PickaxeMenuQuickAccessOption && other.enabled == enabled
     }
 
     override fun hashCode(): Int {

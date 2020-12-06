@@ -5,20 +5,22 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.tool.enchant.menu
+package net.evilblock.prisonaio.module.tool.pickaxe.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.GlassButton
+import net.evilblock.cubed.menu.buttons.StaticItemStackButton
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
-import net.evilblock.prisonaio.module.tool.enchant.menu.button.*
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeHandler
 import net.evilblock.prisonaio.module.tool.enchant.type.*
 import net.evilblock.prisonaio.module.quest.impl.tutorial.TutorialQuest
+import net.evilblock.prisonaio.module.tool.pickaxe.menu.button.GoToRefundEnchantsMenuButton
+import net.evilblock.prisonaio.module.tool.pickaxe.menu.button.SalvagePickaxeButton
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
@@ -34,7 +36,10 @@ import org.bukkit.inventory.meta.FireworkEffectMeta
 import org.bukkit.inventory.meta.ItemMeta
 import java.util.*
 
-class PurchaseEnchantmentsMenu(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Menu() {
+class EnchantMenu(
+    private val pickaxeItem: ItemStack,
+    private val pickaxeData: PickaxeData
+) : Menu() {
 
     companion object {
         private val BLACK_SLOTS = listOf(
@@ -58,11 +63,11 @@ class PurchaseEnchantmentsMenu(private val pickaxeItem: ItemStack, private val p
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons: MutableMap<Int, Button> = HashMap()
 
-        buttons[0] = TokenBalanceButton()
-        buttons[2] = RefundEnchantmentsButton(pickaxeItem, pickaxeData)
-        buttons[4] = PickaxeButton(pickaxeItem.clone(), pickaxeData) { this.openMenu(player) }
+//        buttons[0] = TokenBalanceButton()
+        buttons[2] = GoToRefundEnchantsMenuButton(pickaxeItem, pickaxeData)
+        buttons[4] = StaticItemStackButton(pickaxeItem.clone())
         buttons[6] = SalvagePickaxeButton(this, pickaxeItem, pickaxeData)
-        buttons[8] = ExitButton()
+//        buttons[8] = ExitButton()
 
         buttons[10] = PurchaseEnchantmentButton(Nuke)
         buttons[19] = PurchaseEnchantmentButton(JackHammer)
@@ -92,7 +97,7 @@ class PurchaseEnchantmentsMenu(private val pickaxeItem: ItemStack, private val p
 
         for (i in BLACK_SLOTS) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = GlassButton(15)
+                buttons[i] = GlassButton(7)
             }
         }
 

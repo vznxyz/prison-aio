@@ -50,7 +50,7 @@ class ProfileLayout(
         val buttons = hashMapOf<Int, Button>()
 
         for (i in BLACK_SLOTS) {
-            buttons[i] = GlassButton(15)
+            buttons[i] = GlassButton(7)
         }
 
         for (i in RED_SLOTS) {

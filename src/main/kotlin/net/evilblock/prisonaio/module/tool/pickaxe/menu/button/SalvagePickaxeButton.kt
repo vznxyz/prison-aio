@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.tool.enchant.menu.button
+package net.evilblock.prisonaio.module.tool.pickaxe.menu.button
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -15,7 +15,7 @@ import net.evilblock.cubed.util.bukkit.ColorUtil
 import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
-import net.evilblock.prisonaio.module.tool.enchant.salvage.SalvagePreventionHandler
+import net.evilblock.prisonaio.module.tool.pickaxe.salvage.SalvagePreventionHandler
 import net.evilblock.prisonaio.module.tool.enchant.type.Cubed
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats

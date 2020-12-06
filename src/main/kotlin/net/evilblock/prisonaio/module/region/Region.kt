@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.region
 
 import net.evilblock.cubed.serialize.AbstractTypeSerializable
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import net.evilblock.prisonaio.module.region.listener.RegionListeners
 import org.bukkit.block.Block
 import org.bukkit.entity.*
 import org.bukkit.event.Cancellable
@@ -107,7 +106,7 @@ abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : Abs
 
         if (victim is ItemFrame) {
             if (attacker is Player) {
-                if (!RegionListeners.bypassCheck(attacker, cancellable)) {
+                if (!RegionHandler.bypassCheck(attacker, cancellable)) {
                     cancellable.isCancelled = true
                 }
             }
@@ -123,7 +122,7 @@ abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : Abs
     }
 
     open fun onPlayerInteractEntity(player: Player, rightClicked: Entity, cancellable: Cancellable) {
-        if (RegionListeners.bypassCheck(player, cancellable)) {
+        if (RegionHandler.bypassCheck(player, cancellable)) {
             return
         }
 

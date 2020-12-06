@@ -26,7 +26,7 @@ import org.bukkit.inventory.InventoryView
 class GeneratorMenu(private val generator: Generator) : Menu() {
 
     override fun getTitle(player: Player): String {
-        return "Manage ${generator.getGeneratorType().displayName} (Level ${NumberUtils.format(generator.level)})"
+        return "Manage ${generator.getGeneratorType().getProperName()} (Level ${NumberUtils.format(generator.level)})"
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {
@@ -42,15 +42,17 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
 
     private inner class UpgradeButton : Button() {
         override fun getName(player: Player): String {
-            return "${ChatColor.GRAY}Upgrade ${generator.getGeneratorType().getColoredName()} ${ChatColor.GRAY}to level ${generator.getGeneratorType().color}${generator.getNextLevel().number}"
+            return "${ChatColor.GREEN}${ChatColor.BOLD}Upgrade ${generator.getGeneratorType().getProperName()} ${ChatColor.GRAY}(Lvl ${generator.level} -> ${generator.getNextLevel().number})"
         }
 
         override fun getDescription(player: Player): List<String> {
             return arrayListOf<String>().also { desc ->
                 val nextLevel = generator.getNextLevel()
 
-                desc.add("${ChatColor.GRAY}Cost: ${Formats.formatTokens(nextLevel.cost)}")
-                desc.add("${ChatColor.GRAY}Build Time: ${ChatColor.RED}${ChatColor.BOLD}${TimeUtil.formatIntoAbbreviatedString(nextLevel.buildTime)}")
+                desc.add("${ChatColor.GRAY}Price: ${Formats.formatTokens(nextLevel.cost)}")
+                desc.add("${ChatColor.GRAY}Time: ${ChatColor.RED}${ChatColor.BOLD}${TimeUtil.formatIntoAbbreviatedString(nextLevel.buildTime)}")
+                desc.add("")
+                desc.add("${ChatColor.YELLOW}Click to purchase upgrade")
             }
         }
 
@@ -66,7 +68,7 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
             if (clickType.isLeftClick) {
                 ConfirmMenu { confirmed ->
                     if (!generator.build.finished) {
-                        player.sendMessage("${ChatColor.RED}You can't upgrade your ${generator.getGeneratorType().displayName} until it's finished building!")
+                        player.sendMessage("${ChatColor.RED}You can't upgrade your ${generator.getGeneratorType().getProperName()} until it's finished building!")
                         return@ConfirmMenu
                     }
 
@@ -86,7 +88,7 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
 
         override fun getDescription(player: Player): List<String> {
             return arrayListOf<String>().also { desc ->
-                desc.addAll(TextSplitter.split(text = "Remove this ${generator.getGeneratorType().displayName} generator from your plot. It and all of its contents will be lost forever."))
+                desc.addAll(TextSplitter.split(text = "Remove this ${generator.getGeneratorType().getProperName()} from your plot. It and all of its contents will be lost forever."))
             }
         }
 

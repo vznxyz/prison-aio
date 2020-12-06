@@ -65,7 +65,6 @@ object DailyChallengeHandler : PluginHandler {
     }
 
     fun newSession() {
-        currentSession.clear()
         currentSession = DailyChallengeSession()
 
         Bukkit.broadcastMessage("${BattlePassModule.CHAT_PREFIX}${ChatColor.GRAY}A new Daily Challenges set has been generated!")

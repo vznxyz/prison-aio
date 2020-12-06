@@ -38,8 +38,8 @@ object RobotInventoryListeners : Listener {
             return
         }
 
-        val cursorTier = RobotHandler.getTier(event.cursor)
-        val currentItemTier = RobotHandler.getTier(event.currentItem)
+        val cursorTier = RobotUtils.getRobotItemTier(event.cursor)
+        val currentItemTier = RobotUtils.getRobotItemTier(event.currentItem)
         if (cursorTier == currentItemTier) {
             event.isCancelled = true
 

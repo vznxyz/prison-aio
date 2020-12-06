@@ -11,11 +11,11 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.robot.impl.MinerRobot
+import net.evilblock.prisonaio.module.robot.tick.RobotThread
 import net.evilblock.prisonaio.util.plot.PlotUtil
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -71,6 +71,8 @@ object RobotHandler : PluginHandler {
                 e.printStackTrace()
             }
         }
+
+        RobotThread.start()
     }
 
     override fun saveData() {
@@ -146,19 +148,6 @@ object RobotHandler : PluginHandler {
 
         player.sendMessage("${ChatColor.RED}You are not a member of this plot, so you can't do that!")
         return false
-    }
-
-    @JvmStatic
-    fun getTier(itemStack: ItemStack): Int {
-        if (!itemStack.hasItemMeta() || !itemStack.itemMeta.hasLore()) {
-            return -1
-        }
-
-        val line = itemStack.itemMeta.lore.firstOrNull() { it.startsWith("${ChatColor.RED}${ChatColor.BOLD}Tier ") && !it.contains("Combination") }
-        if (line != null) {
-            return line.split(" ")[1].toInt()
-        }
-        return 0
     }
 
     private fun findNextBackupFile(): File {

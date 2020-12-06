@@ -49,7 +49,7 @@ abstract class BrowseMinesMenu : PaginatedMenu() {
         buttons[3] = PublicMinesMenuButton()
 
         for (i in BLACK_SLOTS) {
-            buttons[i] = GlassButton(15)
+            buttons[i] = GlassButton(7)
         }
 
         return buttons

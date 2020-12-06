@@ -63,9 +63,4 @@ class DailyChallengeSession(val uuid: UUID = UUID.randomUUID()) {
         return TimeUtil.formatIntoDetailedString(remainingSeconds)
     }
 
-    fun clear() {
-        challenges.clear()
-        progress.clear()
-    }
-
 }

@@ -15,11 +15,12 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.tool.ToolsModule
+import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
 import java.io.File
 
 object PickaxePrestigeHandler : PluginHandler {
 
-    private val prestigeMap: MutableMap<Int, PickaxePrestige> = hashMapOf()
+    private val prestigeInfoMap: MutableMap<Int, PickaxePrestigeInfo> = hashMapOf()
 
     override fun getModule(): PluginModule {
         return ToolsModule
@@ -39,8 +40,8 @@ object PickaxePrestigeHandler : PluginHandler {
         val dataFile = getInternalDataFile()
         if (dataFile.exists()) {
             Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
-                val listType = object : TypeToken<List<PickaxePrestige>>() {}.type
-                val list = Cubed.gson.fromJson(reader, listType) as List<PickaxePrestige>
+                val listType = object : TypeToken<List<PickaxePrestigeInfo>>() {}.type
+                val list = Cubed.gson.fromJson(reader, listType) as List<PickaxePrestigeInfo>
 
                 for (prestige in list) {
                     trackPrestige(prestige)
@@ -52,31 +53,49 @@ object PickaxePrestigeHandler : PluginHandler {
     override fun saveData() {
         super.saveData()
 
-        Files.write(Cubed.gson.toJson(prestigeMap.values), getInternalDataFile(), Charsets.UTF_8)
+        Files.write(Cubed.gson.toJson(prestigeInfoMap.values), getInternalDataFile(), Charsets.UTF_8)
     }
 
-    fun getPrestigeSet(): Collection<PickaxePrestige> {
-        return prestigeMap.values
+    fun getPrestigeSet(): Collection<PickaxePrestigeInfo> {
+        return prestigeInfoMap.values
     }
 
-    fun trackPrestige(prestige: PickaxePrestige) {
-        prestigeMap[prestige.number] = prestige
+    fun trackPrestige(prestige: PickaxePrestigeInfo) {
+        prestigeInfoMap[prestige.number] = prestige
     }
 
-    fun forgetPrestige(prestige: PickaxePrestige) {
-        prestigeMap.remove(prestige.number)
+    fun forgetPrestige(prestige: PickaxePrestigeInfo) {
+        prestigeInfoMap.remove(prestige.number)
     }
 
-    fun getPrestige(number: Int): PickaxePrestige? {
-        return prestigeMap[number]
+    fun getPrestige(number: Int): PickaxePrestigeInfo? {
+        return prestigeInfoMap[number]
     }
 
-    fun getNextPrestige(current: Int): PickaxePrestige? {
-        return prestigeMap[current + 1]
+    fun getNextPrestige(current: Int): PickaxePrestigeInfo? {
+        return prestigeInfoMap[current + 1]
     }
 
-    fun getMaxPrestige(): PickaxePrestige? {
-        return prestigeMap.maxBy { it.key }?.value
+    fun getMaxPrestige(): PickaxePrestigeInfo? {
+        return prestigeInfoMap.maxBy { it.key }?.value
+    }
+
+    fun findEnchantLimits(prestige: Int): Map<AbstractEnchant, Int> {
+        return hashMapOf<AbstractEnchant, Int>().also { map ->
+            for (prestigeInfo in getPrestigeSet()) {
+                if (prestige <= prestigeInfo.number) {
+                    for ((enchant, limit) in prestigeInfo.enchantLimits) {
+                        if (map.containsKey(enchant)) {
+                            if (map[enchant]!! < limit) {
+                                map[enchant] = limit
+                            }
+                        } else {
+                            map[enchant] = limit
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

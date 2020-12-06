@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack
 import java.math.BigDecimal
 import java.text.NumberFormat
 
-class PickaxePrestige(val number: Int) {
+class PickaxePrestigeInfo(val number: Int) {
 
     var moneyRequired: Long = 0L
     var tokensRequired: Long = 0L

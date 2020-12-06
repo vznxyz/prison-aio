@@ -70,13 +70,13 @@ object BuildModeHandler : Listener {
 
     @EventHandler
     fun onPlayerMoveEvent(event: PlayerMoveEvent) {
-        if (EventUtils.hasPlayerMoved(event)) {
-            if (isInMode(event.player)) {
-                val modeData = getModeData(event.player)
-                if (modeData.previewing) {
-                    return
-                }
+        if (isInMode(event.player)) {
+            val modeData = getModeData(event.player)
+            if (modeData.previewing) {
+                return
+            }
 
+            if (EventUtils.hasPlayerMoved(event)) {
                 val fromPlot = PlotUtil.getPlot(event.from)
                 val toPlot = PlotUtil.getPlot(event.to)
 
@@ -86,11 +86,11 @@ object BuildModeHandler : Listener {
                 } else {
                     modeData.updateLocation(event.to)
                 }
+            }
 
-                val newRotation = RotateUtil.getFacing(event.player).getOpposite()
-                if (newRotation != modeData.rotation) {
-                    modeData.rotation = newRotation
-                }
+            val newRotation = RotateUtil.getFacing(event.player).getOpposite()
+            if (newRotation != modeData.rotation) {
+                modeData.updateRotation(newRotation)
             }
         }
     }
@@ -102,14 +102,14 @@ object BuildModeHandler : Listener {
             if (modeData.previewing && event.to == modeData.previewLocation) {
                 return
             }
-        }
 
-        val fromPlot = PlotUtil.getPlot(event.from)
-        val toPlot = PlotUtil.getPlot(event.to)
+            val fromPlot = PlotUtil.getPlot(event.from)
+            val toPlot = PlotUtil.getPlot(event.to)
 
-        if (fromPlot == null || toPlot == null || fromPlot.id != toPlot.id) {
-            stopTracking(event.player)
-            event.player.sendMessage("${ChatColor.RED}You teleported out of the plot, so Build Mode has been de-activated!")
+            if (fromPlot == null || toPlot == null || fromPlot.id != toPlot.id) {
+                stopTracking(event.player)
+                event.player.sendMessage("${ChatColor.RED}You teleported out of the plot, so Build Mode has been de-activated!")
+            }
         }
     }
 

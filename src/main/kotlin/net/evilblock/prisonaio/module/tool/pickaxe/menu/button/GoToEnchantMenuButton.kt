@@ -5,10 +5,10 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.tool.enchant.menu.button
+package net.evilblock.prisonaio.module.tool.pickaxe.menu.button
 
 import net.evilblock.cubed.menu.Button
-import net.evilblock.prisonaio.module.tool.enchant.menu.PurchaseEnchantmentsMenu
+import net.evilblock.prisonaio.module.tool.pickaxe.menu.EnchantMenu
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -20,7 +20,7 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
-class PurchaseEnchantmentsButton(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Button() {
+class GoToEnchantMenuButton(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Button() {
 
     override fun getName(player: Player): String {
         return "${ChatColor.DARK_PURPLE}${ChatColor.BOLD}Purchase Enchantments"
@@ -42,7 +42,7 @@ class PurchaseEnchantmentsButton(private val pickaxeItem: ItemStack, private val
 
     override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
         if (clickType == ClickType.LEFT) {
-            PurchaseEnchantmentsMenu(pickaxeItem, pickaxeData).openMenu(player)
+            EnchantMenu(pickaxeItem, pickaxeData).openMenu(player)
         }
     }
 

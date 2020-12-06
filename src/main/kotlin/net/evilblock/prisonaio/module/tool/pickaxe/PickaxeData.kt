@@ -16,6 +16,7 @@ import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
 import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeHandler
 import net.evilblock.prisonaio.module.tool.enchant.serialize.EnchantsMapReferenceSerializer
+import net.evilblock.prisonaio.module.tool.enchant.serialize.EnchantsSetReferenceSerializer
 import net.minecraft.server.v1_12_R1.NBTTagCompound
 import org.bukkit.ChatColor
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
@@ -26,11 +27,16 @@ import java.util.*
 
 class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
 
+    var customName: String? = null
+
     var prestige: Int = 0
     var blocksMined: Int = 0
 
     @JsonAdapter(EnchantsMapReferenceSerializer::class)
     var enchants: MutableMap<AbstractEnchant, Int> = hashMapOf()
+
+    @JsonAdapter(EnchantsSetReferenceSerializer::class)
+    var disabledEnchants: MutableSet<AbstractEnchant> = hashSetOf()
 
     fun addLevels(enchant: AbstractEnchant, levels: Int) {
         if (!enchants.containsKey(enchant)) {
@@ -84,11 +90,11 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
         synchronized(modificationLock) {
             val lore = arrayListOf<String>()
 
-            lore.add("${ChatColor.GREEN}${ChatColor.BOLD}Statistics")
-            lore.add("${ChatColor.GREEN}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige: ${NumberUtils.format(prestige)}")
-            lore.add("${ChatColor.GREEN}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Blocks Mined: ${NumberFormat.getInstance().format(blocksMined)}")
             lore.add("")
-
+            lore.add("${ChatColor.YELLOW}${ChatColor.BOLD}Statistics")
+            lore.add("${ChatColor.GRAY}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(prestige)}")
+            lore.add("${ChatColor.GRAY}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Blocks Mined: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberFormat.getInstance().format(blocksMined)}")
+            lore.add("")
             lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
 
             if (enchants.isNotEmpty()) {
@@ -119,31 +125,19 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
      * Finds the enchantment limit for this pickaxe.
      */
     fun getEnchantLimit(enchant: AbstractEnchant): Int {
-        val nextPrestige = PickaxePrestigeHandler.getNextPrestige(prestige)
-        if (nextPrestige != null) {
-            if (nextPrestige.enchantLimits.containsKey(enchant)) {
-                return nextPrestige.enchantLimits[enchant]!!
-            }
+        return PickaxePrestigeHandler.findEnchantLimits(prestige).getOrDefault(enchant, -1)
+    }
+
+    fun isEnchantDisabled(enchant: AbstractEnchant): Boolean {
+        return disabledEnchants.contains(enchant)
+    }
+
+    fun toggleEnchant(enchant: AbstractEnchant) {
+        if (isEnchantDisabled(enchant)) {
+            disabledEnchants.remove(enchant)
         } else {
-            val maxPrestige = PickaxePrestigeHandler.getMaxPrestige()
-            if (maxPrestige != null) {
-                if (prestige >= maxPrestige.number) {
-                    for (prestige in PickaxePrestigeHandler.getPrestigeSet().filter { it.number < maxPrestige.number }.sortedBy { it.number }.reversed()) {
-                        if (prestige.enchantLimits.containsKey(enchant)) {
-                            return prestige.enchantLimits[enchant]!!
-                        }
-                    }
-                }
-            }
+            disabledEnchants.add(enchant)
         }
-
-        for (prestige in PickaxePrestigeHandler.getPrestigeSet().filter { it.number < prestige }.sortedBy { it.number }.reversed()) {
-            if (prestige.enchantLimits.containsKey(enchant)) {
-                return prestige.enchantLimits[enchant]!!
-            }
-        }
-
-        return -1
     }
 
     companion object {

@@ -1,12 +1,11 @@
 package net.evilblock.prisonaio.module.robot.menu
 
-import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
+import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.TimeUtil
-import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.Formats
@@ -15,6 +14,7 @@ import net.evilblock.prisonaio.module.robot.RobotUtils
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.robot.cosmetic.CosmeticHandler
 import net.evilblock.prisonaio.module.robot.impl.MinerRobot
+import net.evilblock.prisonaio.module.robot.impl.statistic.GraphicalTable
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -23,8 +23,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
-import java.math.BigInteger
+import java.math.BigDecimal
 import java.text.NumberFormat
+import java.util.concurrent.TimeUnit
 
 class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
 
@@ -34,12 +35,7 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
     }
 
     override fun getTitle(player: Player): String {
-        return if (robot.owner == player.uniqueId) {
-            "Your Robot"
-        } else {
-            val ownerName = Cubed.instance.uuidCache.name(robot.owner)
-            "$ownerName's Robot"
-        }
+        return "Manage ${ChatColor.stripColor(robot.getTierName())}"
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {
@@ -53,7 +49,7 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
 
         for (i in 0..44) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = GlassButton(15)
+                buttons[i] = GlassButton(7)
             }
         }
 
@@ -62,81 +58,58 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
 
     private inner class YourRobotButton : Button() {
         override fun getName(player: Player): String {
-            val tierName = robot.getTierName()
-            val tierColor = ChatColor.getLastColors(tierName)
-
-            return if (robot.owner == player.uniqueId) {
-                "$tierColor${ChatColor.BOLD}Your $tierName"
-            } else {
-                "$tierColor${ChatColor.BOLD}${robot.getOwnerName()}'s $tierName"
-            }
+            return robot.getTierName()
         }
 
         override fun getDescription(player: Player): List<String> {
-            val description = arrayListOf<String>()
+            return arrayListOf<String>().also { desc ->
+                val tierName = robot.getTierName()
+                val tierColor = ChatColor.getLastColors(tierName)
 
-            val tierName = robot.getTierName()
-            val tierColor = ChatColor.getLastColors(tierName)
+                val tier = if (robot.tier == 0) {
+                    "None"
+                } else {
+                    robot.tier.toString()
+                }
 
-            if (robot.tier > 0) {
-                description.add("${ChatColor.GRAY}Tier: $tierColor${robot.tier}")
+                val uptimeSeconds = (robot.uptime / 1000.0).toInt()
+                val moneyPerHour = (robot.getMoneyPerTick() * robot.getTicksPerSecond()) * TimeUnit.HOURS.toSeconds(1L)
+                val tokensPerHour = (robot.getTokensPerTick() * robot.getTicksPerSecond()) * TimeUnit.HOURS.toSeconds(1L)
+
+                desc.add("${ChatColor.GRAY}Tier: $tierColor$tier")
+                desc.add("${ChatColor.GRAY}Uptime: $tierColor${TimeUtil.formatIntoAbbreviatedString(uptimeSeconds)}")
+                desc.add("")
+                desc.add("${ChatColor.GRAY}Money/HR: ${Formats.formatMoney(moneyPerHour)}")
+                desc.add("${ChatColor.GRAY}Tokens/HR: ${Formats.formatTokens(tokensPerHour.toLong())}")
+                desc.add("")
+
+                val table = GraphicalTable()
+                    .addEntry(0, 0, "")
+                    .addEntry(0, 1, "${ChatColor.GREEN}${ChatColor.BOLD}MONEY")
+                    .addEntry(0, 2, "${ChatColor.YELLOW}${ChatColor.BOLD}TOKENS")
+
+                    .addEntry(1, 0, "${ChatColor.GRAY}1H")
+                    .addEntry(1, 1, Formats.formatMoney(robot.moneyEarnings.lastHour))
+                    .addEntry(1, 2, Formats.formatTokens(robot.tokenEarnings.lastHour.toBigInteger()))
+
+                    .addEntry(2, 0, "${ChatColor.GRAY}24H")
+                    .addEntry(2, 1, Formats.formatMoney(robot.moneyEarnings.lastDay))
+                    .addEntry(2, 2, Formats.formatTokens(robot.tokenEarnings.lastDay.toBigInteger()))
+
+                    .addEntry(3, 0, "${ChatColor.GRAY}7D")
+                    .addEntry(3, 1, Formats.formatMoney(robot.moneyEarnings.lastWeek))
+                    .addEntry(3, 2, Formats.formatTokens(robot.tokenEarnings.lastWeek.toBigInteger()))
+
+                    .addEntry(4, 0, "${ChatColor.GRAY}ALL")
+                    .addEntry(4, 1, Formats.formatMoney(robot.moneyEarnings.allTime))
+                    .addEntry(4, 2, Formats.formatTokens(robot.tokenEarnings.allTime.toBigInteger()))
+
+                    .title("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}Revenue History")
+                    .borders(true)
+                    .render()
+
+                desc.addAll(table)
             }
-
-            val uptimeMs = System.currentTimeMillis() - robot.getCreatedAt()
-            val formattedUptime = TimeUtil.formatIntoDetailedString((uptimeMs / 1000).toInt())
-            description.add("${ChatColor.GRAY}Uptime: $tierColor$formattedUptime")
-
-            val moneyLastHour = if (robot.moneyEarnings.isHourViewComplete()) {
-                robot.moneyEarnings.getLastHourRealTime() + BigInteger(robot.moneyEarnings.getEarnings().toString())
-            } else {
-                BigInteger(robot.moneyEarnings.getEarnings().toString())
-            }
-
-            val moneyLastDay = if (robot.moneyEarnings.isDayViewComplete()) {
-                robot.moneyEarnings.getLastDayRealTime() + BigInteger(robot.moneyEarnings.getEarnings().toString())
-            } else {
-                BigInteger(robot.moneyEarnings.getEarnings().toString())
-            }
-
-            val moneyLastWeek = if (robot.moneyEarnings.isWeekViewComplete()) {
-                robot.moneyEarnings.getLastWeekRealTime() + BigInteger(robot.moneyEarnings.getEarnings().toString())
-            } else {
-                BigInteger(robot.moneyEarnings.getEarnings().toString())
-            }
-
-            description.add("")
-            description.add("${ChatColor.GREEN}${ChatColor.BOLD}Money Earnings")
-            description.add("${ChatColor.GRAY}Last Hour: ${Formats.formatMoney(moneyLastHour.toBigDecimal())}")
-            description.add("${ChatColor.GRAY}Last 24 Hrs: ${Formats.formatMoney(moneyLastDay.toBigDecimal())}")
-            description.add("${ChatColor.GRAY}Last 7 Days: ${Formats.formatMoney(moneyLastWeek.toBigDecimal())}")
-            description.add("${ChatColor.GRAY}All Time: ${Formats.formatMoney(robot.moneyTotalEarnings.toDouble())}")
-
-            val tokensLastHour = if (robot.tokenEarnings.isHourViewComplete()) {
-                robot.tokenEarnings.getLastHourRealTime() + BigInteger(robot.tokenEarnings.getEarnings().toString())
-            } else {
-                BigInteger(robot.tokenEarnings.getEarnings().toString())
-            }
-
-            val tokensLastDay = if (robot.tokenEarnings.isDayViewComplete()) {
-                robot.tokenEarnings.getLastDayRealTime() + BigInteger(robot.tokenEarnings.getEarnings().toString())
-            } else {
-                BigInteger(robot.tokenEarnings.getEarnings().toString())
-            }
-
-            val tokensLastWeek = if (robot.tokenEarnings.isWeekViewComplete()) {
-                robot.tokenEarnings.getLastWeekRealTime() + BigInteger(robot.tokenEarnings.getEarnings().toString())
-            } else {
-                BigInteger(robot.tokenEarnings.getEarnings().toString())
-            }
-
-            description.add("")
-            description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Token Earnings")
-            description.add("${ChatColor.GRAY}Last Hour: ${Formats.formatTokens(tokensLastHour)}")
-            description.add("${ChatColor.GRAY}Last 24 Hrs: ${Formats.formatTokens(tokensLastDay)}")
-            description.add("${ChatColor.GRAY}Last 7 Days: ${Formats.formatTokens(tokensLastWeek)}")
-            description.add("${ChatColor.GRAY}All Time: ${Formats.formatTokens(robot.tokensTotalEarnings)}")
-
-            return description
         }
 
         override fun getMaterial(player: Player): Material {
@@ -150,33 +123,30 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            val description = arrayListOf<String>()
-            description.add("${ChatColor.GRAY}Upgrades give your robot extra")
-            description.add("${ChatColor.GRAY}abilities to earn you more money")
-            description.add("${ChatColor.GRAY}faster.")
-            description.add("")
+            return arrayListOf<String>().also { desc ->
+                desc.addAll(TextSplitter.split(text = "Upgrades give your robot extra abilities to earn you more money faster."))
+                desc.add("")
 
-            if (robot.getAppliedUpgrades().isEmpty()) {
-                description.add("${ChatColor.GRAY}This robot has no applied upgrades.")
-            } else {
-                description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Applied Upgrades")
+                if (robot.getAppliedUpgrades().isEmpty()) {
+                    desc.add("${ChatColor.GRAY}This robot has no applied upgrades.")
+                } else {
+                    desc.add("${ChatColor.YELLOW}${ChatColor.BOLD}Applied Upgrades")
 
-                for (upgrade in robot.getAppliedUpgrades()) {
-                    val upgradeLevel = robot.getUpgradeLevel(upgrade)
-                    var text = "${ChatColor.GRAY}${upgrade.getName()} (Lvl ${NumberFormat.getInstance().format(upgradeLevel)})"
+                    for (upgrade in robot.getAppliedUpgrades()) {
+                        val upgradeLevel = robot.getUpgradeLevel(upgrade)
+                        var text = "${ChatColor.GRAY}${upgrade.getColoredName()} ${ChatColor.GRAY}(Level ${NumberFormat.getInstance().format(upgradeLevel)})"
 
-                    if (upgradeLevel >= upgrade.getMaxLevel()) {
-                        text = "$text ${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}Maxed"
+                        if (upgradeLevel >= upgrade.getMaxLevel()) {
+                            text = "$text ${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}MAXED"
+                        }
+
+                        desc.add(text)
                     }
-
-                    description.add(text)
                 }
+
+                desc.add("")
+                desc.add("${ChatColor.YELLOW}Click to manage upgrades")
             }
-
-            description.add("")
-            description.add("${ChatColor.YELLOW}Click to manage the robot's upgrades.")
-
-            return description
         }
 
         override fun getMaterial(player: Player): Material {
@@ -196,20 +166,19 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            val ownedCosmetics = CosmeticHandler.getRegisteredCosmetics().filter { CosmeticHandler.hasBeenGrantedCosmetic(player.uniqueId, it) }.size
-            val availableCosmetics = CosmeticHandler.getRegisteredCosmetics().size
+            return arrayListOf<String>().also { desc ->
+                val ownedCosmetics = CosmeticHandler.getRegisteredCosmetics().filter { CosmeticHandler.hasBeenGrantedCosmetic(player.uniqueId, it) }.size
+                val availableCosmetics = CosmeticHandler.getRegisteredCosmetics().size
 
-            val description = arrayListOf<String>()
-            description.add("${ChatColor.GRAY}Style your robot the way you want.")
-            description.add("")
-            description.add("${ChatColor.GRAY}Cosmetics provide no game advantage")
-            description.add("${ChatColor.GRAY}and can be purchased on our store")
-            description.add("${ChatColor.GRAY}at ${ChatColor.RED}store.minejunkie.com${ChatColor.GRAY}.")
-            description.add("")
-            description.add("${ChatColor.GRAY}You own ${ChatColor.GREEN}$ownedCosmetics ${ChatColor.GRAY}cosmetics. ($availableCosmetics available)")
-            description.add("")
-            description.add("${ChatColor.YELLOW}Click to manage the robot's cosmetics.")
-            return description
+                desc.addAll(TextSplitter.split(text = "Cosmetics allow you to style your robot the way you want. They provide no game advantage."))
+                desc.add("")
+                desc.add("${ChatColor.GRAY}Purchase cosmetics on our store:")
+                desc.add("${ChatColor.RED}${ChatColor.BOLD}store.minejunkie.com")
+                desc.add("")
+                desc.add("${ChatColor.GRAY}You own ${ChatColor.GREEN}$ownedCosmetics${ChatColor.GRAY}/${ChatColor.BOLD}$availableCosmetics ${ChatColor.GRAY}cosmetics.")
+                desc.add("")
+                desc.add("${ChatColor.YELLOW}Click to manage cosmetics")
+            }
         }
 
         override fun getMaterial(player: Player): Material {
@@ -231,15 +200,14 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            return listOf(
-                    "${ChatColor.GRAY}Pickup the robot to your inventory.",
-                    "",
-                    "${ChatColor.RED}${ChatColor.BOLD}Warning!",
-                    "${ChatColor.GRAY}Robots lose all stats when they",
-                    "${ChatColor.GRAY}are picked up.",
-                    "",
-                    "${ChatColor.YELLOW}Click to pickup the robot."
-            )
+            return arrayListOf<String>().also { desc ->
+                desc.add("${ChatColor.GRAY}Pickup the robot to your inventory.")
+                desc.add("")
+                desc.add("${ChatColor.RED}${ChatColor.BOLD}Warning!")
+                desc.addAll(TextSplitter.split(text = "Robots lose all stats when they are picked up."))
+                desc.add("")
+                desc.add("${ChatColor.YELLOW}Click to pickup this robot")
+            }
         }
 
         override fun getMaterial(player: Player): Material {
@@ -258,7 +226,7 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
                 }
             }
 
-            ConfirmMenu("Are you sure?") { confirmed ->
+            ConfirmMenu { confirmed ->
                 if (confirmed) {
                     val robotItemStack = RobotUtils.makeRobotItem(1, robot.tier)
 
@@ -292,7 +260,7 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
 
     private inner class CollectButton : Button() {
         override fun getName(player: Player): String {
-            return if (robot.moneyOwed > 0 || robot.tokensOwed > 0) {
+            return if (robot.moneyOwed > BigDecimal.ZERO || robot.tokensOwed > BigDecimal.ZERO) {
                 "${ChatColor.YELLOW}${ChatColor.BOLD}Collect Earnings"
             } else {
                 "${ChatColor.GREEN}${ChatColor.BOLD}All caught up!"
@@ -300,28 +268,29 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            val description = arrayListOf<String>()
+            return arrayListOf<String>().also { desc ->
+                val owedMoney = robot.moneyOwed > BigDecimal.ZERO
+                val owedTokens = robot.tokensOwed > BigDecimal.ZERO
 
-            if (robot.moneyOwed > 0) {
-                description.add("${ChatColor.GRAY}${Constants.DOT_SYMBOL} ${Formats.formatMoney(robot.moneyOwed)}")
+                if (owedMoney && owedTokens) {
+                    desc.addAll(TextSplitter.split(text = "You have ${Formats.formatMoney(robot.moneyOwed)} ${ChatColor.GRAY}and ${Formats.formatTokens(robot.tokensOwed.toBigInteger())} ${ChatColor.GRAY}waiting to be collected."))
+                } else if (owedMoney) {
+                    desc.addAll(TextSplitter.split(text = "You have ${Formats.formatMoney(robot.moneyOwed)} ${ChatColor.GRAY}waiting to be collected."))
+                } else if (owedTokens) {
+                    desc.addAll(TextSplitter.split(text = "You have ${Formats.formatTokens(robot.tokensOwed.toBigInteger())} ${ChatColor.GRAY}waiting to be collected."))
+                } else {
+                    desc.add("${ChatColor.GRAY}You don't have anything to collect.")
+                }
+
+                if (owedMoney || owedTokens) {
+                    desc.add("")
+                    desc.add("${ChatColor.YELLOW}Click to collect earnings")
+                }
             }
-
-            if (robot.tokensOwed > 0) {
-                description.add("${ChatColor.GRAY}${Constants.DOT_SYMBOL} ${Formats.formatTokens(robot.tokensOwed)}")
-            }
-
-            if (description.isEmpty()) {
-                description.add("${ChatColor.GRAY}You don't have anything to collect.")
-            } else {
-                description.add("")
-                description.add("${ChatColor.YELLOW}Click to collect earnings.")
-            }
-
-            return description
         }
 
         override fun getMaterial(player: Player): Material {
-            return if (robot.moneyOwed > 0 || robot.tokensOwed > 0) {
+            return if (robot.moneyOwed > BigDecimal.ZERO || robot.tokensOwed > BigDecimal.ZERO) {
                 Material.STORAGE_MINECART
             } else {
                 Material.MINECART

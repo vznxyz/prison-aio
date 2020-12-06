@@ -10,11 +10,11 @@ package net.evilblock.prisonaio.module.user.setting.listener
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.tool.enchant.menu.PurchaseEnchantmentsMenu
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.tool.enchant.type.AbilityEnchant
+import net.evilblock.prisonaio.module.tool.pickaxe.menu.PickaxeMenu
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.module.user.setting.option.PrivateMessageSoundsOption
@@ -30,7 +30,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 object UserSettingsListeners : Listener {
 
     /**
-     * Handles the Enchant Quick Access setting functionality.
+     * Handles the Pickaxe Menu Quick Access setting functionality.
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerInteractEvent(event: PlayerInteractEvent) {
@@ -64,11 +64,11 @@ object UserSettingsListeners : Listener {
                 }
 
                 val user = UserHandler.getUser(event.player.uniqueId)
-                if (user.settings.getSettingOption(UserSetting.QUICK_ACCESS_ENCHANTS).getValue()) {
+                if (user.settings.getSettingOption(UserSetting.PICKAXE_MENU_QUICK_ACCESS).getValue()) {
                     if (pickaxeData != null) {
                         Tasks.delayed(2L) {
                             if (Menu.currentlyOpenedMenus[event.player.uniqueId] == null) {
-                                PurchaseEnchantmentsMenu(itemInHand, pickaxeData).openMenu(event.player)
+                                PickaxeMenu(itemInHand, pickaxeData).openMenu(event.player)
                             }
                         }
                     }

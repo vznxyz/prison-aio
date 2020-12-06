@@ -7,11 +7,14 @@
 
 package net.evilblock.prisonaio.module.generator
 
+import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.generator.build.mode.BuildModeHandler
 import net.evilblock.prisonaio.module.generator.command.GeneratorCommand
+import net.evilblock.prisonaio.module.generator.command.admin.GiveModifierCommand
+import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifier
 import org.bukkit.event.Listener
 
 object GeneratorsModule : PluginModule() {
@@ -46,7 +49,14 @@ object GeneratorsModule : PluginModule() {
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
-            GeneratorCommand::class.java
+            GeneratorCommand::class.java,
+            GiveModifierCommand::class.java
+        )
+    }
+
+    override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
+        return mapOf(
+            GeneratorModifier::class.java to GeneratorModifier.ModifierParameterType()
         )
     }
 

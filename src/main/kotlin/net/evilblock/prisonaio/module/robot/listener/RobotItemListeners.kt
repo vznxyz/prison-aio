@@ -99,7 +99,7 @@ object RobotItemListeners : Listener {
                     return
                 }
 
-                val tier = RobotHandler.getTier(itemInHand).coerceAtLeast(0)
+                val tier = RobotUtils.getRobotItemTier(itemInHand).coerceAtLeast(0)
                 RobotsModule.getPluginFramework().logger.info("${player.name} is placing a Tier $tier Robot at ${robotLocation.world.name}, ${robotLocation.x}, ${robotLocation.y}, ${robotLocation.z}")
 
                 if (itemInHand.amount == 1) {

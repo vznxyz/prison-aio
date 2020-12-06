@@ -5,20 +5,22 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.tool.enchant.menu
+package net.evilblock.prisonaio.module.tool.pickaxe.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.GlassButton
+import net.evilblock.cubed.menu.buttons.StaticItemStackButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
 import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
-import net.evilblock.prisonaio.module.tool.enchant.menu.button.*
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
-import net.evilblock.prisonaio.module.tool.enchant.salvage.SalvagePreventionHandler
+import net.evilblock.prisonaio.module.tool.pickaxe.salvage.SalvagePreventionHandler
 import net.evilblock.prisonaio.module.tool.enchant.type.*
+import net.evilblock.prisonaio.module.tool.pickaxe.menu.button.GoToEnchantMenuButton
+import net.evilblock.prisonaio.module.tool.pickaxe.menu.button.SalvagePickaxeButton
 import net.evilblock.prisonaio.util.Formats
 import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.ChatColor
@@ -33,7 +35,7 @@ import org.bukkit.inventory.meta.FireworkEffectMeta
 import org.bukkit.inventory.meta.ItemMeta
 import java.util.*
 
-class RefundEnchantmentsMenu(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Menu() {
+class RefundEnchantsMenu(private val pickaxeItem: ItemStack, private val pickaxeData: PickaxeData) : Menu() {
 
     companion object {
         private val BLACK_SLOTS = listOf(
@@ -57,11 +59,11 @@ class RefundEnchantmentsMenu(private val pickaxeItem: ItemStack, private val pic
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons: MutableMap<Int, Button> = HashMap()
 
-        buttons[0] = TokenBalanceButton()
-        buttons[2] = PurchaseEnchantmentsButton(pickaxeItem, pickaxeData)
-        buttons[4] = PickaxeButton(pickaxeItem.clone(), pickaxeData) { this.openMenu(player) }
+//        buttons[0] = TokenBalanceButton()
+        buttons[2] = GoToEnchantMenuButton(pickaxeItem, pickaxeData)
+        buttons[4] = StaticItemStackButton(pickaxeItem.clone())
         buttons[6] = SalvagePickaxeButton(this, pickaxeItem, pickaxeData)
-        buttons[8] = ExitButton()
+//        buttons[8] = ExitButton()
 
         buttons[10] = RefundEnchantmentButton(Nuke)
         buttons[19] = RefundEnchantmentButton(JackHammer)
@@ -91,7 +93,7 @@ class RefundEnchantmentsMenu(private val pickaxeItem: ItemStack, private val pic
 
         for (i in BLACK_SLOTS) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = GlassButton(15)
+                buttons[i] = GlassButton(7)
             }
         }
 
@@ -191,7 +193,7 @@ class RefundEnchantmentsMenu(private val pickaxeItem: ItemStack, private val pic
                                 player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted discarding of Cubed enchantment!")
                             }
 
-                            this@RefundEnchantmentsMenu.openMenu(player)
+                            this@RefundEnchantsMenu.openMenu(player)
                         }.openMenu(player)
                     }
 
@@ -217,7 +219,7 @@ class RefundEnchantmentsMenu(private val pickaxeItem: ItemStack, private val pic
                                 player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Aborted refund!")
                             }
 
-                            this@RefundEnchantmentsMenu.openMenu(player)
+                            this@RefundEnchantsMenu.openMenu(player)
                         }.openMenu(player)
                     } else {
                         player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe doesn't have any refundable ${enchant.textColor}${ChatColor.BOLD}${enchant.enchant} ${ChatColor.RED}levels.")

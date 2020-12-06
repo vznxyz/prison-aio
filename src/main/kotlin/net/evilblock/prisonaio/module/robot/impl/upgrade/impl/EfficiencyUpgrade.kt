@@ -1,5 +1,6 @@
 package net.evilblock.prisonaio.module.robot.impl.upgrade.impl
 
+import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.robot.impl.upgrade.Upgrade
@@ -19,10 +20,7 @@ object EfficiencyUpgrade : Upgrade {
     }
 
     override fun getDescription(): List<String> {
-        return listOf(
-                "${ChatColor.GRAY}Makes your robot mine more efficiently,",
-                "${ChatColor.GRAY}which earns you money faster."
-        )
+        return TextSplitter.split(text = "Makes your robot mine more efficiently, which means it generates revenue quicker.")
     }
 
     override fun getColor(): ChatColor {

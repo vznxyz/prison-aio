@@ -14,7 +14,7 @@ import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
-import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestige
+import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeInfo
 import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -92,7 +92,7 @@ class PrestigeEditorMenu : PaginatedMenu() {
 
                     assert(number.toInt() > 0) { "Number must be more than 0" }
 
-                    val prestige = PickaxePrestige(number.toInt())
+                    val prestige = PickaxePrestigeInfo(number.toInt())
                     PickaxePrestigeHandler.trackPrestige(prestige)
 
                     Tasks.async {
@@ -105,7 +105,7 @@ class PrestigeEditorMenu : PaginatedMenu() {
         }
     }
 
-    private inner class PrestigeButton(private val prestige: PickaxePrestige) : Button() {
+    private inner class PrestigeButton(private val prestige: PickaxePrestigeInfo) : Button() {
         override fun getName(player: Player): String {
             return "${ChatColor.YELLOW}${ChatColor.BOLD}Prestige ${prestige.number}"
         }

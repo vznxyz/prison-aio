@@ -8,7 +8,6 @@ import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
 import net.evilblock.cubed.util.nms.MinecraftProtocol
-import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.Formats
 import net.evilblock.prisonaio.util.economy.Currency
 import net.evilblock.prisonaio.module.robot.menu.ManageRobotMenu
@@ -17,7 +16,7 @@ import net.evilblock.prisonaio.module.robot.RobotHandler
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.robot.cosmetic.Cosmetic
 import net.evilblock.prisonaio.module.robot.cosmetic.impl.SkinCosmetic
-import net.evilblock.prisonaio.module.robot.impl.statistic.MinerRobotTimedEarnings
+import net.evilblock.prisonaio.module.robot.impl.statistic.MinerRobotEarningsV2
 import net.evilblock.prisonaio.module.robot.impl.upgrade.Upgrade
 import net.evilblock.prisonaio.module.robot.impl.upgrade.UpgradeManager
 import net.evilblock.prisonaio.module.robot.impl.upgrade.impl.EfficiencyUpgrade
@@ -25,7 +24,6 @@ import net.evilblock.prisonaio.module.robot.impl.upgrade.impl.FortuneUpgrade
 import net.evilblock.prisonaio.module.robot.serialize.AppliedCosmeticsSerializer
 import net.evilblock.prisonaio.module.robot.serialize.AppliedUpgradesSerializer
 import net.evilblock.prisonaio.module.robot.tick.Tickable
-import net.evilblock.prisonaio.util.plot.PlotUtil
 import net.minecraft.server.v1_12_R1.BlockPosition
 import net.minecraft.server.v1_12_R1.PacketPlayOutBlockBreakAnimation
 import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange
@@ -33,7 +31,6 @@ import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
@@ -48,20 +45,15 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         private const val ROBOT_TICKS = 600
     }
 
-    internal var createdAt: Long = System.currentTimeMillis()
-
     var tier: Int = 0
 
     internal var rewardTicks: Int = ROBOT_TICKS
 
-    internal var moneyTotalEarnings: BigDecimal = BigDecimal("0")
-    internal var moneyEarnings: MinerRobotTimedEarnings = MinerRobotTimedEarnings()
+    internal var moneyEarnings: MinerRobotEarningsV2 = MinerRobotEarningsV2()
+    internal var tokenEarnings: MinerRobotEarningsV2 = MinerRobotEarningsV2()
 
-    internal var tokensTotalEarnings: BigInteger = BigInteger("0")
-    internal var tokenEarnings: MinerRobotTimedEarnings = MinerRobotTimedEarnings()
-
-    internal var moneyOwed: Double = 0.0
-    internal var tokensOwed: Long = 0
+    internal var moneyOwed: BigDecimal = BigDecimal(0.0)
+    internal var tokensOwed: BigDecimal = BigDecimal(0.0)
 
     internal var lastCollect: Long = System.currentTimeMillis()
 
@@ -71,8 +63,8 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
     @JsonAdapter(AppliedCosmeticsSerializer::class)
     internal var enabledCosmetics: MutableList<Cosmetic> = arrayListOf()
 
-    // animation values
-    @Transient private var lastTick: Long = System.currentTimeMillis()
+    private var lastTick: Long = System.currentTimeMillis()
+    var uptime: Long = 0L
 
     // block animation values
     @Transient private var blockPhase: Int = 0
@@ -117,7 +109,8 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
             val texture = RobotsModule.getTierTexture(tier)
             updateHelmet(ItemUtils.applySkullTexture(ItemBuilder(Material.SKULL_ITEM).data(3).build(), texture.first))
         }
-//        updateHelmet(ItemUtils.getPlayerHeadItem(Cubed.instance.uuidCache.name(owner)))
+
+        updateHelmet(ItemUtils.getPlayerHeadItem(Cubed.instance.uuidCache.name(owner)))
 
         if (RobotsModule.hasTierArmorColor(tier)) {
             val armorColor = Color.fromRGB(RobotsModule.getTierArmorColor(tier))
@@ -184,12 +177,15 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         val lines = arrayListOf<String>()
         val ownerName = Cubed.instance.uuidCache.name(owner)
 
+        lines.add(getTierName())
+
         if (tier == 0) {
-            lines.add("${ChatColor.RED}${ChatColor.BOLD}$ownerName's Robot")
+            lines.add("${ChatColor.GRAY}No Tier")
         } else {
-            lines.add(ChatColor.translateAlternateColorCodes('&', RobotsModule.config.getString("tiers.${tier}.name", "&cDefault Tier $tier Name")))
-            lines.add("${ChatColor.GRAY}Owned by $ownerName")
+            lines.add("${ChatColor.GRAY}Tier $tier")
         }
+
+        lines.add("${ChatColor.GRAY}Owned by $ownerName")
 
         if (enabledCosmetics.isNotEmpty()) {
             for (cosmetic in enabledCosmetics) {
@@ -212,6 +208,10 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         }
     }
 
+    fun getTicksPerSecond(): Int {
+        return (1000.0 / getTickInterval()).toInt()
+    }
+
     override fun getLastTick(): Long {
         return lastTick
     }
@@ -225,36 +225,40 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
             throw IllegalStateException("Cannot tick robot on main thread")
         }
 
+        val timePassed = System.currentTimeMillis() - lastTick
+        if (timePassed < 3_000L) {
+            uptime += timePassed
+        }
+
         tickRewards()
 
         if (RobotsModule.isAnimationsEnabled()) {
             tickArmorStandAnimation()
-            tickBlockAnimation()
+        }
+    }
+
+    fun getMoneyPerTick(): Double {
+        return if (hasUpgradeApplied(FortuneUpgrade)) {
+            (RobotsModule.getTierBaseMoney(tier) + (RobotsModule.getFortuneBaseMoney() * getUpgradeLevel(FortuneUpgrade))) * RobotsModule.getFortuneMoneyMultiplier()
+        } else {
+            RobotsModule.getTierBaseMoney(tier)
+        }
+    }
+
+    fun getTokensPerTick(): Double {
+        return if (hasUpgradeApplied(FortuneUpgrade)) {
+            ((RobotsModule.getTierBaseTokens(tier) + RobotsModule.getFortuneBaseTokens()) * (1.0 + (getUpgradeLevel(FortuneUpgrade) * RobotsModule.getFortuneTokensMultiplier())))
+        } else {
+            RobotsModule.getTierBaseTokens(tier)
         }
     }
 
     private fun tickRewards() {
-        var rewardedMoney = RobotsModule.getTierBaseMoney(tier)
-        var rewardedTokens = RobotsModule.getTierBaseTokens(tier)
+        val money = getMoneyPerTick()
+        val tokens = getTokensPerTick()
 
-        if (hasUpgradeApplied(FortuneUpgrade)) {
-            val fortuneLevel = getUpgradeLevel(FortuneUpgrade)
-            val fortuneBaseMoney = RobotsModule.getFortuneBaseMoney()
-            val fortuneMoneyMultiplier = RobotsModule.getFortuneMoneyMultiplier()
-
-            rewardedMoney = (rewardedMoney + (fortuneBaseMoney * fortuneLevel)) * fortuneMoneyMultiplier
-
-            val fortuneBaseTokens = RobotsModule.getFortuneBaseTokens()
-            val fortuneTokensMultiplier = RobotsModule.getFortuneTokensMultiplier()
-
-            rewardedTokens = ((rewardedTokens + fortuneBaseTokens) * (1.0 + (fortuneLevel * fortuneTokensMultiplier)).toLong())
-        }
-
-        moneyTotalEarnings += BigDecimal(rewardedMoney.toString())
-        moneyEarnings.addEarnings(rewardedMoney.toLong())
-
-        tokensTotalEarnings += BigInteger(rewardedTokens.toString())
-        tokenEarnings.addEarnings(rewardedTokens)
+        moneyEarnings.addEarnings(money)
+        tokenEarnings.addEarnings(tokens)
 
         if (rewardTicks-- <= 0) {
             moneyEarnings.aggregate()
@@ -263,8 +267,8 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
             rewardTicks = ROBOT_TICKS
         }
 
-        moneyOwed += rewardedMoney
-        tokensOwed += rewardedTokens
+        moneyOwed += BigDecimal(money)
+        tokensOwed += BigDecimal(tokens)
     }
 
     private fun tickArmorStandAnimation() {
@@ -286,38 +290,8 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         }
     }
 
-    private fun tickBlockAnimation() {
-        val fakeBlockLocation = getFakeBlockLocation()
-        val blockBreakAnimationPacket = PacketPlayOutBlockBreakAnimation()
-
-        // there will be some overlap here, but these effects are very localized so it should be ok
-        val blockBreakEntityId = (fakeBlockLocation.blockX and 0xFFF shl 20 or (fakeBlockLocation.blockZ and 0xFFF shl 8) or (fakeBlockLocation.blockY and 0xFF))
-        Reflection.setDeclaredFieldValue(blockBreakAnimationPacket, "a", blockBreakEntityId)
-
-        Reflection.setDeclaredFieldValue(blockBreakAnimationPacket, "b", BlockPosition(fakeBlockLocation.blockX, fakeBlockLocation.blockY, fakeBlockLocation.blockZ))
-        Reflection.setDeclaredFieldValue(blockBreakAnimationPacket, "c", blockPhase)
-
-        for (currentWatcher in getCurrentWatcherPlayers()) {
-            if (currentWatcher.location.world != currentWatcher.world) {
-                continue
-            }
-
-            (currentWatcher as CraftPlayer).handle.playerConnection.sendPacket(blockBreakAnimationPacket)
-        }
-
-        blockPhase++
-
-        if (blockPhase > 9) {
-            blockPhase = 0
-        }
-    }
-
-    fun getCreatedAt(): Long {
-        return createdAt
-    }
-
     fun collectEarnings(player: Player, sendMessages: Boolean = true): Boolean {
-        if (moneyOwed == 0.0 && tokensOwed == 0L) {
+        if (moneyOwed == BigDecimal.ZERO && tokensOwed == BigDecimal.ZERO) {
             if (sendMessages) {
                 player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You don't have anything to collect.")
             }
@@ -328,25 +302,27 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         lastCollect = System.currentTimeMillis()
 
         val moneyCollected = moneyOwed
-        val tokensCollected = tokensOwed
+        val tokensCollected = tokensOwed.toBigInteger()
 
-        moneyOwed = 0.0
-        tokensOwed = 0
+        moneyOwed = BigDecimal(0.0)
+        tokensOwed = BigDecimal(0.0)
 
-        if (moneyCollected > 0) {
+        val collectingMoney = moneyCollected > BigDecimal.ZERO
+        if (collectingMoney) {
             Currency.Type.MONEY.give(player.uniqueId, moneyCollected)
         }
 
-        if (tokensCollected > 0) {
+        val collectingTokens = tokensCollected > BigInteger.ZERO
+        if (collectingTokens) {
             Currency.Type.TOKENS.give(player.uniqueId, tokensCollected)
         }
 
         if (sendMessages) {
-            if (moneyCollected > 0 && tokensCollected > 0) {
+            if (collectingMoney && collectingTokens) {
                 player.sendMessage("${RobotsModule.CHAT_PREFIX}You collected ${Formats.formatMoney(moneyCollected)} ${ChatColor.GRAY}and ${Formats.formatTokens(tokensCollected)}${ChatColor.GRAY}.")
-            } else if (moneyCollected > 0) {
+            } else if (collectingMoney) {
                 player.sendMessage("${RobotsModule.CHAT_PREFIX}You collected ${Formats.formatMoney(moneyCollected)}${ChatColor.GRAY}.")
-            } else if (tokensCollected > 0) {
+            } else if (collectingTokens) {
                 player.sendMessage("${RobotsModule.CHAT_PREFIX}You collected ${Formats.formatTokens(tokensCollected)}${ChatColor.GRAY}.")
             }
         }

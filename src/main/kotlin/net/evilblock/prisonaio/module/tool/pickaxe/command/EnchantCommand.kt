@@ -5,12 +5,12 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.tool.enchant.command
+package net.evilblock.prisonaio.module.tool.pickaxe.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
-import net.evilblock.prisonaio.module.tool.enchant.menu.PurchaseEnchantmentsMenu
+import net.evilblock.prisonaio.module.tool.pickaxe.menu.EnchantMenu
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -32,7 +32,7 @@ object EnchantCommand {
         if (pickaxeData == null) {
             player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe isn't registered! Try switching hands!")
         } else {
-            PurchaseEnchantmentsMenu(player.inventory.itemInMainHand, pickaxeData).openMenu(player)
+            EnchantMenu(player.inventory.itemInMainHand, pickaxeData).openMenu(player)
         }
     }
 

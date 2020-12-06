@@ -33,6 +33,8 @@ object Permissions {
     const val GANGS_TROPHIES_TAKE = "prisonaio.gangs.trophies.take"
     const val GANGS_BOOSTERS_GRANT = "prisonaio.gangs.boosters.grant"
 
+    const val GENERATORS_GIVE = "prisonaio.generators.give"
+
     const val QUESTS_ADMIN = "prisonaio.quests.admin"
     const val BANK_NOTES_ADMIN = "prisonaio.banknotes.admin"
     const val TOKENS_ADMIN = "prisonaio.tokens.admin"
