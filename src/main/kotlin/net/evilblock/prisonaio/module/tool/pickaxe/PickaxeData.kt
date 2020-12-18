@@ -11,15 +11,12 @@ import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemUtils
-import net.evilblock.cubed.util.nms.NBTUtil
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeHandler
 import net.evilblock.prisonaio.module.tool.enchant.serialize.EnchantsMapReferenceSerializer
 import net.evilblock.prisonaio.module.tool.enchant.serialize.EnchantsSetReferenceSerializer
-import net.minecraft.server.v1_12_R1.NBTTagCompound
 import org.bukkit.ChatColor
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import java.text.NumberFormat
@@ -33,12 +30,12 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
     var blocksMined: Int = 0
 
     @JsonAdapter(EnchantsMapReferenceSerializer::class)
-    var enchants: MutableMap<AbstractEnchant, Int> = hashMapOf()
+    var enchants: MutableMap<Enchant, Int> = hashMapOf()
 
     @JsonAdapter(EnchantsSetReferenceSerializer::class)
-    var disabledEnchants: MutableSet<AbstractEnchant> = hashSetOf()
+    var disabledEnchants: MutableSet<Enchant> = hashSetOf()
 
-    fun addLevels(enchant: AbstractEnchant, levels: Int) {
+    fun addLevels(enchant: Enchant, levels: Int) {
         if (!enchants.containsKey(enchant)) {
             enchants[enchant] = levels
         } else {
@@ -46,17 +43,17 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
         }
     }
 
-    fun setLevel(enchant: AbstractEnchant, level: Int) {
+    fun setLevel(enchant: Enchant, level: Int) {
         enchants[enchant] = level
     }
 
-    fun removeEnchant(enchant: AbstractEnchant) {
+    fun removeEnchant(enchant: Enchant) {
         enchants.remove(enchant)
     }
 
     fun sync(itemStack: ItemStack) {
         synchronized(modificationLock) {
-            enchants = EnchantsManager.readEnchantsFromLore(itemStack)
+            enchants = EnchantHandler.readEnchantsFromLore(itemStack)
 
             if (itemStack.hasItemMeta() && itemStack.itemMeta.hasLore()) {
                 for (line in itemStack.itemMeta.lore) {
@@ -88,25 +85,30 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
 
     fun applyMeta(itemStack: ItemStack) {
         synchronized(modificationLock) {
-            val lore = arrayListOf<String>()
+            val lore = arrayListOf<String>().also { lore ->
+                lore.add("")
+                lore.add("${ChatColor.YELLOW}${ChatColor.BOLD}Statistics")
+                lore.add("${ChatColor.GRAY}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(prestige)}")
+                lore.add("${ChatColor.GRAY}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Blocks Mined: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberFormat.getInstance().format(blocksMined)}")
+                lore.add("")
+                lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
 
-            lore.add("")
-            lore.add("${ChatColor.YELLOW}${ChatColor.BOLD}Statistics")
-            lore.add("${ChatColor.GRAY}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(prestige)}")
-            lore.add("${ChatColor.GRAY}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Blocks Mined: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberFormat.getInstance().format(blocksMined)}")
-            lore.add("")
-            lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
-
-            if (enchants.isNotEmpty()) {
-                for ((enchant, level) in enchants.entries.sortedWith(EnchantsManager.MAPPED_ENCHANT_COMPARATOR)) {
-                    lore.add("${enchant.lorified()} ${NumberUtils.format(level)}")
+                if (enchants.isNotEmpty()) {
+                    for ((enchant, level) in enchants.entries.sortedWith(EnchantHandler.MAPPED_ENCHANT_COMPARATOR)) {
+                        lore.add("${enchant.lorified()} ${NumberUtils.format(level)}")
+                    }
+                } else {
+                    lore.add("${ChatColor.GRAY}No enchants applied!")
                 }
-            } else {
-                lore.add("${ChatColor.GRAY}No enchants applied!")
             }
 
             if (itemStack.itemMeta != null) {
                 val meta = itemStack.itemMeta
+
+                if (customName != null) {
+                    meta.displayName = customName
+                }
+
                 meta.lore = lore
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
 
@@ -124,15 +126,15 @@ class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
     /**
      * Finds the enchantment limit for this pickaxe.
      */
-    fun getEnchantLimit(enchant: AbstractEnchant): Int {
+    fun getEnchantLimit(enchant: Enchant): Int {
         return PickaxePrestigeHandler.findEnchantLimits(prestige).getOrDefault(enchant, -1)
     }
 
-    fun isEnchantDisabled(enchant: AbstractEnchant): Boolean {
+    fun isEnchantDisabled(enchant: Enchant): Boolean {
         return disabledEnchants.contains(enchant)
     }
 
-    fun toggleEnchant(enchant: AbstractEnchant) {
+    fun toggleEnchant(enchant: Enchant) {
         if (isEnchantDisabled(enchant)) {
             disabledEnchants.remove(enchant)
         } else {

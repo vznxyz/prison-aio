@@ -25,9 +25,9 @@ object GangChatListeners : Listener {
         val quickChatTrigger = event.message.startsWith("@")
 
         if (quickChatEnabled || quickChatTrigger) {
-            val accessibleGangs = GangHandler.getAccessibleGangs(event.player.uniqueId)
-            if (accessibleGangs.size == 1) {
-                handleMessage(event, accessibleGangs.first(), quickChatTrigger)
+            val gang = GangHandler.getGangByPlayer(event.player)
+            if (gang != null) {
+                handleMessage(event, gang, quickChatTrigger)
                 return
             }
 

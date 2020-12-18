@@ -41,7 +41,7 @@ class BlocksMinedChallenge(id: String, internal var blocksMined: Int) : Challeng
         val percentage = ProgressBarBuilder.percentage(value, blocksMined)
 
         val progressColor = ProgressBarBuilder.colorPercentage(percentage)
-        val progressBar = ProgressBarBuilder().build(percentage)
+        val progressBar = ProgressBarBuilder.DEFAULT.build(percentage)
 
         return "${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}($progressColor${DECIMAL_FORMAT.format(percentage)}%${ChatColor.GRAY})"
     }

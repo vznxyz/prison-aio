@@ -11,7 +11,7 @@ import mkremins.fanciful.FancyMessage
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.text.NumberFormat

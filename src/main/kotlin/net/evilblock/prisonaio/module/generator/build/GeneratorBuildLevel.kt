@@ -19,7 +19,7 @@ open class GeneratorBuildLevel(
     val buildTime: Int
 ) {
 
-    fun getSchematic(rotation: Rotation): RotatedSchematic? {
+    fun getSchematic(rotation: Rotation): RotatedSchematic {
         return GeneratorHandler.getSchematic(schematic, rotation)
     }
 

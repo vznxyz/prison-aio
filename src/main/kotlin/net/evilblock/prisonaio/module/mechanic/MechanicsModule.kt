@@ -78,6 +78,7 @@ object MechanicsModule : PluginModule() {
         return listOf(
             CraftingMechanicsListeners,
             AnvilMechanicsListeners,
+            DisableBlockDecayListeners,
             DisableBrewingMechanicsListeners,
             DisableExplosionsListeners,
             DisableFarmingMechanicsListeners,

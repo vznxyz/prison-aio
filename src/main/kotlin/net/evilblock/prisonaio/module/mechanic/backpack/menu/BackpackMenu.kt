@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.mechanic.backpack.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.buttons.StaticItemStackButton
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
@@ -48,7 +49,7 @@ class BackpackMenu(private val backpack: Backpack) : Menu() {
 
         for (i in 0..8) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 15, " ")
+                buttons[i] = GlassButton(7)
             }
         }
 

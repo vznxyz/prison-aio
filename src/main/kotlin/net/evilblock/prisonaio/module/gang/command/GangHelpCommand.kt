@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.gang.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.util.bukkit.Constants
-import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.GangsModule
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 
@@ -36,7 +36,7 @@ object GangHelpCommand {
         "",
         "${ChatColor.RED}Other Help:",
         "${ChatColor.YELLOW}To use ${ChatColor.GREEN}gang chat${ChatColor.YELLOW}, prefix your message with the ${ChatColor.GRAY}'${ChatColor.GREEN}@${ChatColor.GRAY}' ${ChatColor.YELLOW}symbol.",
-        "${ChatColor.YELLOW}Gangs are limited to ${ChatColor.GREEN}${GangModule.getMaxMembers()} members${ChatColor.YELLOW}.",
+        "${ChatColor.YELLOW}Gangs are limited to ${ChatColor.GREEN}${GangsModule.getMaxMembers()} members${ChatColor.YELLOW}.",
         "${ChatColor.GRAY}${Constants.LONG_LINE}"
     )
 

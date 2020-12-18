@@ -18,26 +18,18 @@ enum class GangPermission(
     private val incompatible: Set<PermissionValue>
 ) {
 
-    ALLOW_VISITORS(
-        "Allow Visitors",
-        "This setting controls whether or not players can visit your cell.",
-        "The owner of that gang isn't accepting visitors right now.",
-        Material.WOOD_DOOR,
-        PermissionValue.MEMBERS,
-        setOf(PermissionValue.CO_LEADERS)
-    ),
     BUILD_AND_BREAK(
         "Building & Breaking",
-        "This setting controls who can build and break on your island.",
-        "You don't have permission to build in this cell.",
-        Material.DIAMOND_PICKAXE,
+        "This setting controls who can build and break in your gang's HQ.",
+        "You don't have permission to build here!",
+        Material.GRASS,
         PermissionValue.MEMBERS,
         emptySet()
     ),
     ACCESS_CONTAINERS(
         "Access Containers",
         "This setting controls who can access containers such as chests, furnaces, hoppers, and droppers.",
-        "You don't have permission to access containers in this cell.",
+        "You don't have permission to access containers here!",
         Material.CHEST,
         PermissionValue.MEMBERS,
         emptySet()
@@ -45,7 +37,7 @@ enum class GangPermission(
     INTERACT_WITH_BLOCKS(
         "Interact With Blocks",
         "This setting controls who can interact with blocks such as doors, trap doors, fence gates, buttons, levers, pressure plates, repeaters, and comparators.",
-        "You don't have permission to interact with blocks in this cell.",
+        "You don't have permission to interact with blocks here!",
         Material.LEVER,
         PermissionValue.MEMBERS,
         emptySet()
@@ -53,10 +45,34 @@ enum class GangPermission(
     SPEND_TROPHIES(
         "Spend Trophies",
         "This setting controls who can spend trophies in the Gang Shop.",
-        "You don't have permission to spend the gang's trophies.",
+        "You don't have permission to spend the gang's trophies!",
         Material.GOLD_INGOT,
         PermissionValue.CO_LEADERS,
         setOf(PermissionValue.MEMBERS, PermissionValue.VISITORS)
+    ),
+    ALLOW_VISITORS(
+        "Allow Visitors",
+        "This setting controls whether or not players can visit your gang's HQ.",
+        "The owner of that gang isn't accepting visitors right now.",
+        Material.WOOD_DOOR,
+        PermissionValue.MEMBERS,
+        setOf(PermissionValue.CO_LEADERS)
+    ),
+    KICK_VISITORS(
+        "Kick Visitors",
+        "This setting controls who can kick visitors in your gang's HQ.",
+        "You don't have permission to kick visitors!",
+        Material.IRON_DOOR,
+        PermissionValue.CAPTAINS,
+        setOf(PermissionValue.VISITORS)
+    ),
+    KICK_MEMBERS(
+        "Kick Members",
+        "This setting controls who can kick members of your gang.",
+        "You don't have permission to kick gang members!",
+        Material.TNT,
+        PermissionValue.CAPTAINS,
+        setOf(PermissionValue.VISITORS, PermissionValue.MEMBERS)
     );
 
     fun getDefaultValue(): PermissionValue {

@@ -19,7 +19,6 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.store.bukkit.UUIDCache
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.storage.StorageModule
 import net.evilblock.prisonaio.module.user.economy.EconomyProvider
 import net.milkbowl.vault.economy.Economy
 import org.bson.Document
@@ -27,6 +26,7 @@ import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicePriority
 import java.io.File
 import java.math.BigDecimal
@@ -45,7 +45,7 @@ object UserHandler : PluginHandler {
 
     private val JSON_WRITER_SETTINGS = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()
 
-    private val usersCollection: MongoCollection<Document> = StorageModule.database.getCollection("users")
+    private val usersCollection: MongoCollection<Document> = PrisonAIO.instance.database.getCollection("users")
     private val usersMap: MutableMap<UUID, User> = ConcurrentHashMap()
 
     val economyLogFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "economy.txt"))
@@ -147,13 +147,8 @@ object UserHandler : PluginHandler {
 
         val document = usersCollection.find(Document("uuid", uuid.toString())).first()
         if (document != null) {
-            try {
-                return Cubed.gson.fromJson(document.toJson(JSON_WRITER_SETTINGS), User::class.java).also {
-                    it.init()
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                throw IllegalStateException("Failed to deserialize user document", e)
+            return Cubed.gson.fromJson(document.toJson(JSON_WRITER_SETTINGS), User::class.java).also {
+                it.init()
             }
         }
 
@@ -201,6 +196,10 @@ object UserHandler : PluginHandler {
         } else {
             return usersMap[uuid]!!
         }
+    }
+
+    fun getUser(player: Player): User {
+        return getUser(player.uniqueId)
     }
 
     fun isUserLoaded(uuid: UUID): Boolean {

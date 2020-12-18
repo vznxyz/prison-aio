@@ -23,7 +23,7 @@ object GangLeaveCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        val visitingGang = GangHandler.getAssumedGang(player.uniqueId)
+        val visitingGang = GangHandler.getGangByPlayer(player.uniqueId)
         if (visitingGang == null) {
             player.sendMessage("${ChatColor.RED}You must be inside a gang to leave it.")
             return

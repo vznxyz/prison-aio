@@ -15,8 +15,8 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import org.bukkit.inventory.ItemStack
@@ -70,7 +70,7 @@ object SalvagePreventionHandler : PluginHandler {
         pickaxes.remove(itemStack)
     }
 
-    fun getRefundableEnchants(itemStack: ItemStack, pickaxeData: PickaxeData): Map<AbstractEnchant, Int> {
+    fun getRefundableEnchants(itemStack: ItemStack, pickaxeData: PickaxeData): Map<Enchant, Int> {
         val enchants = pickaxeData.enchants.toMutableMap()
         if (enchants.isEmpty()) {
             return emptyMap()
@@ -88,7 +88,7 @@ object SalvagePreventionHandler : PluginHandler {
             return enchants
         }
 
-        val matchingPickaxeEnchants = EnchantsManager.readEnchantsFromLore(matchingPickaxe)
+        val matchingPickaxeEnchants = EnchantHandler.readEnchantsFromLore(matchingPickaxe)
 
         for ((enchant, level) in enchants.toMap()) {
             if (matchingPickaxeEnchants.containsKey(enchant)) {

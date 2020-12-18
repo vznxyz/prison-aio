@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.battlepass.challenge.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
@@ -40,7 +41,7 @@ class EditChallengeMenu(private val challenge: Challenge) : Menu() {
 
         for (i in 0..8) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 15, " ")
+                buttons[i] = GlassButton(7)
             }
         }
 
@@ -79,7 +80,7 @@ class EditChallengeMenu(private val challenge: Challenge) : Menu() {
             if (clickType.isLeftClick) {
                 EzPrompt.Builder()
                     .promptText("${ChatColor.GREEN}Please input a new name for the challenge.")
-                    .acceptInput { _, input ->
+                    .acceptInput { input ->
                         challenge.name = ChatColor.translateAlternateColorCodes('&', input)
                         ChallengeHandler.saveData()
 

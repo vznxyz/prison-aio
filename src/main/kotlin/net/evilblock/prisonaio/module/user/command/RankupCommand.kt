@@ -28,19 +28,18 @@ object RankupCommand {
     fun execute(player: Player) {
         val user = UserHandler.getUser(player.uniqueId)
 
-        val optionalNextRank = RankHandler.getNextRank(user.getRank())
-        if (!optionalNextRank.isPresent) {
+        val nextRank = RankHandler.getNextRank(user.getRank())
+        if (nextRank == null) {
             player.sendMessage("${ChatColor.RED}You have achieved max rank and cannot rankup anymore. Try /prestige!")
             return
         }
 
-        val rank = optionalNextRank.get()
-        val rankPrice = rank.getPrice(user.getPrestige())
+        val rankPrice = nextRank.getPrice(user.getPrestige())
 
         if (user.hasMoneyBalance(rankPrice)) {
             val previousRank = user.getRank()
 
-            val playerRankupEvent = PlayerRankupEvent(player, previousRank, rank)
+            val playerRankupEvent = PlayerRankupEvent(player, previousRank, nextRank)
             Bukkit.getServer().pluginManager.callEvent(playerRankupEvent)
 
             if (playerRankupEvent.isCancelled) {
@@ -48,16 +47,16 @@ object RankupCommand {
             }
 
             user.subtractMoneyBalance(rankPrice)
-            user.updateRank(rank)
+            user.updateRank(nextRank)
             user.applyPermissions(player)
 
-            rank.executeCommands(player)
+            nextRank.executeCommands(player)
 
             val moneyNeeded = NumberUtils.format(rankPrice)
 
             player.sendMessage("")
             player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Rankup Purchased")
-            player.sendMessage(" ${ChatColor.GRAY}Congratulations on your rankup from ${previousRank.displayName} ${ChatColor.GRAY}to ${rank.displayName}${ChatColor.GRAY}!")
+            player.sendMessage(" ${ChatColor.GRAY}Congratulations on your rankup from ${previousRank.displayName} ${ChatColor.GRAY}to ${nextRank.displayName}${ChatColor.GRAY}!")
             player.sendMessage(" ${ChatColor.GRAY}The rankup cost ${ChatColor.GREEN}$${ChatColor.YELLOW}$moneyNeeded${ChatColor.GRAY}.")
             player.sendMessage("")
         } else {
@@ -65,7 +64,7 @@ object RankupCommand {
 
             player.sendMessage("")
             player.sendMessage(" ${ChatColor.RED}${ChatColor.BOLD}Cannot Afford Rankup")
-            player.sendMessage(" ${ChatColor.GRAY}You need $moneyNeeded ${ChatColor.GRAY}more to rankup to ${rank.displayName}${ChatColor.GRAY}.")
+            player.sendMessage(" ${ChatColor.GRAY}You need $moneyNeeded ${ChatColor.GRAY}more to rankup to ${nextRank.displayName}${ChatColor.GRAY}.")
             player.sendMessage("")
         }
     }

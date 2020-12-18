@@ -7,6 +7,17 @@
 
 package net.evilblock.prisonaio.module.gang.invite
 
+import net.evilblock.prisonaio.module.gang.GangHandler
 import java.util.*
 
-data class GangInvite(val invitedBy: UUID, val invitedAt: Long)
+data class GangInvite(val invitedBy: UUID, val invitedAt: Long) {
+
+    fun isExpired(): Boolean {
+        return System.currentTimeMillis() >= invitedAt + GangHandler.INVITE_EXPIRE_TIME
+    }
+
+    fun getRemainingTime(): Long {
+        return (invitedAt + GangHandler.INVITE_EXPIRE_TIME) - System.currentTimeMillis()
+    }
+
+}

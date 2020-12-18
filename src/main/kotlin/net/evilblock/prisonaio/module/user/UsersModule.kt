@@ -32,10 +32,8 @@ import net.evilblock.prisonaio.module.user.perk.Perk
 import net.evilblock.prisonaio.module.user.perk.autosell.AutoSellNotification
 import net.evilblock.prisonaio.module.user.scoreboard.PrisonScoreGetter
 import net.evilblock.prisonaio.module.user.scoreboard.PrisonTitleGetter
-import net.evilblock.prisonaio.module.user.scoreboard.animation.ContentSwitching
 import net.evilblock.prisonaio.module.user.scoreboard.animation.RainbowAnimation
-import net.evilblock.prisonaio.module.user.scoreboard.animation.TitleAnimation
-import net.evilblock.prisonaio.module.user.setting.listener.UserChatSettingsListeners
+import net.evilblock.prisonaio.module.user.scoreboard.animation.ScoreboardAnimation
 import net.evilblock.prisonaio.module.user.setting.listener.UserSettingsListeners
 import net.evilblock.prisonaio.module.user.setting.task.UserSettingsTickTask
 import net.evilblock.prisonaio.module.user.task.PlayTimeSyncTask
@@ -69,9 +67,8 @@ object UsersModule : PluginModule() {
 
         ScoreboardHandler.configure(PrisonTitleGetter, PrisonScoreGetter)
 
-        Tasks.asyncTimer(TitleAnimation, 1L, 1L)
+        Tasks.asyncTimer(ScoreboardAnimation, 1L, 1L)
         Tasks.asyncTimer(RainbowAnimation, 1L, 1L)
-        Tasks.asyncTimer(ContentSwitching, 1L, 1L)
     }
 
     override fun onDisable() {
@@ -105,7 +102,6 @@ object UsersModule : PluginModule() {
             UserPrestigeListeners,
             UserStatisticsListeners,
             UserSettingsListeners,
-            UserChatSettingsListeners,
             BankNoteAdminListeners,
             BankNoteDupeListeners,
             BankNoteListeners,
@@ -122,7 +118,7 @@ object UsersModule : PluginModule() {
             BalanceTopCommand.javaClass,
             DropCommand.javaClass,
             FlyCommand.javaClass,
-            HelpCommand.javaClass,
+            MainMenuCommand.javaClass,
             NicknameCommand.javaClass,
             PingCommand.javaClass,
             PlayTimeCommand.javaClass,
@@ -135,6 +131,7 @@ object UsersModule : PluginModule() {
             ShopMultiplierCommand.javaClass,
             SettingsCommand.javaClass,
             SpawnCommand.javaClass,
+            ToggleEnchantMessagesCommand.javaClass,
             TokensCommand.javaClass,
             TokensHelpCommand.javaClass,
             TokensWithdrawCommand.javaClass,

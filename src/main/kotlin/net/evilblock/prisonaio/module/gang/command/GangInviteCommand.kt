@@ -24,7 +24,7 @@ object GangInviteCommand {
     )
     @JvmStatic
     fun execute(sender: Player, @Param(name = "player") playerUuid: UUID) {
-        val gang = GangHandler.getAssumedGang(sender.uniqueId)
+        val gang = GangHandler.getGangByPlayer(sender.uniqueId)
         if (gang == null) {
             sender.sendMessage("${ChatColor.RED}You must be inside your gang to invite other players.")
             return

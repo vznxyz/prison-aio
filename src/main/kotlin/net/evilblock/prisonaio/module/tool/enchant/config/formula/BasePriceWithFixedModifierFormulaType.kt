@@ -11,7 +11,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.enchant.menu.admin.ManageEnchantsMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -107,7 +107,7 @@ object BasePriceWithFixedModifierFormulaType : PriceFormulaType("Base Price + Fi
                         formula.basePrice = number.toInt()
 
                         Tasks.async {
-                            EnchantsManager.saveConfig()
+                            EnchantHandler.saveConfig()
                         }
 
                         this@EditVariablesMenu.openMenu(player)
@@ -139,7 +139,7 @@ object BasePriceWithFixedModifierFormulaType : PriceFormulaType("Base Price + Fi
                         formula.fixedRate = number.toInt()
 
                         Tasks.async {
-                            EnchantsManager.saveConfig()
+                            EnchantHandler.saveConfig()
                         }
 
                         this@EditVariablesMenu.openMenu(player)

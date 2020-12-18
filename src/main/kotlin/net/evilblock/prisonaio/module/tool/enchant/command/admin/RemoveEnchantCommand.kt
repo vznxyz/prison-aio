@@ -9,8 +9,8 @@ package net.evilblock.prisonaio.module.tool.enchant.command.admin
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -23,14 +23,14 @@ object RemoveEnchantCommand {
         permission = "prisonaio.enchants.remove"
     )
     @JvmStatic
-    fun execute(player: Player, @Param(name = "enchant") enchant: AbstractEnchant) {
+    fun execute(player: Player, @Param(name = "enchant") enchant: Enchant) {
         if (player.inventory.itemInMainHand == null || !player.inventory.itemInHand.type.name.endsWith("_PICKAXE")) {
-            player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}You must be holding the pickaxe you would like to remove an enchant from.")
+            player.sendMessage("${EnchantHandler.CHAT_PREFIX}${ChatColor.RED}You must be holding the pickaxe you would like to remove an enchant from.")
             return
         }
 
         val pickaxeData = PickaxeHandler.getPickaxeData(player.inventory.itemInMainHand) ?: return
-        EnchantsManager.removeEnchant(pickaxeData, player.inventory.itemInMainHand, enchant)
+        EnchantHandler.removeEnchant(pickaxeData, player.inventory.itemInMainHand, enchant)
 
         player.updateInventory()
         player.sendMessage("${ChatColor.GREEN}Removed enchant!")

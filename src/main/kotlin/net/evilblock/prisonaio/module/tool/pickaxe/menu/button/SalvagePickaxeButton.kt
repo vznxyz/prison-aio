@@ -11,12 +11,11 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.util.TextSplitter
-import net.evilblock.cubed.util.bukkit.ColorUtil
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.tool.pickaxe.salvage.SalvagePreventionHandler
-import net.evilblock.prisonaio.module.tool.enchant.type.Cubed
+import net.evilblock.prisonaio.module.tool.enchant.impl.Cubed
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
@@ -54,12 +53,12 @@ class SalvagePickaxeButton(private val origin: Menu, private val pickaxeItem: It
         if (clickType == ClickType.LEFT) {
             val enchants = SalvagePreventionHandler.getRefundableEnchants(pickaxeItem, pickaxeData)
             if (enchants.isEmpty()) {
-                player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe doesn't have any salvagable enchantments, therefore it cannot be salvaged.")
+                player.sendMessage("${EnchantHandler.CHAT_PREFIX}${ChatColor.RED}Your pickaxe doesn't have any salvagable enchantments, therefore it cannot be salvaged.")
                 return
             }
 
             if (enchants.containsKey(Cubed)) {
-                player.sendMessage("${EnchantsManager.CHAT_PREFIX}${ChatColor.RED}Your pickaxe has the Cubed enchantment, which makes the pickaxe un-salvagable.")
+                player.sendMessage("${EnchantHandler.CHAT_PREFIX}${ChatColor.RED}Your pickaxe has the Cubed enchantment, which makes the pickaxe un-salvagable.")
                 return
             }
 
@@ -67,9 +66,9 @@ class SalvagePickaxeButton(private val origin: Menu, private val pickaxeItem: It
 
             enchants.entries
                 .filter { entry -> entry.key !is Cubed }
-                .sortedWith(EnchantsManager.MAPPED_ENCHANT_COMPARATOR)
+                .sortedWith(EnchantHandler.MAPPED_ENCHANT_COMPARATOR)
                 .forEach { entry ->
-                    description.add("${ColorUtil.toChatColor(entry.key.iconColor)}${ChatColor.BOLD}❙ ${ChatColor.GRAY}${entry.key.getStrippedEnchant()} ${entry.value} (${ChatColor.GOLD}${Formats.formatTokens(entry.key.getRefundTokens(entry.value))}${ChatColor.GRAY})")
+                    description.add("${entry.key.getCategory().textColor}${ChatColor.BOLD}❙ ${ChatColor.GRAY}${entry.key.getStrippedName()} ${entry.value} (${ChatColor.GOLD}${Formats.formatTokens(entry.key.getRefundTokens(entry.value))}${ChatColor.GRAY})")
                 }
 
             description.add("")
@@ -90,7 +89,7 @@ class SalvagePickaxeButton(private val origin: Menu, private val pickaxeItem: It
                 ConfirmMenu(title = "Salvage Pickaxe?", extraInfo = description) { confirmed ->
                     if (confirmed) {
                         player.closeInventory()
-                        player.sendMessage("${EnchantsManager.CHAT_PREFIX}You have salvaged your pickaxe for ${Formats.formatTokens(totalReturns)}${ChatColor.GRAY}. It is now gone forever...")
+                        player.sendMessage("${EnchantHandler.CHAT_PREFIX}You have salvaged your pickaxe for ${Formats.formatTokens(totalReturns)}${ChatColor.GRAY}. It is now gone forever...")
 
                         val indexOfItem = player.inventory.first(pickaxeItem)
                         if (indexOfItem == -1) {

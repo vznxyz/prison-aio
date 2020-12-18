@@ -7,6 +7,8 @@
 
 package net.evilblock.prisonaio.module.generator.build
 
+import net.evilblock.cubed.util.ProgressBarBuilder
+import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.generator.Generator
 import net.evilblock.prisonaio.module.generator.GeneratorHandler
 import net.evilblock.prisonaio.util.particle.ParticleMeta
@@ -29,12 +31,39 @@ class GeneratorBuild {
     var speed: Double = 1.0
 
     fun getTickInterval(): Long {
-        return (((generator.getLevel().buildTime / total.toDouble()) * 1000.0) * speed).toLong()
+        return (((generator.getLevel().buildTime / total.toDouble()) * 1000.0) / speed).toLong()
+    }
+
+    fun getRemainingTime(): Long {
+        if (finished) {
+            return 0L
+        }
+
+        val level = generator.getLevel()
+        val schematic = level.getSchematic(generator.rotation)
+
+        val blocksLeft = schematic.blocks.size - progress
+        val timeLeft = (blocksLeft * getTickInterval())
+
+        if (lastPlaced == 0L) {
+            lastPlaced = System.currentTimeMillis() - (1000.0.toLong() + 1)
+        }
+
+        val remainingTime = timeLeft - ((System.currentTimeMillis() - lastPlaced) / speed).toLong()
+        return if (remainingTime > 0) { remainingTime } else { 0 }
+    }
+
+    fun renderProgressBar(): String {
+        return ProgressBarBuilder.DEFAULT.build(ProgressBarBuilder.percentage(progress, total))
+    }
+
+    fun renderRemainingTime(): String {
+        return TimeUtil.formatIntoAbbreviatedString((getRemainingTime() / 1000.0).toInt())
     }
 
     fun tick() {
         val level = generator.getLevel()
-        val schematic = level.getSchematic(generator.rotation) ?: throw IllegalStateException("Couldn't find schematic for ${generator.getGeneratorType().name} level ${level.number}")
+        val schematic = level.getSchematic(generator.rotation)
 
         total = schematic.blocks.size
 
@@ -71,33 +100,9 @@ class GeneratorBuild {
                 finished = true
 
                 Bukkit.getPlayer(generator.owner)?.also { player ->
-                    player.sendMessage("${GeneratorHandler.CHAT_PREFIX}Your ${generator.getGeneratorType().getColoredName()} ${ChatColor.GRAY}generator has finished building!")
+                    player.sendMessage("${GeneratorHandler.CHAT_PREFIX}Your ${generator.getGeneratorType().getColoredName()} ${ChatColor.GRAY}has finished building!")
                 }
             }
-        }
-    }
-
-    fun getRemainingTime(): Long {
-        if (finished) {
-            return 0L
-        }
-
-        val level = generator.getLevel()
-        val schematic = GeneratorHandler.getSchematic(level.schematic, generator.rotation) ?: return 0L
-
-        val blocksLeft = schematic.blocks.size - progress
-        val timeLeft = (blocksLeft * getTickInterval())
-
-        if (lastPlaced == 0L) {
-            lastPlaced = System.currentTimeMillis() - (1000.0.toLong() + 1)
-        }
-
-        val remainingTime = timeLeft - ((System.currentTimeMillis() - lastPlaced) * speed).toLong()
-
-        return if (remainingTime <= 0) {
-            0
-        } else {
-            remainingTime
         }
     }
 

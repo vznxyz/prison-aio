@@ -47,7 +47,7 @@ class BlocksMinedAtMineChallenge(id: String, @JsonAdapter(MineReferenceSerialize
         val percentage = ProgressBarBuilder.percentage(value, blocksMined)
 
         val progressColor = ProgressBarBuilder.colorPercentage(percentage)
-        val progressBar = ProgressBarBuilder().build(percentage)
+        val progressBar = ProgressBarBuilder.DEFAULT.build(percentage)
 
         return "${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}($progressColor${DECIMAL_FORMAT.format(percentage)}%${ChatColor.GRAY})"
     }
@@ -88,7 +88,7 @@ class BlocksMinedAtMineChallenge(id: String, @JsonAdapter(MineReferenceSerialize
         override fun startSetupPrompt(player: Player, id: String, lambda: (Challenge) -> Unit) {
             EzPrompt.Builder()
                 .promptText("${ChatColor.GREEN}Please input the ID of the mine.")
-                .acceptInput { player, input ->
+                .acceptInput { input ->
                     val mine = MineHandler.getMineById(input)
                     if (!mine.isPresent) {
                         player.sendMessage("${ChatColor.RED}A mine by that ID doesn't exist.")

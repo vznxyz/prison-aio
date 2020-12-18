@@ -3,20 +3,21 @@ package net.evilblock.prisonaio.module.robot.impl
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.util.Reflection
+import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
 import net.evilblock.cubed.util.nms.MinecraftProtocol
 import net.evilblock.prisonaio.util.Formats
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import net.evilblock.prisonaio.module.robot.menu.ManageRobotMenu
 import net.evilblock.prisonaio.module.robot.Robot
 import net.evilblock.prisonaio.module.robot.RobotHandler
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.robot.cosmetic.Cosmetic
 import net.evilblock.prisonaio.module.robot.cosmetic.impl.SkinCosmetic
-import net.evilblock.prisonaio.module.robot.impl.statistic.MinerRobotEarningsV2
+import net.evilblock.prisonaio.util.statistic.EarningsHistoryV2
 import net.evilblock.prisonaio.module.robot.impl.upgrade.Upgrade
 import net.evilblock.prisonaio.module.robot.impl.upgrade.UpgradeManager
 import net.evilblock.prisonaio.module.robot.impl.upgrade.impl.EfficiencyUpgrade
@@ -49,8 +50,8 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
 
     internal var rewardTicks: Int = ROBOT_TICKS
 
-    internal var moneyEarnings: MinerRobotEarningsV2 = MinerRobotEarningsV2()
-    internal var tokenEarnings: MinerRobotEarningsV2 = MinerRobotEarningsV2()
+    internal var moneyEarnings: EarningsHistoryV2 = EarningsHistoryV2()
+    internal var tokenEarnings: EarningsHistoryV2 = EarningsHistoryV2()
 
     internal var moneyOwed: BigDecimal = BigDecimal(0.0)
     internal var tokensOwed: BigDecimal = BigDecimal(0.0)
@@ -291,6 +292,12 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
     }
 
     fun collectEarnings(player: Player, sendMessages: Boolean = true): Boolean {
+        if (System.currentTimeMillis() < lastCollect + 3_000L) {
+            val cooldown = TimeUtil.formatIntoAbbreviatedString((((lastCollect + 3_000L) - System.currentTimeMillis()) / 1000.0).toInt())
+            player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You must wait another $cooldown before collecting again!")
+            return false
+        }
+
         if (moneyOwed == BigDecimal.ZERO && tokensOwed == BigDecimal.ZERO) {
             if (sendMessages) {
                 player.sendMessage("${RobotsModule.CHAT_PREFIX}${ChatColor.RED}You don't have anything to collect.")

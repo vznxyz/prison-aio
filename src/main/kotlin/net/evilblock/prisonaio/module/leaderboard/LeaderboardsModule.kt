@@ -63,7 +63,7 @@ object LeaderboardsModule : PluginModule() {
 		return listOf(
 			ExemptionAddCommand.javaClass,
 			ExemptionRemoveCommand.javaClass,
-			IndexCommand.javaClass,
+			LeaderboardsCommand.javaClass,
 			RefreshCommand.javaClass,
 			ResultsCommand.javaClass,
 			SpawnLeaderboardCommand.javaClass

@@ -10,7 +10,7 @@ package net.evilblock.prisonaio.module.minigame.lottery
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.module.minigame.MinigamesModule
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger

@@ -11,8 +11,10 @@ import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import java.text.NumberFormat
 
 object TokensGiveCommand {
@@ -26,10 +28,18 @@ object TokensGiveCommand {
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player") user: User, @Param(name = "amount") amount: Long) {
         user.addTokensBalance(amount)
-        UserHandler.saveUser(user)
 
-        val formattedAmount = NumberFormat.getInstance().format(amount)
-        sender.sendMessage("${ChatColor.GREEN}You added ${ChatColor.WHITE}$formattedAmount ${ChatColor.GREEN}tokens to ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GREEN}'s balance.")
+        sender.sendMessage("${ChatColor.GOLD}Added ${Formats.formatTokens(amount)}${ChatColor.GOLD} to ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GOLD}'s balance!")
+
+        val log = StringBuilder().append(sender.name)
+
+        if (sender is Player) {
+            log.append(" (${sender.uniqueId}, ${sender.address.address.hostAddress})")
+        }
+
+        log.append(" added $amount to ${user.getUsername()}'s (${user.uuid}) balance")
+
+        UserHandler.economyLogFile.commit(log.toString())
     }
 
 }

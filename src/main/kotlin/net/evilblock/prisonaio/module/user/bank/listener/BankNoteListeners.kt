@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.user.bank.listener
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
 import net.evilblock.prisonaio.util.Permissions
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -19,6 +20,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import java.math.BigDecimal
 
 object BankNoteListeners : Listener {
 
@@ -48,10 +50,10 @@ object BankNoteListeners : Listener {
                 return
             }
 
-            val announce = if (bankNote.useTokens) {
-                bankNote.value >= 25_000_000L
+            val announce = if (bankNote.currency == Currency.Type.TOKENS) {
+                bankNote.value >= BigDecimal(25_000_000L)
             } else {
-                bankNote.value >= 10_000_000_000_000_000
+                bankNote.value >= BigDecimal(10_000_000_000_000_000)
             }
 
             if (announce) {

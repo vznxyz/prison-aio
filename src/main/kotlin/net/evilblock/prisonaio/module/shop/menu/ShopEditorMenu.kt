@@ -82,7 +82,7 @@ class ShopEditorMenu : PaginatedMenu() {
                     .promptText(EzPrompt.IDENTIFIER_PROMPT)
                     .charLimit(16)
                     .regex(EzPrompt.IDENTIFIER_REGEX)
-                    .acceptInput { player, input ->
+                    .acceptInput { input ->
                         if (ShopHandler.getShopById(input).isPresent) {
                             player.sendMessage("${ChatColor.RED}A shop's ID must be unique, and a shop with the ID `$input` already exists.")
                             return@acceptInput

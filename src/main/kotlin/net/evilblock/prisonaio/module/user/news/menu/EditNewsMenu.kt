@@ -82,7 +82,7 @@ class EditNewsMenu(private val news: News) : Menu() {
                 EzPrompt.Builder()
                     .promptText("${ChatColor.GREEN}Please input a new title.")
                     .charLimit(128)
-                    .acceptInput { _, input ->
+                    .acceptInput { input ->
                         news.title = ChatColor.translateAlternateColorCodes('&', input)
 
                         Tasks.async {

@@ -26,7 +26,7 @@ import net.evilblock.prisonaio.module.shop.ShopHandler
 import net.evilblock.prisonaio.module.shop.item.ShopItem
 import net.evilblock.prisonaio.module.shop.item.menu.EditShopItemMenu
 import net.evilblock.prisonaio.module.shop.menu.template.ShopMenuTemplate
-import net.evilblock.prisonaio.util.economy.menu.SelectCurrencyMenu
+import net.evilblock.prisonaio.module.mechanic.economy.menu.SelectCurrencyMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.conversations.ConversationContext
@@ -64,10 +64,8 @@ class EditShopMenu(val shop: Shop) : PaginatedMenu() {
 
     override fun getAllPagesButtons(player: Player): Map<Int, Button> {
         return hashMapOf<Int, Button>().also { buttons ->
-            buttons[0] = CreateShopItemButton()
-
             for (item in shop.items) {
-                buttons[buttons.size - 1] = ShopItemButton(item)
+                buttons[buttons.size] = ShopItemButton(item)
             }
         }
     }
@@ -288,22 +286,20 @@ class EditShopMenu(val shop: Shop) : PaginatedMenu() {
         }
 
         override fun getDescription(player: Player): List<String> {
-            val description = arrayListOf<String>()
+            return arrayListOf<String>().also { desc ->
+                desc.add("")
 
-            description.add("")
+                desc.addAll(TextSplitter.split(
+                    length = 40,
+                    text = "Change the currency that players use to purchase items FROM the store. This will not affect selling blocks to shops at all.",
+                    linePrefix = ChatColor.GRAY.toString()
+                ))
 
-            description.addAll(TextSplitter.split(
-                length = 40,
-                text = "Change the currency that players use to purchase items FROM the store. This will not affect selling blocks to shops at all.",
-                linePrefix = ChatColor.GRAY.toString()
-            ))
-
-            description.add("")
-            description.add("${ChatColor.GRAY}Currently using ${shop.currency.displayName}")
-            description.add("")
-            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit currency")
-
-            return description
+                desc.add("")
+                desc.add("${ChatColor.GRAY}Currently using ${shop.currency.displayName}")
+                desc.add("")
+                desc.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit currency")
+            }
         }
 
         override fun getMaterial(player: Player): Material {

@@ -17,7 +17,7 @@ import net.evilblock.prisonaio.module.minigame.MinigamesModule
 import net.evilblock.prisonaio.module.minigame.coinflip.task.CoinFlipGameTicker
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import java.io.File
 import java.util.*

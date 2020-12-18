@@ -12,8 +12,6 @@ gang:
   max-members: 6
   # The maximum characters a gang's name can contain
   max-name-length: 32
-  # The maximum amount of gangs a player can join at once
-  max-gangs-per-player: 1
   # Jerry The Prison Guard settings
   jerry:
     hologram-lines:

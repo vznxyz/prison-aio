@@ -10,7 +10,7 @@ package net.evilblock.prisonaio.module.gang.listener
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.gang.GangHandler
-import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.GangsModule
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.gang.challenge.GangChallengeHandler
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
@@ -22,22 +22,21 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import java.util.concurrent.ThreadLocalRandom
-import kotlin.random.Random
 
 object GangTrophiesListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     fun onRegionBlockBreakEvent(event: RegionBlockBreakEvent) {
         if (event.region.supportsRewards()) {
-            val assumedGang = GangHandler.getAssumedGang(event.player.uniqueId) ?: return
+            val assumedGang = GangHandler.getGangByPlayer(event.player.uniqueId) ?: return
 
-            var chance = GangModule.readTrophyBlockBreakChance()
+            var chance = GangsModule.readTrophyBlockBreakChance()
             if (assumedGang.hasBooster(GangBooster.BoosterType.INCREASED_TROPHIES)) {
-                chance += GangModule.readIncreasedTrophiesChanceMod()
+                chance += GangsModule.readIncreasedTrophiesChanceMod()
             }
 
             if (Chance.percent(chance)) {
-                val amount = ThreadLocalRandom.current().nextInt(GangModule.readTrophyBlockBreakMinAmount(), GangModule.readTrophyBlockBreakMaxAmount())
+                val amount = ThreadLocalRandom.current().nextInt(GangsModule.readTrophyBlockBreakMinAmount(), GangsModule.readTrophyBlockBreakMaxAmount())
                 assumedGang.giveTrophies(amount)
 
                 val memberInfo = assumedGang.getMemberInfo(event.player.uniqueId)

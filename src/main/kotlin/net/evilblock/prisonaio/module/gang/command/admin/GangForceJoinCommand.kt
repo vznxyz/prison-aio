@@ -28,7 +28,7 @@ object GangForceJoinCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "gang") gang: Gang, @Param(name = "player") playerUuid: UUID) {
-        if (GangHandler.getAssumedGang(playerUuid) != null) {
+        if (GangHandler.getGangByPlayer(playerUuid) != null) {
             player.sendMessage("${ChatColor.RED}That player is already in a gang!")
             return
         }

@@ -71,7 +71,7 @@ class ArenaEditorMenu : Menu() {
                     .promptText("${ChatColor.GREEN}Please input a name for the arena.")
                     .regex(EzPrompt.IDENTIFIER_REGEX)
                     .charLimit(32)
-                    .acceptInput { _, input ->
+                    .acceptInput { input ->
                         if (EventGameArenaHandler.getArenaByName(input) != null) {
                             player.sendMessage("${ChatColor.RED}That name is taken!")
                             return@acceptInput

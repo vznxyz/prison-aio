@@ -103,8 +103,8 @@ class Gang(
         guideNpc.initializeData()
         guideNpc.persistent = false
         guideNpc.gang = this
-        guideNpc.updateTexture(GangModule.getJerryTextureValue(), GangModule.getJerryTextureSignature())
-        guideNpc.updateLines(GangModule.getJerryHologramLines())
+        guideNpc.updateTexture(GangsModule.getJerryTextureValue(), GangsModule.getJerryTextureSignature())
+        guideNpc.updateLines(GangsModule.getJerryHologramLines())
 
         if (!EntityManager.isEntityTracked(guideNpc)) {
             EntityManager.trackEntity(guideNpc)
@@ -227,8 +227,16 @@ class Gang(
         return leader == uuid || members.containsKey(uuid)
     }
 
+    fun isMember(player: Player): Boolean {
+        return isMember(player.uniqueId)
+    }
+
     fun getMemberInfo(uuid: UUID): GangMember? {
         return members[uuid]
+    }
+
+    fun getMemberInfo(player: Player): GangMember? {
+        return getMemberInfo(player.uniqueId)
     }
 
     internal fun expireInvitations() {
@@ -246,17 +254,23 @@ class Gang(
     }
 
     fun isInvited(uuid: UUID): Boolean {
-        return invitations.containsKey(uuid) && (System.currentTimeMillis() - invitations[uuid]!!.invitedAt) < 30 * 60 * 1000
+        return invitations.containsKey(uuid) && !invitations[uuid]!!.isExpired()
     }
 
-    fun invitePlayer(uuid: UUID, invitedBy: UUID) {
-        invitations[uuid] = GangInvite(invitedBy = invitedBy, invitedAt = System.currentTimeMillis())
+    fun getInviteInfo(uuid: UUID): GangInvite? {
+        return invitations[uuid]
+    }
 
-        val playerInvitedName = Cubed.instance.uuidCache.name(uuid)
+    fun invitePlayer(player: UUID, invitedBy: UUID) {
+        invitations[player] = GangInvite(invitedBy = invitedBy, invitedAt = System.currentTimeMillis())
+
+        GangHandler.trackInvited(this, player)
+
+        val playerInvitedName = Cubed.instance.uuidCache.name(player)
         val invitedByName = Cubed.instance.uuidCache.name(invitedBy)
         sendMessagesToMembers("${ChatColor.YELLOW}$playerInvitedName has been invited to the gang by $invitedByName.")
 
-        val playerInvited = Bukkit.getPlayer(uuid)
+        val playerInvited = Bukkit.getPlayer(player)
         if (playerInvited != null) {
             playerInvited.sendMessage("")
             playerInvited.sendMessage(" ${ChatColor.LIGHT_PURPLE}${ChatColor.BOLD}New Invitation to Join Gang")
@@ -276,11 +290,29 @@ class Gang(
         }
     }
 
-    fun revokeInvite(uuid: UUID) {
-        invitations.remove(uuid)
+    fun invitePlayer(player: Player, invitedBy: UUID) {
+        invitePlayer(player.uniqueId, invitedBy)
+    }
 
-        val playerInvitedName = Cubed.instance.uuidCache.name(uuid)
+    fun removeInvite(player: UUID) {
+        invitations.remove(player)
+
+        GangHandler.forgetInvited(this, player)
+    }
+
+    fun removeInvite(player: Player) {
+        removeInvite(player.uniqueId)
+    }
+
+    fun revokeInvite(player: UUID) {
+        removeInvite(player)
+
+        val playerInvitedName = Cubed.instance.uuidCache.name(player)
         sendMessagesToMembers("${ChatColor.YELLOW}$playerInvitedName's invitation to join the gang has been revoked.")
+    }
+
+    fun revokeInvite(player: Player) {
+        revokeInvite(player.uniqueId)
     }
 
     fun addMember(member: GangMember) {

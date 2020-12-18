@@ -82,7 +82,7 @@ class EditDeliveryManRewardMenu(private val reward: DeliveryManReward) : Menu() 
                 EzPrompt.Builder()
                     .promptText(EzPrompt.NAME_PROMPT)
                     .charLimit(48)
-                    .acceptInput { player, input ->
+                    .acceptInput { input ->
                         reward.name = ChatColor.translateAlternateColorCodes('&', input)
 
                         DeliveryManHandler.saveData()

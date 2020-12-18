@@ -10,8 +10,8 @@ package net.evilblock.prisonaio.module.tool.enchant.menu.admin
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.enchant.config.menu.SelectPriceFormulaMenu
 import org.bukkit.ChatColor
 import org.bukkit.FireworkEffect
@@ -36,28 +36,28 @@ class ManageEnchantsMenu : Menu() {
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        for (enchant in EnchantsManager.getRegisteredEnchants().sortedWith(EnchantsManager.ENCHANT_COMPARATOR)) {
+        for (enchant in EnchantHandler.getRegisteredEnchants().sortedWith(EnchantHandler.ENCHANT_COMPARATOR)) {
             buttons[buttons.size] = EnchantButton(enchant)
         }
 
         return buttons
     }
 
-    private inner class EnchantButton(private val enchant: AbstractEnchant) : Button() {
+    private inner class EnchantButton(private val enchant: Enchant) : Button() {
         override fun getName(player: Player): String {
-            return "${enchant.textColor}${ChatColor.BOLD}${enchant.enchant}"
+            return enchant.getColoredName()
         }
 
         override fun getDescription(player: Player): List<String> {
             val description = arrayListOf<String>()
 
-            if (EnchantsManager.config.isEnchantEnabled(enchant)) {
+            if (EnchantHandler.config.isEnchantEnabled(enchant)) {
                 description.add("${ChatColor.GRAY}Enabled: ${ChatColor.GREEN}yes")
             } else {
                 description.add("${ChatColor.GRAY}Enabled: ${ChatColor.RED}no")
             }
 
-            val formula = EnchantsManager.config.getEnchantPriceFormula(enchant)
+            val formula = EnchantHandler.config.getEnchantPriceFormula(enchant)
             description.addAll(formula.getVariablesPreview())
 
             description.add("")
@@ -77,7 +77,7 @@ class ManageEnchantsMenu : Menu() {
 
             description.add("${ChatColor.AQUA}${ChatColor.BOLD}MIDDLE-CLICK ${ChatColor.AQUA}to change formula")
 
-            if (EnchantsManager.config.isEnchantEnabled(enchant)) {
+            if (EnchantHandler.config.isEnchantEnabled(enchant)) {
                 description.add("${ChatColor.RED}${ChatColor.BOLD}SHIFT LEFT-CLICK ${ChatColor.RED}to disable enchant")
             } else {
                 description.add("${ChatColor.GREEN}${ChatColor.BOLD}SHIFT LEFT-CLICK ${ChatColor.GREEN}to enable enchant")
@@ -99,15 +99,15 @@ class ManageEnchantsMenu : Menu() {
             itemMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS)
 
             val fireworkEffectMeta = itemMeta as FireworkEffectMeta
-            fireworkEffectMeta.effect = FireworkEffect.builder().withColor(enchant.iconColor).build()
+            fireworkEffectMeta.effect = FireworkEffect.builder().withColor(enchant.getCategory().iconColor).build()
 
             return fireworkEffectMeta
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            val formula = EnchantsManager.config.getEnchantPriceFormula(enchant)
+            val formula = EnchantHandler.config.getEnchantPriceFormula(enchant)
 
-            for (editAction in EnchantsManager.config.getEnchantPriceFormula(enchant).getEditActions()) {
+            for (editAction in EnchantHandler.config.getEnchantPriceFormula(enchant).getEditActions()) {
                 if (editAction.clickType == clickType || ((editAction.clickType == ClickType.MIDDLE && clickType == ClickType.CREATIVE) || (editAction.clickType == ClickType.CREATIVE && clickType == ClickType.MIDDLE))) {
                     editAction.clicked.invoke(player, formula)
                     return
@@ -117,10 +117,10 @@ class ManageEnchantsMenu : Menu() {
             // middle-click
             if (clickType == ClickType.MIDDLE || clickType == ClickType.CREATIVE) {
                 SelectPriceFormulaMenu { selectedFormula ->
-                    EnchantsManager.config.updateEnchantPriceFormula(enchant, selectedFormula)
+                    EnchantHandler.config.updateEnchantPriceFormula(enchant, selectedFormula)
 
                     Tasks.async {
-                        EnchantsManager.saveConfig()
+                        EnchantHandler.saveConfig()
                     }
                     
                     this@ManageEnchantsMenu.openMenu(player)
@@ -129,14 +129,14 @@ class ManageEnchantsMenu : Menu() {
 
             // shift left-click
             if (clickType.isShiftClick && clickType.isLeftClick) {
-                if (EnchantsManager.config.isEnchantEnabled(enchant)) {
-                    EnchantsManager.config.disableEnchant(enchant)
+                if (EnchantHandler.config.isEnchantEnabled(enchant)) {
+                    EnchantHandler.config.disableEnchant(enchant)
                 } else {
-                    EnchantsManager.config.enableEnchant(enchant)
+                    EnchantHandler.config.enableEnchant(enchant)
                 }
 
                 Tasks.async {
-                    EnchantsManager.saveConfig()
+                    EnchantHandler.saveConfig()
                 }
             }
         }

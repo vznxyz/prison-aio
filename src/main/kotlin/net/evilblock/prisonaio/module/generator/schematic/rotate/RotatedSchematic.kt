@@ -17,23 +17,4 @@ class RotatedSchematic(
     val blocks: Array<SchematicBlock>,
     var villager: Vector,
     var villagerYaw: Float
-) {
-
-    fun setVillagerYaw(data: Byte) {
-        when ((data and 3).toInt()) {
-            1 -> villagerYaw = 90f
-            2 -> villagerYaw = 180f
-            3 -> villagerYaw = 270f
-        }
-
-        when (rotation.getOpposite()) {
-            Rotation.EAST -> villagerYaw += 90f
-            Rotation.SOUTH -> villagerYaw += 180f
-            Rotation.WEST -> villagerYaw += 270f
-            else -> {}
-        }
-
-        villagerYaw %= 360f
-    }
-
-}
+)

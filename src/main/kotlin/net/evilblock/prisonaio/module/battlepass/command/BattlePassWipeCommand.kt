@@ -8,8 +8,8 @@
 package net.evilblock.prisonaio.module.battlepass.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.battlepass.BattlePassProgress
-import net.evilblock.prisonaio.module.storage.StorageModule
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Permissions
 import org.bson.Document
@@ -26,7 +26,7 @@ object BattlePassWipeCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender) {
-        StorageModule.database.getCollection("users").updateMany(Document(), Document("\$unset", Document("battlePassData", "")))
+        PrisonAIO.instance.database.getCollection("users").updateMany(Document(), Document("\$unset", Document("battlePassData", "")))
 
         for (user in UserHandler.getUsers()) {
             user.battlePassProgress = BattlePassProgress(user)

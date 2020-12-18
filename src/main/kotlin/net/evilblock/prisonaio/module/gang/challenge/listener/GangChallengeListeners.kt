@@ -21,7 +21,7 @@ object GangChallengeListeners : Listener {
 
     @EventHandler
     fun onBlockBreakEvent(event: BlockBreakEvent) {
-        val gang = GangHandler.getAssumedGang(event.player.uniqueId)
+        val gang = GangHandler.getGangByPlayer(event.player.uniqueId)
         if (gang != null) {
             gang.challengesData.blocksMined += 1
 
@@ -33,7 +33,7 @@ object GangChallengeListeners : Listener {
 
     @EventHandler
     fun onAsyncPlayerPrestigeEvent(event: AsyncPlayerPrestigeEvent) {
-        val gang = GangHandler.getAssumedGang(event.player.uniqueId)
+        val gang = GangHandler.getGangByPlayer(event.player.uniqueId)
         if (gang != null) {
             gang.challengesData.acquiredPrestiges += event.to - event.from
 

@@ -56,7 +56,7 @@ class ExecuteCommandChallenge(id: String, internal var command: String) : Challe
         override fun startSetupPrompt(player: Player, id: String, lambda: (Challenge) -> Unit) {
             EzPrompt.Builder()
                 .promptText("${ChatColor.GREEN}Please input the command.")
-                .acceptInput { player, input ->
+                .acceptInput { input ->
                     lambda.invoke(ExecuteCommandChallenge(id, input.trim()))
                 }
                 .build()

@@ -15,7 +15,7 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.tool.ToolsModule
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import java.io.File
 
 object PickaxePrestigeHandler : PluginHandler {
@@ -80,8 +80,8 @@ object PickaxePrestigeHandler : PluginHandler {
         return prestigeInfoMap.maxBy { it.key }?.value
     }
 
-    fun findEnchantLimits(prestige: Int): Map<AbstractEnchant, Int> {
-        return hashMapOf<AbstractEnchant, Int>().also { map ->
+    fun findEnchantLimits(prestige: Int): Map<Enchant, Int> {
+        return hashMapOf<Enchant, Int>().also { map ->
             for (prestigeInfo in getPrestigeSet()) {
                 if (prestige <= prestigeInfo.number) {
                     for ((enchant, limit) in prestigeInfo.enchantLimits) {

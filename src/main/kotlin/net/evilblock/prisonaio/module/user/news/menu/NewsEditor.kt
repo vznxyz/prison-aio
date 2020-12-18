@@ -89,7 +89,7 @@ class NewsEditor : PaginatedMenu() {
             if (clickType.isLeftClick) {
                 EzPrompt.Builder()
                     .promptText("${ChatColor.GREEN}Please input a title for the post.")
-                    .acceptInput { _, input ->
+                    .acceptInput { input ->
                         val news = News(title = ChatColor.translateAlternateColorCodes('&', input), createdBy = player.uniqueId)
                         NewsHandler.trackNews(news)
 

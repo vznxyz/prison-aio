@@ -11,7 +11,7 @@ import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.module.user.User
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player

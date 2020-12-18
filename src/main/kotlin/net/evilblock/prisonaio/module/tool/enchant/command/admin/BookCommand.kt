@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.tool.enchant.command.admin
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -25,7 +25,7 @@ object BookCommand {
     fun execute(
         sender: CommandSender,
         @Param(name = "player", defaultValue = "self") target: Player,
-        @Param(name = "enchant") enchant: AbstractEnchant,
+        @Param(name = "enchant") enchant: Enchant,
         @Param(name = "level") level: Int,
         @Param(name = "add", defaultValue = "true") add: Boolean
     ) {
@@ -36,12 +36,12 @@ object BookCommand {
         }
 
         if (sender is Player) {
-            target.sendMessage("${ChatColor.GREEN}You've been given a ${enchant.textColor}${enchant.enchant} $level Book ${ChatColor.GREEN}by ${ChatColor.YELLOW}${sender.name}${ChatColor.GREEN}.")
+            target.sendMessage("${ChatColor.GREEN}You've been given a ${enchant.getCategory().textColor}${enchant.enchant} $level Book ${ChatColor.GREEN}by ${ChatColor.YELLOW}${sender.name}${ChatColor.GREEN}.")
         } else {
-            target.sendMessage("${ChatColor.GREEN}You've been given a ${enchant.textColor}${enchant.enchant} $level Book${ChatColor.GREEN}.")
+            target.sendMessage("${ChatColor.GREEN}You've been given a ${enchant.getCategory().textColor}${enchant.enchant} $level Book${ChatColor.GREEN}.")
         }
 
-        sender.sendMessage("${ChatColor.GREEN}You've given a ${enchant.textColor}${enchant.enchant} $level Book ${ChatColor.GREEN}to ${ChatColor.YELLOW}${target.name}.")
+        sender.sendMessage("${ChatColor.GREEN}You've given a ${enchant.getCategory().textColor}${enchant.enchant} $level Book ${ChatColor.GREEN}to ${ChatColor.YELLOW}${target.name}.")
     }
 
 }

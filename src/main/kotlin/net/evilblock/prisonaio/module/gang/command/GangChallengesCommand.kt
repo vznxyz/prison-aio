@@ -21,7 +21,7 @@ object GangChallengesCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        val assumedGang = GangHandler.getAssumedGang(player.uniqueId)
+        val assumedGang = GangHandler.getGangByPlayer(player.uniqueId)
         if (assumedGang != null) {
             GangChallengesMenu(assumedGang).openMenu(player)
         } else {

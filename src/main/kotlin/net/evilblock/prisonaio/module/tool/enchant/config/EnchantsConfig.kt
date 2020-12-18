@@ -9,8 +9,8 @@ package net.evilblock.prisonaio.module.tool.enchant.config
 
 import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.enchant.config.formula.FixedPriceFormulaType
 import net.evilblock.prisonaio.module.tool.enchant.config.formula.PriceFormulaType
 import net.evilblock.prisonaio.module.tool.enchant.serialize.EnchantsSetReferenceSerializer
@@ -19,36 +19,36 @@ import java.lang.reflect.Type
 class EnchantsConfig {
 
     @JsonAdapter(EnchantsSetReferenceSerializer::class)
-    private val disabledEnchants: MutableSet<AbstractEnchant> = hashSetOf()
+    private val disabledEnchants: MutableSet<Enchant> = hashSetOf()
 
     @JsonAdapter(EnchantPriceMapSerializer::class)
-    internal val enchantPriceFormulas: MutableMap<AbstractEnchant, PriceFormulaType.PriceFormula> = hashMapOf()
+    internal val enchantPriceFormulas: MutableMap<Enchant, PriceFormulaType.PriceFormula> = hashMapOf()
 
-    fun isEnchantEnabled(enchant: AbstractEnchant): Boolean {
+    fun isEnchantEnabled(enchant: Enchant): Boolean {
         return !disabledEnchants.contains(enchant)
     }
 
-    fun enableEnchant(enchant: AbstractEnchant) {
+    fun enableEnchant(enchant: Enchant) {
         disabledEnchants.remove(enchant)
     }
 
-    fun disableEnchant(enchant: AbstractEnchant) {
+    fun disableEnchant(enchant: Enchant) {
         disabledEnchants.add(enchant)
     }
 
-    fun getEnchantPriceFormula(enchant: AbstractEnchant): PriceFormulaType.PriceFormula {
+    fun getEnchantPriceFormula(enchant: Enchant): PriceFormulaType.PriceFormula {
         if (!enchantPriceFormulas.containsKey(enchant)) {
             enchantPriceFormulas[enchant] = FixedPriceFormulaType.FixedPriceFormula()
         }
         return enchantPriceFormulas[enchant]!!
     }
 
-    fun updateEnchantPriceFormula(enchant: AbstractEnchant, formula: PriceFormulaType.PriceFormula) {
+    fun updateEnchantPriceFormula(enchant: Enchant, formula: PriceFormulaType.PriceFormula) {
         enchantPriceFormulas[enchant] = formula
     }
 
-    private inner class EnchantPriceMapSerializer : JsonSerializer<MutableMap<AbstractEnchant, PriceFormulaType.PriceFormula>>, JsonDeserializer<MutableMap<AbstractEnchant, PriceFormulaType.PriceFormula>> {
-        override fun serialize(map: MutableMap<AbstractEnchant, PriceFormulaType.PriceFormula>, type: Type, context: JsonSerializationContext): JsonElement {
+    private inner class EnchantPriceMapSerializer : JsonSerializer<MutableMap<Enchant, PriceFormulaType.PriceFormula>>, JsonDeserializer<MutableMap<Enchant, PriceFormulaType.PriceFormula>> {
+        override fun serialize(map: MutableMap<Enchant, PriceFormulaType.PriceFormula>, type: Type, context: JsonSerializationContext): JsonElement {
             return JsonObject().also {
                 for ((enchant, formula) in map) {
                     it.add(enchant.id, context.serialize(formula, PriceFormulaType.PriceFormula::class.java))
@@ -56,10 +56,10 @@ class EnchantsConfig {
             }
         }
 
-        override fun deserialize(element: JsonElement, type: Type, context: JsonDeserializationContext): MutableMap<AbstractEnchant, PriceFormulaType.PriceFormula> {
-            return hashMapOf<AbstractEnchant, PriceFormulaType.PriceFormula>().also { map ->
+        override fun deserialize(element: JsonElement, type: Type, context: JsonDeserializationContext): MutableMap<Enchant, PriceFormulaType.PriceFormula> {
+            return hashMapOf<Enchant, PriceFormulaType.PriceFormula>().also { map ->
                 for ((key, value) in element.asJsonObject.entrySet()) {
-                    val enchant = EnchantsManager.getEnchantById(key)
+                    val enchant = EnchantHandler.getEnchantById(key)
                     if (enchant != null) {
                         map[enchant] = context.deserialize(value, PriceFormulaType.PriceFormula::class.java) as PriceFormulaType.PriceFormula
                     }

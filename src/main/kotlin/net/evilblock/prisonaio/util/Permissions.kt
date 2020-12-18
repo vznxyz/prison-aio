@@ -21,6 +21,8 @@ object Permissions {
 
     const val ECONOMY_ADMIN = "prisonaio.economy.admin"
 
+    const val WARPS_MANAGE = "prisonaio.warps.manage"
+
     const val NEWS_EDITOR = "prisonaio.news.editor"
     const val NEWS_VIEW_STATS = "prisonaio.news.view-stats"
 
@@ -43,6 +45,8 @@ object Permissions {
     const val SHOP_EDITOR = "prisonaio.shop.admin"
 
     const val SALVAGE_PREVENTION_EDITOR = "prisonaio.enchants.salvage.editor"
+
+    const val PICKAXE_ADMIN = "prisonaio.enchants.prestige.editor"
     const val PICKAXE_PRESTIGE_EDITOR = "prisonaio.enchants.prestige.editor"
 
     const val PERK_AUTO_SELL = "user.perks.autosell"

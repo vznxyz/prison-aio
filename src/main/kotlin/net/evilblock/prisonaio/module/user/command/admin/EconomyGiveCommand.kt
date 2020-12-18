@@ -28,6 +28,7 @@ object EconomyGiveCommand {
     @JvmStatic
     fun execute(sender: CommandSender, @Param(name = "player", defaultValue = "self") user: User, @Param(name = "amount") amount: Double) {
         user.addMoneyBalance(amount)
+
         sender.sendMessage("${ChatColor.GOLD}Added ${Formats.formatMoney(amount)}${ChatColor.GOLD} to ${ChatColor.WHITE}${user.getUsername()}${ChatColor.GOLD}'s balance!")
 
         val log = StringBuilder().append(sender.name)

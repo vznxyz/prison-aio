@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.battlepass.challenge.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.BackButton
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.buttons.TexturedHeadButton
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.TextSplitter
@@ -75,7 +76,7 @@ class BrowseChallengesMenu(private val user: User, private val daily: Boolean) :
 
         for (i in 0 until 54) {
             if (!buttons.containsKey(i)) {
-                buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 15, " ")
+                buttons[i] = GlassButton(7)
             }
         }
 

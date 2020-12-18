@@ -60,7 +60,7 @@ object ChatFormatListeners : Listener {
         tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.MONEY_SYMBOL} ${ChatColor.GRAY}${NumberUtils.format(user.getMoneyBalance())}"))
         tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}${NumberUtils.format(user.getTokenBalance())}"))
 
-        val gang = GangHandler.getAssumedGang(user.uuid)
+        val gang = GangHandler.getGangByPlayer(user.uuid)
         if (gang != null) {
             tooltipLines.add(FancyMessage(" ${ChatColor.RED}${Constants.FLAG_SYMBOL} ${ChatColor.GRAY}${gang.name} (Gang)"))
         }

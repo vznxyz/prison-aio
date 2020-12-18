@@ -13,21 +13,60 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.region.RegionHandler
-import net.evilblock.prisonaio.module.tool.enchant.type.AbilityEnchant
+import net.evilblock.prisonaio.module.tool.enchant.impl.AbilityEnchant
 import net.evilblock.prisonaio.module.tool.pickaxe.menu.PickaxeMenu
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.setting.UserSetting
+import net.evilblock.prisonaio.module.user.setting.option.ChatModeOption
 import net.evilblock.prisonaio.module.user.setting.option.PrivateMessageSoundsOption
 import net.evilblock.prisonaio.module.user.setting.option.PrivateMessagesOption
 import net.evilblock.source.messaging.event.ToggleMessagesEvent
 import net.evilblock.source.messaging.event.ToggleSoundsEvent
+import net.evilblock.source.server.announcement.event.AnnouncementBroadcastEvent
+import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerInteractEvent
 
 object UserSettingsListeners : Listener {
+
+    @EventHandler
+    fun onAnnouncementBroadcastEvent(event: AnnouncementBroadcastEvent) {
+        val iterator = event.receivers.iterator()
+        while (iterator.hasNext()) {
+            val player = iterator.next()
+
+            try {
+                val user = UserHandler.getUser(player.uniqueId)
+                if (!user.settings.getSettingOption(UserSetting.SERVER_ANNOUNCEMENTS).getValue<Boolean>()) {
+                    iterator.remove()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
+    fun onAsyncPlayerChatEvent(event: AsyncPlayerChatEvent) {
+        val user = UserHandler.getUser(event.player.uniqueId)
+        if (user.settings.getSettingOption(UserSetting.CHAT_MODE).getValue<ChatModeOption.ChatMode>() != ChatModeOption.ChatMode.GLOBAL_CHAT) {
+            event.isCancelled = true
+            event.player.sendMessage("${ChatColor.RED}You can't talk in public chat while you have it disabled. View /settings to configure your chat settings.")
+            return
+        }
+
+        val recipientsIterator = event.recipients.iterator()
+        while (recipientsIterator.hasNext()) {
+            val recipient = recipientsIterator.next()
+            if (UserHandler.getUser(recipient.uniqueId).settings.getSettingOption(UserSetting.CHAT_MODE).getValue<ChatModeOption.ChatMode>() != ChatModeOption.ChatMode.GLOBAL_CHAT) {
+                recipientsIterator.remove()
+            }
+        }
+    }
 
     /**
      * Handles the Pickaxe Menu Quick Access setting functionality.

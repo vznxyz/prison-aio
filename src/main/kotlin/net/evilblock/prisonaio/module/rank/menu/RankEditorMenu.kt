@@ -81,7 +81,7 @@ class RankEditorMenu : PaginatedMenu() {
                     .promptText(EzPrompt.IDENTIFIER_PROMPT)
                     .charLimit(16)
                     .regex(EzPrompt.IDENTIFIER_REGEX)
-                    .acceptInput { player, input ->
+                    .acceptInput { input ->
                         if (RankHandler.getRankById(input).isPresent) {
                             player.sendMessage("${ChatColor.RED}A rank's ID must be unique, and a rank with the ID `$input` already exists.")
                             return@acceptInput

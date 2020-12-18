@@ -11,8 +11,8 @@ import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.reward.deliveryman.DeliveryManHandler
+import net.evilblock.prisonaio.module.reward.deliveryman.command.DeliveryManCommand
 import net.evilblock.prisonaio.module.reward.deliveryman.command.DeliveryManEditorCommand
-import net.evilblock.prisonaio.module.reward.deliveryman.command.DeliveryManSpawnCommand
 import net.evilblock.prisonaio.module.reward.event.EventRewardListeners
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.evilblock.prisonaio.module.reward.minecrate.listener.MineCrateListeners
@@ -66,8 +66,8 @@ object RewardsModule : PluginModule() {
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
+            DeliveryManCommand.javaClass,
             DeliveryManEditorCommand.javaClass,
-            DeliveryManSpawnCommand.javaClass,
             GlobalMultiplierSetCommand.javaClass,
             GlobalMultiplierRemoveCommand.javaClass
         )

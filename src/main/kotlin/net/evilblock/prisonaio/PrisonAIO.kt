@@ -7,31 +7,35 @@
 
 package net.evilblock.prisonaio
 
+import com.mongodb.client.MongoDatabase
+import net.evilblock.cosmetics.CosmeticsPlugin
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.CubedOptions
+import net.evilblock.cubed.command.CommandHandler
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.serialize.AbstractTypeSerializer
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
+import net.evilblock.prisonaio.hook.CosmeticsHook
+import net.evilblock.prisonaio.listener.KeepChunksLoadedListeners
 import net.evilblock.prisonaio.listener.PrematureLoadListeners
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
-import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.GangsModule
 import net.evilblock.prisonaio.module.chat.ChatModule
 import net.evilblock.prisonaio.module.combat.CombatModule
-import net.evilblock.prisonaio.module.exchange.GrandExchangeModule
+import net.evilblock.prisonaio.module.auction.AuctionHouseModule
 import net.evilblock.prisonaio.module.generator.Generator
 import net.evilblock.prisonaio.module.generator.GeneratorsModule
 import net.evilblock.prisonaio.module.tool.ToolsModule
-import net.evilblock.prisonaio.module.system.SystemModule
+import net.evilblock.prisonaio.module.admin.AdminModule
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MinesModule
 import net.evilblock.prisonaio.module.mine.block.BlockType
 import net.evilblock.prisonaio.module.minigame.MinigamesModule
-import net.evilblock.prisonaio.module.privatemine.PrivateMinesModule
 import net.evilblock.prisonaio.module.quest.QuestsModule
 import net.evilblock.prisonaio.module.quest.progress.QuestProgress
 import net.evilblock.prisonaio.module.rank.RanksModule
@@ -41,17 +45,19 @@ import net.evilblock.prisonaio.module.reward.deliveryman.reward.requirement.Deli
 import net.evilblock.prisonaio.module.robot.Robot
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.shop.ShopsModule
-import net.evilblock.prisonaio.module.storage.StorageModule
 import net.evilblock.prisonaio.module.tool.enchant.config.formula.PriceFormulaType
 import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import net.evilblock.prisonaio.service.ServicesThread
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
+import net.evilblock.prisonaio.module.warps.WarpsModule
 import org.bukkit.generator.ChunkGenerator
 
 class PrisonAIO : PluginFramework() {
 
     companion object {
-        @JvmStatic lateinit var instance: PrisonAIO
+        @JvmStatic
+        lateinit var instance: PrisonAIO
     }
 
     var loaded: Boolean = false
@@ -59,14 +65,20 @@ class PrisonAIO : PluginFramework() {
 
     val enabledModules: MutableList<PluginModule> = arrayListOf()
 
+    lateinit var database: MongoDatabase
+
     override fun onEnable() {
         instance = this
 
+        if (server.pluginManager.getPlugin("Cosmetics") != null) {
+            CosmeticsPlugin.instance.hook = CosmeticsHook
+        }
+
+        server.pluginManager.registerEvents(KeepChunksLoadedListeners, this)
         server.pluginManager.registerEvents(PrematureLoadListeners, this)
 
         Cubed.instance.configureOptions(CubedOptions(requireRedis = true, requireMongo = true))
 
-        // register this plugins gson type adapters
         Cubed.instance.useGsonBuilderThenRebuild { builder ->
             builder.registerTypeAdapter(QuestProgress::class.java, QuestProgress.Serializer())
             builder.registerTypeAdapter(BlockType::class.java, BlockType.Serializer())
@@ -79,27 +91,30 @@ class PrisonAIO : PluginFramework() {
             builder.registerTypeAdapter(Robot::class.java, AbstractTypeSerializer<Robot>())
         }
 
+        CommandHandler.registerParameterType(Currency.Type::class.java, Currency.Type.CurrencyParameterType())
+
+        database = Cubed.instance.mongo.client.getDatabase(config.getString("mongo-database"))
+
         enabledModules.addAll(arrayListOf(
-            SystemModule,
-            StorageModule,
+            AdminModule,
             RegionsModule,
             MechanicsModule,
+            CombatModule,
             ToolsModule,
             RanksModule,
 //            AchievementsModule,
             QuestsModule,
+            WarpsModule,
             ShopsModule,
             MinesModule,
-            GangModule,
-            PrivateMinesModule,
+            GangsModule,
             BattlePassModule,
-            GrandExchangeModule,
+            AuctionHouseModule,
             UsersModule,
             ChatModule,
             RewardsModule,
             MinigamesModule,
             LeaderboardsModule,
-            CombatModule,
             GeneratorsModule,
             RobotsModule
         ))

@@ -8,10 +8,7 @@
 package net.evilblock.prisonaio.module.user.profile.menu
 
 import net.evilblock.cubed.menu.Button
-import net.evilblock.cubed.menu.buttons.AddButton
-import net.evilblock.cubed.menu.buttons.GlassButton
-import net.evilblock.cubed.menu.buttons.SkullButton
-import net.evilblock.cubed.menu.buttons.TexturedHeadButton
+import net.evilblock.cubed.menu.buttons.*
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Constants
@@ -19,6 +16,8 @@ import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.user.User
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.menu.MainMenu
 import net.evilblock.prisonaio.module.user.profile.ProfileComment
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileCommentsMenu
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileStatisticsMenu
@@ -47,36 +46,32 @@ class ProfileLayout(
     }
 
     fun renderLayout(player: Player): MutableMap<Int, Button> {
-        val buttons = hashMapOf<Int, Button>()
+        return hashMapOf<Int, Button>().also { buttons ->
+            for (i in BORDER_SLOTS) {
+                buttons[i] = GlassButton(7)
+            }
 
-        for (i in BLACK_SLOTS) {
-            buttons[i] = GlassButton(7)
-        }
+            buttons[0] = BackButton { MainMenu(UserHandler.getUser(player)).openMenu(player) }
+            buttons[4] = HeadButton()
 
-        for (i in RED_SLOTS) {
-            buttons[i] = GlassButton(14)
-        }
+            buttons[18] = StatisticsButton()
+            buttons[27] = CommentsButton()
 
-        buttons[0] = HeadButton()
-        buttons[2] = StatisticsButton()
-        buttons[4] = CommentsButton()
+            if (player.uniqueId == user.uuid) {
+                buttons[36] = SettingsButton()
+            }
 
-        if (player.uniqueId == user.uuid) {
-            buttons[6] = SettingsButton()
-        }
-
-        if (activeTab == ProfileMenuTab.COMMENTS) {
-            if (!user.hasPostedProfileComment(player.uniqueId)) {
-                val allowingComments = (user.settings.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
-                if (allowingComments) {
-                    buttons[12] = AddCommentButton()
-                } else {
-                    buttons[12] = NotAllowingCommentsButton()
+            if (activeTab == ProfileMenuTab.COMMENTS) {
+                if (!user.hasPostedProfileComment(player.uniqueId)) {
+                    val allowingComments = (user.settings.getSettingOption(UserSetting.PROFILE_COMMENTS_RESTRICTION) as CommentsRestrictionOption).restriction == CommentsRestrictionOption.RestrictionOptionValue.ALLOWED
+                    if (allowingComments) {
+                        buttons[12] = AddCommentButton()
+                    } else {
+                        buttons[12] = NotAllowingCommentsButton()
+                    }
                 }
             }
         }
-
-        return buttons
     }
 
     private inner class AddCommentButton : AddButton() {
@@ -85,15 +80,15 @@ class ProfileLayout(
         }
 
         override fun getDescription(player: Player): List<String> {
-            val description = arrayListOf<String>()
-
-            description.addAll(TextSplitter.split(text = "Post a new comment to ${user.getUsername()}'s profile.", linePrefix = "${ChatColor.GRAY}"))
-            description.add("")
-            description.addAll(TextSplitter.split(text = "Posting unsolicited links or content deemed as harassment will result in punishment.", linePrefix = "${ChatColor.RED}"))
-            description.add("")
-            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to post a comment")
-
-            return description
+            return arrayListOf<String>().also { desc ->
+                desc.add("")
+                desc.addAll(TextSplitter.split(text = "Post a new comment to ${user.getUsername()}'s profile.", linePrefix = "${ChatColor.GRAY}"))
+                desc.add("")
+                desc.add("${ChatColor.RED}${ChatColor.BOLD}Warning")
+                desc.addAll(TextSplitter.split(text = "Posting unsolicited links or content deemed as harassment will result in punishment."))
+                desc.add("")
+                desc.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to post a comment")
+            }
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
@@ -102,7 +97,7 @@ class ProfileLayout(
                 if (allowingComments && !user.hasPostedProfileComment(player.uniqueId)) {
                     EzPrompt.Builder()
                         .promptText("${ChatColor.GREEN}Please type the message you'd like to post on ${user.getUsername()}'s profile. ${ChatColor.GRAY}(Limited to 120 characters)")
-                        .acceptInput { _, input ->
+                        .acceptInput { input ->
                             user.addProfileComment(ProfileComment(creator = player.uniqueId, message = input))
                             ProfileCommentsMenu(user).openMenu(player)
                         }
@@ -165,7 +160,7 @@ class ProfileLayout(
             val formattedTokensBalance = NumberUtils.format(user.getTokenBalance())
             description.add("${ChatColor.RED}${Constants.TOKENS_SYMBOL} ${ChatColor.GRAY}$formattedTokensBalance")
 
-            val gang = GangHandler.getAssumedGang(user.uuid)
+            val gang = GangHandler.getGangByPlayer(user.uuid)
             if (gang != null) {
                 description.add("${ChatColor.RED}${Constants.FLAG_SYMBOL} ${ChatColor.GRAY}${gang.name} (Gang)")
             }
@@ -277,8 +272,9 @@ class ProfileLayout(
     }
 
     companion object {
-        private val RED_SLOTS = listOf(1, 8, 9, 45)
-        private val BLACK_SLOTS = arrayListOf(9, 18, 27, 36, 45).also { list -> list.addAll(0..9) }
+        private val BORDER_SLOTS = arrayListOf(1, 8, 9, 18, 27, 36, 45).also { list ->
+            list.addAll(0..9)
+        }
     }
 
 }

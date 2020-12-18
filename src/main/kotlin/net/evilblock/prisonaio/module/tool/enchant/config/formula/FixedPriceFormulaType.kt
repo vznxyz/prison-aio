@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.tool.enchant.config.formula
 
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.enchant.menu.admin.ManageEnchantsMenu
 import org.bukkit.ChatColor
 import org.bukkit.event.inventory.ClickType
@@ -39,7 +39,7 @@ object FixedPriceFormulaType : PriceFormulaType("Fixed Price") {
                         (formula as FixedPriceFormula).price = number.toLong()
 
                         Tasks.async {
-                            EnchantsManager.saveConfig()
+                            EnchantHandler.saveConfig()
                         }
 
                         ManageEnchantsMenu().openMenu(player)

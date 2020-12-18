@@ -20,6 +20,7 @@ import net.evilblock.prisonaio.module.generator.GeneratorHandler
 import net.evilblock.prisonaio.module.generator.GeneratorType
 import net.evilblock.prisonaio.module.generator.build.mode.BuildMode
 import net.evilblock.prisonaio.module.generator.build.mode.BuildModeHandler
+import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -62,7 +63,7 @@ class PanelMenu(private val plot: Plot) : Menu() {
         override fun getDescription(player: Player): List<String> {
             return arrayListOf<String>().also { desc ->
                 desc.add("")
-                desc.add("${ChatColor.YELLOW}${ChatColor.BOLD}Click ")
+                desc.add("${ChatColor.YELLOW}Click to open generator panel")
             }
         }
 
@@ -72,6 +73,12 @@ class PanelMenu(private val plot: Plot) : Menu() {
                 .setLore(getDescription(player))
                 .build()
         }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                GeneratorMenu(generator).openMenu(player)
+            }
+        }
     }
 
     private inner class PurchaseGeneratorButton(private val type: GeneratorType) : Button() {
@@ -79,9 +86,9 @@ class PanelMenu(private val plot: Plot) : Menu() {
             val hasGeneratorType = GeneratorHandler.getGeneratorsByPlot(plot).any { it.getGeneratorType() == type }
 
             return if (hasGeneratorType) {
-                "${type.getColoredName()} Generator ${ChatColor.GRAY}(Reached Limit)"
+                "${type.getColoredName()} ${ChatColor.GRAY}(Reached Limit)"
             } else {
-                "${type.getColoredName()} Generator ${ChatColor.GRAY}(Level 1)"
+                "${type.getColoredName()} ${ChatColor.GRAY}(Level 1)"
             }
         }
 
@@ -94,7 +101,7 @@ class PanelMenu(private val plot: Plot) : Menu() {
                     val firstLevel = type.getLevels().first()
 
                     desc.add("${ChatColor.GRAY}Price: ${Formats.formatTokens(firstLevel.cost)}")
-                    desc.add("${ChatColor.GRAY}Time: ${ChatColor.RED}${ChatColor.BOLD}${TimeUtil.formatIntoAbbreviatedString(firstLevel.buildTime)}")
+                    desc.add("${ChatColor.GRAY}Build Time: ${ChatColor.RED}${ChatColor.BOLD}${TimeUtil.formatIntoAbbreviatedString(firstLevel.buildTime)}")
                     desc.add("")
                     desc.add("${ChatColor.YELLOW}Click to purchase a ${type.getProperName()}")
                 }
@@ -110,10 +117,44 @@ class PanelMenu(private val plot: Plot) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                val hasGeneratorType = GeneratorHandler.getGeneratorsByPlot(plot).any { it.getGeneratorType() == type }
-                if (hasGeneratorType) {
-                    player.sendMessage("${ChatColor.RED}You have reached the limit of ${type.getProperName(true)} you can have on a plot!")
+                val firstLevel = type.getLevels().first()
+
+                val user = UserHandler.getUser(player)
+                if (!user.hasTokenBalance(firstLevel.cost)) {
+                    player.sendMessage("${ChatColor.RED}You can't afford to purchase a ${type.getProperName()}!")
                     return
+                }
+
+                val core = GeneratorHandler.getCoreByPlot(plot)
+
+                if (type != GeneratorType.CORE) {
+                    if (core == null) {
+                        player.sendMessage("${ChatColor.RED}You need to place a Core on your plot first!")
+                        return
+                    }
+
+                    if (!core.build.finished) {
+                        player.sendMessage("${ChatColor.RED}You must wait for your Core to finish building!")
+                        return
+                    }
+
+                    val generatorsOnPlot = GeneratorHandler.getGeneratorsByPlot(plot)
+
+                    val maxBuilds = generatorsOnPlot.size - 1 >= core.getLevel().maxBuilds
+                    if (maxBuilds) {
+                        player.sendMessage("${ChatColor.RED}You need to upgrade your Core to place more generators!")
+                        return
+                    }
+
+                    if (generatorsOnPlot.any { it.getGeneratorType() == type }) {
+                        player.sendMessage("${ChatColor.RED}You've reached the limit")
+                        return
+                    }
+                } else {
+                    if (core != null) {
+                        player.sendMessage("${ChatColor.RED}You can only place one Core on a plot!")
+                        return
+                    }
                 }
 
                 val buildMode = BuildMode(player, plot, type, type.getLevels().first(), player.location)

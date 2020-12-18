@@ -18,15 +18,15 @@ class TokenBuildLevel(
 
     companion object {
         val LEVELS: Array<GeneratorBuildLevel> = arrayOf(
-            TokenBuildLevel(1, "token1", 5_000L, 1_800),
-            TokenBuildLevel(2, "token2", 5_000L, 7_200),
-            TokenBuildLevel(3, "token3", 5_000L, 14_400),
-            TokenBuildLevel(4, "token4", 5_000L, 28_800),
-            TokenBuildLevel(5, "token5", 5_000L, 43_200),
-            TokenBuildLevel(6, "token6", 5_000L, 64_800),
-            TokenBuildLevel(7, "token7", 5_000L, 86_400),
-            TokenBuildLevel(8, "token8", 5_000L, 129_600),
-            TokenBuildLevel(9, "token9", 5_000L, 172_800)
+            TokenBuildLevel(1, "token1.schematic", 5_000L, 1_800),
+            TokenBuildLevel(2, "token2.schematic", 5_000L, 7_200),
+            TokenBuildLevel(3, "token3.schematic", 5_000L, 14_400),
+            TokenBuildLevel(4, "token4.schematic", 5_000L, 28_800),
+            TokenBuildLevel(5, "token5.schematic", 5_000L, 43_200),
+            TokenBuildLevel(6, "token6.schematic", 5_000L, 64_800),
+            TokenBuildLevel(7, "token7.schematic", 5_000L, 86_400),
+            TokenBuildLevel(8, "token8.schematic", 5_000L, 129_600),
+            TokenBuildLevel(9, "token9.schematic", 5_000L, 172_800)
         )
     }
 

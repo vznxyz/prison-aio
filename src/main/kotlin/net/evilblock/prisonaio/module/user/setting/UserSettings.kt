@@ -8,7 +8,7 @@
 package net.evilblock.prisonaio.module.user.setting
 
 import com.google.gson.annotations.JsonAdapter
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import net.evilblock.prisonaio.module.tool.enchant.serialize.EnchantsSetReferenceSerializer
 import net.evilblock.prisonaio.module.user.User
 import java.util.*
@@ -18,7 +18,7 @@ class UserSettings(@Transient internal var user: User) {
     private val settings: MutableMap<UserSetting, UserSettingOption> = EnumMap(UserSetting::class.java)
 
     @JsonAdapter(EnchantsSetReferenceSerializer::class)
-    private val disabledEnchantMessages: MutableSet<AbstractEnchant> = hashSetOf()
+    private val disabledEnchantMessages: MutableSet<Enchant> = hashSetOf()
 
     /**
      * Updates the user's setting option for the given [setting].
@@ -41,14 +41,14 @@ class UserSettings(@Transient internal var user: User) {
     /**
      * If the user has the given [enchant]'s messages disabled.
      */
-    fun isEnchantMessagesDisabled(enchant: AbstractEnchant): Boolean {
+    fun isEnchantMessagesDisabled(enchant: Enchant): Boolean {
         return disabledEnchantMessages.contains(enchant)
     }
 
     /**
      * Toggles if the user has the given [enchant]'s messages disabled.
      */
-    fun toggleEnchantMessages(enchant: AbstractEnchant) {
+    fun toggleEnchantMessages(enchant: Enchant) {
         if (disabledEnchantMessages.contains(enchant)) {
             disabledEnchantMessages.remove(enchant)
         } else {

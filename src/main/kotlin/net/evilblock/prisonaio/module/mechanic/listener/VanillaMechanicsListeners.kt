@@ -43,7 +43,7 @@ object VanillaMechanicsListeners : Listener {
                     event.isCancelled = true
 
                     event.entity.teleport(Bukkit.getServer().worlds[0].spawnLocation)
-                    event.entity.sendMessage("${ChatColor.YELLOW}You have been teleported to spawn.")
+                    event.entity.sendMessage("${ChatColor.YELLOW}You've been teleported to spawn!")
                 }
                 EntityDamageEvent.DamageCause.FIRE,
                 EntityDamageEvent.DamageCause.LAVA -> {

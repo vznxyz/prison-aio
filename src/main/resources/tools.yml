@@ -1,4 +1,3 @@
-token-shop-command: "openshop tokens"
 cubed:
   decription: "Destroys a radius of blocks around every block that you break."
   nerf:

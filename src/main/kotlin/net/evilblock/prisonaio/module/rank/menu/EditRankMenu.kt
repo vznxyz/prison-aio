@@ -78,7 +78,7 @@ class EditRankMenu(val rank: Rank) : Menu() {
 
             EzPrompt.Builder()
                 .promptText("${ChatColor.GREEN}Please input a new name. ${ChatColor.GRAY}(Colors supported)")
-                .acceptInput { player, input ->
+                .acceptInput { input ->
                     if (input.length >= 32) {
                         player.sendMessage("${ChatColor.RED}Rank name is too long! (${input.length} > 32 characters)")
                         return@acceptInput

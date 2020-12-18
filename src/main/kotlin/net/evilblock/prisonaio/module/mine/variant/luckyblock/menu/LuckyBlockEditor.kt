@@ -92,7 +92,7 @@ class LuckyBlockEditor : PaginatedMenu() {
                 EzPrompt.Builder()
                     .charLimit(48)
                     .promptText("${ChatColor.GREEN}Please input an ID for the LuckyBlock.")
-                    .acceptInput { _, input ->
+                    .acceptInput { input ->
                         if (LuckyBlockHandler.getBlockTypeById(input) != null) {
                             player.sendMessage("${ChatColor.RED}That ID is taken by another LuckyBlock type!")
                             return@acceptInput

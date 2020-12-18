@@ -7,6 +7,7 @@ import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.ItemUtils
+import net.evilblock.cubed.util.bukkit.render.GraphicalTable
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.Formats
 import net.evilblock.prisonaio.module.robot.RobotHandler
@@ -14,7 +15,6 @@ import net.evilblock.prisonaio.module.robot.RobotUtils
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.robot.cosmetic.CosmeticHandler
 import net.evilblock.prisonaio.module.robot.impl.MinerRobot
-import net.evilblock.prisonaio.module.robot.impl.statistic.GraphicalTable
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -175,7 +175,7 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
                 desc.add("${ChatColor.GRAY}Purchase cosmetics on our store:")
                 desc.add("${ChatColor.RED}${ChatColor.BOLD}store.minejunkie.com")
                 desc.add("")
-                desc.add("${ChatColor.GRAY}You own ${ChatColor.GREEN}$ownedCosmetics${ChatColor.GRAY}/${ChatColor.BOLD}$availableCosmetics ${ChatColor.GRAY}cosmetics.")
+                desc.add("${ChatColor.GRAY}You own ${ChatColor.GREEN}${ChatColor.BOLD}$ownedCosmetics${ChatColor.GRAY}/$availableCosmetics ${ChatColor.GRAY}cosmetics.")
                 desc.add("")
                 desc.add("${ChatColor.YELLOW}Click to manage cosmetics")
             }

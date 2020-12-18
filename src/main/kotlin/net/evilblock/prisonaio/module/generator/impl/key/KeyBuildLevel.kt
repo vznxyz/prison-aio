@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.generator.impl.key
 
+import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.module.generator.build.GeneratorBuildLevel
 
 class KeyBuildLevel(
@@ -18,6 +19,10 @@ class KeyBuildLevel(
     val maxKeys: Int,
     val keys: List<KeyChance>
 ) : GeneratorBuildLevel(number, schematic, nextLevelCost, tickInterval, buildTime) {
+
+    fun pickRandomKey(): KeyChance {
+        return Chance.weightedPick(keys) { it.chance }
+    }
 
     data class KeyChance(val key: String, val chance: Double)
 

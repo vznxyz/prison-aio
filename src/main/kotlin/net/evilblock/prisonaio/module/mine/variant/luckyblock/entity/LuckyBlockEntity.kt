@@ -35,7 +35,14 @@ class LuckyBlockEntity(
     }
 
     override fun getDebugViewLocation(): Location {
-        return location.clone().add(0.5, 0.0, 0.5)
+        return location.clone().add(0.5, 0.2, 0.5)
+    }
+
+    override fun renderDebugInformation(): List<String> {
+        return arrayListOf<String>().also { info ->
+            info.addAll(super.renderDebugInformation())
+            info.add("Block Type: ${luckyBlock.name}")
+        }
     }
 
     override fun sendSpawnPackets(player: Player) {

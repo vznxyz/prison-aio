@@ -4,9 +4,10 @@ description: "All-in-one Prison server solution"
 author: joeleoli
 version: "1.0"
 depend:
+  - PlotSquared
   - Cubed
   - Source
+  - Cosmetics
   - Vault
-  - PlotSquared
 softdepend:
   - DeluxeTags

@@ -11,9 +11,8 @@ import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
-import net.evilblock.prisonaio.module.tool.enchant.command.*
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.enchant.command.admin.*
 import net.evilblock.prisonaio.module.tool.enchant.command.parameter.AbstractEnchantParameterType
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
@@ -22,7 +21,11 @@ import net.evilblock.prisonaio.module.tool.pickaxe.prestige.command.PrestigeEdit
 import net.evilblock.prisonaio.module.tool.pickaxe.salvage.SalvagePreventionHandler
 import net.evilblock.prisonaio.module.tool.pickaxe.salvage.command.SalvagePreventionEditorCommand
 import net.evilblock.prisonaio.module.tool.pickaxe.command.*
+import net.evilblock.prisonaio.module.tool.pickaxe.command.PickaxeCommand
+import net.evilblock.prisonaio.module.tool.pickaxe.command.admin.*
 import net.evilblock.prisonaio.module.tool.pickaxe.listener.PickaxeStatisticsListeners
+import net.evilblock.prisonaio.module.tool.rename.command.GiveRenameTagCommand
+import net.evilblock.prisonaio.module.tool.rename.listener.RenameTagListeners
 import org.bukkit.event.Listener
 
 object ToolsModule : PluginModule() {
@@ -43,7 +46,7 @@ object ToolsModule : PluginModule() {
         PickaxeHandler.initialLoad()
         PickaxePrestigeHandler.initialLoad()
         SalvagePreventionHandler.initialLoad()
-        EnchantsManager.loadConfig()
+        EnchantHandler.loadConfig()
     }
 
     override fun onReload() {
@@ -64,8 +67,9 @@ object ToolsModule : PluginModule() {
 
     override fun getListeners(): List<Listener> {
         return listOf(
-            EnchantsManager,
-            PickaxeStatisticsListeners
+            EnchantHandler,
+            PickaxeStatisticsListeners,
+            RenameTagListeners
         )
     }
 
@@ -76,6 +80,8 @@ object ToolsModule : PluginModule() {
             ManageEnchantsCommand.javaClass,
             EnchantCommand.javaClass,
             PickaxeCommand.javaClass,
+            GivePickaxeCommand.javaClass,
+            GiveRenameTagCommand.javaClass,
             PickaxeDebugCommand.javaClass,
             PickaxeSetBlocksMinedCommand.javaClass,
             PickaxeSetLevelCommand.javaClass,
@@ -88,12 +94,8 @@ object ToolsModule : PluginModule() {
 
     override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
         return mapOf(
-            AbstractEnchant::class.java to AbstractEnchantParameterType
+            Enchant::class.java to AbstractEnchantParameterType
         )
-    }
-
-    fun readTokenShopCommand(): String {
-        return config.getString("token-shop-command", "openshop tokens")
     }
 
 }

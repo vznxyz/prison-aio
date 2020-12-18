@@ -26,7 +26,7 @@ import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
 import net.evilblock.prisonaio.module.shop.serialize.ShopReferenceSerializer
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType

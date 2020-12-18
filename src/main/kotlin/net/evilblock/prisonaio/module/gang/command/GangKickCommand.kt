@@ -25,7 +25,7 @@ object GangKickCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "player") kickTarget: UUID) {
-        val gang = GangHandler.getAssumedGang(player.uniqueId)
+        val gang = GangHandler.getGangByPlayer(player.uniqueId)
         if (gang == null) {
             player.sendMessage("${ChatColor.RED}You must be in a gang to kick a player from it.")
             return

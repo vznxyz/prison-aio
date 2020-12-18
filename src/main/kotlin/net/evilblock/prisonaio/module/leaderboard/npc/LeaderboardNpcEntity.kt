@@ -20,7 +20,7 @@ class LeaderboardNpcEntity(@JsonAdapter(LeaderboardReferenceSerializer::class) i
     override fun initializeData() {
         super.initializeData()
 
-        updateLines(leaderboard.getDisplayLines(true))
+        updateLines(leaderboard.getDisplayLines(includeTitle = true, fullView = true))
     }
 
     class LeaderboardReferenceSerializer : JsonSerializer<Leaderboard>, JsonDeserializer<Leaderboard> {

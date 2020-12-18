@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.mine.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.BackButton
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.menus.ExitButton
 import net.evilblock.cubed.util.bukkit.ConversationUtil
 import net.evilblock.prisonaio.module.mine.MineHandler
@@ -42,7 +43,7 @@ class MineManageBlocksMenu(private val mine: NormalMine) : Menu() {
 
         // toolbar separator
         for (i in 9..17) {
-            buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 0, " ")
+            buttons[i] = GlassButton(0)
         }
 
         // list block types

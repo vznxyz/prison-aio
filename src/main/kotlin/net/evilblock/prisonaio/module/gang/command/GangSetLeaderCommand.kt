@@ -24,7 +24,7 @@ object GangSetLeaderCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "player") newLeader: UUID) {
-        val gang = GangHandler.getAssumedGang(player.uniqueId)
+        val gang = GangHandler.getGangByPlayer(player.uniqueId)
         if (gang == null) {
             player.sendMessage("${ChatColor.RED}You must be inside a gang to set relinquish leadership of it.")
             return

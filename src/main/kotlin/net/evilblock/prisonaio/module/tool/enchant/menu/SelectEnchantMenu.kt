@@ -9,8 +9,8 @@ package net.evilblock.prisonaio.module.tool.enchant.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -18,8 +18,8 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 
 class SelectEnchantMenu(
-    private val filtered: Collection<AbstractEnchant> = emptyList(),
-    private val select: (AbstractEnchant) -> Unit
+    private val filtered: Collection<Enchant> = emptyList(),
+    private val select: (Enchant) -> Unit
 ) : Menu() {
 
     override fun getTitle(player: Player): String {
@@ -29,7 +29,7 @@ class SelectEnchantMenu(
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        for (enchant in EnchantsManager.getRegisteredEnchants().sortedWith(EnchantsManager.ENCHANT_COMPARATOR)) {
+        for (enchant in EnchantHandler.getRegisteredEnchants().sortedWith(EnchantHandler.ENCHANT_COMPARATOR)) {
             if (filtered.contains(enchant)) {
                 continue
             }
@@ -40,9 +40,9 @@ class SelectEnchantMenu(
         return buttons
     }
 
-    private inner class EnchantButton(private val enchant: AbstractEnchant) : Button() {
+    private inner class EnchantButton(private val enchant: Enchant) : Button() {
         override fun getName(player: Player): String {
-            return "${enchant.textColor}${ChatColor.BOLD}${enchant.enchant}"
+            return enchant.getColoredName()
         }
 
         override fun getDescription(player: Player): List<String> {

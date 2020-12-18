@@ -67,7 +67,7 @@ class EditArenaMenu(private val arena: EventGameArena) : Menu() {
             if (clickType.isLeftClick) {
                 EzPrompt.Builder()
                     .regex(EzPrompt.IDENTIFIER_REGEX)
-                    .acceptInput { _, input ->
+                    .acceptInput { input ->
                         if (EventGameArenaHandler.getArenaByName(input) != null) {
                             player.sendMessage("${ChatColor.RED}That name is taken!")
                             return@acceptInput

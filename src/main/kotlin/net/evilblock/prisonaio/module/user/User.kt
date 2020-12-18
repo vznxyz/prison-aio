@@ -14,7 +14,6 @@ import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.achievement.Achievement
 import net.evilblock.prisonaio.module.battlepass.BattlePassProgress
-import net.evilblock.prisonaio.module.exchange.listing.GrandExchangeListing
 import net.evilblock.prisonaio.module.quest.Quest
 import net.evilblock.prisonaio.module.quest.QuestHandler
 import net.evilblock.prisonaio.module.quest.progress.QuestProgress
@@ -25,7 +24,7 @@ import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.rank.serialize.RankReferenceSerializer
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
 import net.evilblock.prisonaio.module.user.activity.type.CompletedAchievementActivity
-import net.evilblock.prisonaio.module.user.exchange.GrandExchangeUserData
+import net.evilblock.prisonaio.module.user.auction.UserActionHouseData
 import net.evilblock.prisonaio.module.user.news.News
 import net.evilblock.prisonaio.module.user.perk.UserPerks
 import net.evilblock.prisonaio.module.user.profile.ProfileComment
@@ -61,13 +60,13 @@ class User(val uuid: UUID) {
     private var prestige: Int = 0
     private var prestigeTokens: Int = 0
 
-    private var moneyBalance: BigDecimal = BigDecimal.ZERO
-    private var tokenBalance: BigInteger = BigInteger.ZERO
+    private var moneyBalance: BigDecimal = BigDecimal(0.0)
+    private var tokenBalance: BigInteger = BigInteger("0")
 
     var perks: UserPerks = UserPerks(this)
     var statistics: UserStatistics = UserStatistics(this)
     var settings: UserSettings = UserSettings(this)
-    var grandExchangeData: GrandExchangeUserData = GrandExchangeUserData(this)
+    var auctionHouseData: UserActionHouseData = UserActionHouseData(this)
     var battlePassProgress: BattlePassProgress = BattlePassProgress(this)
 
     private val profileComments: MutableList<ProfileComment> = arrayListOf()
@@ -83,39 +82,11 @@ class User(val uuid: UUID) {
     internal var readNews: MutableSet<News> = hashSetOf()
 
     fun init() {
-        if (perks == null) {
-            perks = UserPerks(this)
-        } else {
-            perks.user = this
-        }
-
-        if (statistics == null) {
-            statistics = UserStatistics(this)
-        } else {
-            statistics.user = this
-        }
-
-        if (settings == null) {
-            settings = UserSettings(this)
-        } else {
-            settings.user = this
-        }
-
-        if (grandExchangeData == null) {
-            grandExchangeData = GrandExchangeUserData(this)
-        } else {
-            grandExchangeData.user = this
-
-            if (grandExchangeData.bidListings == null) {
-                grandExchangeData.bidListings = arrayListOf()
-            }
-        }
-
-        if (battlePassProgress == null) {
-            battlePassProgress = BattlePassProgress(this)
-        } else {
-            battlePassProgress.user = this
-        }
+        perks.user = this
+        statistics.user = this
+        settings.user = this
+        auctionHouseData.user = this
+        battlePassProgress.user = this
     }
 
     /**
@@ -200,8 +171,8 @@ class User(val uuid: UUID) {
     fun purchaseMaxRankups(player: Player, manual: Boolean = false) {
         val previousRank = rank
 
-        val optionalNextRank = RankHandler.getNextRank(previousRank)
-        if (!optionalNextRank.isPresent) {
+        val nextRank = RankHandler.getNextRank(previousRank)
+        if (nextRank == null) {
             if (manual) {
                 player.sendMessage("${ChatColor.RED}You have achieved max rank and cannot rankup anymore. Try /prestige!")
             }

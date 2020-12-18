@@ -8,7 +8,7 @@
 package net.evilblock.prisonaio.module.gang.booster
 
 import net.evilblock.cubed.util.TimeUtil
-import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.GangsModule
 import org.bukkit.Material
 import java.text.DecimalFormat
 import java.util.*
@@ -49,7 +49,7 @@ class GangBooster(
         ),
         SALES_MULTIPLIER(
             "5x Shop Multiplier",
-            "Grants every member of your gang a ${DECIMAL_FORMAT.format(GangModule.readSalesMultiplierMod())}x Shop Multiplier for a given amount of time.",
+            "Grants every member of your gang a ${DECIMAL_FORMAT.format(GangsModule.readSalesMultiplierMod())}x Shop Multiplier for a given amount of time.",
             Material.NETHER_STAR,
             50_000,
             TimeUnit.MINUTES.toMillis(60)

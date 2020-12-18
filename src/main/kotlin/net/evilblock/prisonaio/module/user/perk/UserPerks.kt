@@ -8,7 +8,7 @@
 package net.evilblock.prisonaio.module.user.perk
 
 import net.evilblock.prisonaio.module.gang.GangHandler
-import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.GangsModule
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorHandler
 import net.evilblock.prisonaio.module.reward.multiplier.GlobalMultiplierHandler
@@ -127,10 +127,10 @@ class UserPerks(@Transient internal var user: User) {
             stackedMultiplier += 4.0
         }
 
-        val assumedGang = GangHandler.getAssumedGang(player.uniqueId)
+        val assumedGang = GangHandler.getGangByPlayer(player.uniqueId)
         if (assumedGang != null) {
             if (assumedGang.hasBooster(GangBooster.BoosterType.SALES_MULTIPLIER)) {
-                stackedMultiplier += GangModule.readSalesMultiplierMod()
+                stackedMultiplier += GangsModule.readSalesMultiplierMod()
             }
         }
 

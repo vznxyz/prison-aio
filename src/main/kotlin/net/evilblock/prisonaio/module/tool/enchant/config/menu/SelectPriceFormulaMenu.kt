@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.tool.enchant.config.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.enchant.config.formula.PriceFormulaType
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -26,7 +26,7 @@ class SelectPriceFormulaMenu(private val selected: (PriceFormulaType.PriceFormul
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = hashMapOf<Int, Button>()
 
-        for (formulaType in EnchantsManager.getRegistedPriceFormulaTypes()) {
+        for (formulaType in EnchantHandler.getRegistedPriceFormulaTypes()) {
             buttons[buttons.size] = PriceFormulaTypeButton(formulaType)
         }
 

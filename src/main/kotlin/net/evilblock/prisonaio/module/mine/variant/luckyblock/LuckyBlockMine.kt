@@ -91,6 +91,10 @@ class LuckyBlockMine(id: String) : Mine(id) {
         return false
     }
 
+    override fun supportsCosmetics(): Boolean {
+        return false
+    }
+
     override fun resetRegion() {
         if (region == null) {
             throw IllegalStateException("Cannot reset mine if its region is not set")

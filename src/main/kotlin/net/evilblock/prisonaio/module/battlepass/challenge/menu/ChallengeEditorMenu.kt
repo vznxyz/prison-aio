@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.battlepass.challenge.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.AddButton
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.TextSplitter
@@ -41,7 +42,7 @@ class ChallengeEditorMenu : PaginatedMenu() {
         buttons[2] = AddChallengeButton()
 
         for (i in 9..17) {
-            buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 0, " ")
+            buttons[i] = GlassButton(0)
         }
 
         return buttons
@@ -98,7 +99,7 @@ class ChallengeEditorMenu : PaginatedMenu() {
                 EzPrompt.Builder()
                     .promptText("${ChatColor.GREEN}Please input an ID for the challenge.")
                     .regex(EzPrompt.IDENTIFIER_REGEX)
-                    .acceptInput { player, input ->
+                    .acceptInput { input ->
                         if (ChallengeHandler.getChallengeById(input) != null) {
                             player.sendMessage("${ChatColor.RED}A challenge's ID must be unique, and a challenge with the ID `$input` already exists.")
                             return@acceptInput

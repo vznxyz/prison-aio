@@ -19,6 +19,7 @@ import net.evilblock.prisonaio.module.generator.schematic.rotate.RotatedSchemati
 import net.evilblock.prisonaio.module.generator.schematic.rotate.Rotation
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.plot.PlotUtil
+import org.bukkit.ChatColor
 import org.bukkit.DyeColor
 import org.bukkit.Location
 import org.bukkit.Material
@@ -50,7 +51,7 @@ class BuildMode(
     fun start() {
         snapshot = PlayerSnapshot(player)
         rotation = RotateUtil.getFacing(player)
-        schematic = level.getSchematic(rotation) ?: throw IllegalStateException("Couldn't find schematic for ${type.name} level ${level.number}")
+        schematic = level.getSchematic(rotation)
 
         player.inventory.clear()
         player.closeInventory()
@@ -71,14 +72,24 @@ class BuildMode(
     }
 
     fun sendPacket() {
-        val schematic = level.getSchematic(rotation) ?: throw IllegalStateException("Couldn't find schematic for ${type.name} level ${level.number}")
+        val schematic = level.getSchematic(rotation)
         val area: Vector = schematic.area
         val min = location.clone().subtract(area.blockX / 2.toDouble(), 0.0, area.blockZ / 2.toDouble())
         val max = min.clone().add(area)
 
         blockChanges = BlockChangeBuilder(player.world)
 
-        if (!previewing) {
+        if (previewing) {
+            for (block in schematic.blocks) {
+                blockChanges.addChange(
+                    min.blockX + block.vector.blockX,
+                    min.blockY + block.vector.blockY,
+                    min.blockZ + block.vector.blockZ,
+                    block.type,
+                    block.data.toInt()
+                )
+            }
+        } else {
             val id = Material.STAINED_GLASS.id
 
             val plot = PlotUtil.getPlot(location)
@@ -96,7 +107,7 @@ class BuildMode(
                 }
             }
 
-            val data = if (canBuild(player, Cuboid(min, max))) {
+            val data = if (canBuild(player, Cuboid(min, max), false)) {
                 DyeColor.LIME.woolData.toInt()
             } else {
                 DyeColor.RED.woolData.toInt()
@@ -113,16 +124,6 @@ class BuildMode(
                     .addChange(min.blockX, min.blockY, i, id, data)
                     .addChange(max.blockX, min.blockY, i, id, data)
             }
-        } else {
-            for (block in schematic.blocks) {
-                blockChanges.addChange(
-                    min.blockX + block.vector.blockX,
-                    min.blockY + block.vector.blockY,
-                    min.blockZ + block.vector.blockZ,
-                    block.type,
-                    block.data.toInt()
-                )
-            }
         }
 
         blockChanges.sendUpdate(player, false)
@@ -137,7 +138,7 @@ class BuildMode(
             clearPacket()
 
             val newLocation = location.clone()
-            newLocation.y = location.y - level.getSchematic(rotation)!!.area.blockY
+            newLocation.y = location.y - level.getSchematic(rotation).area.blockY
 
             this.location = newLocation
             sendPacket()
@@ -146,7 +147,7 @@ class BuildMode(
 
     fun updateRotation(newRotation: Rotation) {
         rotation = newRotation
-        schematic = GeneratorHandler.getSchematic(level.schematic, newRotation)!!
+        schematic = level.getSchematic(newRotation)
 
         if (!previewing) {
             clearPacket()
@@ -175,7 +176,11 @@ class BuildMode(
         return Cuboid(min, max)
     }
 
-    fun canBuild(player: Player, area: Cuboid): Boolean {
+    fun getCost(): Long {
+        return type.getLevels().first().cost
+    }
+
+    fun canBuild(player: Player, area: Cuboid, sendMessages: Boolean): Boolean {
         if (area.upperY >= 256 || area.lowerY <= 0) {
             return false
         }
@@ -199,14 +204,40 @@ class BuildMode(
             || plotMin != plotMax
             || plotMin != plotAltMin
             || plotMin != plotAltMax) {
+            if (sendMessages) {
+                player.sendMessage("${ChatColor.RED}You can't place a generator there!")
+            }
             return false
         }
 
         if (GeneratorHandler.isOccupiedArea(area, plotMin)) {
+            if (sendMessages) {
+                player.sendMessage("${ChatColor.RED}That area is occupied by another generator!")
+            }
             return false
         }
 
+        val core = GeneratorHandler.getCoreByPlot(plot.id)
+        if (core == null) {
+            if (type != GeneratorType.CORE) {
+                if (sendMessages) {
+                    player.sendMessage("${ChatColor.RED}You need to place a Core on your plot first!")
+                }
+                return false
+            }
+        } else {
+            if (!core.build.finished) {
+                if (sendMessages) {
+                    player.sendMessage("${ChatColor.RED}You can't place a generator there!")
+                }
+                return false
+            }
+        }
+
         if (RegionBypass.hasBypass(player)) {
+            if (sendMessages) {
+                RegionBypass.attemptNotify(player)
+            }
             return true
         }
 

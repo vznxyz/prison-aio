@@ -8,9 +8,8 @@
 package net.evilblock.prisonaio.module.gang.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.prisonaio.module.gang.GangHandler
-import net.evilblock.prisonaio.module.region.RegionHandler
-import net.evilblock.prisonaio.module.region.RegionsModule
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -23,7 +22,7 @@ object GangDisbandCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        val gang = GangHandler.getAssumedGang(player.uniqueId)
+        val gang = GangHandler.getGangByPlayer(player.uniqueId)
         if (gang == null) {
             player.sendMessage("${ChatColor.RED}You must be in a gang to disband it.")
             return
@@ -34,16 +33,11 @@ object GangDisbandCommand {
             return
         }
 
-        gang.sendMessagesToMembers("${ChatColor.YELLOW}The gang has been disbanded by the leader.")
-
-        for (member in gang.getMembers().keys) {
-            GangHandler.updateGangAccess(member, gang, false)
-        }
-
-        gang.kickVisitors(force = true)
-
-        GangHandler.forgetGang(gang)
-        RegionHandler.clearBlockCache(gang)
+        ConfirmMenu { confirmed ->
+            if (confirmed) {
+                GangHandler.disbandGang(gang)
+            }
+        }.openMenu(player)
 
         player.sendMessage("${ChatColor.GREEN}You have successfully disbanded your gang.")
     }

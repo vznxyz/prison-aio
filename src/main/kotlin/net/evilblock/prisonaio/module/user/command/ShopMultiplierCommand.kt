@@ -10,7 +10,7 @@ package net.evilblock.prisonaio.module.user.command
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.prisonaio.module.gang.GangHandler
-import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.GangsModule
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorHandler
 import net.evilblock.prisonaio.module.mechanic.armor.impl.MinerArmorSet
@@ -58,13 +58,13 @@ object ShopMultiplierCommand {
             }
         }
 
-        val assumedGang = GangHandler.getAssumedGang(player.uniqueId)
+        val assumedGang = GangHandler.getGangByPlayer(player.uniqueId)
         if (assumedGang != null && assumedGang.hasBooster(GangBooster.BoosterType.SALES_MULTIPLIER)) {
             hasMultiplier = true
 
             val booster = assumedGang.getBooster(GangBooster.BoosterType.SALES_MULTIPLIER)!!
             val formattedDuration = TimeUtil.formatIntoDetailedString((booster.getRemainingTime() / 1000.0).toInt())
-            player.sendMessage("${ChatColor.GRAY}You have a Gang Booster shop multiplier of ${ChatColor.RED}${ChatColor.BOLD}${DECIMAL_FORMAT.format(GangModule.readSalesMultiplierMod())}x ${ChatColor.GRAY}for a period of ${ChatColor.RED}$formattedDuration${ChatColor.GRAY}.")
+            player.sendMessage("${ChatColor.GRAY}You have a Gang Booster shop multiplier of ${ChatColor.RED}${ChatColor.BOLD}${DECIMAL_FORMAT.format(GangsModule.readSalesMultiplierMod())}x ${ChatColor.GRAY}for a period of ${ChatColor.RED}$formattedDuration${ChatColor.GRAY}.")
         }
 
         val globalMultiplier = GlobalMultiplierHandler.getActiveMultiplier()

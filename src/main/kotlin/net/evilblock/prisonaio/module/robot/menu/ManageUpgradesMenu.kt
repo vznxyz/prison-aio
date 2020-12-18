@@ -7,7 +7,7 @@ import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import net.evilblock.prisonaio.module.robot.impl.MinerRobot
 import net.evilblock.prisonaio.module.robot.impl.upgrade.Upgrade
 import net.evilblock.prisonaio.module.robot.impl.upgrade.impl.EfficiencyUpgrade
@@ -81,7 +81,7 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
             val nextLevelPrice = upgrade.getPrice(player, robot.tier, nextLevel)
             val formattedPrice = currency.format(nextLevelPrice)
 
-            description.add("${ChatColor.GRAY}Level: ${upgrade.getColor()}${ChatColor.BOLD}${NumberUtils.format(currentLevel)}${ChatColor.GRAY}/${ChatColor.BOLD}${NumberUtils.format(upgrade.getMaxLevel())}")
+            description.add("${ChatColor.GRAY}Level: ${upgrade.getColor()}${ChatColor.BOLD}${NumberUtils.format(currentLevel)}${ChatColor.GRAY}/${NumberUtils.format(upgrade.getMaxLevel())}")
 
             val isMaxed = currentLevel >= upgrade.getMaxLevel()
             if (!isMaxed) {

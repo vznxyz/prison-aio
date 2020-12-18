@@ -8,7 +8,6 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.robot.impl.MinerRobot
 import net.evilblock.prisonaio.module.robot.tick.RobotThread
@@ -49,18 +48,14 @@ object RobotHandler : PluginHandler {
                 Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
                     val robots = Cubed.gson.fromJson(reader, dataType) as List<Robot>
 
-                    Tasks.async {
-                        for (robot in robots) {
-                            robot.initializeData()
-                            trackRobot(robot)
-                        }
+                    for (robot in robots) {
+                        robot.initializeData()
+                        trackRobot(robot)
+                    }
 
-                        Tasks.sync {
-                            for (robot in robots) {
-                                if (robot is MinerRobot) {
-                                    robot.setupFakeBlock(false)
-                                }
-                            }
+                    for (robot in robots) {
+                        if (robot is MinerRobot) {
+                            robot.setupFakeBlock(false)
                         }
                     }
 
@@ -103,12 +98,15 @@ object RobotHandler : PluginHandler {
      */
     fun forgetRobot(robot: Robot) {
         robotsByUuid.remove(robot.uuid)
+
         EntityManager.forgetEntity(robot)
         EntityManager.forgetEntity(robot.hologram)
 
-        val plot = PlotUtil.getPlot(robot.location)
-        if (plot != null) {
-            robotsByPlot[plot.id]?.remove(robot)
+        if (robot.location.world != null) {
+            val plot = PlotUtil.getPlot(robot.location)
+            if (plot != null) {
+                robotsByPlot[plot.id]?.remove(robot)
+            }
         }
     }
 

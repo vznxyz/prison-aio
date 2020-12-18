@@ -9,9 +9,9 @@ package net.evilblock.prisonaio.module.reward.minecrate.listener
 
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.tool.enchant.type.Luck
+import net.evilblock.prisonaio.module.tool.enchant.impl.Luck
 import net.evilblock.prisonaio.module.gang.GangHandler
-import net.evilblock.prisonaio.module.gang.GangModule
+import net.evilblock.prisonaio.module.gang.GangsModule
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.mechanic.event.MultiBlockBreakEvent
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
@@ -88,9 +88,9 @@ object MineCrateListeners : Listener {
         }
 
         // apply gang booster multiplier
-        val assumedGang = GangHandler.getAssumedGang(event.player.uniqueId)
+        val assumedGang = GangHandler.getGangByPlayer(event.player.uniqueId)
         if (assumedGang != null && assumedGang.hasBooster(GangBooster.BoosterType.INCREASED_MINE_CRATES)) {
-            chanceModifier += GangModule.readIncreasedMineCratesChanceMod()
+            chanceModifier += GangsModule.readIncreasedMineCratesChanceMod()
         }
 
         if (!MineCrateHandler.isOnCooldown(event.player)) {

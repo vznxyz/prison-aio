@@ -21,7 +21,7 @@ object SpawnCommand {
     @JvmStatic
     fun execute(player: Player) {
         player.teleport(Bukkit.getServer().worlds[0].spawnLocation)
-        player.sendMessage("${ChatColor.YELLOW}You have been teleported to spawn.")
+        player.sendMessage("${ChatColor.YELLOW}You've been teleported to spawn!")
     }
 
 }

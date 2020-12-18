@@ -23,7 +23,7 @@ import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
 import net.evilblock.prisonaio.module.shop.transaction.TransactionResult
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -213,11 +213,6 @@ class Shop(var id: String) {
     fun openMenu(player: Player) {
         if (menuTemplate == null) {
             player.sendMessage("${ChatColor.RED}Unable to open the $name ${ChatColor.RED}shop because it has no template!")
-            return
-        }
-
-        if (items.none { it.isSelling() }) {
-            player.sendMessage("${ChatColor.RED}The $name ${ChatColor.RED}shop is not selling any items!")
             return
         }
 

@@ -8,7 +8,7 @@
 package net.evilblock.prisonaio.module.tool.pickaxe.menu.button
 
 import net.evilblock.cubed.menu.Button
-import net.evilblock.prisonaio.module.tool.pickaxe.menu.EnchantMenu
+import net.evilblock.prisonaio.module.tool.pickaxe.menu.PurchaseEnchantsMenu
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -42,7 +42,7 @@ class GoToEnchantMenuButton(private val pickaxeItem: ItemStack, private val pick
 
     override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
         if (clickType == ClickType.LEFT) {
-            EnchantMenu(pickaxeItem, pickaxeData).openMenu(player)
+            PurchaseEnchantsMenu(pickaxeItem, pickaxeData).openMenu(player)
         }
     }
 

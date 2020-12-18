@@ -8,18 +8,18 @@
 package net.evilblock.prisonaio.module.tool.enchant.serialize
 
 import com.google.gson.*
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
-import net.evilblock.prisonaio.module.tool.enchant.EnchantsManager
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import java.lang.reflect.Type
 
-class EnchantsSetReferenceSerializer : JsonSerializer<MutableSet<AbstractEnchant>>, JsonDeserializer<MutableSet<AbstractEnchant>> {
+class EnchantsSetReferenceSerializer : JsonSerializer<MutableSet<Enchant>>, JsonDeserializer<MutableSet<Enchant>> {
 
-    override fun serialize(set: MutableSet<AbstractEnchant>, type: Type, context: JsonSerializationContext): JsonElement {
+    override fun serialize(set: MutableSet<Enchant>, type: Type, context: JsonSerializationContext): JsonElement {
         return JsonArray().also { array -> set.forEach { array.add(JsonPrimitive(it.id)) } }
     }
 
-    override fun deserialize(json: JsonElement, type: Type, context: JsonDeserializationContext): MutableSet<AbstractEnchant> {
-        return json.asJsonArray.mapNotNull { EnchantsManager.getEnchantById(it.asString) }.toMutableSet()
+    override fun deserialize(json: JsonElement, type: Type, context: JsonDeserializationContext): MutableSet<Enchant> {
+        return json.asJsonArray.mapNotNull { EnchantHandler.getEnchantById(it.asString) }.toMutableSet()
     }
 
 }

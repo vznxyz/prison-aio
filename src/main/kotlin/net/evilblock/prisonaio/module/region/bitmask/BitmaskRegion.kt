@@ -78,6 +78,10 @@ open class BitmaskRegion(id: String, cuboid: Cuboid? = null) : Region(id, cuboid
         return (bitmask and bitmaskType.bitmaskValue) == bitmaskType.bitmaskValue
     }
 
+    override fun supportsCosmetics(): Boolean {
+        return !hasBitmask(RegionBitmask.DANGER_ZONE)
+    }
+
     override fun onRightClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
         if (hasBitmask(RegionBitmask.SAFE_ZONE)) {
             if (Constants.CONTAINER_TYPES.contains(clickedBlock.type)) {

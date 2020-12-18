@@ -22,7 +22,7 @@ import net.evilblock.prisonaio.module.robot.listener.RobotInventoryListeners
 import net.evilblock.prisonaio.module.robot.listener.RobotItemListeners
 import net.evilblock.prisonaio.module.robot.listener.RobotPlotListeners
 import net.evilblock.prisonaio.module.robot.mechanic.RobotMechanicHandler
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -92,6 +92,10 @@ object RobotsModule : PluginModule() {
             RobotItemListeners,
             RobotPlotListeners
         )
+    }
+
+    override fun requiresLateLoad(): Boolean {
+        return true
     }
 
     @JvmStatic

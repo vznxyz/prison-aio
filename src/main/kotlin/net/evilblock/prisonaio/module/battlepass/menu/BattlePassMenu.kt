@@ -9,6 +9,8 @@ package net.evilblock.prisonaio.module.battlepass.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.buttons.BackButton
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.buttons.TexturedHeadButton
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
@@ -19,6 +21,7 @@ import net.evilblock.prisonaio.module.battlepass.tier.Tier
 import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
 import net.evilblock.prisonaio.module.battlepass.tier.reward.Reward
 import net.evilblock.prisonaio.module.user.User
+import net.evilblock.prisonaio.module.user.menu.MainMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -43,52 +46,55 @@ class BattlePassMenu(private val user: User) : Menu() {
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {
-        val buttons = hashMapOf<Int, Button>()
-
-        val range = if (page == 1) {
-            1..9
-        } else {
-            (((page - 1) * 9) + 1)..(page * 9)
-        }
-
-        for (tier in TierHandler.getTiers().filter { it.number in range }) {
-            var tierSlotRemainder = (tier.number % 9) - 1
-            if (tierSlotRemainder == -1) {
-                tierSlotRemainder = 8
-            }
-
-            val slot = TIER_TOP_SLOTS[tierSlotRemainder]
-
-            buttons[slot] = TierButton(tier)
-
-            if (tier.freeReward == null) {
-                buttons[slot - 9] = EmptyRewardButton(tier)
+        return hashMapOf<Int, Button>().also { buttons ->
+            val range = if (page == 1) {
+                1..9
             } else {
-                buttons[slot - 9] = RewardButton(tier, tier.freeReward!!)
+                (((page - 1) * 9) + 1)..(page * 9)
             }
 
-            if (tier.premiumReward == null) {
-                buttons[slot + 9] = EmptyRewardButton(tier)
+            for (tier in TierHandler.getTiers().filter { it.number in range }) {
+                var tierSlotRemainder = (tier.number % 9) - 1
+                if (tierSlotRemainder == -1) {
+                    tierSlotRemainder = 8
+                }
+
+                val slot = TIER_TOP_SLOTS[tierSlotRemainder]
+
+                buttons[slot] = TierButton(tier)
+
+                if (tier.freeReward == null) {
+                    buttons[slot - 9] = EmptyRewardButton(tier)
+                } else {
+                    buttons[slot - 9] = RewardButton(tier, tier.freeReward!!)
+                }
+
+                if (tier.premiumReward == null) {
+                    buttons[slot + 9] = EmptyRewardButton(tier)
+                } else {
+                    buttons[slot + 9] = RewardButton(tier, tier.premiumReward!!)
+                }
+            }
+
+            buttons[4] = InfoButton()
+
+            buttons[2] = ChallengesMenuButton(true)
+            buttons[6] = ChallengesMenuButton(false)
+
+            if (page == 1) {
+                buttons[0] = BackButton { MainMenu(user).openMenu(player) }
             } else {
-                buttons[slot + 9] = RewardButton(tier, tier.premiumReward!!)
+                buttons[0] = PreviousPageButton()
+            }
+
+            buttons[8] = NextPageButton()
+
+            for (i in 0 until 54) {
+                if (!buttons.containsKey(i)) {
+                    buttons[i] = GlassButton(7)
+                }
             }
         }
-
-        buttons[4] = InfoButton()
-
-        buttons[45] = PreviousPageButton()
-        buttons[53] = NextPageButton()
-
-        buttons[2] = ChallengesMenuButton(true)
-        buttons[6] = ChallengesMenuButton(false)
-
-        for (i in 0 until 54) {
-            if (!buttons.containsKey(i)) {
-                buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 15, " ")
-            }
-        }
-
-        return buttons
     }
 
     override fun size(buttons: Map<Int, Button>): Int {

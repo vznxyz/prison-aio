@@ -8,13 +8,14 @@
 package net.evilblock.prisonaio.module.user.bank.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.cubed.command.data.flag.Flag
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.user.bank.BankNote
 import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import java.math.BigDecimal
 import java.util.*
 
 object BankNoteGiveCommand {
@@ -25,7 +26,13 @@ object BankNoteGiveCommand {
         permission = "prisonaio.banknotes.give"
     )
     @JvmStatic
-    fun execute(sender: CommandSender, @Flag(value = ["t", "tokens"], description = "Use tokens instead of money", defaultValue = false) useTokens: Boolean, @Param(name = "player") target: Player, @Param(name = "amount") moneyValue: Double, @Param(name = "reason", defaultValue = "Unspecified", wildcard = true) reason: String) {
+    fun execute(
+        sender: CommandSender,
+        @Param(name = "player") target: Player,
+        @Param(name = "amount") moneyValue: Double,
+        @Param(name = "currency") currency: Currency.Type,
+        @Param(name = "reason", defaultValue = "Unspecified", wildcard = true) reason: String
+    ) {
         val issuedBy: UUID? = if (sender is Player) {
             sender.uniqueId
         } else {
@@ -33,8 +40,8 @@ object BankNoteGiveCommand {
         }
 
         val bankNote = BankNote(
-            value = moneyValue,
-            useTokens = useTokens,
+            value = BigDecimal(moneyValue),
+            currency = currency,
             issuedTo = target.uniqueId,
             issuedBy = issuedBy,
             reason = reason

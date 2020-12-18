@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.mine.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.BackButton
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.menus.ExitButton
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.ConversationUtil
@@ -43,7 +44,7 @@ class MineManageResetMenu(private val mine: NormalMine) : Menu() {
 
         // toolbar separator
         for (i in 9..17) {
-            buttons[i] = Button.placeholder(Material.STAINED_GLASS_PANE, 15, " ")
+            buttons[i] = GlassButton(7)
         }
 
         // first row

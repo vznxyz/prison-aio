@@ -31,6 +31,7 @@ import org.bukkit.util.Vector
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.experimental.and
 
 object GeneratorHandler : PluginHandler {
 
@@ -86,6 +87,10 @@ object GeneratorHandler : PluginHandler {
         return generatorsByPlot.getOrDefault(plotId, emptySet())
     }
 
+    fun getCoreByPlot(plot: PlotId): CoreGenerator? {
+        return getGeneratorsByPlot(plot).firstOrNull { it.getGeneratorType() == GeneratorType.CORE } as CoreGenerator?
+    }
+
     fun getCoreByPlot(plot: Plot): CoreGenerator? {
         return getGeneratorsByPlot(plot).firstOrNull { it.getGeneratorType() == GeneratorType.CORE } as CoreGenerator?
     }
@@ -114,8 +119,14 @@ object GeneratorHandler : PluginHandler {
         RegionHandler.clearBlockCache(generator)
     }
 
-    fun getSchematic(file: String, rotation: Rotation): RotatedSchematic? {
-        return schematics[file].let { if (it == null) null else it[rotation]!! }
+    fun getSchematic(file: String, rotation: Rotation): RotatedSchematic {
+        return schematics[file].let {
+            if (it == null) {
+                throw IllegalStateException("Failed to find schematic file `$file`")
+            } else {
+                it[rotation]!!
+            }
+        }
     }
 
     private fun loadSchematics() {
@@ -154,9 +165,23 @@ object GeneratorHandler : PluginHandler {
                     for (z in rotated[0][0].indices) {
                         val block = rotated[x][y][z]
                         if (block.getMaterial() !== Material.AIR) {
-                            if (block.getMaterial() == Material.SKULL) {
+                            if (block.getMaterial().name.startsWith("REDSTONE_COMPARATOR")) {
                                 villager = Vector(x + 0.5, y.toDouble(), z + 0.5)
-                                villagerYaw = block.data.toFloat()
+
+                                when ((block.data and 3).toInt()) {
+                                    1 -> villagerYaw = 90f
+                                    2 -> villagerYaw = 180f
+                                    3 -> villagerYaw = 270f
+                                }
+
+                                when (rotation.getOpposite()) {
+                                    Rotation.EAST -> villagerYaw += 90f
+                                    Rotation.SOUTH -> villagerYaw += 180f
+                                    Rotation.WEST -> villagerYaw += 270f
+                                    else -> {}
+                                }
+
+                                villagerYaw %= 360f
                             } else {
                                 block.vector = Vector(x.toDouble(), y.toDouble(), z.toDouble())
                                 block.data = RotateUtil.getDirectionalByte(block.getMaterial(), block.data, rotation)

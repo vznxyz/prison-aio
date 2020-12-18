@@ -29,4 +29,12 @@ class TokenGenerator(plot: Plot, owner: UUID, bounds: Cuboid, rotation: Rotation
         super.tick()
     }
 
+    override fun getMaxModifiers(): Int {
+        return 3
+    }
+
+    override fun renderInformation(): MutableList<String> {
+        return super.renderInformation()
+    }
+
 }

@@ -19,12 +19,16 @@ import net.evilblock.cubed.util.bukkit.AngleUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
+import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.cubed.util.hook.WorldEditUtils
 import net.evilblock.prisonaio.module.gang.booster.task.GangBoosterLogic
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
+import net.evilblock.prisonaio.module.gang.service.GangInvitesExpiryService
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
+import net.evilblock.prisonaio.service.ServiceRegistry
 import net.evilblock.prisonaio.util.Permissions
+import net.evilblock.source.chat.filter.ChatFilterHandler
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.Skull
@@ -32,6 +36,7 @@ import org.bukkit.entity.Player
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -43,18 +48,22 @@ import kotlin.collections.set
 object GangHandler : PluginHandler {
 
     val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}Gangs${ChatColor.GRAY}] "
+    val INVITE_EXPIRE_TIME = TimeUnit.HOURS.toMillis(2L)
 
     private var gridIndex = 0
     private val grid: HashMap<Int, Gang> = hashMapOf()
 
     private val gangByName: MutableMap<String, Gang> = ConcurrentHashMap()
-    private val gangAccess: MutableMap<UUID, MutableSet<Gang>> = ConcurrentHashMap()
-    private val gangVisiting: MutableMap<UUID, Gang> = ConcurrentHashMap()
+    private val gangByPlayer: MutableMap<UUID, Gang> = ConcurrentHashMap()
+
+    private val invitesByPlayer: MutableMap<UUID, MutableSet<Gang>> = ConcurrentHashMap()
+
+    private val currentlyVisiting: MutableMap<UUID, Gang> = ConcurrentHashMap()
 
     var asyncWorld: AsyncWorld? = null
 
     override fun getModule(): PluginModule {
-        return GangModule
+        return GangsModule
     }
 
     override fun getInternalDataFile(): File {
@@ -81,10 +90,12 @@ object GangHandler : PluginHandler {
                 gang.updateCachedValue()
             }
         }
+
+        ServiceRegistry.register(GangInvitesExpiryService, 20L, 20L * 15L)
     }
 
     private fun loadWorld() {
-        WorldCreator(GangModule.getGridWorldName())
+        WorldCreator(GangsModule.getGridWorldName())
                 .generator(EmptyChunkGenerator())
                 .generateStructures(false)
                 .createWorld()
@@ -131,7 +142,7 @@ object GangHandler : PluginHandler {
      * Gets the [World] that hosts the grid.
      */
     fun getGridWorld(): World {
-        return Bukkit.getWorld(GangModule.getGridWorldName())
+        return Bukkit.getWorld(GangsModule.getGridWorldName())
     }
 
     /**
@@ -183,10 +194,24 @@ object GangHandler : PluginHandler {
     }
 
     /**
+     * Returns the [Gang] for the given [player].
+     */
+    fun getGangByPlayer(player: UUID): Gang? {
+        return gangByPlayer[player]
+    }
+
+    /**
+     * Returns the [Gang] for the given [player].
+     */
+    fun getGangByPlayer(player: Player): Gang? {
+        return gangByPlayer[player.uniqueId]
+    }
+
+    /**
      * Gets the [Gang] a player is currently at.
      */
     fun getVisitingGang(player: Player): Gang? {
-        return gangVisiting[player.uniqueId]
+        return currentlyVisiting[player.uniqueId]
     }
 
     /**
@@ -194,62 +219,10 @@ object GangHandler : PluginHandler {
      */
     fun updateVisitingGang(player: Player, gang: Gang?) {
         if (gang == null) {
-            gangVisiting.remove(player.uniqueId)
+            currentlyVisiting.remove(player.uniqueId)
         } else {
-            gangVisiting[player.uniqueId] = gang
+            currentlyVisiting[player.uniqueId] = gang
         }
-    }
-
-    /**
-     * Returns a set of [Gang]s that the given [player] has been invited to.
-     */
-    fun getGangsInvitedTo(player: Player): Set<Gang> {
-        return getAllGangs()
-            .filter { it.isInvited(player.uniqueId) }
-            .toSet()
-    }
-
-    fun getGangAccessCache(): MutableMap<UUID, MutableSet<Gang>> {
-        return gangAccess
-    }
-
-    /**
-     * Returns a set of [Gang]s that the given [playerUuid] can join.
-     */
-    fun getAccessibleGangs(playerUuid: UUID): Set<Gang> {
-        val cache = gangAccess.getOrDefault(playerUuid, hashSetOf())
-
-        return if (cache.isNotEmpty()) {
-            cache.sortedBy { it.leader == playerUuid }.reversed().toSet()
-        } else {
-            cache
-        }
-    }
-
-    fun updateGangAccess(uuid: UUID, gang: Gang, joinable: Boolean) {
-        if (!gangAccess.containsKey(uuid)) {
-            gangAccess[uuid] = ConcurrentHashMap.newKeySet()
-        }
-
-        if (joinable) {
-            gangAccess[uuid]!!.add(gang)
-        } else {
-            gangAccess[uuid]!!.remove(gang)
-        }
-    }
-
-    /**
-     * Returns a set of [Gang]s that the given [playerUuid] owns.
-     */
-    fun getOwnedGangs(playerUuid: UUID): Set<Gang> {
-        return gangAccess.getOrDefault(playerUuid, hashSetOf()).filter { it.leader == playerUuid }.toSet()
-    }
-
-    /**
-     * Returns the assumed [Gang] for the given [playerUuid].
-     */
-    fun getAssumedGang(playerUuid: UUID): Gang? {
-        return getAccessibleGangs(playerUuid).firstOrNull()
     }
 
     fun fetchPreviousGang(uuid: UUID): Gang? {
@@ -260,15 +233,7 @@ object GangHandler : PluginHandler {
                 return null
             }
 
-            val gangId = UUID.fromString(redisValue)
-
-            for (gang in getAccessibleGangs(uuid)) {
-                if (gang.uuid == gangId) {
-                    return gang
-                }
-            }
-
-            return null
+            return getGangById(UUID.fromString(redisValue))
         } catch (e: Exception) {
             return null
         }
@@ -284,8 +249,73 @@ object GangHandler : PluginHandler {
         }
     }
 
+    /**
+     * Returns a set of [Gang]s that the given [player] has been invited to.
+     */
+    fun getGangsInvitedTo(player: Player): Set<Gang> {
+        return invitesByPlayer.getOrDefault(player.uniqueId, emptySet())
+    }
+
+    fun trackInvited(gang: Gang, player: UUID) {
+        if (invitesByPlayer.containsKey(player)) {
+            invitesByPlayer[player]!!.add(gang)
+        } else {
+            invitesByPlayer[player] = hashSetOf(gang)
+        }
+    }
+
+    fun trackInvited(gang: Gang, player: Player) {
+        trackInvited(gang, player.uniqueId)
+    }
+
+    fun forgetInvited(gang: Gang, player: UUID) {
+        if (invitesByPlayer.containsKey(player)) {
+            invitesByPlayer[player]!!.remove(gang)
+        }
+    }
+
+    fun forgetInvited(gang: Gang, player: Player) {
+        forgetInvited(gang, player)
+    }
+
+    fun updateGangAccess(uuid: UUID, gang: Gang, joinable: Boolean) {
+        if (joinable) {
+            gangByPlayer[uuid] = gang
+        } else {
+            gangByPlayer.remove(uuid)
+        }
+    }
+
     fun hasBypass(player: Player): Boolean {
         return player.hasPermission(Permissions.GANGS_ADMIN) && RegionBypass.hasBypass(player)
+    }
+
+    fun attemptJoinGang(player: Player, gang: Gang) {
+        if (getGangByPlayer(player) != null) {
+            player.sendMessage("${ChatColor.RED}You already belong to a gang!")
+            return
+        }
+
+        if (gang.isMember(player.uniqueId)) {
+            player.sendMessage("${ChatColor.RED}You are already a member of that gang!")
+            return
+        }
+
+        if (!gang.isInvited(player.uniqueId)) {
+            player.sendMessage("${ChatColor.RED}You haven't been invited to join that gang!")
+            return
+        }
+
+        if (gang.getMembers().size >= GangsModule.getMaxMembers()) {
+            player.sendMessage("${ChatColor.RED}That gang has the maximum amount of members! Somebody will have to leave or be kicked for you to be able to join.")
+            return
+        }
+
+        gang.memberJoin(player.uniqueId)
+
+        Tasks.sync {
+            attemptJoinSession(player, gang)
+        }
     }
 
     fun attemptJoinSession(player: Player, gang: Gang) {
@@ -334,10 +364,37 @@ object GangHandler : PluginHandler {
      * This method should always be called asynchronously.
      */
     @Throws(IllegalStateException::class)
-    fun createNewGang(leader: UUID, name: String, onFinish: (Gang) -> Unit) {
+    fun createNewGang(player: Player, name: String, onFinish: (Gang) -> Unit) {
         assert(!Bukkit.isPrimaryThread()) { "Cannot generate new gang on primary thread" }
 
-        val schematicFile = GangModule.getIslandSchematicFile()
+        if (ChatFilterHandler.filterMessage(name) != null) {
+            player.sendMessage("${ChatColor.RED}The name you input contains inappropriate content. Please try a different name.")
+            return
+        }
+
+        if (!name.matches(EzPrompt.IDENTIFIER_REGEX)) {
+            player.sendMessage("${ChatColor.RED}The name you input does not match the regex pattern ${EzPrompt.IDENTIFIER_REGEX.pattern}.")
+            return
+        }
+
+        if (getGangByPlayer(player) != null) {
+            player.sendMessage("${ChatColor.RED}You can only have one gang at a time. To create a new gang, delete your old gang and then try again.")
+            return
+        }
+
+        if (getGangByName(name) != null) {
+            player.sendMessage("${ChatColor.RED}The name `$name` is already taken by another gang.")
+            return
+        }
+
+        if (name.length > GangsModule.getMaxNameLength()) {
+            player.sendMessage("${ChatColor.RED}A gang's name can only be ${GangsModule.getMaxNameLength()} characters long. The name you entered was ${name.length} characters.")
+            return
+        }
+
+        player.sendMessage("${ChatColor.GREEN}Creating your gang...")
+
+        val schematicFile = GangsModule.getIslandSchematicFile()
         if (!schematicFile.exists()) {
             throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
         }
@@ -367,10 +424,10 @@ object GangHandler : PluginHandler {
                 }
             }
 
-            val gangLeader = GangMember(leader)
+            val gangLeader = GangMember(player.uniqueId)
             gangLeader.role = GangMember.Role.LEADER
 
-            val gang = Gang(gridIndex, name, leader, scanResults.spawnLocation!!, scanResults.guideLocation!!, schematicData.cuboid)
+            val gang = Gang(gridIndex, name, player.uniqueId, scanResults.spawnLocation!!, scanResults.guideLocation!!, schematicData.cuboid)
             gang.initializeData()
             gang.addMember(gangLeader)
 
@@ -383,6 +440,19 @@ object GangHandler : PluginHandler {
         }
     }
 
+    fun disbandGang(gang: Gang) {
+        gang.sendMessagesToMembers("${ChatColor.YELLOW}The gang has been disbanded by the leader.")
+
+        for (member in gang.getMembers().keys) {
+            updateGangAccess(member, gang, false)
+        }
+
+        gang.kickVisitors(force = true)
+
+        forgetGang(gang)
+        RegionHandler.clearBlockCache(gang)
+    }
+
     /**
      * Creates and inserts a [Gang] into the grid.
      *
@@ -392,7 +462,7 @@ object GangHandler : PluginHandler {
     fun resetGang(gang: Gang, onFinish: () -> Unit) {
         assert(!Bukkit.isPrimaryThread()) { "Cannot reset gang on primary thread" }
 
-        val schematicFile = GangModule.getIslandSchematicFile()
+        val schematicFile = GangsModule.getIslandSchematicFile()
         if (!schematicFile.exists()) {
             throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
         }
@@ -435,7 +505,7 @@ object GangHandler : PluginHandler {
 
     @Throws(IllegalStateException::class)
     fun pasteSchematic(schematicData: GridSchematicData, onFinish: (Boolean) -> Unit) {
-        val schematicFile = GangModule.getIslandSchematicFile()
+        val schematicFile = GangsModule.getIslandSchematicFile()
         if (!schematicFile.exists()) {
             throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
         }
@@ -507,7 +577,7 @@ object GangHandler : PluginHandler {
      * Finds the spawn points for a given location.
      */
     private fun startSchematicScan(start: Location): SchematicScanResults {
-        val schematicSize = WorldEditUtils.readSchematicSize(GangModule.getIslandSchematicFile())
+        val schematicSize = WorldEditUtils.readSchematicSize(GangsModule.getIslandSchematicFile())
 
         val minPoint = start.clone()
         val maxPoint = start.clone().add(schematicSize.x, schematicSize.y, schematicSize.z)
@@ -548,18 +618,18 @@ object GangHandler : PluginHandler {
             return Pair(0, 0)
         }
 
-        val x = index % GangModule.getGridColumns()
-        val y = index / GangModule.getGridColumns()
+        val x = index % GangsModule.getGridColumns()
+        val y = index / GangsModule.getGridColumns()
 
         return Pair(x, y)
     }
 
     private fun gridToIndex(x: Int, y: Int): Int {
-        return x + (GangModule.getGridColumns() * y)
+        return x + (GangsModule.getGridColumns() * y)
     }
 
     private fun gridCoordsToBlockCoords(pos: Pair<Int, Int>): Pair<Int, Int> {
-        return Pair(pos.first * GangModule.getGridGutterWidth(), pos.second * GangModule.getGridGutterWidth())
+        return Pair(pos.first * GangsModule.getGridGutterWidth(), pos.second * GangsModule.getGridGutterWidth())
     }
 
 }

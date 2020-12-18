@@ -12,8 +12,10 @@ import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.bank.BankNote
 import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
+import java.math.BigDecimal
 
 object WithdrawCommand {
 
@@ -44,8 +46,8 @@ object WithdrawCommand {
         user.requiresSave()
 
         val bankNote = BankNote(
-            value = money,
-            useTokens = false,
+            value = BigDecimal(money),
+            currency = Currency.Type.MONEY,
             issuedTo = player.uniqueId,
             reason = "Manual Withdraw"
         )

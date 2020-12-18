@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.battlepass.challenge.impl
 
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.ProgressBarBuilder
-import net.evilblock.cubed.util.bukkit.ConversationUtil
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.battlepass.challenge.Challenge
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeType
@@ -41,7 +40,7 @@ class PrestigeChallenge(id: String, internal var prestige: Int) : Challenge(id) 
         val percentage = ProgressBarBuilder.percentage(value, prestige)
 
         val progressColor = ProgressBarBuilder.colorPercentage(percentage)
-        val progressBar = ProgressBarBuilder().build(percentage)
+        val progressBar = ProgressBarBuilder.DEFAULT.build(percentage)
 
         return "${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}($progressColor${DECIMAL_FORMAT.format(percentage)}%${ChatColor.GRAY})"
     }

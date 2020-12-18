@@ -26,24 +26,25 @@ abstract class Leaderboard(val id: String, val name: String) {
 
     abstract fun formatEntry(entry: LeaderboardEntry<*>): String
 
-    fun getDisplayLines(fullView: Boolean): List<String> {
-        val lines = arrayListOf<String>()
-        lines.add(name)
+    fun getDisplayLines(includeTitle: Boolean, fullView: Boolean): List<String> {
+        return arrayListOf<String>().also { lines ->
+            if (includeTitle) {
+                lines.add(name)
+            }
 
-        if (entries.isEmpty()) {
-            lines.add("${ChatColor.GRAY}Loading data...")
-            return lines
-        }
+            if (entries.isEmpty()) {
+                lines.add("${ChatColor.GRAY}Loading data...")
+                return lines
+            }
 
-        for ((index, entry) in entries.withIndex()) {
-            lines.add(formatEntry(entry))
+            for ((index, entry) in entries.withIndex()) {
+                lines.add(formatEntry(entry))
 
-            if (fullView && index >= 4) {
-                break
+                if (fullView && index >= 4) {
+                    break
+                }
             }
         }
-
-        return lines
     }
 
     fun refresh() {
@@ -61,7 +62,7 @@ abstract class Leaderboard(val id: String, val name: String) {
 
         for (npc in LeaderboardsModule.getLeaderboardNpcs()) {
             if (npc.leaderboard == this) {
-                npc.updateLines(getDisplayLines(true))
+                npc.updateLines(getDisplayLines(includeTitle = true, fullView = true))
 
                 if (updateSkin) {
                     val fallbackTexture = if (CubedConfig.hasNpcTexture(LeaderboardsModule.readFallbackTextureId())) {

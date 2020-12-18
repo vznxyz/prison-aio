@@ -10,11 +10,9 @@ package net.evilblock.prisonaio.module.generator.entity
 import net.evilblock.cubed.entity.Entity
 import net.evilblock.cubed.entity.hologram.updating.UpdatingHologramEntity
 import net.evilblock.cubed.entity.villager.VillagerEntity
-import net.evilblock.cubed.util.ProgressBarBuilder
-import net.evilblock.cubed.util.TimeUtil
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.generator.Generator
-import net.evilblock.prisonaio.module.generator.GeneratorType
-import net.evilblock.prisonaio.module.generator.impl.core.CoreGenerator
+import net.evilblock.prisonaio.module.generator.build.mode.BuildModeHandler
 import net.evilblock.prisonaio.module.generator.menu.GeneratorMenu
 import org.bukkit.ChatColor
 import org.bukkit.Location
@@ -41,9 +39,12 @@ class GeneratorVillagerEntity(location: Location) : VillagerEntity(lines = listO
     }
 
     override fun onRightClick(player: Player) {
-        GeneratorMenu(generator as CoreGenerator).openMenu(player)
-//        generator.build.speed = generator.build.speed * 2
-//        player.sendMessage("speed: ${generator.build.speed}")
+        if (BuildModeHandler.isInMode(player)) {
+            player.sendMessage("${ChatColor.RED}You can't access Generator NPCs while in Build Mode!")
+            return
+        }
+
+        GeneratorMenu(generator).openMenu(player)
     }
 
     override fun isMultiPartEntity(): Boolean {
@@ -56,22 +57,15 @@ class GeneratorVillagerEntity(location: Location) : VillagerEntity(lines = listO
 
     private inner class UpdatingGeneratorHologram(location: Location) : UpdatingHologramEntity("", location) {
         override fun getNewLines(): List<String> {
-            return arrayListOf<String>().also {
+            return arrayListOf<String>().also { lines ->
                 val genType = generator.getGeneratorType()
-                if (genType == GeneratorType.CORE) {
-                    it.add(genType.getColoredName())
-                } else {
-                    it.add(genType.getColoredName() + " Generator")
-                }
 
-                it.add("${ChatColor.GRAY}Level ${generator.level}")
+                lines.add(genType.getColoredName())
+                lines.add("${ChatColor.GRAY}Level ${generator.level}")
 
                 if (!generator.build.finished) {
-                    val progressBar = PROGRESS_BAR.build(ProgressBarBuilder.percentage(generator.build.progress, generator.build.total))
-                    val countdown = TimeUtil.formatIntoAbbreviatedString((generator.build.getRemainingTime() / 1000.0).toInt())
-
-                    it.add("${ChatColor.GRAY}Progress: ${ChatColor.RED}$countdown")
-                    it.add(progressBar)
+                    lines.add("${ChatColor.GRAY}Progress: ${ChatColor.RED}${generator.build.renderRemainingTime()}")
+                    lines.add("${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}${generator.build.renderProgressBar()}${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}")
                 }
             }
         }
@@ -79,10 +73,6 @@ class GeneratorVillagerEntity(location: Location) : VillagerEntity(lines = listO
         override fun getTickInterval(): Long {
             return 1000L
         }
-    }
-
-    companion object {
-        private val PROGRESS_BAR = ProgressBarBuilder()
     }
 
 }

@@ -39,18 +39,17 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
     }
 
     override fun getPrePaginatedTitle(player: Player): String {
-        return "Manage Members"
+        return "Gang Members"
     }
 
     override fun getGlobalButtons(player: Player): Map<Int, Button>? {
-        val buttons = hashMapOf<Int, Button>()
-        buttons[0] = InvitePlayerButton()
+        return hashMapOf<Int, Button>().also { buttons ->
+            buttons[0] = InvitePlayerButton()
 
-        for (i in 9..17) {
-            buttons[i] = GlassButton(0)
+            for (i in 9..17) {
+                buttons[i] = GlassButton(0)
+            }
         }
-
-        return buttons
     }
 
     override fun getAllPagesButtons(player: Player): Map<Int, Button> {
@@ -78,7 +77,7 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
     override fun onClose(player: Player, manualClose: Boolean) {
         if (manualClose) {
             Tasks.delayed(1L) {
-                JerryMenu(gang.guideNpc).openMenu(player)
+                GangMenu(gang).openMenu(player)
             }
         }
     }

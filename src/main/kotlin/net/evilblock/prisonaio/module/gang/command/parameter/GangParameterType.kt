@@ -20,7 +20,7 @@ object GangParameterType : ParameterType<Gang> {
 
     override fun transform(sender: CommandSender, source: String): Gang? {
         if (source == "self") {
-            val gang = GangHandler.getAssumedGang((sender as Player).uniqueId)
+            val gang = GangHandler.getGangByPlayer((sender as Player).uniqueId)
             if (gang == null) {
                 sender.sendMessage("${ChatColor.RED}You are not in a gang right now.")
             }
@@ -41,7 +41,7 @@ object GangParameterType : ParameterType<Gang> {
 
         val playerUuid = Cubed.instance.uuidCache.uuid(source)
         if (playerUuid != null) {
-            val assumedGang = GangHandler.getAssumedGang(playerUuid)
+            val assumedGang = GangHandler.getGangByPlayer(playerUuid)
             if (assumedGang != null) {
                 return assumedGang
             }

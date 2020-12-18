@@ -21,7 +21,7 @@ import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipGame
 import net.evilblock.prisonaio.module.minigame.coinflip.CoinFlipHandler
 import net.evilblock.prisonaio.module.user.UserHandler
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player

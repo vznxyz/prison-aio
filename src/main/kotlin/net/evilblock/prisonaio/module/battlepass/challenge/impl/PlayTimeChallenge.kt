@@ -43,7 +43,7 @@ class PlayTimeChallenge(id: String, internal var duration: Long) : Challenge(id)
         val percentage = ProgressBarBuilder.percentage(value, goal)
 
         val progressColor = ProgressBarBuilder.colorPercentage(percentage)
-        val progressBar = ProgressBarBuilder().build(percentage)
+        val progressBar = ProgressBarBuilder.DEFAULT.build(percentage)
 
         return "${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}($progressColor${DECIMAL_FORMAT.format(percentage)}%${ChatColor.GRAY})"
     }

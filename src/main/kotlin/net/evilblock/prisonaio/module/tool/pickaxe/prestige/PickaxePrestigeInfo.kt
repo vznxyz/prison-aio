@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.tool.pickaxe.prestige
 
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.util.bukkit.Constants
-import net.evilblock.prisonaio.module.tool.enchant.AbstractEnchant
+import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.tool.enchant.serialize.EnchantsMapReferenceSerializer
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -27,7 +27,7 @@ class PickaxePrestigeInfo(val number: Int) {
     var blocksMinedRequired: Int = 0
 
     @JsonAdapter(EnchantsMapReferenceSerializer::class)
-    val enchantLimits: MutableMap<AbstractEnchant, Int> = hashMapOf()
+    val enchantLimits: MutableMap<Enchant, Int> = hashMapOf()
 
     fun meetsRequirements(player: Player, pickaxeData: PickaxeData): Boolean {
         val user = UserHandler.getUser(player.uniqueId)

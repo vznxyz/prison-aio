@@ -53,6 +53,8 @@ dependencies {
     compileOnly 'net.evilblock:cubed:1.1'
     compileOnly 'net.evilblock:source:1.0'
     compileOnly 'net.evilblock.rift:bukkit:1.1'
+    compileOnly 'net.evilblock:crates:1.0'
+    compileOnly 'net.evilblock:cosmetics:1.0'
     compileOnly 'com.ngxdev:paper:1.12.2'
     compileOnly 'com.ngxdev:paper-api:1.12.2'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
@@ -93,6 +95,6 @@ processResources {
 
 tasks.withType(Jar) {
     def home = System.properties['user.home']
-//    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/shared")
-    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/Prison/plugins")
+    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/shared")
+//    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/Prison/plugins")
 }

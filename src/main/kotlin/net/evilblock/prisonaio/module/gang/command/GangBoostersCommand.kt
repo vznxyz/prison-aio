@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.gang.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.prisonaio.module.gang.GangHandler
-import net.evilblock.prisonaio.module.gang.menu.GangBoostersMenu
+import net.evilblock.prisonaio.module.gang.menu.BoostersMenu
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -21,13 +21,13 @@ object GangBoostersCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        val assumedGang = GangHandler.getAssumedGang(player.uniqueId)
+        val assumedGang = GangHandler.getGangByPlayer(player.uniqueId)
         if (assumedGang == null) {
             player.sendMessage("${ChatColor.RED}You must be in a gang to access Gang Boosters.")
             return
         }
 
-        GangBoostersMenu(assumedGang).openMenu(player)
+        BoostersMenu(assumedGang).openMenu(player)
     }
 
 }

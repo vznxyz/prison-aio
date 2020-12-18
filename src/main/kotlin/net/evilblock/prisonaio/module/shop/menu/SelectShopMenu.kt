@@ -8,7 +8,7 @@
 package net.evilblock.prisonaio.module.shop.menu
 
 import net.evilblock.cubed.menu.Button
-import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.ShopHandler
 import org.bukkit.ChatColor
@@ -21,24 +21,23 @@ open class SelectShopMenu(
     private val title: String = "Select Shop",
     private val filtered: Collection<Shop> = emptyList(),
     private val select: (Shop) -> Unit
-) : Menu() {
+) : PaginatedMenu() {
 
-    override fun getTitle(player: Player): String {
+    override fun getPrePaginatedTitle(player: Player): String {
         return title
     }
 
-    override fun getButtons(player: Player): Map<Int, Button> {
-        val buttons = hashMapOf<Int, Button>()
+    override fun getAllPagesButtons(player: Player): Map<Int, Button> {
+        return hashMapOf<Int, Button>().also { buttons ->
 
-        for (shop in ShopHandler.getShops()) {
-            if (filtered.contains(shop)) {
-                continue
+            for (shop in ShopHandler.getShops()) {
+                if (filtered.contains(shop)) {
+                    continue
+                }
+
+                buttons[buttons.size] = ShopButton(shop)
             }
-
-            buttons[buttons.size] = ShopButton(shop)
         }
-
-        return buttons
     }
 
     private inner class ShopButton(private val shop: Shop) : Button() {

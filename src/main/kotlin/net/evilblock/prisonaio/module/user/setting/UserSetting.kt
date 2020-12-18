@@ -26,6 +26,18 @@ enum class UserSetting(
     val onUpdate: (User, UserSettingOption) -> Unit = { _, _ -> }
 ) {
 
+    SERVER_ANNOUNCEMENTS(
+        displayName = "Server Announcements",
+        description = "This setting controls if you will receive server announcement chat messages.",
+        icon = { ItemStack(Material.BEACON) },
+        defaultOption = { ServerAnnouncementsOption(true) },
+        options = {
+            arrayListOf(
+                ServerAnnouncementsOption(true),
+                ServerAnnouncementsOption(false)
+            )
+        }
+    ),
     SCOREBOARD_VISIBILITY(
         displayName = "Scoreboard Visibility",
         description = "This setting controls if the scoreboard is visible.",
@@ -35,18 +47,6 @@ enum class UserSetting(
             arrayListOf(
                 ScoreboardVisibilityOption(true),
                 ScoreboardVisibilityOption(false)
-            )
-        }
-    ),
-    SCOREBOARD_STYLE(
-        displayName = "Scoreboard Style",
-        description = "This setting controls the style of the scoreboard.",
-        icon = { ItemStack(Material.PAINTING) },
-        defaultOption = { ScoreboardStyleOption(ScoreboardStyleOption.ScoreboardStyle.FANCY) },
-        options = {
-            arrayListOf(
-                ScoreboardStyleOption(ScoreboardStyleOption.ScoreboardStyle.SIMPLE),
-                ScoreboardStyleOption(ScoreboardStyleOption.ScoreboardStyle.FANCY)
             )
         }
     ),
@@ -294,9 +294,9 @@ enum class UserSetting(
             )
         }
     ),
-    GRAND_EXCHANGE_NOTIFICATIONS(
-        displayName = "Grand Exchange Notifications",
-        description = "This setting controls if you will receive notifications about Grand Exchange listings you're involved in. If this setting is disabled, the other Grand Exchange settings will have no effect.",
+    AH_NOTIFICATIONS(
+        displayName = "Auction House Notifications",
+        description = "This setting controls if you will receive notifications about Auction House listings you're involved in. If this setting is disabled, the other Auction House settings will have no effect.",
         icon = { option ->
             if (option.getValue()) {
                 ItemUtils.makeTexturedSkull(Constants.IB_UNLOCKED_TEXTURE)
@@ -312,15 +312,39 @@ enum class UserSetting(
             )
         }
     ),
-    GRAND_EXCHANGE_OUTBID_NOTIFICATIONS(
-        displayName = "Grand Exchange Outbid Notifications",
-        description = "This setting controls if you will receive a notification when you've been outbid in a Grand Exchange auction. Has no effect if \"Grand Exchange Notifications\" is disabled.",
+    AH_OUTBID_NOTIFICATIONS(
+        displayName = "Auction House Outbid Notifications",
+        description = "This setting controls if you will receive a notification when you've been outbid in a Auction House auction. Has no effect if \"Auction House Notifications\" is disabled.",
         icon = { ItemUtils.makeTexturedSkull(Constants.IB_WARNING_TEXTURE) },
         defaultOption = { GEOutbidNotificationOption(true) },
         options = {
             arrayListOf(
                 GEOutbidNotificationOption(true),
                 GEOutbidNotificationOption(false)
+            )
+        }
+    ),
+    COSMETIC_TRACKS(
+        displayName = "Display Cosmetic Tracks",
+        description = "This setting controls if player cosmetic tracks will be displayed to you.",
+        icon = { ItemStack(Material.RAILS) },
+        defaultOption = { CosmeticTracksOption(true) },
+        options = {
+            arrayListOf(
+                CosmeticTracksOption(true),
+                CosmeticTracksOption(false)
+            )
+        }
+    ),
+    COSMETIC_EFFECTS(
+        displayName = "Display Cosmetic Effects",
+        description = "This setting controls if player cosmetic efffects will be displayed to you.",
+        icon = { ItemStack(Material.BLAZE_POWDER) },
+        defaultOption = { CosmeticEffectsOption(true) },
+        options = {
+            arrayListOf(
+                CosmeticEffectsOption(true),
+                CosmeticEffectsOption(false)
             )
         }
     );

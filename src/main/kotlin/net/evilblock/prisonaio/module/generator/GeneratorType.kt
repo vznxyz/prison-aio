@@ -35,13 +35,13 @@ enum class GeneratorType(
         "Core",
         ChatColor.RED,
         ItemStack(Material.BEACON),
-        "This is the heart of all your Generators. Upgrading your Core unlocks new Generator Upgrades."
+        "The Core is the heart of your generators. Level up your Core to unlock new generator levels."
     ),
     MONEY(
         "Money",
         ChatColor.GREEN,
         ItemStack(Material.GOLD_INGOT),
-        "Generates an amount of money that increases based on the Generator's level."
+        "Generates bank-notes with a value that increases based on the Generator's level."
     ),
     TOKEN(
         "Token",

@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.generator.GeneratorHandler
 import net.evilblock.prisonaio.module.generator.schematic.rotate.RotateUtil
+import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.plot.PlotUtil
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -138,11 +139,19 @@ object BuildModeHandler : Listener {
 
             when (event.item) {
                 BuildModeItems.CONFIRM -> {
-                    if (!modeData.canBuild(event.player, modeData.getBounds())) {
-                        event.player.sendMessage("${ChatColor.RED}You can't place a generator there!")
+                    if (!modeData.canBuild(event.player, modeData.getBounds(), true)) {
                         return
                     }
 
+                    val cost = modeData.getCost()
+
+                    val user = UserHandler.getUser(event.player)
+                    if (!user.hasTokenBalance(cost)) {
+                        event.player.sendMessage("${ChatColor.RED}You can't afford to purchase a ${modeData.type.getProperName()}!")
+                        return
+                    }
+
+                    user.subtractTokensBalance(cost)
                     stopTracking(event.player)
 
                     val generator = modeData.type.createInstance(modeData.plot, event.player.uniqueId, modeData.getBounds(), modeData.rotation)
@@ -153,8 +162,7 @@ object BuildModeHandler : Listener {
                     GeneratorHandler.trackGenerator(generator)
                 }
                 BuildModeItems.PREVIEW -> {
-                    if (!modeData.canBuild(event.player, modeData.getBounds())) {
-                        event.player.sendMessage("${ChatColor.RED}You can't place a generator there!")
+                    if (!modeData.canBuild(event.player, modeData.getBounds(), true)) {
                         return
                     }
 

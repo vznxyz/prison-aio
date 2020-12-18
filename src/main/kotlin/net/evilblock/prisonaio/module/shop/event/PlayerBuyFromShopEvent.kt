@@ -10,12 +10,9 @@ package net.evilblock.prisonaio.module.shop.event
 import net.evilblock.cubed.plugin.PluginEvent
 import net.evilblock.prisonaio.module.shop.Shop
 import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptItem
-import net.evilblock.prisonaio.module.shop.receipt.ShopReceiptType
-import net.evilblock.prisonaio.util.economy.Currency
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import java.math.BigDecimal
-import java.math.BigInteger
 
 class PlayerBuyFromShopEvent(
     val player: Player,

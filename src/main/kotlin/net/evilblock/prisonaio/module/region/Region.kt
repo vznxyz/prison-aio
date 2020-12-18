@@ -61,6 +61,10 @@ abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : Abs
         return false
     }
 
+    open fun supportsCosmetics(): Boolean {
+        return true
+    }
+
     open fun onLeftClickBlock(player: Player, clickedBlock: Block, cancellable: Cancellable) {
 
     }

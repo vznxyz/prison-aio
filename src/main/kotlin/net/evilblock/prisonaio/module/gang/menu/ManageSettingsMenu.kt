@@ -10,7 +10,7 @@ package net.evilblock.prisonaio.module.gang.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.TextSplitter
-import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.gang.Gang
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
 import org.bukkit.ChatColor
@@ -21,34 +21,35 @@ import org.bukkit.inventory.InventoryView
 
 class ManageSettingsMenu(private val gang: Gang) : Menu() {
 
+    companion object {
+        private val BUTTON_SLOTS = listOf(10, 12, 14, 16, 28, 30, 32, 34)
+    }
+
     init {
         updateAfterClick = true
     }
 
     override fun getTitle(player: Player): String {
-        return "Manage Settings"
+        return "Settings & Permissions"
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {
-        val buttons = hashMapOf<Int, Button>()
-
-        val startAt = 10
-        GangPermission.values().forEachIndexed { index, permission ->
-            buttons[startAt + (index * 2)] = PermissionButton(permission)
+        return hashMapOf<Int, Button>().also { buttons ->
+            for ((index, permission) in GangPermission.values().withIndex()) {
+                buttons[BUTTON_SLOTS[index]] = PermissionButton(permission)
+            }
         }
-
-        return buttons
     }
 
     override fun size(buttons: Map<Int, Button>): Int {
-        return 27
+        return 45
     }
 
     override fun onClose(player: Player, manualClose: Boolean) {
         if (manualClose) {
-            PrisonAIO.instance.server.scheduler.runTaskLater(PrisonAIO.instance, {
-                JerryMenu(gang.guideNpc).openMenu(player)
-            }, 1L)
+            Tasks.delayed(1L) {
+                GangMenu(gang).openMenu(player)
+            }
         }
     }
 

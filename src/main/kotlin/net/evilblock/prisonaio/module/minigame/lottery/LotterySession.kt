@@ -8,7 +8,7 @@
 package net.evilblock.prisonaio.module.minigame.lottery
 
 import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.prisonaio.util.economy.Currency
+import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import java.math.BigInteger

@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.util
 
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextUtil
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.source.messaging.MessagingManager
@@ -75,6 +76,20 @@ object Formats {
         }
 
         return "${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${String.format("%,e", amount)}"
+    }
+
+    @JvmStatic
+    fun formatMoneyAbbreviated(amount: Double): String {
+        return "${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(amount)}"
+    }
+
+    @JvmStatic
+    fun formatMoneyAbbreviated(amount: BigDecimal): String {
+        return if (amount.toDouble() < Long.MAX_VALUE) {
+            NumberUtils.format(amount.toDouble())
+        } else {
+            "${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(amount)}"
+        }
     }
 
     @JvmStatic

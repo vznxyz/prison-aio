@@ -20,6 +20,13 @@ import net.evilblock.prisonaio.module.mine.service.MineResetService
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.LuckyBlockHandler
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.command.LuckyBlockEditorCommand
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.command.LuckyBlockToggleCommand
+import net.evilblock.prisonaio.module.mine.variant.personal.PrivateMineHandler
+import net.evilblock.prisonaio.module.mine.variant.personal.command.*
+import net.evilblock.prisonaio.module.mine.variant.personal.listener.PrivateMineInternalDataListeners
+import net.evilblock.prisonaio.module.mine.variant.personal.listener.PrivateMineInventoryListeners
+import net.evilblock.prisonaio.module.mine.variant.personal.listener.PrivateMineShopListeners
+import net.evilblock.prisonaio.module.mine.variant.personal.listener.PrivateMineWorldListeners
+import net.evilblock.prisonaio.module.mine.variant.personal.service.ResetMineService
 import net.evilblock.prisonaio.service.ServiceRegistry
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
@@ -41,7 +48,9 @@ object MinesModule : PluginModule() {
     override fun onEnable() {
         LuckyBlockHandler.initialLoad()
         MineHandler.initialLoad()
+        PrivateMineHandler.initialLoad()
 
+        ServiceRegistry.register(ResetMineService, 20L)
         ServiceRegistry.register(MineResetService, 200L, 20L)
     }
 
@@ -65,7 +74,12 @@ object MinesModule : PluginModule() {
             MineListCommand::class.java,
             MineTeleportCommand::class.java,
             LuckyBlockEditorCommand::class.java,
-            LuckyBlockToggleCommand::class.java
+            LuckyBlockToggleCommand::class.java,
+            PersonalMineCreateCommand.javaClass,
+            PersonalMineKickCommand.javaClass,
+            PersonalMineHelpCommand.javaClass,
+            PersonalMineMenuCommand.javaClass,
+            PersonalMineResetCommand.javaClass
         )
     }
 
@@ -80,7 +94,11 @@ object MinesModule : PluginModule() {
             MineChunkListeners,
             MineInventoryListeners,
             MineShopListeners,
-            LuckyBlockHandler.spawnSelectionHandler
+            LuckyBlockHandler.spawnSelectionHandler,
+            PrivateMineWorldListeners,
+            PrivateMineInventoryListeners,
+            PrivateMineShopListeners,
+            PrivateMineInternalDataListeners
         )
     }
 

@@ -95,19 +95,19 @@ object RankHandler : PluginHandler {
         return Optional.of(sortedRanks[indexOf - 1])
     }
 
-    fun getNextRank(rank: Rank): Optional<Rank> {
+    fun getNextRank(rank: Rank): Rank? {
         val sortedRanks = getSortedRanks()
         val indexOf = sortedRanks.indexOf(rank)
 
         if (indexOf == -1) {
-            return Optional.empty()
+            return null
         }
 
         if (indexOf + 1 >= sortedRanks.size) {
-            return Optional.empty()
+            return null
         }
 
-        return Optional.of(sortedRanks[indexOf + 1])
+        return sortedRanks[indexOf + 1]
     }
 
 }
