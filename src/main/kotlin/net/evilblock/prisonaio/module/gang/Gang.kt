@@ -52,15 +52,18 @@ class Gang(
 
     private val members: MutableMap<UUID, GangMember> = hashMapOf()
     private var invitations: HashMap<UUID, GangInvite> = hashMapOf()
-    private var permissions = hashMapOf<GangPermission, GangPermission.PermissionValue>()
 
-    var challengesData: GangChallengesData = GangChallengesData(this)
-    private var trophies: Int = 0
+    private var forceInvites: Int = 5
+    private var pastMembers: MutableSet<UUID> = hashSetOf()
+
+    private var permissions = hashMapOf<GangPermission, GangPermission.PermissionValue>()
     private var boosters: MutableSet<GangBooster> = hashSetOf()
 
-    internal var cachedValue: BigInteger = BigInteger("0")
-
     internal var guideNpc: JerryNpcEntity = JerryNpcEntity(guideLocation)
+    var challengesData: GangChallengesData = GangChallengesData(this)
+
+    private var trophies: Int = 0
+    internal var cachedValue: BigInteger = BigInteger("0")
 
     @Transient
     internal var visitors: HashSet<UUID> = hashSetOf()
@@ -315,8 +318,33 @@ class Gang(
         revokeInvite(player.uniqueId)
     }
 
+    fun getForceInvites(): Int {
+        return forceInvites
+    }
+
+    fun useForceInvite() {
+        forceInvites--
+    }
+
+    fun giveForceInvites(amount: Int) {
+        forceInvites += amount
+    }
+
+    fun takeForceInvites(amount: Int) {
+        forceInvites -= amount
+    }
+
+    fun isPastMember(uuid: UUID): Boolean {
+        return pastMembers.contains(uuid)
+    }
+
+    fun isPastMember(player: Player): Boolean {
+        return isPastMember(player.uniqueId)
+    }
+
     fun addMember(member: GangMember) {
         members[member.uuid] = member
+        pastMembers.add(member.uuid)
     }
 
     fun memberJoin(uuid: UUID) {

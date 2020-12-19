@@ -93,6 +93,8 @@ object GangsModule : PluginModule() {
             GangSetHomeCommand.javaClass,
             GangSetLeaderCommand.javaClass,
             GangVisitCommand.javaClass,
+            GangForceInvitesGiveCommand.javaClass,
+            GangForceInvitesTakeCommand.javaClass,
             GangForceDisbandCommand.javaClass,
             GangForceJoinCommand.javaClass,
             GangForceKickCommand.javaClass,

@@ -66,6 +66,14 @@ enum class GangPermission(
         PermissionValue.CAPTAINS,
         setOf(PermissionValue.VISITORS)
     ),
+    INVITE_MEMBERS(
+        "Invite Members",
+        "This setting controls who can invite members to your gang.",
+        "You don't have permission to invite members to the gang!",
+        Material.PAPER,
+        PermissionValue.CO_LEADERS,
+        setOf(PermissionValue.VISITORS, PermissionValue.MEMBERS)
+    ),
     KICK_MEMBERS(
         "Kick Members",
         "This setting controls who can kick members of your gang.",

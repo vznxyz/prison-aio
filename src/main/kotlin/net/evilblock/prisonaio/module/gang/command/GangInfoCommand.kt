@@ -58,6 +58,7 @@ object GangInfoCommand {
 
         sender.sendMessage("${ChatColor.GRAY} Trophies: ${ChatColor.RED}${NumberUtils.format(gang.getTrophies())}")
         sender.sendMessage("${ChatColor.GRAY} Value: ${ChatColor.RED}${NumberUtils.format(gang.cachedValue)}")
+        sender.sendMessage("${ChatColor.GRAY} Force Invites: ${ChatColor.RED}${NumberUtils.format(gang.getForceInvites())}")
         sender.sendMessage("${ChatColor.GRAY}${Constants.LONG_LINE}")
     }
 

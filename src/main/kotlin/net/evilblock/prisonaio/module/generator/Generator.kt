@@ -306,7 +306,6 @@ abstract class Generator(
 
     override fun onEntityDamage(entity: Entity, cause: EntityDamageEvent.DamageCause, cancellable: Cancellable) {
         cancellable.isCancelled = true
-        println(entity.name + " - " + cause.name)
     }
 
     override fun equals(other: Any?): Boolean {

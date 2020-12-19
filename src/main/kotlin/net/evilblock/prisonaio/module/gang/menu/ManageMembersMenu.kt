@@ -15,11 +15,11 @@ import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TimeUtil
-import net.evilblock.cubed.util.bukkit.ConversationUtil
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.PlayerPrompt
 import net.evilblock.prisonaio.module.gang.Gang
 import net.evilblock.prisonaio.module.gang.GangMember
+import net.evilblock.prisonaio.module.gang.permission.GangPermission
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -96,30 +96,69 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
             )
         }
 
-        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            if (!gang.isLeader(player.uniqueId)) {
-                player.sendMessage("${ChatColor.RED}You must be the leader of the gang to invite other players.")
+        override fun clicked(sender: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (!gang.testPermission(sender, GangPermission.INVITE_MEMBERS)) {
                 return
             }
 
-            player.closeInventory()
+            sender.closeInventory()
 
-            ConversationUtil.startConversation(player, PlayerPrompt { invitedPlayer ->
+            PlayerPrompt { invitedPlayer ->
+                if (!gang.testPermission(sender, GangPermission.INVITE_MEMBERS)) {
+                    return@PlayerPrompt
+                }
+
                 if (gang.isMember(invitedPlayer)) {
-                    player.sendMessage("${ChatColor.RED}That player is already a member of the gang.")
+                    sender.sendMessage("${ChatColor.RED}That player is already a member of the gang!")
                     return@PlayerPrompt
                 }
 
                 if (gang.isInvited(invitedPlayer)) {
-                    player.sendMessage("${ChatColor.RED}That player has already been invited to the gang.")
+                    sender.sendMessage("${ChatColor.RED}That player has already been invited to the gang!")
                     return@PlayerPrompt
                 }
 
-                gang.invitePlayer(invitedPlayer, player.uniqueId)
+                if (gang.isPastMember(invitedPlayer)) {
+                    if (gang.getForceInvites() <= 0) {
+                        sender.sendMessage("${ChatColor.RED}You must use a force-invite on that player, as they were once a member of your gang!")
+                        sender.sendMessage("${ChatColor.RED}You have no remaining force-invites!")
+                    } else {
+                        ConfirmMenu("Use Force Invite?") { confirmed ->
+                            if (confirmed) {
+                                if (!gang.testPermission(sender, GangPermission.INVITE_MEMBERS)) {
+                                    return@ConfirmMenu
+                                }
 
-                val playerInvitedName = Cubed.instance.uuidCache.name(invitedPlayer)
-                player.sendMessage("${ChatColor.GREEN}Successfully invited $playerInvitedName to the gang.")
-            })
+                                if (gang.isMember(invitedPlayer)) {
+                                    sender.sendMessage("${ChatColor.RED}That player is already a member of the gang!")
+                                    return@ConfirmMenu
+                                }
+
+                                if (gang.isInvited(invitedPlayer)) {
+                                    sender.sendMessage("${ChatColor.RED}That player has already been invited to the gang!")
+                                    return@ConfirmMenu
+                                }
+
+                                if (gang.getForceInvites() <= 0) {
+                                    sender.sendMessage("${ChatColor.RED}You have no remaining force-invites!")
+                                    return@ConfirmMenu
+                                }
+
+                                gang.useForceInvite()
+                                gang.invitePlayer(invitedPlayer, sender.uniqueId)
+
+                                val playerInvitedName = Cubed.instance.uuidCache.name(invitedPlayer)
+                                sender.sendMessage("${ChatColor.GREEN}You've invited $playerInvitedName to the gang!")
+                            }
+                        }.openMenu(sender)
+                    }
+                } else {
+                    gang.invitePlayer(invitedPlayer, sender.uniqueId)
+
+                    val playerInvitedName = Cubed.instance.uuidCache.name(invitedPlayer)
+                    sender.sendMessage("${ChatColor.GREEN}You've invited $playerInvitedName to the gang!")
+                }
+            }.start(sender)
         }
     }
 
