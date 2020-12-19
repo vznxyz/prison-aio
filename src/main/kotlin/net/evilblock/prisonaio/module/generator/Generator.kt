@@ -13,6 +13,7 @@ import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.serialize.AbstractTypeSerializable
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.module.generator.build.GeneratorBuild
@@ -20,11 +21,14 @@ import net.evilblock.prisonaio.module.generator.build.GeneratorBuildLevel
 import net.evilblock.prisonaio.module.generator.entity.GeneratorVillagerEntity
 import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifier
 import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifierType
-import net.evilblock.prisonaio.module.generator.modifier.ModifierItemUtil
+import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifierUtils
 import net.evilblock.prisonaio.module.generator.schematic.rotate.Rotation
 import net.evilblock.prisonaio.module.region.Region
 import org.bukkit.ChatColor
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -133,7 +137,7 @@ abstract class Generator(
             if (activeModifiers.size < getMaxModifiers()) {
                 for (item in modifierStorage) {
                     if (item != null) {
-                        val modifier = ModifierItemUtil.fromItemStack(item)
+                        val modifier = GeneratorModifierUtils.extractModifierFromItemStack(item)
                         if (modifier != null) {
                             if (!hasActiveModifier(modifier.type)) {
                                 modifiers[modifier.type] = modifier
@@ -170,6 +174,43 @@ abstract class Generator(
 
         build.finished = true
         build.clearBlocks()
+    }
+
+    open fun hasItemStorage(): Boolean {
+        return false
+    }
+
+    open fun getItemStorage(): MutableList<ItemStack> {
+        return arrayListOf()
+    }
+
+    open fun removeItemFromStorage(player: Player, itemStack: ItemStack): Int {
+        val originalAmount = itemStack.amount
+        var remainingAmount = itemStack.amount
+
+        val removed = arrayListOf<ItemStack>()
+        for (stored in getItemStorage()) {
+            if (stored.isSimilar(itemStack)) {
+                if (stored.amount > remainingAmount) {
+                    stored.amount -= remainingAmount
+                    break
+                } else {
+                    removed.add(stored)
+                    remainingAmount -= stored.amount
+                }
+            }
+        }
+
+        for (item in removed) {
+            getItemStorage().remove(item)
+        }
+
+        if (originalAmount > remainingAmount) {
+            player.inventory.addItem(ItemBuilder.copyOf(itemStack).amount(originalAmount - remainingAmount).build())
+            player.updateInventory()
+        }
+
+        return remainingAmount
     }
 
     abstract fun getMaxModifiers(): Int
@@ -261,6 +302,11 @@ abstract class Generator(
             }
             return 0
         }
+    }
+
+    override fun onEntityDamage(entity: Entity, cause: EntityDamageEvent.DamageCause, cancellable: Cancellable) {
+        cancellable.isCancelled = true
+        println(entity.name + " - " + cause.name)
     }
 
     override fun equals(other: Any?): Boolean {

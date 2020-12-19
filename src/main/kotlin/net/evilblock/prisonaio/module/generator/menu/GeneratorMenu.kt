@@ -7,8 +7,6 @@
 
 package net.evilblock.prisonaio.module.generator.menu
 
-import com.intellectualcrafters.plot.PS
-import com.intellectualcrafters.plot.`object`.Location
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.GlassButton
@@ -23,7 +21,7 @@ import net.evilblock.prisonaio.module.generator.Generator
 import net.evilblock.prisonaio.module.generator.GeneratorHandler
 import net.evilblock.prisonaio.module.generator.GeneratorType
 import net.evilblock.prisonaio.module.generator.build.GeneratorBuildLevel
-import net.evilblock.prisonaio.module.generator.modifier.ModifierItemUtil
+import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifierUtils
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
@@ -60,6 +58,13 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
                 }
             }
 
+            if (generator.hasItemStorage()) {
+                val itemsStorage = generator.getItemStorage()
+                for ((index, itemStack) in itemsStorage.withIndex()) {
+                    buttons[STORAGE_SLOTS[index]] = ItemStorageButton(itemStack)
+                }
+            }
+
             val nextLevel = generator.getNextLevel()
             if (nextLevel != null) {
                 buttons[16] = UpgradeButton(nextLevel)
@@ -80,7 +85,7 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
             return false
         }
 
-        val modifier = ModifierItemUtil.fromItemStack(itemStack) ?: return false
+        val modifier = GeneratorModifierUtils.extractModifierFromItemStack(itemStack) ?: return false
         if (!generator.isModifierCompatible(modifier.type)) {
             player.sendMessage("${ChatColor.RED}That modifier item is not compatible with this Generator!")
             return false
@@ -285,6 +290,18 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
                 else -> {
 
                 }
+            }
+        }
+    }
+
+    inner class ItemStorageButton(private val itemStack: ItemStack) : Button() {
+        override fun getButtonItem(player: Player): ItemStack {
+            return itemStack.clone()
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                generator.removeItemFromStorage(player, itemStack)
             }
         }
     }

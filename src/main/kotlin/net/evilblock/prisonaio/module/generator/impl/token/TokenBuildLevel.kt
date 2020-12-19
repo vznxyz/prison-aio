@@ -8,26 +8,20 @@
 package net.evilblock.prisonaio.module.generator.impl.token
 
 import net.evilblock.prisonaio.module.generator.build.GeneratorBuildLevel
+import java.math.BigDecimal
 
 class TokenBuildLevel(
     number: Int,
     schematic: String,
-    nextLevelCost: Long,
-    buildTime: Int
-) : GeneratorBuildLevel(number, schematic, nextLevelCost, 1000L, buildTime) {
+    upgradeCost: Long,
+    buildTime: Int,
+    maxTokens: Double,
+    tokensPerTick: Double,
+    tokensPerItem: Double
+) : GeneratorBuildLevel(number, schematic, upgradeCost, 1000L, buildTime) {
 
-    companion object {
-        val LEVELS: Array<GeneratorBuildLevel> = arrayOf(
-            TokenBuildLevel(1, "token1.schematic", 5_000L, 1_800),
-            TokenBuildLevel(2, "token2.schematic", 5_000L, 7_200),
-            TokenBuildLevel(3, "token3.schematic", 5_000L, 14_400),
-            TokenBuildLevel(4, "token4.schematic", 5_000L, 28_800),
-            TokenBuildLevel(5, "token5.schematic", 5_000L, 43_200),
-            TokenBuildLevel(6, "token6.schematic", 5_000L, 64_800),
-            TokenBuildLevel(7, "token7.schematic", 5_000L, 86_400),
-            TokenBuildLevel(8, "token8.schematic", 5_000L, 129_600),
-            TokenBuildLevel(9, "token9.schematic", 5_000L, 172_800)
-        )
-    }
+    val maxTokens: BigDecimal = BigDecimal(maxTokens)
+    val tokensPerTick: BigDecimal = BigDecimal(tokensPerTick)
+    val tokensPerItem: BigDecimal = BigDecimal(tokensPerItem)
 
 }

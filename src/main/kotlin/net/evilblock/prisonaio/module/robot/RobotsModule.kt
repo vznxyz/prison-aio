@@ -21,7 +21,6 @@ import net.evilblock.prisonaio.module.robot.listener.RobotBlockListeners
 import net.evilblock.prisonaio.module.robot.listener.RobotInventoryListeners
 import net.evilblock.prisonaio.module.robot.listener.RobotItemListeners
 import net.evilblock.prisonaio.module.robot.listener.RobotPlotListeners
-import net.evilblock.prisonaio.module.robot.mechanic.RobotMechanicHandler
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
@@ -47,33 +46,29 @@ object RobotsModule : PluginModule() {
 
         CosmeticHandler.load()
         RobotHandler.initialLoad()
-        RobotMechanicHandler.initialLoad()
     }
 
     override fun onAutoSave() {
         super.onAutoSave()
 
         RobotHandler.saveData()
-        RobotMechanicHandler.saveData()
     }
 
     override fun onDisable() {
         super.onDisable()
 
         RobotHandler.saveData()
-        RobotMechanicHandler.saveData()
     }
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
+            RobotsCommand.javaClass,
             AlignNearCommand::class.java,
             DeleteNearCommand::class.java,
-            GiveMechanicCommand::class.java,
             GiveRobotCommand::class.java,
             SpawnExampleRobotCommand::class.java,
-            SpawnMechanicCommand::class.java,
             ToggleAnimationsCommand::class.java,
-            ToggleMechanicCommand::class.java,
+            ToggleMergeCommand::class.java,
             CosmeticsCommand::class.java,
             CosmeticGrantCommand::class.java
         )

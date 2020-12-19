@@ -16,10 +16,10 @@ import org.bukkit.ChatColor
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
-object ModifierItemUtil {
+object GeneratorModifierUtils {
 
     @JvmStatic
-    fun toItemStack(type: GeneratorModifierType, amount: Int, value: Double, duration: Duration?): ItemStack {
+    fun makeModifierItemStack(type: GeneratorModifierType, amount: Int, value: Double, duration: Duration?): ItemStack {
         val item = ItemBuilder.copyOf(type.icon)
             .amount(amount)
             .name("${type.color}${ChatColor.BOLD}${type.displayName.toUpperCase()}")
@@ -58,7 +58,7 @@ object ModifierItemUtil {
     }
 
     @JvmStatic
-    fun fromItemStack(itemStack: ItemStack): GeneratorModifier? {
+    fun extractModifierFromItemStack(itemStack: ItemStack): GeneratorModifier? {
         try {
             val nmsCopy = ItemUtils.getNmsCopy(itemStack)
             val tag = NBTUtil.getOrCreateTag(nmsCopy)

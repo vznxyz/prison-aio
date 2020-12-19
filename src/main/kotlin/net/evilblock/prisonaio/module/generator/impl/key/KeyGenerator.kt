@@ -45,6 +45,14 @@ class KeyGenerator(plot: Plot, owner: UUID, bounds: Cuboid, rotation: Rotation) 
         return super.getNextLevel() as KeyBuildLevel?
     }
 
+    override fun hasItemStorage(): Boolean {
+        return true
+    }
+
+    override fun getItemStorage(): MutableList<ItemStack> {
+        return keyStorage
+    }
+
     override fun getMaxModifiers(): Int {
         return 3
     }

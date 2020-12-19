@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.generator.build
 import net.evilblock.prisonaio.module.generator.GeneratorHandler
 import net.evilblock.prisonaio.module.generator.schematic.rotate.RotatedSchematic
 import net.evilblock.prisonaio.module.generator.schematic.rotate.Rotation
+import org.bukkit.configuration.ConfigurationSection
 
 open class GeneratorBuildLevel(
     val number: Int,
@@ -18,6 +19,10 @@ open class GeneratorBuildLevel(
     val tickInterval: Long,
     val buildTime: Int
 ) {
+
+    open fun onLoad(section: ConfigurationSection) {
+
+    }
 
     fun getSchematic(rotation: Rotation): RotatedSchematic {
         return GeneratorHandler.getSchematic(schematic, rotation)

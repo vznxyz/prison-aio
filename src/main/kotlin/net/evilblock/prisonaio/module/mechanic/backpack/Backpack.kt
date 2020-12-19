@@ -171,7 +171,7 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
 
     fun toBackpackItem(): ItemStack {
         val item = ItemBuilder.of(Material.CHEST)
-            .name("${ChatColor.RED}${ChatColor.BOLD}Backpack")
+            .name("${ChatColor.BLUE}${ChatColor.BOLD}Backpack")
             .build()
 
         updateLore(item)
@@ -188,9 +188,9 @@ class Backpack(val id: String = UUID.randomUUID().toString().replace("-", "").su
     fun updateLore(itemStack: ItemStack) {
         if (itemStack.hasItemMeta()) {
             val lore = arrayListOf<String>()
-            lore.add("${ChatColor.GRAY}Items: ${ChatColor.RED}${NumberUtils.format(getItemsSize())}${ChatColor.GRAY}/${ChatColor.RED}${NumberUtils.format(getMaxItemsSize())}")
+            lore.add("${ChatColor.GRAY}Items: ${ChatColor.BLUE}${NumberUtils.format(getItemsSize())}${ChatColor.GRAY}/${ChatColor.BLUE}${NumberUtils.format(getMaxItemsSize())}")
             lore.add("")
-            lore.add("${ChatColor.RED}${ChatColor.BOLD}Upgrades")
+            lore.add("${ChatColor.BLUE}${ChatColor.BOLD}Upgrades")
 
             if (upgrades.isEmpty()) {
                 lore.add("${ChatColor.GRAY}None")

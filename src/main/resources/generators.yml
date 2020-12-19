@@ -1,0 +1,278 @@
+core:
+  levels:
+    1:
+      schematic: "core1.schematic"
+      upgrade-cost: 5000
+      build-time: 1800
+      max-builds: 2
+      max-money-level: 1
+      max-token-level: 2
+      max-key-level: 2
+    2:
+      schematic: "core2.schematic"
+      upgrade-cost: 10000
+      build-time: 50000
+      max-builds: 3
+      max-money-level: 2
+      max-token-level: 3
+      max-key-level: 3
+    3:
+      schematic: "core3.schematic"
+      upgrade-cost: 50000
+      build-time: 14400
+      max-builds: 4
+      max-money-level: 2
+      max-token-level: 4
+      max-key-level: 4
+    4:
+      schematic: "core4.schematic"
+      upgrade-cost: 100000
+      build-time: 28800
+      max-builds: 5
+      max-money-level: 3
+      max-token-level: 5
+      max-key-level: 5
+    5:
+      schematic: "core5.schematic"
+      upgrade-cost: 250000
+      build-time: 43200
+      max-builds: 6
+      max-money-level: 3
+      max-token-level: 6
+      max-key-level: 6
+    6:
+      schematic: "core6.schematic"
+      upgrade-cost: 500000
+      build-time: 86400
+      max-builds: 7
+      max-money-level: 3
+      max-token-level: 7
+      max-key-level: 7
+    7:
+      schematic: "core7.schematic"
+      upgrade-cost: 1000000
+      build-time: 172800
+      max-builds: 8
+      max-money-level: 4
+      max-token-level: 7
+      max-key-level: 7
+    8:
+      schematic: "core8.schematic"
+      upgrade-cost: 5000000
+      build-time: 259200
+      max-builds: 10
+      max-money-level: 4
+      max-token-level: 8
+      max-key-level: 8
+    9:
+      schematic: "core9.schematic"
+      upgrade-cost: 50000000
+      build-time: 345600
+      max-builds: 10
+      max-money-level: 5
+      max-token-level: 9
+      max-key-level: 9
+        #CoreBuildLevel(1, "core1.schematic", 5000L, 1_800, 2, 1, 2, 2),
+        #            CoreBuildLevel(2, "core2.schematic", 10_000L, 7_200, 3, 2, 3, 3),
+        #            CoreBuildLevel(3, "core3.schematic", 50_000L, 14_400, 4, 2, 4, 4),
+        #            CoreBuildLevel(4, "core4.schematic", 100_000L, 28_800, 5, 3, 5, 5),
+        #            CoreBuildLevel(5, "core5.schematic", 250_000L, 43_200, 6, 3, 6, 6),
+        #            CoreBuildLevel(6, "core6.schematic", 500_000L, 86_400, 7, 3, 7, 7),
+        #            CoreBuildLevel(7, "core7.schematic", 1_000_000L, 172_800, 8, 4, 7, 7),
+      #            CoreBuildLevel(8, "core8.schematic", 5_000_000L, 259_200, 10, 4, 8, 8),
+      #            CoreBuildLevel(9, "core9.schematic", 50_000_000L, 345_600, 10, 5, 9, 9)
+money:
+  levels:
+    1:
+      schematic: "money1.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-money: 0
+      money-per-tick: 0
+      money-per-item: 0
+    2:
+      schematic: "money2.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-money: 0
+      money-per-tick: 0
+      money-per-item: 0
+    3:
+      schematic: "money3.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-money: 0
+      money-per-tick: 0
+      money-per-item: 0
+    4:
+      schematic: "money4.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-money: 0
+      money-per-tick: 0
+      money-per-item: 0
+    5:
+      schematic: "money5.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-money: 0
+      money-per-tick: 0
+      money-per-item: 0
+    6:
+      schematic: "money6.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-money: 0
+      money-per-tick: 0
+      money-per-item: 0
+    7:
+      schematic: "money7.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-money: 0
+      money-per-tick: 0
+      money-per-item: 0
+    8:
+      schematic: "money8.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-money: 0
+      money-per-tick: 0
+      money-per-item: 0
+    9:
+      schematic: "money9.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-money: 0
+      money-per-tick: 0
+      money-per-item: 0
+#MoneyBuildLevel(1, "money1.schematic", 5_000L, 1_800, 25_000_000_000.0, 10_000_000.0, 1_000_000_000.0),
+  #            MoneyBuildLevel(2, "money2.schematic", 5_000L, 7_200, 50_000_000_000.0, 20_000_000.0, 2_000_000_000.0),
+  #            MoneyBuildLevel(3, "money3.schematic", 5_000L, 14_400, 125_000_000_000.0, 50_000_000.0, 5_000_000_000.0),
+  #            MoneyBuildLevel(4, "money4.schematic", 5_000L, 28_800, 250_000_000_000.0, 100_000_000.0, 10_000_000_000.0),
+  #            MoneyBuildLevel(5, "money5.schematic", 5_000L, 43_200, 750_000_000_000.0, 300_000_000.0, 30_000_000_000.0),
+  #            MoneyBuildLevel(6, "money6.schematic", 5_000L, 64_800, 1_250_000_000_000.0, 500_000_000.0, 50_000_000_000.0),
+  #            MoneyBuildLevel(7, "money7.schematic", 5_000L, 86_400, 1_875_000_000_000.0, 750_000_000.0, 75_000_000_000.0),
+  #            MoneyBuildLevel(8, "money8.schematic", 5_000L, 129_600, 3_125_000_000_000.0, 1_250_000_000.0, 125_000_000_000.0),
+  #            MoneyBuildLevel(9, "money9.schematic", 5_000L, 172_800, 3_750_000_000_000.0, 1_500_000_000.0, 150_000_000_000.0)
+token:
+  levels:
+    1:
+      schematic: "token1.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-tokens: 0
+      tokens-per-tick: 0
+      tokens-per-item: 0
+    2:
+      schematic: "token2.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-tokens: 0
+      tokens-per-tick: 0
+      tokens-per-item: 0
+    3:
+      schematic: "token3.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-tokens: 0
+      tokens-per-tick: 0
+      tokens-per-item: 0
+    4:
+      schematic: "token4.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-tokens: 0
+      tokens-per-tick: 0
+      tokens-per-item: 0
+    5:
+      schematic: "token5.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-tokens: 0
+      tokens-per-tick: 0
+      tokens-per-item: 0
+    6:
+      schematic: "token6.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-tokens: 0
+      tokens-per-tick: 0
+      tokens-per-item: 0
+    7:
+      schematic: "token7.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-tokens: 0
+      tokens-per-tick: 0
+      tokens-per-item: 0
+    8:
+      schematic: "token8.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-tokens: 0
+      tokens-per-tick: 0
+      tokens-per-item: 0
+    9:
+      schematic: "token9.schematic"
+      upgrade-cost: 0
+      build-time: 0
+      max-tokens: 0
+      tokens-per-tick: 0
+      tokens-per-item: 0
+#TokenBuildLevel(1, "token1.schematic", 5_000L, 1_800, 750_000.0, 500.0, 50_000.0),
+  #            TokenBuildLevel(2, "token2.schematic", 5_000L, 7_200, 2_000_000.0, 2_000.0, 100_000.0),
+  #            TokenBuildLevel(3, "token3.schematic", 5_000L, 14_400, 5_000_000.0, 5_000.0, 250_000.0),
+  #            TokenBuildLevel(4, "token4.schematic", 5_000L, 28_800, 10_000_000.0, 10_000.0, 500_000.0),
+  #            TokenBuildLevel(5, "token5.schematic", 5_000L, 43_200, 20_000_000.0, 15_000.0, 1_000_000.0),
+  #            TokenBuildLevel(6, "token6.schematic", 5_000L, 64_800, 40_000_000.0, 25_000.0, 2_000_000.0),
+  #            TokenBuildLevel(7, "token7.schematic", 5_000L, 86_400, 75_000_000.0, 40_000.0, 5_000_000.0),
+  #            TokenBuildLevel(8, "token8.schematic", 5_000L, 129_600, 150_000_000.0, 55_000.0, 15_000_000.0),
+  #            TokenBuildLevel(9, "token9.schematic", 5_000L, 172_800, 375_000_000.0, 75_000.0, 25_000_000.0)
+key:
+  levels:
+    1:
+      schematic: "key1.schematic"
+      upgrade-cost: 5000
+      tick-interval: 180_000
+      build-time: 1800
+      max-keys: 5
+      key-chance:
+        rare: 15.0
+        legendary: 5.0
+    2:
+      schematic: "key2.schematic"
+      upgrade-cost: 15000
+      tick-interval: 120000
+      build-time: 64800
+      max-keys: 8
+      key-chance:
+        rare: 15.0
+        legendary: 5.0
+    3:
+      schematic: "key3.schematic"
+      upgrade-cost: 50000
+      tick-interval: 90000
+      build-time: 64800
+      max-keys: 8
+      key-chance:
+        rare: 15.0
+        legendary: 5.0
+    4:
+      schematic: "key4.schematic"
+      upgrade-cost: 250000
+      tick-interval: 60000
+      build-time: 86400
+      max-keys: 10
+      key-chance:
+        rare: 15.0
+        legendary: 5.0
+    5:
+      schematic: "key5.schematic"
+      upgrade-cost: 1000000
+      tick-interval: 30000
+      build-time: 172800
+      max-keys: 15
+      key-chance:
+        rare: 15.0
+        legendary: 5.0

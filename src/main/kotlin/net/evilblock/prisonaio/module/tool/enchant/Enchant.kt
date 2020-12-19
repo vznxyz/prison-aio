@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
 import net.evilblock.prisonaio.module.tool.ToolsModule
+import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -61,7 +62,7 @@ abstract class Enchant(
     }
 
     fun sendMessage(player: Player, message: String) {
-        if (!player.hasMetadata("ENCHANT_MSGS_DISABLED")) {
+        if (!UserHandler.getUser(player).settings.isEnchantMessagesDisabled(this)) {
             player.sendMessage("${ChatColor.GRAY}[${getCategory().textColor}${ChatColor.BOLD}$enchant${ChatColor.GRAY}] $message")
         }
     }

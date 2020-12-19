@@ -8,38 +8,10 @@ import net.evilblock.cubed.util.nms.NBTUtil
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.TimeUnit
 
 object RobotUtils {
-
-    @JvmStatic
-    fun isMechanicEggItem(itemStack: ItemStack): Boolean {
-        return itemStack.type == Material.MONSTER_EGG
-                && itemStack.hasItemMeta()
-                && itemStack.itemMeta.hasDisplayName()
-                && itemStack.itemMeta.hasLore()
-                && itemStack.itemMeta.displayName == "${ChatColor.YELLOW}${ChatColor.BOLD}Robot Mechanic Egg"
-                && ItemUtils.itemTagHasKey(itemStack, "RobotMechanicEgg")
-    }
-
-    @JvmStatic
-    fun makeMechanicEggItem(amount: Int): ItemStack {
-        val lore = TextSplitter.split(text = "Place this egg on any region that you own to spawn a Robot Mechanic, who is useful for combining and collecting from robots.")
-
-        var item = ItemBuilder.of(Material.MONSTER_EGG)
-                .amount(amount)
-                .name("${ChatColor.YELLOW}${ChatColor.BOLD}Robot Mechanic Egg")
-                .setLore(lore)
-                .build()
-
-        GlowEnchantment.addGlow(item)
-
-        item = ItemUtils.setMonsterEggType(item, EntityType.SPIDER)
-
-        return ItemUtils.addToItemTag(item, "RobotMechanicEgg", "true", true)
-    }
 
     @JvmStatic
     fun isRobotItem(itemStack: ItemStack): Boolean {

@@ -24,6 +24,9 @@ object RenameTagUtils {
             .setLore(TextSplitter.split(text = "Drag and drop this tag onto your pickaxe to rename it."))
             .glow()
             .build()
+            .let {
+                ItemUtils.addToItemTag(it, "RenameTag", "true", true)
+            }
     }
 
     @JvmStatic

@@ -89,11 +89,14 @@ class PrisonManagementMenu : Menu() {
                 val totalMemory = AdminModule.getTotalMemory()
                 val memoryColor = TextUtil.colorPercentage(NumberUtils.percentage(usedMemory.first, usedMemory.first))
 
+                val formattedViewDist = NumberUtils.format(Bukkit.getViewDistance())
+
                 desc.add("${ChatColor.GRAY}TPS: $tpsColor$formattedTps")
                 desc.add("${ChatColor.GRAY}Memory: $memoryColor${ChatColor.BOLD}${usedMemory.first}${usedMemory.second}${ChatColor.GRAY}/${totalMemory.first}${totalMemory.second}")
                 desc.add("${ChatColor.GRAY}Players: ${ChatColor.YELLOW}${ChatColor.BOLD}${Bukkit.getOnlinePlayers().size}${ChatColor.GRAY}/${Bukkit.getMaxPlayers()}")
                 desc.add("${ChatColor.GRAY}Entities: ${ChatColor.YELLOW}${ChatColor.BOLD}${AdminModule.countEntities()}")
                 desc.add("${ChatColor.GRAY}Worlds: ${ChatColor.YELLOW}${ChatColor.BOLD}${Bukkit.getWorlds().size}")
+                desc.add("${ChatColor.GRAY}View Distance: ${ChatColor.YELLOW}${ChatColor.BOLD}${formattedViewDist}")
             }
         }
 

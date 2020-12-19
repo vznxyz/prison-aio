@@ -141,14 +141,14 @@ class Shop(var id: String) {
 
         Tasks.sync {
             val droppedItems = player.inventory.addItem(*splitItems.toTypedArray())
-            if (droppedItems.isNotEmpty()) {
-                val region = RegionHandler.findRegion(player.location)
-                if (region is BitmaskRegion && region.hasBitmask(RegionBitmask.SAFE_ZONE)) {
-                    for (item in droppedItems) {
-                        player.location.world.dropItem(player.location, item.value)
-                    }
-                }
-            }
+//            if (droppedItems.isNotEmpty()) {
+//                val region = RegionHandler.findRegion(player.location)
+//                if (region is BitmaskRegion && !region.hasBitmask(RegionBitmask.SAFE_ZONE)) {
+//                    for (item in droppedItems) {
+//                        player.location.world.dropItem(player.location, item.value)
+//                    }
+//                }
+//            }
 
             player.updateInventory()
         }

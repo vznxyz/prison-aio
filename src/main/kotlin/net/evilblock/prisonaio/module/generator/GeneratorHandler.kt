@@ -15,6 +15,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
+import net.evilblock.prisonaio.module.generator.build.GeneratorBuildLevel
 import net.evilblock.prisonaio.module.generator.impl.core.CoreGenerator
 import net.evilblock.prisonaio.module.generator.schematic.Schematic
 import net.evilblock.prisonaio.module.generator.schematic.SchematicBlock
@@ -38,6 +39,7 @@ object GeneratorHandler : PluginHandler {
     val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}Generators${ChatColor.GRAY}] "
 
     private val schematics: MutableMap<String, EnumMap<Rotation, RotatedSchematic>> = ConcurrentHashMap()
+    private val levels: MutableMap<GeneratorType, Array<GeneratorBuildLevel>> = ConcurrentHashMap()
 
     private val generators: MutableSet<Generator> = ConcurrentHashMap.newKeySet()
     private val generatorsByPlot: MutableMap<PlotId, MutableSet<Generator>> = ConcurrentHashMap()
@@ -54,6 +56,7 @@ object GeneratorHandler : PluginHandler {
         super.initialLoad()
 
         loadSchematics()
+        loadLevels()
 
         val dataFile = getInternalDataFile()
         if (dataFile.exists()) {
@@ -198,6 +201,24 @@ object GeneratorHandler : PluginHandler {
             val rotatedSchematic = RotatedSchematic(rotation, area, noAirBlocks.toTypedArray(), villager, villagerYaw)
             rotationMap[rotation] = rotatedSchematic
         }
+    }
+
+    private fun loadLevels() {
+        for (type in GeneratorType.values()) {
+            val loaded = arrayListOf<GeneratorBuildLevel>()
+
+            val root = getModule().config.getConfigurationSection(type.configSection + ".levels")
+            for (level in root.getKeys(false)) {
+                val section = root.getConfigurationSection(level)
+                loaded.add(type.createInstance.invoke(level.toInt(), section))
+            }
+
+            levels[type] = loaded.toTypedArray()
+        }
+    }
+
+    fun getLevels(type: GeneratorType): Array<GeneratorBuildLevel> {
+        return levels[type]!!
     }
 
     @JvmStatic

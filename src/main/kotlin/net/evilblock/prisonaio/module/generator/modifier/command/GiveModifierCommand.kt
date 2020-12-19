@@ -13,7 +13,7 @@ import net.evilblock.cubed.util.Duration
 import net.evilblock.cubed.util.TextUtil
 import net.evilblock.prisonaio.module.generator.GeneratorHandler
 import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifierType
-import net.evilblock.prisonaio.module.generator.modifier.ModifierItemUtil
+import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifierUtils
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -46,9 +46,9 @@ object GiveModifierCommand {
         }
 
         if (player.inventory.firstEmpty() == -1) {
-            player.enderChest.addItem(ModifierItemUtil.toItemStack(modifierType, amount, value, duration))
+            player.enderChest.addItem(GeneratorModifierUtils.makeModifierItemStack(modifierType, amount, value, duration))
         } else {
-            player.inventory.addItem(ModifierItemUtil.toItemStack(modifierType, amount, value, duration))
+            player.inventory.addItem(GeneratorModifierUtils.makeModifierItemStack(modifierType, amount, value, duration))
         }
 
         sender.sendMessage("${GeneratorHandler.CHAT_PREFIX}You've given ${player.name} ${modifierType.color}${ChatColor.BOLD}${amount}x ${modifierType.getColoredName()} ${ChatColor.GRAY}${TextUtil.pluralize(amount, "modifier", "modifiers")}!")

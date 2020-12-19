@@ -46,6 +46,7 @@ object VanillaMechanicsListeners : Listener {
                     event.entity.sendMessage("${ChatColor.YELLOW}You've been teleported to spawn!")
                 }
                 EntityDamageEvent.DamageCause.FIRE,
+                EntityDamageEvent.DamageCause.FIRE_TICK,
                 EntityDamageEvent.DamageCause.LAVA -> {
                     event.isCancelled = true
                 }

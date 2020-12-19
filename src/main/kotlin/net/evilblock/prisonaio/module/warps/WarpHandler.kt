@@ -24,7 +24,7 @@ object WarpHandler : PluginHandler {
     }
 
     override fun getInternalDataFile(): File {
-        return File(File(getModule().getPluginFramework().dataFolder, "internal"), "warps")
+        return File(File(getModule().getPluginFramework().dataFolder, "internal"), "warps.json")
     }
 
     fun getWarps(): Collection<Warp> {
