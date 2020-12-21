@@ -18,7 +18,7 @@ import net.evilblock.prisonaio.module.minigame.MinigamesModule
 import java.io.File
 import java.util.ArrayList
 
-object EventGameArenaHandler : PluginHandler {
+object EventGameArenaHandler : PluginHandler() {
 
     private val arenas: MutableList<EventGameArena> = ArrayList()
 

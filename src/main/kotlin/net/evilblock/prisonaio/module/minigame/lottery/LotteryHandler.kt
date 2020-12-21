@@ -15,7 +15,7 @@ import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
 
-object LotteryHandler : PluginHandler {
+object LotteryHandler : PluginHandler() {
 
 
 

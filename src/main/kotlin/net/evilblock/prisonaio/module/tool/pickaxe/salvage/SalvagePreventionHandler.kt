@@ -22,7 +22,7 @@ import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import org.bukkit.inventory.ItemStack
 import java.io.File
 
-object SalvagePreventionHandler : PluginHandler {
+object SalvagePreventionHandler : PluginHandler() {
 
     private val pickaxes = arrayListOf<ItemStack>()
 

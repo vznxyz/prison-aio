@@ -105,11 +105,11 @@ object RanksModule : PluginModule() {
     }
 
     fun getPrestigeBlocksMinedRequirementBase(): Int {
-        return config.getInt("prestige.blocks-mined-requirement.base")
+        return config.getInt("prestige.blocks-progress-requirement.base")
     }
 
     fun getPrestigeBlocksMinedRequirementModifier(): Int {
-        return config.getInt("prestige.blocks-mined-requirement.modifier")
+        return config.getInt("prestige.blocks-progress-requirement.modifier")
     }
 
     fun getPrestigeCommands(): List<String> {

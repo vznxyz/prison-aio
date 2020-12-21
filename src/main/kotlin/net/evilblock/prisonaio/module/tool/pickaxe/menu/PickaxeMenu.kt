@@ -15,12 +15,15 @@ import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.cubed.util.bukkit.prompt.InputPrompt
 import net.evilblock.prisonaio.module.tool.enchant.EnchantCategory
 import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.tool.pickaxe.prestige.PickaxePrestigeHandler
+import net.evilblock.prisonaio.module.tool.rename.RenameTagUtils
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.menu.ToggleEnchantMessagesMenu
+import net.evilblock.source.chat.filter.ChatFilterHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -86,7 +89,46 @@ class PickaxeMenu(
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
+                ConfirmMenu("Rename pickaxe?") { confirmed ->
+                    if (confirmed) {
+                        InputPrompt()
+                            .withText("${ChatColor.GREEN}Please input a new name for your pickaxe. ${ChatColor.GRAY}(Limited to 32 characters)")
+                            .withLimit(32)
+                            .acceptInput { input ->
+                                val first = player.inventory.first(RenameTagUtils.makeRenameTag(1))
+                                if (first == -1) {
+                                    player.sendMessage("${ChatColor.RED}You don't have a Rename Tag in your inventory!")
+                                    return@acceptInput
+                                }
 
+                                val itemAtSlot = player.inventory.getItem(first)
+                                if (itemAtSlot == null) {
+                                    player.sendMessage("${ChatColor.RED}You don't have a Rename Tag in your inventory!")
+                                    return@acceptInput
+                                }
+
+                                val colored = ChatColor.translateAlternateColorCodes('&', input)
+                                val stripped = ChatColor.stripColor(colored)
+
+                                if (ChatFilterHandler.filterMessage(stripped) != null) {
+                                    player.sendMessage("${ChatColor.RED}The name you input contains inappropriate content. Please try a different name.")
+                                    return@acceptInput
+                                }
+
+                                pickaxeData.customName = colored
+                                pickaxeData.applyMeta(pickaxeItem)
+
+                                if (itemAtSlot.amount <= 1) {
+                                    player.inventory.setItem(first, null)
+                                } else {
+                                    itemAtSlot.amount--
+                                }
+
+                                player.updateInventory()
+                            }
+                            .start(player)
+                    }
+                }.openMenu(player)
             }
         }
     }

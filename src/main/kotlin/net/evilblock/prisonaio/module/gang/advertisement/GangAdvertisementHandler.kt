@@ -22,7 +22,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
-object GangAdvertisementHandler : PluginHandler {
+object GangAdvertisementHandler : PluginHandler() {
 
     val EXPIRE_TIME = TimeUnit.HOURS.toMillis(1L)
 

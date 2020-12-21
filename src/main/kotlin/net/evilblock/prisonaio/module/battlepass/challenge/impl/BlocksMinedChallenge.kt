@@ -68,7 +68,7 @@ class BlocksMinedChallenge(id: String, internal var blocksMined: Int) : Challeng
         }
 
         override fun getDescription(): String {
-            return "Reach a certain amount of blocks mined"
+            return "Reach a certain amount of blocks progress"
         }
 
         override fun getIcon(): ItemStack {

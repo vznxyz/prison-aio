@@ -88,14 +88,14 @@ data class ShopItem(
     }
 
     /**
-     * Calculates and returns the remaining cooldown for the given [uuid] (Player UUID).
+     * Calculates and returns the progress cooldown for the given [uuid] (Player UUID).
      */
     fun getRemainingPurchaseCooldown(player: Player): Long {
         return getRemainingPurchaseCooldown(player.uniqueId)
     }
 
     /**
-     * Calculates and returns the remaining cooldown for the given [uuid] (Player UUID).
+     * Calculates and returns the progress cooldown for the given [uuid] (Player UUID).
      */
     fun getRemainingPurchaseCooldown(uuid: UUID): Long {
         return (purchaseTimestamps[uuid]!! + purchaseCooldown!!.get()) - System.currentTimeMillis()

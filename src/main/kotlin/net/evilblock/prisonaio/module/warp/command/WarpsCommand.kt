@@ -5,10 +5,10 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.warps.command
+package net.evilblock.prisonaio.module.warp.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.prisonaio.module.warps.menu.WarpsMenu
+import net.evilblock.prisonaio.module.warp.menu.WarpsMenu
 import org.bukkit.entity.Player
 
 object WarpsCommand {

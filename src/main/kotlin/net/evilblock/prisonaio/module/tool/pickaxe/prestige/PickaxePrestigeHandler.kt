@@ -18,7 +18,7 @@ import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import java.io.File
 
-object PickaxePrestigeHandler : PluginHandler {
+object PickaxePrestigeHandler : PluginHandler() {
 
     private val prestigeInfoMap: MutableMap<Int, PickaxePrestigeInfo> = hashMapOf()
 
@@ -80,19 +80,30 @@ object PickaxePrestigeHandler : PluginHandler {
         return prestigeInfoMap.maxBy { it.key }?.value
     }
 
+    // find next prestige limits + add all of the previous limits
     fun findEnchantLimits(prestige: Int): Map<Enchant, Int> {
         return hashMapOf<Enchant, Int>().also { map ->
-            for (prestigeInfo in getPrestigeSet()) {
-                if (prestige <= prestigeInfo.number) {
-                    for ((enchant, limit) in prestigeInfo.enchantLimits) {
-                        if (map.containsKey(enchant)) {
-                            if (map[enchant]!! < limit) {
+            val nextPrestige = getNextPrestige(prestige)
+            if (nextPrestige != null) {
+                map.putAll(nextPrestige.enchantLimits)
+
+                for (prestigeInfo in getPrestigeSet()) {
+                    if (prestige <= prestigeInfo.number) {
+                        for ((enchant, limit) in prestigeInfo.enchantLimits) {
+                            if (map.containsKey(enchant)) {
+                                if (map[enchant]!! > limit) {
+                                    map[enchant] = limit
+                                }
+                            } else {
                                 map[enchant] = limit
                             }
-                        } else {
-                            map[enchant] = limit
                         }
                     }
+                }
+            } else {
+                val maxPrestige = getMaxPrestige()
+                if (maxPrestige != null) {
+                    map.putAll(maxPrestige.enchantLimits)
                 }
             }
         }

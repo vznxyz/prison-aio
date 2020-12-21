@@ -20,7 +20,7 @@ import java.io.File
 import java.io.IOException
 import java.lang.reflect.Type
 
-object EventConfigHandler : PluginHandler {
+object EventConfigHandler : PluginHandler() {
 
     private val dataFile: File = File(File(PrisonAIO.instance.dataFolder, "internal"), "events-config.json")
     private val dataType: Type = object : TypeToken<EventConfig>() {}.type

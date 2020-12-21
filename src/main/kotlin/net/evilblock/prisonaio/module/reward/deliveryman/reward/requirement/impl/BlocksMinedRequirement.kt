@@ -42,7 +42,7 @@ class BlocksMinedRequirement(private var blocksMined: Int) : DeliveryManRewardRe
         }
 
         override fun getDescription(): String {
-            return "Reach a certain amount of blocks mined"
+            return "Reach a certain amount of blocks progress"
         }
 
         override fun getIcon(): ItemStack {

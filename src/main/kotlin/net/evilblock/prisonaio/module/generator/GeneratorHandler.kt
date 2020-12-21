@@ -24,17 +24,20 @@ import net.evilblock.prisonaio.module.generator.schematic.rotate.RotatedSchemati
 import net.evilblock.prisonaio.module.generator.schematic.rotate.Rotation
 import net.evilblock.prisonaio.module.generator.service.GeneratorTickService
 import net.evilblock.prisonaio.module.region.RegionHandler
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.service.ServiceRegistry
+import net.evilblock.prisonaio.util.plot.PlotUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.experimental.and
 
-object GeneratorHandler : PluginHandler {
+object GeneratorHandler : PluginHandler() {
 
     val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}Generators${ChatColor.GRAY}] "
 
@@ -230,5 +233,22 @@ object GeneratorHandler : PluginHandler {
         }
         return false
     }
+
+    @JvmStatic
+    fun canAccess(player: Player): Boolean {
+        val plot = PlotUtil.getPlot(player.location) ?: return false
+
+        if (RegionBypass.hasBypass(player)) {
+            RegionBypass.attemptNotify(player)
+            return true
+        }
+
+        if (plot.isOwner(player.uniqueId)) {
+            return true
+        }
+
+        return false
+    }
+
 
 }

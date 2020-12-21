@@ -20,7 +20,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import java.io.File
 
-object DailyChallengeHandler : PluginHandler {
+object DailyChallengeHandler : PluginHandler() {
 
     private var currentSession: DailyChallengeSession = DailyChallengeSession()
 

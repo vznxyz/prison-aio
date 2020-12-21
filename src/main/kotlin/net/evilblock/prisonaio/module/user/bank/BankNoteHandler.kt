@@ -23,7 +23,7 @@ import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.util.*
 
-object BankNoteHandler : PluginHandler {
+object BankNoteHandler : PluginHandler() {
 
     private val bankNotes = hashMapOf<UUID, BankNote>()
 

@@ -18,7 +18,7 @@ import net.evilblock.prisonaio.module.user.UsersModule
 import java.io.File
 import java.util.*
 
-object NewsHandler : PluginHandler {
+object NewsHandler : PluginHandler() {
 
     private val news: MutableMap<UUID, News> = hashMapOf()
 

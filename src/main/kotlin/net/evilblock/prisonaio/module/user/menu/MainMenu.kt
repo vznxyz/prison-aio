@@ -22,7 +22,7 @@ import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileStatisticsMenu
 import net.evilblock.prisonaio.module.user.setting.menu.UserSettingsMenu
-import net.evilblock.prisonaio.module.warps.menu.WarpsMenu
+import net.evilblock.prisonaio.module.warp.menu.WarpsMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -67,7 +67,7 @@ class MainMenu(private val user: User) : Menu() {
             buttons[45] = SettingsButton()
 
             buttons[48] = DiscordButton()
-            buttons[49] = BuycraftButton()
+            buttons[49] = StoreButton()
             buttons[50] = ForumsButton()
         }
     }
@@ -300,9 +300,9 @@ class MainMenu(private val user: User) : Menu() {
         }
     }
 
-    private inner class BuycraftButton : Button() {
+    private inner class StoreButton : Button() {
         override fun getName(player: Player): String {
-            return "${ChatColor.WHITE}${ChatColor.BOLD}Buycraft"
+            return "${ChatColor.WHITE}${ChatColor.BOLD}Store"
         }
 
         override fun getMaterial(player: Player): Material {

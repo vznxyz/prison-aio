@@ -5,14 +5,14 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.warps
+package net.evilblock.prisonaio.module.warp
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.warps.command.*
-import net.evilblock.prisonaio.module.warps.command.parameter.WarpParameterType
+import net.evilblock.prisonaio.module.warp.command.*
+import net.evilblock.prisonaio.module.warp.command.parameter.WarpParameterType
 import org.bukkit.event.Listener
 
 object WarpsModule : PluginModule() {

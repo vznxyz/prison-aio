@@ -21,6 +21,10 @@ class EditRewardCommandsMenu(private val reward: LuckyBlockReward) : TextEditorM
         updateAfterClick = true
     }
 
+    override fun getPrePaginatedTitle(player: Player): String {
+        return "Edit Reward Commands"
+    }
+
     override fun getPromptBuilder(player: Player, index: Int): EzPrompt.Builder {
         return EzPrompt.Builder()
             .promptText("${ChatColor.GREEN}Please enter a new command.")

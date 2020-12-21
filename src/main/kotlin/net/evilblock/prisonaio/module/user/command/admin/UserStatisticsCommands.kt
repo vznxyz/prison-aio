@@ -21,8 +21,8 @@ import org.bukkit.command.CommandSender
 object UserStatisticsCommands {
 
     @Command(
-        names = ["user set-stat blocks-mined"],
-        description = "Set the blocks-mined statistic of a user",
+        names = ["user set-stat blocks-progress"],
+        description = "Set the blocks-progress statistic of a user",
         permission = Permissions.USERS_ADMIN,
         async = true
     )
@@ -33,12 +33,12 @@ object UserStatisticsCommands {
         user.statistics.setBlocksMined(amount)
         UserHandler.saveUser(user)
 
-        sender.sendMessage("${ChatColor.GREEN}Updated ${user.getUsername()}'s blocks-mined statistic to $amount.")
+        sender.sendMessage("${ChatColor.GREEN}Updated ${user.getUsername()}'s blocks-progress statistic to $amount.")
     }
 
     @Command(
-        names = ["user set-stat blocks-mined-at-mine"],
-        description = "Set the blocks-mined-at-mine statistic of a user",
+        names = ["user set-stat blocks-progress-at-mine"],
+        description = "Set the blocks-progress-at-mine statistic of a user",
         permission = Permissions.USERS_ADMIN,
         async = true
     )
@@ -59,7 +59,7 @@ object UserStatisticsCommands {
             UserHandler.saveUser(user)
         }
 
-        sender.sendMessage("${ChatColor.GREEN}Updated ${user.getUsername()}'s blocks-mined-at-mine statistic to $amount for mine ${ChatColor.BLUE}${mine.id}${ChatColor.GREEN}.")
+        sender.sendMessage("${ChatColor.GREEN}Updated ${user.getUsername()}'s blocks-progress-at-mine statistic to $amount for mine ${ChatColor.BLUE}${mine.id}${ChatColor.GREEN}.")
     }
 
     @Command(

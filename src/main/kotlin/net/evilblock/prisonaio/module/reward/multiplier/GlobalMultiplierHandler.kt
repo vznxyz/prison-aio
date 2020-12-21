@@ -18,7 +18,7 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import java.io.File
 
-object GlobalMultiplierHandler : PluginHandler {
+object GlobalMultiplierHandler : PluginHandler() {
 
     private var activeEvent: GlobalMultiplier? = null
 

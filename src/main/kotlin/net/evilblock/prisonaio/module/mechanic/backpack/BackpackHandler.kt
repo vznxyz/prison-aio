@@ -28,7 +28,7 @@ import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
-object BackpackHandler : PluginHandler {
+object BackpackHandler : PluginHandler() {
 
     @JvmStatic
     val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GREEN}${ChatColor.BOLD}Backpack${ChatColor.GRAY}] "

@@ -30,6 +30,7 @@ import net.evilblock.prisonaio.module.generator.Generator
 import net.evilblock.prisonaio.module.generator.GeneratorsModule
 import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.admin.AdminModule
+import net.evilblock.prisonaio.module.kit.KitsModule
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mine.Mine
@@ -50,7 +51,8 @@ import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import net.evilblock.prisonaio.service.ServicesThread
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
-import net.evilblock.prisonaio.module.warps.WarpsModule
+import net.evilblock.prisonaio.module.warp.WarpsModule
+import org.bukkit.Bukkit
 import org.bukkit.generator.ChunkGenerator
 
 class PrisonAIO : PluginFramework() {
@@ -105,6 +107,7 @@ class PrisonAIO : PluginFramework() {
 //            AchievementsModule,
             QuestsModule,
             WarpsModule,
+            KitsModule,
             ShopsModule,
             MinesModule,
             GangsModule,
@@ -125,6 +128,12 @@ class PrisonAIO : PluginFramework() {
             loaded = true
 
             ServicesThread().start()
+        }
+
+        Tasks.timer(60L, 60L) {
+            for (world in Bukkit.getWorlds()) {
+                world.time = 6000
+            }
         }
     }
 

@@ -15,6 +15,8 @@ object GeneratorTickService : Service {
     override fun run() {
         for (generator in GeneratorHandler.getGenerators()) {
             try {
+                generator.tickModifiers()
+
                 if (System.currentTimeMillis() >= generator.lastTick + generator.getTickInterval()) {
                     generator.lastTick = System.currentTimeMillis()
                     generator.tick()

@@ -54,6 +54,8 @@ class UserSettings(@Transient internal var user: User) {
         } else {
             disabledEnchantMessages.add(enchant)
         }
+
+        user.requiresSave = true
     }
 
 }

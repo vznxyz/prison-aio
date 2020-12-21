@@ -19,6 +19,10 @@ class EditNewsTextMenu(private val news: News) : TextEditorMenu(lines = news.lin
         supportsColors = true
     }
 
+    override fun getPrePaginatedTitle(player: Player): String {
+        return "Edit News Text"
+    }
+
     override fun onSave(player: Player, list: List<String>) {
         Tasks.async {
             news.lines = ArrayList(list)

@@ -21,7 +21,7 @@ import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.entity.Player
 import java.io.File
 
-object ChallengeHandler : PluginHandler {
+object ChallengeHandler : PluginHandler() {
 
     @JvmStatic
     val CHALLENGE_TYPES: MutableList<ChallengeType> = arrayListOf(

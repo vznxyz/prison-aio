@@ -18,7 +18,7 @@ import net.evilblock.prisonaio.module.admin.AdminModule
 import java.io.File
 import java.util.*
 
-object AnalyticHandler : PluginHandler {
+object AnalyticHandler : PluginHandler() {
 
     private val analytics: MutableMap<Analytic, Any?> = EnumMap(Analytic::class.java)
 

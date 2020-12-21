@@ -30,7 +30,7 @@ import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.util.*
 
-object ShopHandler: PluginHandler {
+object ShopHandler: PluginHandler() {
 
     private val shopsMap: MutableMap<String, Shop> = hashMapOf()
     private val receipts = hashMapOf<UUID, MutableSet<ShopReceipt>>()

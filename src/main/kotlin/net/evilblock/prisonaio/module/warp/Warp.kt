@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.warps
+package net.evilblock.prisonaio.module.warp
 
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
@@ -23,6 +23,14 @@ class Warp(val id: String, var location: Location) {
 
     var currency: Currency.Type? = null
     var price: Number? = null
+
+    fun getPermission(): String {
+        return "warps.${id.toLowerCase()}"
+    }
+
+    fun hasPermission(player: Player): Boolean {
+        return player.hasPermission(getPermission())
+    }
 
     fun getFormattedName(): String {
         if (displayName == id) {

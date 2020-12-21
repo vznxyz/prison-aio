@@ -17,7 +17,7 @@ import org.bukkit.entity.Player
 
 class EditDeliveryManRewardCommandsMenu(private val reward: DeliveryManReward) : TextEditorMenu(lines = reward.commands.toMutableList()) {
 
-    override fun getTitle(player: Player): String {
+    override fun getPrePaginatedTitle(player: Player): String {
         return "Edit Commands - ${reward.name}"
     }
 

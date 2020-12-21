@@ -18,8 +18,8 @@ object GangChallengeHandler {
     private val challenges: MutableMap<String, GangChallenge> = hashMapOf()
 
     fun initialLoad() {
-        trackChallenge(BlocksMinedGangChallenge("blocks-mined-500k", 5_000, 500_000))
-        trackChallenge(BlocksMinedGangChallenge("blocks-mined-1m", 10_000, 1_000_000))
+        trackChallenge(BlocksMinedGangChallenge("blocks-progress-500k", 5_000, 500_000))
+        trackChallenge(BlocksMinedGangChallenge("blocks-progress-1m", 10_000, 1_000_000))
         trackChallenge(AcquirePrestigesGangChallenge("acquire-prestiges", 5_000, 250))
         trackChallenge(AcquireTrophiesGangChallenge("acquire-prestiges", 20_000, 200_000))
         trackChallenge(LeaderboardsPlacementGangChallenge("leaderboards-placement", 10_000))

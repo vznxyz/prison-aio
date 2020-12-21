@@ -18,8 +18,8 @@ import org.bukkit.entity.Player
 object PickaxeSetBlocksMinedCommand {
 
     @Command(
-        names = ["pickaxe set-stat blocks-mined"],
-        description = "Set the blocks mined statistic of a pickaxe",
+        names = ["pickaxe set-stat blocks-progress"],
+        description = "Set the blocks progress statistic of a pickaxe",
         permission = "prisonaio.pickaxe.set-stat",
         async = true
     )
@@ -41,7 +41,7 @@ object PickaxeSetBlocksMinedCommand {
         pickaxeData.applyMeta(itemInHand)
 
         player.updateInventory()
-        player.sendMessage("${ChatColor.GREEN}Updated pickaxe's blocks-mined statistic to ${NumberUtils.format(blocksMined)}!")
+        player.sendMessage("${ChatColor.GREEN}Updated pickaxe's blocks-progress statistic to ${NumberUtils.format(blocksMined)}!")
     }
 
 }

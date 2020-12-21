@@ -16,6 +16,10 @@ import org.bukkit.entity.Player
 
 class EditShopItemCommandsMenu(private val shop: Shop, private val shopItem: ShopItem) : TextEditorMenu(lines = shopItem.commands) {
 
+    override fun getPrePaginatedTitle(player: Player): String {
+        return "Edit Shop Item Commands"
+    }
+
     override fun onClose(player: Player) {
         Tasks.delayed(1L) {
             EditShopMenu(shop).openMenu(player)

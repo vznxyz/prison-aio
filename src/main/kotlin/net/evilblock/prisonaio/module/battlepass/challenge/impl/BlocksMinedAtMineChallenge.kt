@@ -78,7 +78,7 @@ class BlocksMinedAtMineChallenge(id: String, @JsonAdapter(MineReferenceSerialize
         }
 
         override fun getDescription(): String {
-            return "Reach a certain amount of blocks mined at a certain mine"
+            return "Reach a certain amount of blocks progress at a certain mine"
         }
 
         override fun getIcon(): ItemStack {

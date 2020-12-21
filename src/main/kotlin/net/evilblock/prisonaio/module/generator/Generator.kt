@@ -115,11 +115,7 @@ abstract class Generator(
         }
     }
 
-    open fun tick() {
-        if (!build.finished) {
-            build.tick()
-        }
-
+    open fun tickModifiers() {
         if (getMaxModifiers() > 0) {
             val expired = arrayListOf<GeneratorModifier>()
             for (modifier in modifiers.values) {
@@ -156,6 +152,12 @@ abstract class Generator(
                     }
                 }
             }
+        }
+    }
+
+    open fun tick() {
+        if (!build.finished) {
+            build.tick()
         }
     }
 

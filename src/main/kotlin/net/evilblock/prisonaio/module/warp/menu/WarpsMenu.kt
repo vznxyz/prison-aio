@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.warps.menu
+package net.evilblock.prisonaio.module.warp.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.buttons.BackButton
@@ -16,11 +16,13 @@ import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.menu.MainMenu
-import net.evilblock.prisonaio.module.warps.Warp
-import net.evilblock.prisonaio.module.warps.WarpHandler
+import net.evilblock.prisonaio.module.warp.Warp
+import net.evilblock.prisonaio.module.warp.WarpHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 
 class WarpsMenu : PaginatedMenu() {
@@ -84,10 +86,14 @@ class WarpsMenu : PaginatedMenu() {
                 desc.addAll(TextSplitter.split(text = warp.description))
                 desc.add("")
 
-                if (warp.isPriceSet()) {
-                    desc.add(styleAction(ChatColor.GREEN, "LEFT-CLICK", "to teleport for ${warp.currency!!.format(warp.price!!)}"))
+                if (warp.hasPermission(player)) {
+                    if (warp.isPriceSet()) {
+                        desc.add(styleAction(ChatColor.GREEN, "LEFT-CLICK", "to teleport for ${warp.currency!!.format(warp.price!!)}"))
+                    } else {
+                        desc.add(styleAction(ChatColor.GREEN, "LEFT-CLICK", "to teleport"))
+                    }
                 } else {
-                    desc.add(styleAction(ChatColor.GREEN, "LEFT-CLICK", "to teleport"))
+                    desc.add("${ChatColor.RED}No permission to access this warp!")
                 }
             }
         }
@@ -97,6 +103,23 @@ class WarpsMenu : PaginatedMenu() {
                 .name(getName(player))
                 .setLore(getDescription(player))
                 .build()
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (!warp.hasPermission(player)) {
+                player.sendMessage("${ChatColor.RED}You don't have access to that warp!")
+                return
+            }
+
+            if (warp.isPriceSet()) {
+                if (warp.canAfford(player)) {
+                    warp.teleport(player)
+                } else {
+                    player.sendMessage("${ChatColor.RED}You can't afford to purchase that warp!")
+                }
+            } else {
+                warp.teleport(player)
+            }
         }
     }
 

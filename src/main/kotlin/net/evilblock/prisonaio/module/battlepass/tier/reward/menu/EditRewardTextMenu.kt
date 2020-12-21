@@ -17,6 +17,10 @@ import org.bukkit.entity.Player
 
 class EditRewardTextMenu(private val reward: Reward) : TextEditorMenu(reward.textLines) {
 
+    override fun getPrePaginatedTitle(player: Player): String {
+        return "Edit Reward Text"
+    }
+
     override fun getPromptBuilder(player: Player, index: Int): EzPrompt.Builder {
         return EzPrompt.Builder()
             .promptText("${ChatColor.GREEN}Please enter the new text.")

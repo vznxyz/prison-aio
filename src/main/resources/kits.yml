@@ -1,0 +1,5 @@
+# The public kits menu title
+menu-title: "&c&lKits"
+
+# The chat prefix that is prepended to kits messages
+chat-prefix: "&7[&c&lKits&7] "

@@ -17,7 +17,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 
-object MineCrateHandler : PluginHandler {
+object MineCrateHandler : PluginHandler() {
 
     private var rewardSets: MutableList<MineCrateRewardSet> = arrayListOf()
     private var spawnedCrates = hashMapOf<Location, MineCrate>()

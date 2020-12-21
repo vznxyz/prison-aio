@@ -18,7 +18,7 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-object RankHandler : PluginHandler {
+object RankHandler : PluginHandler() {
 
     private val ranksMap: MutableMap<String, Rank> = hashMapOf()
 

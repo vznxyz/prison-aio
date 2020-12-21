@@ -11,10 +11,13 @@ import net.evilblock.cubed.scoreboard.ScoreGetter
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.ProgressBarBuilder
+import net.evilblock.cubed.util.TextUtil
 import net.evilblock.cubed.util.TimeUtil
+import net.evilblock.cubed.util.bukkit.Rainbow
 import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldownHandler
 import net.evilblock.prisonaio.module.combat.enderpearl.EnderpearlCooldownHandler
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
+import net.evilblock.prisonaio.module.mine.variant.mineparty.MinePartyHandler
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.rank.RankHandler
 import net.evilblock.prisonaio.module.region.RegionHandler
@@ -106,23 +109,40 @@ object PrisonScoreGetter : ScoreGetter {
 
         scores.add("")
 
-        val nextRank = RankHandler.getNextRank(user.getRank())
-        if (nextRank != null) {
-            val nextRankPrice = nextRank.getPrice(user.getPrestige())
-            val formattedPrice = NumberUtils.format(nextRankPrice)
+        val minePartyEvent = MinePartyHandler.getEvent()
+        if (minePartyEvent != null) {
+            val color = Rainbow.currentColor
 
-            val progressPercentage = if (user.hasMoneyBalance(nextRankPrice)) {
-                100.0
-            } else {
-                (moneyBalance.toDouble() / nextRankPrice) * 100.0
+            val formattedTime = TimeUtil.formatIntoAbbreviatedString(minePartyEvent.getRemainingSeconds())
+            val formattedProgress = NumberUtils.format(minePartyEvent.progress)
+            val formattedGoal = NumberUtils.format(minePartyEvent.goal)
+
+            val progressPercentage = NumberUtils.percentage(minePartyEvent.progress, minePartyEvent.goal)
+            val progressBar = ProgressBarBuilder().build(progressPercentage)
+
+            scores.add("${padding}${color}${ChatColor.BOLD}MineParty ${ChatColor.GRAY}(/mineparty)")
+            scores.add("${ChatColor.GRAY}Time: ${color}${ChatColor.BOLD}$formattedTime")
+            scores.add("${ChatColor.GRAY}Progress: ${color}${ChatColor.BOLD}${formattedProgress}${ChatColor.GRAY}/${formattedGoal}")
+            scores.add("${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}${progressBar}${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} ${TextUtil.colorPercentage(progressPercentage)}${progressPercentage}%")
+        } else {
+            val nextRank = RankHandler.getNextRank(user.getRank())
+            if (nextRank != null) {
+                val nextRankPrice = nextRank.getPrice(user.getPrestige())
+                val formattedPrice = NumberUtils.format(nextRankPrice)
+
+                val progressPercentage = if (user.hasMoneyBalance(nextRankPrice)) {
+                    100.0
+                } else {
+                    (moneyBalance.toDouble() / nextRankPrice) * 100.0
+                }
+
+                val progressColor = ProgressBarBuilder.colorPercentage(progressPercentage)
+                val progressBar = ProgressBarBuilder(char = '⬛').build(progressPercentage)
+
+                scores.add("${padding}$primaryColor${ChatColor.BOLD}Rankup")
+                scores.add("${padding}${ChatColor.GRAY}${user.getRank().displayName} ${ChatColor.GRAY}-> ${nextRank.displayName} ${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedPrice")
+                scores.add("${padding}${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} $progressColor${progressPercentage.toInt()}%")
             }
-
-            val progressColor = ProgressBarBuilder.colorPercentage(progressPercentage)
-            val progressBar = ProgressBarBuilder(char = '⬛').build(progressPercentage)
-
-            scores.add("${padding}$primaryColor${ChatColor.BOLD}Rankup")
-            scores.add("${padding}${ChatColor.GRAY}${user.getRank().displayName} ${ChatColor.GRAY}-> ${nextRank.displayName} ${ChatColor.GREEN}$${ChatColor.YELLOW}$formattedPrice")
-            scores.add("${padding}${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}$progressBar${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE} $progressColor${progressPercentage.toInt()}%")
         }
 
         renderBorders(user, scores)

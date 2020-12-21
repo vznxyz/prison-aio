@@ -22,7 +22,7 @@ import net.minecraft.server.v1_12_R1.IBlockData
 import org.bukkit.Location
 import java.lang.reflect.Type
 
-class NormalMine(id: String) : Mine(id = id) {
+open class NormalMine(id: String) : Mine(id = id) {
 
     val blocksConfig: MineBlocksConfig = MineBlocksConfig()
     val resetConfig: MineResetConfig = MineResetConfig()

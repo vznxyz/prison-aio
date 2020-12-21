@@ -52,7 +52,7 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
 
             if (generator.modifierStorage.any { it != null }) {
                 for ((index, itemStack) in generator.modifierStorage.withIndex()) {
-                    if (itemStack != null) {
+                    if (itemStack != null && index < MODIFIER_SLOTS.size) {
                         buttons[MODIFIER_SLOTS[index]] = ModifierItemButton(itemStack)
                     }
                 }
@@ -61,7 +61,9 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
             if (generator.hasItemStorage()) {
                 val itemsStorage = generator.getItemStorage()
                 for ((index, itemStack) in itemsStorage.withIndex()) {
-                    buttons[STORAGE_SLOTS[index]] = ItemStorageButton(itemStack)
+                    if (index < STORAGE_SLOTS.size) {
+                        buttons[STORAGE_SLOTS[index]] = ItemStorageButton(itemStack)
+                    }
                 }
             }
 
@@ -74,6 +76,10 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
 
             buttons[43] = DestroyButton()
         }
+    }
+
+    override fun size(buttons: Map<Int, Button>): Int {
+        return 54
     }
 
     override fun getAutoUpdateTicks(): Long {

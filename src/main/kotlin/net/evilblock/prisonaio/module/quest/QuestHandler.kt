@@ -24,7 +24,7 @@ import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import java.util.*
 
-object QuestHandler : PluginHandler {
+object QuestHandler : PluginHandler() {
 
     private val quests = arrayListOf<Quest>(TutorialQuest)
     private val missionEntities: MutableMap<UUID, MutableList<Entity>> = hashMapOf()

@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.warps
+package net.evilblock.prisonaio.module.warp
 
 import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
@@ -15,7 +15,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
-object WarpHandler : PluginHandler {
+object WarpHandler : PluginHandler() {
 
     private val warps: MutableMap<String, Warp> = ConcurrentHashMap()
 

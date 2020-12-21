@@ -70,6 +70,8 @@ object PrestigeCommand {
             }
         }
 
+        user.applyPermissions(player)
+
         player.sendMessage("")
         player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Entered Next Prestige")
         player.sendMessage(" ${ChatColor.GRAY}Congratulations on entering the next prestige! Your")

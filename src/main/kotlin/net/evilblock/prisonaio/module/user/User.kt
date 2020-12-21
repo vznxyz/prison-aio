@@ -491,7 +491,7 @@ class User(val uuid: UUID) {
     }
 
     /**
-     * Gets the remaining milliseconds until the user can claim the given [reward].
+     * Gets the progress milliseconds until the user can claim the given [reward].
      */
     fun getRemainingRewardCooldown(reward: DeliveryManReward): Long {
         return (claimedRewards[reward]!! + reward.cooldown.timeDuration) - System.currentTimeMillis()

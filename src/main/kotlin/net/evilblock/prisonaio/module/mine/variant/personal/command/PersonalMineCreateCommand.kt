@@ -32,7 +32,7 @@ object PersonalMineCreateCommand {
 
             player.sendMessage("")
             player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Private Mine Ready")
-            player.sendMessage(" ${ChatColor.GRAY}Your private mine is ready to be mined!")
+            player.sendMessage(" ${ChatColor.GRAY}Your private mine is ready to be progress!")
             player.sendMessage(" ${ChatColor.YELLOW}Type /pmine to get started!")
             player.sendMessage("")
         } catch (e: IllegalStateException) {

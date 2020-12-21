@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-object RobotHandler : PluginHandler {
+object RobotHandler : PluginHandler() {
 
     private val dataType = object : TypeToken<List<Robot>>() {}.type
     private val backupsFolder = File(getModule().getPluginFramework().dataFolder, "backups")

@@ -35,7 +35,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
-object UserHandler : PluginHandler {
+object UserHandler : PluginHandler() {
 
     val NICKNAME_COLORS: List<ChatColor> = listOf(ChatColor.RED, ChatColor.GOLD, ChatColor.YELLOW, ChatColor.GREEN, ChatColor.DARK_GREEN, ChatColor.AQUA, ChatColor.DARK_AQUA, ChatColor.BLUE, ChatColor.DARK_PURPLE, ChatColor.LIGHT_PURPLE, ChatColor.WHITE, ChatColor.GRAY)
     val NICKNAME_STYLES: List<ChatColor> = listOf(ChatColor.BOLD, ChatColor.ITALIC, ChatColor.UNDERLINE)

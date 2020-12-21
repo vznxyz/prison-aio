@@ -121,7 +121,7 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
                 if (gang.isPastMember(invitedPlayer)) {
                     if (gang.getForceInvites() <= 0) {
                         sender.sendMessage("${ChatColor.RED}You must use a force-invite on that player, as they were once a member of your gang!")
-                        sender.sendMessage("${ChatColor.RED}You have no remaining force-invites!")
+                        sender.sendMessage("${ChatColor.RED}You have no progress force-invites!")
                     } else {
                         ConfirmMenu("Use Force Invite?") { confirmed ->
                             if (confirmed) {
@@ -140,7 +140,7 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
                                 }
 
                                 if (gang.getForceInvites() <= 0) {
-                                    sender.sendMessage("${ChatColor.RED}You have no remaining force-invites!")
+                                    sender.sendMessage("${ChatColor.RED}You have no progress force-invites!")
                                     return@ConfirmMenu
                                 }
 

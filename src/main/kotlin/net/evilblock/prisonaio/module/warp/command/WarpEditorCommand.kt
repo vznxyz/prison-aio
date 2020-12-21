@@ -5,10 +5,10 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.warps.command
+package net.evilblock.prisonaio.module.warp.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.prisonaio.module.warps.menu.WarpEditorMenu
+import net.evilblock.prisonaio.module.warp.menu.WarpEditorMenu
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.entity.Player
 

@@ -12,6 +12,7 @@ import net.evilblock.cubed.entity.hologram.updating.UpdatingHologramEntity
 import net.evilblock.cubed.entity.villager.VillagerEntity
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.generator.Generator
+import net.evilblock.prisonaio.module.generator.GeneratorHandler
 import net.evilblock.prisonaio.module.generator.build.mode.BuildModeHandler
 import net.evilblock.prisonaio.module.generator.menu.GeneratorMenu
 import org.bukkit.ChatColor
@@ -41,6 +42,11 @@ class GeneratorVillagerEntity(location: Location) : VillagerEntity(lines = listO
     override fun onRightClick(player: Player) {
         if (BuildModeHandler.isInMode(player)) {
             player.sendMessage("${ChatColor.RED}You can't access Generator NPCs while in Build Mode!")
+            return
+        }
+
+        if (!GeneratorHandler.canAccess(player)) {
+            player.sendMessage("${ChatColor.RED}That's not yours!")
             return
         }
 

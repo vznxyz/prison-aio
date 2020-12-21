@@ -13,7 +13,7 @@ import net.evilblock.prisonaio.module.combat.CombatModule
 import org.bukkit.entity.Player
 import java.util.*
 
-object CombatTimerHandler : PluginHandler {
+object CombatTimerHandler : PluginHandler() {
 
     private val timers: MutableMap<UUID, CombatTimer> = hashMapOf()
 

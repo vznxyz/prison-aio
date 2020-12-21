@@ -23,7 +23,7 @@ import net.evilblock.prisonaio.module.reward.deliveryman.reward.requirement.impl
 import org.bukkit.ChatColor
 import java.io.File
 
-object DeliveryManHandler : PluginHandler {
+object DeliveryManHandler : PluginHandler() {
 
     @JvmStatic
     val REQUIREMENT_REGISTRY: MutableList<DeliveryManRewardRequirementType<*>> = arrayListOf(

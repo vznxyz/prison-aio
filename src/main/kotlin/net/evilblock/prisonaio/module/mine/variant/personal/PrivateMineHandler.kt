@@ -37,7 +37,7 @@ import kotlin.collections.set
 /**
  * A 2-dimensional grid filled in a linear sequence.
  */
-object PrivateMineHandler : PluginHandler {
+object PrivateMineHandler : PluginHandler() {
 
     private val schematicFile: File = File(File(Bukkit.getPluginManager().getPlugin("WorldEdit").dataFolder, "schematics"), "PrivateMine.schematic")
 

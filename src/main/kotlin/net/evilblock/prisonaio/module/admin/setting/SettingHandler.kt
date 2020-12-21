@@ -18,7 +18,7 @@ import net.evilblock.prisonaio.module.admin.AdminModule
 import java.io.File
 import java.util.*
 
-object SettingHandler : PluginHandler {
+object SettingHandler : PluginHandler() {
 
     private val settings: MutableMap<Setting, Any?> = EnumMap(Setting::class.java)
 

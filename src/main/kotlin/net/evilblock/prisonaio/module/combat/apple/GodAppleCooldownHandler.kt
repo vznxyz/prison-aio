@@ -12,7 +12,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import java.util.*
 
-object GodAppleCooldownHandler : PluginHandler {
+object GodAppleCooldownHandler : PluginHandler() {
 
     private val cooldowns: MutableMap<UUID, GodAppleCooldown> = hashMapOf()
 

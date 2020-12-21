@@ -11,7 +11,7 @@ import net.evilblock.prisonaio.module.combat.deathmessage.trackers.*
 import org.bukkit.entity.Player
 import java.util.*
 
-object DeathMessageHandler : PluginHandler {
+object DeathMessageHandler : PluginHandler() {
 
     private val damage: MutableMap<UUID, MutableList<Damage>> = hashMapOf()
 

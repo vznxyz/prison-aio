@@ -21,7 +21,7 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-object PickaxeHandler : PluginHandler {
+object PickaxeHandler : PluginHandler() {
 
     private val pickaxes: MutableMap<UUID, PickaxeData> = ConcurrentHashMap()
 

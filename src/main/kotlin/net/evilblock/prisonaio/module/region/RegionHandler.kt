@@ -26,7 +26,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import java.io.File
 
-object RegionHandler : PluginHandler {
+object RegionHandler : PluginHandler() {
 
     private val DATA_TYPE = object : TypeToken<List<Region>>() {}.type
 

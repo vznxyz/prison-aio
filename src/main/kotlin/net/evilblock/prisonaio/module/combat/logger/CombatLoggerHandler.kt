@@ -12,7 +12,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import java.util.*
 
-object CombatLoggerHandler : PluginHandler {
+object CombatLoggerHandler : PluginHandler() {
 
     private val loggers: MutableMap<UUID, CombatLogger> = hashMapOf()
 

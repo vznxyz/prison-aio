@@ -5,11 +5,11 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.warps.command.parameter
+package net.evilblock.prisonaio.module.warp.command.parameter
 
 import net.evilblock.cubed.command.data.parameter.ParameterType
-import net.evilblock.prisonaio.module.warps.Warp
-import net.evilblock.prisonaio.module.warps.WarpHandler
+import net.evilblock.prisonaio.module.warp.Warp
+import net.evilblock.prisonaio.module.warp.WarpHandler
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player

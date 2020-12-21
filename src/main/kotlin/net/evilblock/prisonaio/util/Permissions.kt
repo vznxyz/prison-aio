@@ -61,12 +61,11 @@ object Permissions {
     const val EVENTS_TOGGLE = "prisonaio.events.toggle"
     const val EVENTS_EDIT = "prisonaio.events.edit"
 
+    const val MINE_PARTY = "prisonaio.mineparty.admin"
     const val GLOBAL_MULTIPLIER = "prisonaio.rewards.global-multi"
-
     const val ABILITY_ARMOR_GIVE = "prisonaio.ability-armor.give"
-
     const val COINFLIP_MANAGE = "prisonaio.minigame.coinflip.admin.toggle"
-
     const val PMINE_CREATE = "prisonaio.pmine.create"
+    const val AUCTION_HOUSE_MOD = "prisonaio.auctionhouse.mod"
 
 }

@@ -17,7 +17,7 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import java.io.File
 
-object TierHandler : PluginHandler {
+object TierHandler : PluginHandler() {
 
     private val tiers: MutableMap<Int, Tier> = hashMapOf()
 

@@ -22,7 +22,7 @@ import org.bukkit.ChatColor
 import java.io.File
 import java.util.*
 
-object CoinFlipHandler : PluginHandler {
+object CoinFlipHandler : PluginHandler() {
 
     val CHAT_PREFIX: String = "${ChatColor.GRAY}[${ChatColor.AQUA}${ChatColor.BOLD}COIN${ChatColor.YELLOW}${ChatColor.BOLD}FLIP${ChatColor.GRAY}] "
     val PRIMARY_COLOR = ChatColor.WHITE

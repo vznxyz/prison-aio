@@ -20,7 +20,7 @@ import net.evilblock.prisonaio.module.mine.variant.luckyblock.service.ProcessSpa
 import net.evilblock.prisonaio.service.ServiceRegistry
 import java.io.File
 
-object LuckyBlockHandler : PluginHandler {
+object LuckyBlockHandler : PluginHandler() {
 
     var disabled: Boolean = false
 

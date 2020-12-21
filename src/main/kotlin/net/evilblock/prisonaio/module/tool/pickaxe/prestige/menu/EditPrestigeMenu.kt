@@ -201,14 +201,14 @@ class EditPrestigeMenu(private val prestige: PickaxePrestigeInfo) : Menu() {
 
             description.addAll(TextSplitter.split(
                 length = 40,
-                text = "The amount of blocks a player must have mined to level their pickaxe to this prestige.",
+                text = "The amount of blocks a player must have progress to level their pickaxe to this prestige.",
                 linePrefix = ChatColor.GRAY.toString()
             ))
 
             description.add("")
             description.add("${ChatColor.GRAY}Current requirement: ${NumberUtils.format(prestige.blocksMinedRequired)}")
             description.add("")
-            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit blocks mined requirement")
+            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to edit blocks progress requirement")
 
             return description
         }
@@ -219,7 +219,7 @@ class EditPrestigeMenu(private val prestige: PickaxePrestigeInfo) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                NumberPrompt().withText("${ChatColor.GREEN}Please input the amount of blocks mined required.").acceptInput { number ->
+                NumberPrompt().withText("${ChatColor.GREEN}Please input the amount of blocks progress required.").acceptInput { number ->
                     assert(number.toInt() > 0) { "Number must be more than 0" }
 
                     prestige.blocksMinedRequired = number.toInt()

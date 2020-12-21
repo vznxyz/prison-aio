@@ -60,7 +60,7 @@ class ProfileStatisticsMenu(user: User) : ProfileLayoutMenu(layout = ProfileLayo
         override fun getDescription(player: Player): List<String> {
             return TextSplitter.split(
                 length = 36,
-                text = "${layout.user.getUsername()} has mined ${NumberFormat.getInstance().format(layout.user.statistics.getBlocksMined())} blocks.",
+                text = "${layout.user.getUsername()} has progress ${NumberFormat.getInstance().format(layout.user.statistics.getBlocksMined())} blocks.",
                 linePrefix = "${ChatColor.GRAY}"
             )
         }

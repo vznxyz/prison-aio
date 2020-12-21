@@ -24,7 +24,7 @@ import org.bukkit.entity.Player
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
-object EventGameHandler : PluginHandler {
+object EventGameHandler : PluginHandler() {
 
     private val GAME_COOLDOWN = TimeUnit.MINUTES.toMillis(5L)
 

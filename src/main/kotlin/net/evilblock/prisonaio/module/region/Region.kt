@@ -108,7 +108,7 @@ abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : Abs
             cancellable.isCancelled = true
         }
 
-        if (victim is ItemFrame) {
+        if (victim is ItemFrame || victim is Painting) {
             if (attacker is Player) {
                 if (!RegionHandler.bypassCheck(attacker, cancellable)) {
                     cancellable.isCancelled = true

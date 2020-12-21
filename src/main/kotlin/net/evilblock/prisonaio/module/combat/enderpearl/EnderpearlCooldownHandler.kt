@@ -14,7 +14,7 @@ import net.evilblock.prisonaio.module.combat.CombatModule
 import org.bukkit.Bukkit
 import java.util.*
 
-object EnderpearlCooldownHandler : PluginHandler {
+object EnderpearlCooldownHandler : PluginHandler() {
 
     private val cooldowns: MutableMap<UUID, EnderpearlCooldown> = hashMapOf()
 

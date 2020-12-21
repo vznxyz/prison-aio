@@ -25,7 +25,7 @@ import org.bson.json.JsonWriterSettings
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-object AuctionHouseHandler : PluginHandler {
+object AuctionHouseHandler : PluginHandler() {
 
     private val JSON_WRITER_SETTINGS = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()
     private val LISTING_TYPE = object : TypeToken<Listing>() {}.type

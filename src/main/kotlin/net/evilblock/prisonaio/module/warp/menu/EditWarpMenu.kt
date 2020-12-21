@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.warps.menu
+package net.evilblock.prisonaio.module.warp.menu
 
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -17,8 +17,8 @@ import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.InputPrompt
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
-import net.evilblock.prisonaio.module.warps.Warp
-import net.evilblock.prisonaio.module.warps.WarpHandler
+import net.evilblock.prisonaio.module.warp.Warp
+import net.evilblock.prisonaio.module.warp.WarpHandler
 import net.evilblock.prisonaio.module.mechanic.economy.menu.SelectCurrencyMenu
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -80,7 +80,7 @@ class EditWarpMenu(private val warp: Warp) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                warp.teleport(player)
+                player.teleport(warp.location)
             }
         }
     }

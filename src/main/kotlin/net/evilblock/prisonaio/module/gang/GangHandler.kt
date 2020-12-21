@@ -45,7 +45,7 @@ import kotlin.collections.set
 /**
  * A 2-dimensional grid filled in a linear sequence.
  */
-object GangHandler : PluginHandler {
+object GangHandler : PluginHandler() {
 
     val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GOLD}${ChatColor.BOLD}Gangs${ChatColor.GRAY}] "
     val INVITE_EXPIRE_TIME = TimeUnit.HOURS.toMillis(2L)

@@ -84,7 +84,7 @@ enum class GeneratorModifierType(
             try {
                 return valueOf(source)
             } catch (e: Exception) {
-                sender.sendMessage("${ChatColor.RED}Couldn't find a gang booster by that name.")
+                sender.sendMessage("${ChatColor.RED}Couldn't find a modifier type by that name!")
             }
             return null
         }

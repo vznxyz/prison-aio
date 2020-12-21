@@ -18,6 +18,7 @@ import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
+import net.evilblock.prisonaio.module.auction.AuctionHouseHandler
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
 import net.evilblock.prisonaio.module.auction.listing.Listing
 import net.evilblock.prisonaio.module.auction.listing.ListingType
@@ -39,6 +40,7 @@ import net.evilblock.prisonaio.module.auction.menu.sort.impl.PriceLowToHighListi
 import net.evilblock.prisonaio.module.auction.notification.AHNotification
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.menu.MainMenu
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -47,6 +49,8 @@ import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import java.math.BigInteger
+import java.util.*
+import kotlin.collections.ArrayList
 
 abstract class BrowseListingsMenu : AuctionHouseLayoutMenu() {
 
@@ -147,6 +151,10 @@ abstract class BrowseListingsMenu : AuctionHouseLayoutMenu() {
                         }
                     }
                 }
+
+                if (player.hasPermission(Permissions.AUCTION_HOUSE_MOD)) {
+                    info.add("${ChatColor.WHITE}${ChatColor.BOLD}MIDDLE-CLICK ${ChatColor.WHITE}to refund listing (mod)")
+                }
             }
 
             return ItemBuilder.copyOf(listing.getGoods()).addToLore(*info.toTypedArray()).build().also {
@@ -164,6 +172,42 @@ abstract class BrowseListingsMenu : AuctionHouseLayoutMenu() {
             }
 
             if (!listing.isCompleted()) {
+                if (clickType == ClickType.MIDDLE && player.hasPermission(Permissions.AUCTION_HOUSE_MOD)) {
+                    ConfirmMenu { confirmed ->
+                        if (confirmed) {
+                            listing.setDeleted(player.uniqueId)
+
+                            Tasks.async {
+                                AuctionHouseHandler.saveListing(listing)
+
+                                val vendor = UserHandler.getOrLoadAndCacheUser(listing.createdBy)
+                                vendor.auctionHouseData.addReturnedListing(listing)
+
+                                val returnedBids = hashMapOf<UUID, ListingBid>()
+                                for (bid in listing.getBidHistory()) {
+                                    if (returnedBids.containsKey(bid.createdBy)) {
+                                        if (bid.amount >= returnedBids[bid.createdBy]!!.amount) {
+                                            returnedBids[bid.createdBy] = bid
+                                        }
+                                    } else {
+                                        returnedBids[bid.createdBy] = bid
+                                    }
+                                }
+
+                                for ((uuid, bid) in returnedBids) {
+                                    val user = UserHandler.getOrLoadAndCacheUser(uuid)
+                                    user.auctionHouseData.addNotification(AHNotification(message = "${ChatColor.GRAY}Your bid of ${listing.getCurrencyType().format(bid.amount)} ${ChatColor.GRAY}on ${ChatColor.RED}${listing.getCreatorUsername()}${ChatColor.GRAY}'s auction has been returned!"))
+
+                                    listing.getCurrencyType().give(uuid, bid.amount)
+                                }
+                            }
+                        }
+
+                        this@BrowseListingsMenu.openMenu(player)
+                    }.openMenu(player)
+                    return
+                }
+
                 when (listing.listingType) {
                     ListingType.AUCTION -> {
                         if (player.uniqueId == listing.createdBy) {

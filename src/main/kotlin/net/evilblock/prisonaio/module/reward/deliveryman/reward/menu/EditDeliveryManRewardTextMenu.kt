@@ -21,7 +21,7 @@ class EditDeliveryManRewardTextMenu(private val reward: DeliveryManReward) : Tex
         supportsColors = true
     }
 
-    override fun getTitle(player: Player): String {
+    override fun getPrePaginatedTitle(player: Player): String {
         return "Edit Rewards Text - ${reward.name}"
     }
 

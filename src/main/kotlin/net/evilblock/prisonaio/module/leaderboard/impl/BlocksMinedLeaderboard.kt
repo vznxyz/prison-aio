@@ -17,7 +17,7 @@ import org.bson.Document
 import org.bukkit.ChatColor
 import java.util.*
 
-object BlocksMinedLeaderboard : Leaderboard("blocks-mined", "${ChatColor.AQUA}${ChatColor.BOLD}Top Blocks Mined") {
+object BlocksMinedLeaderboard : Leaderboard("blocks-progress", "${ChatColor.AQUA}${ChatColor.BOLD}Top Blocks Mined") {
 
     override fun fetchEntries(): List<LeaderboardEntry<*>> {
         val entries = arrayListOf<LeaderboardEntry<Int>>()

@@ -39,6 +39,8 @@ object RenameTagListeners : Listener {
         event.cursor = null
         event.isCancelled = true
 
+        val renameTagItem = event.cursor
+
         val pickaxeItem = event.currentItem
         val pickaxeData = PickaxeHandler.getPickaxeData(pickaxeItem) ?: return
 
@@ -50,6 +52,18 @@ object RenameTagListeners : Listener {
                     .withText("${ChatColor.GREEN}Please input a new name for your pickaxe. ${ChatColor.GRAY}(Limited to 32 characters)")
                     .withLimit(32)
                     .acceptInput { input ->
+                        val first = player.inventory.first(renameTagItem)
+                        if (first == -1) {
+                            player.sendMessage("${ChatColor.RED}You don't have a Rename Tag in your inventory!")
+                            return@acceptInput
+                        }
+
+                        val itemAtSlot = player.inventory.getItem(first)
+                        if (itemAtSlot == null) {
+                            player.sendMessage("${ChatColor.RED}You don't have a Rename Tag in your inventory!")
+                            return@acceptInput
+                        }
+
                         val colored = ChatColor.translateAlternateColorCodes('&', input)
                         val stripped = ChatColor.stripColor(colored)
 
@@ -61,11 +75,17 @@ object RenameTagListeners : Listener {
                         pickaxeData.customName = colored
                         pickaxeData.applyMeta(pickaxeItem)
 
+                        if (itemAtSlot.amount <= 1) {
+                            player.inventory.setItem(first, null)
+                        } else {
+                            itemAtSlot.amount--
+                        }
+
                         player.updateInventory()
                     }
                     .start(player)
             }
-        }
+        }.openMenu(player)
     }
 
 }

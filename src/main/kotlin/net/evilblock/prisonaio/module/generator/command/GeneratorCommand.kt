@@ -8,8 +8,8 @@
 package net.evilblock.prisonaio.module.generator.command
 
 import net.evilblock.cubed.command.Command
+import net.evilblock.prisonaio.module.generator.GeneratorHandler
 import net.evilblock.prisonaio.module.generator.menu.PanelMenu
-import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.plot.PlotUtil
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -22,28 +22,13 @@ object GeneratorCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        if (!canAccess(player)) {
+        if (!GeneratorHandler.canAccess(player)) {
             player.sendMessage("${ChatColor.RED}You must be standing on a plot you own to view your Generator Panel!")
             return
         }
 
         val plot = PlotUtil.getPlot(player.location) ?: throw IllegalAccessException("Plot is null")
         PanelMenu(plot).openMenu(player)
-    }
-
-    private fun canAccess(player: Player): Boolean {
-        val plot = PlotUtil.getPlot(player.location) ?: return false
-
-        if (RegionBypass.hasBypass(player)) {
-            RegionBypass.attemptNotify(player)
-            return true
-        }
-
-        if (plot.isOwner(player.uniqueId)) {
-            return true
-        }
-
-        return false
     }
 
 }

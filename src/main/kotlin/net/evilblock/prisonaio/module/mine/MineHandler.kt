@@ -23,7 +23,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 
-object MineHandler : PluginHandler {
+object MineHandler : PluginHandler() {
 
     private val minesMap: MutableMap<String, Mine> = ConcurrentHashMap()
 

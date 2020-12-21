@@ -20,6 +20,7 @@ import net.evilblock.prisonaio.module.mine.service.MineResetService
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.LuckyBlockHandler
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.command.LuckyBlockEditorCommand
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.command.LuckyBlockToggleCommand
+import net.evilblock.prisonaio.module.mine.variant.mineparty.command.*
 import net.evilblock.prisonaio.module.mine.variant.personal.PrivateMineHandler
 import net.evilblock.prisonaio.module.mine.variant.personal.command.*
 import net.evilblock.prisonaio.module.mine.variant.personal.listener.PrivateMineInternalDataListeners
@@ -73,6 +74,11 @@ object MinesModule : PluginModule() {
             MineSetSpawnCommand::class.java,
             MineListCommand::class.java,
             MineTeleportCommand::class.java,
+            JoinEventCommand.javaClass,
+            StartEventCommand.javaClass,
+            CancelEventCommand.javaClass,
+            SetProgressCommand.javaClass,
+            SetGoalCommand.javaClass,
             LuckyBlockEditorCommand::class.java,
             LuckyBlockToggleCommand::class.java,
             PersonalMineCreateCommand.javaClass,

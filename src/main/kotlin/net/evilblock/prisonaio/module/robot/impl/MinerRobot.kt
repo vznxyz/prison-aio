@@ -111,7 +111,7 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
             updateHelmet(ItemUtils.applySkullTexture(ItemBuilder(Material.SKULL_ITEM).data(3).build(), texture.first))
         }
 
-        updateHelmet(ItemUtils.getPlayerHeadItem(Cubed.instance.uuidCache.name(owner)))
+//        updateHelmet(ItemUtils.getPlayerHeadItem(Cubed.instance.uuidCache.name(owner)))
 
         if (RobotsModule.hasTierArmorColor(tier)) {
             val armorColor = Color.fromRGB(RobotsModule.getTierArmorColor(tier))
