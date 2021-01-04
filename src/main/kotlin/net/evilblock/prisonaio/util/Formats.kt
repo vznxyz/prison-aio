@@ -71,11 +71,7 @@ object Formats {
 
     @JvmStatic
     fun formatMoney(amount: BigDecimal): String {
-        if (amount.toDouble() < Long.MAX_VALUE) {
-            return formatMoney(amount.toDouble())
-        }
-
-        return "${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${String.format("%,e", amount)}"
+        return "${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(amount)}"
     }
 
     @JvmStatic

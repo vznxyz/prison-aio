@@ -94,13 +94,13 @@ object MineHandler : PluginHandler() {
         deleteMine(mine.id)
     }
 
-    fun getNearbyMine(player: Player): Optional<Mine> {
+    fun getNearbyMine(player: Player): Mine? {
         for (mine in minesMap.values.filter { it.region != null }) {
             if (mine.isNearbyMine(player)) {
-                return Optional.of(mine)
+                return mine
             }
         }
-        return Optional.empty()
+        return null
     }
 
 }

@@ -99,7 +99,11 @@ class LeaderboardsMenu(private var redirectOnClose: Boolean = false) : Menu() {
         }
 
         override fun applyMetadata(player: Player, itemMeta: ItemMeta): ItemMeta? {
-            return (itemMeta as SkullMeta).also { it.owner = leaderboard.entries.first().skinSource }
+            return (itemMeta as SkullMeta).also {
+                if (leaderboard.entries.isNotEmpty()) {
+                    it.owner = leaderboard.entries.first().skinSource
+                }
+            }
         }
     }
 

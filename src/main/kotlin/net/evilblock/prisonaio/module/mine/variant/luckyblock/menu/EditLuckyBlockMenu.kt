@@ -14,6 +14,7 @@ import net.evilblock.cubed.menu.buttons.TexturedHeadButton
 import net.evilblock.cubed.menu.menus.SelectItemStackMenu
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -43,11 +44,13 @@ class EditLuckyBlockMenu(private val luckyBlock: LuckyBlock) : Menu() {
 
     override fun getButtons(player: Player): Map<Int, Button> {
         return hashMapOf<Int, Button>().also { buttons ->
-            buttons[0] = EditNameButton()
+            buttons[1] = EditNameButton()
             buttons[2] = EditBlockTypeButton()
-            buttons[4] = EditRewardsButton()
+            buttons[3] = EditRewardsButton()
+            buttons[4] = EditMinRewardsButton()
+            buttons[5] = EditMaxRewardsButton()
             buttons[6] = EditSpawnChanceButton()
-            buttons[8] = EditSkinSourceButton()
+            buttons[7] = EditSkinSourceButton()
 
             for (i in 0 until 9) {
                 if (!buttons.containsKey(i)) {
@@ -163,6 +166,78 @@ class EditLuckyBlockMenu(private val luckyBlock: LuckyBlock) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 LuckyBlockRewardsEditor(luckyBlock = luckyBlock).openMenu(player)
+            }
+        }
+    }
+
+    private inner class EditMinRewardsButton : TexturedHeadButton(texture = Constants.IB_WOOD_NUMBER_TEXTURE) {
+        override fun getName(player: Player): String {
+            return "${ChatColor.AQUA}${ChatColor.BOLD}Edit Min Rewards ${ChatColor.GRAY}(${NumberUtils.format(luckyBlock.minRewards)})"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            return arrayListOf<String>().also { desc ->
+                desc.addAll(TextSplitter.split(text = ""))
+                desc.add("")
+                desc.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to increase min rewards by +1")
+                desc.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to decrease min rewards by -1")
+                desc.add("")
+                desc.add("${ChatColor.GREEN}${ChatColor.BOLD}SHIFT LEFT-CLICK ${ChatColor.GREEN}to increase min rewards by +10")
+                desc.add("${ChatColor.RED}${ChatColor.BOLD}SHIFT RIGHT-CLICK ${ChatColor.RED}to decrease min rewards by -10")
+            }
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            val mod = if (clickType.isShiftClick) {
+                10
+            } else {
+                1
+            }
+
+            if (clickType.isLeftClick) {
+                luckyBlock.minRewards += mod
+            } else if (clickType.isRightClick) {
+                luckyBlock.minRewards -= mod
+            }
+
+            Tasks.async {
+                LuckyBlockHandler.saveData()
+            }
+        }
+    }
+
+    private inner class EditMaxRewardsButton : TexturedHeadButton(texture = Constants.IB_WOOD_NUMBER_TEXTURE) {
+        override fun getName(player: Player): String {
+            return "${ChatColor.AQUA}${ChatColor.BOLD}Edit Max Rewards ${ChatColor.GRAY}(${NumberUtils.format(luckyBlock.maxRewards)})"
+        }
+
+        override fun getDescription(player: Player): List<String> {
+            return arrayListOf<String>().also { desc ->
+                desc.addAll(TextSplitter.split(text = ""))
+                desc.add("")
+                desc.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to increase max rewards by +1")
+                desc.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to decrease max rewards by -1")
+                desc.add("")
+                desc.add("${ChatColor.GREEN}${ChatColor.BOLD}SHIFT LEFT-CLICK ${ChatColor.GREEN}to increase max rewards by +10")
+                desc.add("${ChatColor.RED}${ChatColor.BOLD}SHIFT RIGHT-CLICK ${ChatColor.RED}to decrease max rewards by -10")
+            }
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            val mod = if (clickType.isShiftClick) {
+                10
+            } else {
+                1
+            }
+
+            if (clickType.isLeftClick) {
+                luckyBlock.maxRewards += mod
+            } else if (clickType.isRightClick) {
+                luckyBlock.maxRewards -= mod
+            }
+
+            Tasks.async {
+                LuckyBlockHandler.saveData()
             }
         }
     }

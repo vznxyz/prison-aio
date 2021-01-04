@@ -18,14 +18,14 @@ import net.evilblock.prisonaio.module.combat.enderpearl.EnderpearlCooldownHandle
 import net.evilblock.prisonaio.module.combat.enderpearl.listener.EnderpearlListeners
 import net.evilblock.prisonaio.module.combat.logger.CombatLoggerHandler
 import net.evilblock.prisonaio.module.combat.listener.CombatListeners
+import net.evilblock.prisonaio.module.combat.logger.listener.CombatLoggerListeners
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
-import net.evilblock.prisonaio.module.combat.timer.command.BlockedCommandsAddCommand
-import net.evilblock.prisonaio.module.combat.timer.command.BlockedCommandsListCommand
-import net.evilblock.prisonaio.module.combat.timer.command.BlockedCommandsRemoveCommand
 import net.evilblock.prisonaio.module.combat.timer.listener.CombatTimerListeners
 import org.bukkit.event.Listener
 
 object CombatModule : PluginModule() {
+
+    private var disabledCommands: List<String> = arrayListOf()
 
     override fun getName(): String {
         return "Combat"
@@ -47,13 +47,26 @@ object CombatModule : PluginModule() {
         DeathMessageHandler.initialLoad()
         GodAppleCooldownHandler.initialLoad()
         EnderpearlCooldownHandler.initialLoad()
+
+        try {
+            loadConfig()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onReload() {
+        super.onReload()
+
+        try {
+            loadConfig()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun getCommands(): List<Class<*>> {
         return listOf(
-            BlockedCommandsAddCommand.javaClass,
-            BlockedCommandsListCommand.javaClass,
-            BlockedCommandsRemoveCommand.javaClass,
             ClearDamageCacheCommand.javaClass
         )
     }
@@ -62,9 +75,18 @@ object CombatModule : PluginModule() {
         return listOf(
             GodAppleListeners,
             EnderpearlListeners,
+            CombatListeners,
             CombatTimerListeners,
-            CombatListeners
+            CombatLoggerListeners
         )
+    }
+
+    private fun loadConfig() {
+        disabledCommands = config.getStringList("disabled-commands")
+    }
+
+    fun getDisabledCommands(): List<String> {
+        return disabledCommands
     }
 
 }

@@ -95,6 +95,7 @@ object GangsModule : PluginModule() {
             GangVisitCommand.javaClass,
             GangForceInvitesGiveCommand.javaClass,
             GangForceInvitesTakeCommand.javaClass,
+            GangForceInvitesResetAllCommand.javaClass,
             GangForceDisbandCommand.javaClass,
             GangForceJoinCommand.javaClass,
             GangForceKickCommand.javaClass,
@@ -104,6 +105,7 @@ object GangsModule : PluginModule() {
             GangTrophiesGiveCommand.javaClass,
             GangTrophiesSetCommand.javaClass,
             GangTrophiesTakeCommand.javaClass,
+            GangTrophiesResetAllCommand.javaClass,
             GangBoostersGrantCommand.javaClass
         )
     }

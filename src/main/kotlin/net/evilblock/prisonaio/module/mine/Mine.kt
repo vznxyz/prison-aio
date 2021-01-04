@@ -39,6 +39,10 @@ abstract class Mine(id: String) : BitmaskRegion(id, null), AbstractTypeSerializa
         cacheChunks()
     }
 
+    open fun onDelete() {
+
+    }
+
     override fun getRegionName(): String {
         return "Mine $id"
     }
@@ -95,6 +99,10 @@ abstract class Mine(id: String) : BitmaskRegion(id, null), AbstractTypeSerializa
     }
 
     open fun supportsAutomaticReset(): Boolean {
+        return true
+    }
+
+    open fun supportsFullInventoryTeleport(): Boolean {
         return true
     }
 

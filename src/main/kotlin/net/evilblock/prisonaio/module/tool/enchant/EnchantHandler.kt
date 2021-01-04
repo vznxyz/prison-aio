@@ -191,32 +191,28 @@ object EnchantHandler : Listener {
                     continue
                 }
 
-                if (event.player.hasMetadata("JE-" + enchant.id)) {
-                    if (pickaxe?.enchants?.containsKey(enchant) == true) {
-                        if (pickaxe.enchants[enchant] != event.player.getMetadata("JE-" + enchant.id)[0].asInt()) {
-                            enchant.onUnhold(event.player)
-                            event.player.removeMetadata("JE-" + enchant.id, PrisonAIO.instance)
+                val metadataKey = "JE-" + enchant.id
 
-                            if (pickaxe.isEnchantDisabled(enchant)) {
-                                continue
-                            }
-
-                            if (region.supportsPassiveEnchants()) {
-                                enchant.onHold(event.player, newItem, pickaxe.enchants[enchant]!!)
-                                event.player.setMetadata("JE-" + enchant.id, FixedMetadataValue(PrisonAIO.instance, pickaxe.enchants[enchant]))
-                            }
-                        }
-                    } else {
+                if (event.player.hasMetadata(metadataKey)) {
+                    if (!region.supportsPassiveEnchants()
+                        || pickaxe == null
+                        || !pickaxe.enchants.containsKey(enchant)
+                        || pickaxe.isEnchantDisabled(enchant)
+                        || pickaxe.enchants[enchant] != event.player.getMetadata(metadataKey)[0].asInt()) {
                         enchant.onUnhold(event.player)
-                        event.player.removeMetadata("JE-" + enchant.id, PrisonAIO.instance)
+                        event.player.removeMetadata(metadataKey, PrisonAIO.instance)
+                    } else {
+                        enchant.onHold(event.player, newItem, pickaxe.enchants[enchant]!!)
+                        event.player.setMetadata(metadataKey, FixedMetadataValue(PrisonAIO.instance, pickaxe.enchants[enchant]))
                     }
-                } else if (pickaxe?.enchants?.containsKey(enchant) == true && region.supportsPassiveEnchants()) {
-                    if (pickaxe.isEnchantDisabled(enchant)) {
-                        continue
+                } else {
+                    if (region.supportsPassiveEnchants()
+                        && pickaxe != null
+                        && pickaxe.enchants.containsKey(enchant)
+                        && !pickaxe.isEnchantDisabled(enchant)) {
+                        enchant.onHold(event.player, newItem, pickaxe.enchants[enchant]!!)
+                        event.player.setMetadata(metadataKey, FixedMetadataValue(PrisonAIO.instance, pickaxe.enchants[enchant]))
                     }
-
-                    enchant.onHold(event.player, newItem, pickaxe.enchants[enchant]!!)
-                    event.player.setMetadata("JE-" + enchant.id, FixedMetadataValue(PrisonAIO.instance, pickaxe.enchants[enchant]))
                 }
             }
         }

@@ -40,7 +40,7 @@ abstract class Leaderboard(val id: String, val name: String) {
             for ((index, entry) in entries.withIndex()) {
                 lines.add(formatEntry(entry))
 
-                if (fullView && index >= 4) {
+                if (!fullView && index >= 4) {
                     break
                 }
             }

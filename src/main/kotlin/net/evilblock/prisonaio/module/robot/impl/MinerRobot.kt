@@ -226,21 +226,24 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
             throw IllegalStateException("Cannot tick robot on main thread")
         }
 
-        val timePassed = System.currentTimeMillis() - lastTick
-        if (timePassed < 3_000L) {
-            uptime += timePassed
-        }
+        val owner = Bukkit.getPlayer(owner)
+        if (owner != null && owner.isOnline) {
+            val timePassed = System.currentTimeMillis() - lastTick
+            if (timePassed < 3_000L) {
+                uptime += timePassed
+            }
 
-        tickRewards()
+            tickRewards()
 
-        if (RobotsModule.isAnimationsEnabled()) {
-            tickArmorStandAnimation()
+            if (RobotsModule.isAnimationsEnabled()) {
+                tickArmorStandAnimation()
+            }
         }
     }
 
     fun getMoneyPerTick(): Double {
         return if (hasUpgradeApplied(FortuneUpgrade)) {
-            (RobotsModule.getTierBaseMoney(tier) + (RobotsModule.getFortuneBaseMoney() * getUpgradeLevel(FortuneUpgrade))) * RobotsModule.getFortuneMoneyMultiplier()
+            ((RobotsModule.getTierBaseMoney(tier) + RobotsModule.getFortuneBaseMoney()) * (1.0 + (getUpgradeLevel(FortuneUpgrade) * RobotsModule.getFortuneMoneyMultiplier())))
         } else {
             RobotsModule.getTierBaseMoney(tier)
         }

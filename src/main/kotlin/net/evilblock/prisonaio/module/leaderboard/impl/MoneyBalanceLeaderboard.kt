@@ -40,9 +40,6 @@ object MoneyBalanceLeaderboard : Leaderboard("top-balance", "${ChatColor.GREEN}$
                     BigDecimal(rawValue)
                 }
                 else -> {
-                    if (rawValue == null) {
-                        println(document["uuid"].toString() + " is null")
-                    }
                     BigDecimal(rawValue as Int)
                 }
             }

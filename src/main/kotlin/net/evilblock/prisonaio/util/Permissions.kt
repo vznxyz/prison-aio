@@ -22,6 +22,7 @@ object Permissions {
     const val ECONOMY_ADMIN = "prisonaio.economy.admin"
 
     const val WARPS_MANAGE = "prisonaio.warps.manage"
+    const val WARPS_ACCESS_ALL = "prisonaio.warps.access.all"
 
     const val NEWS_EDITOR = "prisonaio.news.editor"
     const val NEWS_VIEW_STATS = "prisonaio.news.view-stats"

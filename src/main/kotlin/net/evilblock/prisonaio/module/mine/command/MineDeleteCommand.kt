@@ -27,6 +27,8 @@ object MineDeleteCommand {
     )
     @JvmStatic
     fun execute(player: Player, @Param(name = "mine") mine: Mine) {
+        mine.onDelete()
+
         RegionHandler.forgetRegion(mine)
         RegionHandler.clearBlockCache(mine)
         MineHandler.deleteMine(mine)

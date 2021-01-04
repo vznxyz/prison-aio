@@ -30,10 +30,10 @@ object MineInventoryListeners : Listener {
         val user = UserHandler.getUser(event.player.uniqueId)
         if (user.settings.getSettingOption(UserSetting.SNEAK_TO_TELEPORT).getValue()) {
             if (event.isSneaking && event.player.inventory.firstEmpty() == -1) {
-                val optionalMine = MineHandler.getNearbyMine(event.player)
-                if (optionalMine.isPresent) {
-                    if (optionalMine.get().spawnPoint != null) {
-                        event.player.teleport(optionalMine.get().spawnPoint)
+                val nearbyMine = MineHandler.getNearbyMine(event.player)
+                if (nearbyMine != null && nearbyMine.supportsFullInventoryTeleport()) {
+                    if (nearbyMine.spawnPoint != null) {
+                        event.player.teleport(nearbyMine.spawnPoint)
                     }
                 }
             }
@@ -46,8 +46,8 @@ object MineInventoryListeners : Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     fun onBlockBreakEvent(event: BlockBreakEvent) {
         if (event.player.inventory.firstEmpty() == -1) {
-            val optionalMine = MineHandler.getNearbyMine(event.player)
-            if (optionalMine.isPresent) {
+            val nearbyMine = MineHandler.getNearbyMine(event.player)
+            if (nearbyMine != null && nearbyMine.supportsFullInventoryTeleport()) {
                 event.player.sendTitle(Title("${ChatColor.RED}Inventory full!", "Sneak to teleport to the shop.", 10, 20, 10))
             }
         }

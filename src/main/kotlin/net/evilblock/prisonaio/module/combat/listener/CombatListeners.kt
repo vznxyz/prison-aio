@@ -7,7 +7,7 @@
 
 package net.evilblock.prisonaio.module.combat.listener
 
-import net.evilblock.prisonaio.module.combat.timer.listener.CombatTimerListeners
+import net.evilblock.prisonaio.module.combat.CombatModule
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
 import net.evilblock.prisonaio.module.region.bitmask.RegionBitmask
@@ -23,7 +23,7 @@ object CombatListeners : Listener {
     fun onPlayerCommandPreprocessEvent(event: PlayerCommandPreprocessEvent) {
         val region = RegionHandler.findRegion(event.player.location)
         if (region is BitmaskRegion && region.hasBitmask(RegionBitmask.DANGER_ZONE)) {
-            for (blockedCommand in CombatTimerListeners.BLOCKED_COMMANDS) {
+            for (blockedCommand in CombatModule.getDisabledCommands()) {
                 if (event.message.startsWith(blockedCommand, ignoreCase = true)) {
                     event.isCancelled = true
                     event.player.sendMessage("${ChatColor.RED}You can't execute that command in the PvP arena!")

@@ -17,7 +17,7 @@ object GangBoosterParameterType : ParameterType<GangBooster.BoosterType> {
 
     override fun transform(sender: CommandSender, source: String): GangBooster.BoosterType? {
         try {
-            return GangBooster.BoosterType.valueOf(source)
+            return GangBooster.BoosterType.valueOf(source.toUpperCase())
         } catch (e: Exception) {
             sender.sendMessage("${ChatColor.RED}Couldn't find a gang booster by that name.")
         }

@@ -39,7 +39,7 @@ object GangInfoCommand {
             .send(sender)
 
         sender.sendMessage("${ChatColor.GRAY} Announcement: ${ChatColor.RED}${gang.announcement}")
-        sender.sendMessage("${ChatColor.GRAY} Leader: ${ChatColor.WHITE}${gang.getLeaderUsername()}")
+        sender.sendMessage("${ChatColor.GRAY} Leader: ${ChatColor.RED}${getFormattedMemberName(gang, gang.getMemberInfo(gang.leader)!!)}")
 
         val coLeaders = gang.getMembers().values.filter { it.role == GangMember.Role.CO_LEADER }
         if (coLeaders.isNotEmpty()) {
@@ -48,7 +48,7 @@ object GangInfoCommand {
 
         val captains = gang.getMembers().values.filter { it.role == GangMember.Role.CAPTAIN }
         if (captains.isNotEmpty()) {
-            sender.sendMessage("${ChatColor.GRAY} Captains: ${ChatColor.WHITE}${coLeaders.joinToString { getFormattedMemberName(gang, it) }}")
+            sender.sendMessage("${ChatColor.GRAY} Captains: ${ChatColor.WHITE}${captains.joinToString { getFormattedMemberName(gang, it) }}")
         }
 
         val members = gang.getMembers().values.filter { it.role == GangMember.Role.MEMBER }

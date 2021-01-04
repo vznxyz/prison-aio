@@ -65,7 +65,7 @@ class LuckyBlockEntity(
         DataWatcherUtil.setTypeFlag(armorStandDataWatcher, ObjectBasedDataWatcherUtil.ENTITY_ARMOR_STAND_a, 1, true)
         DataWatcherUtil.setTypeFlag(armorStandDataWatcher, ObjectBasedDataWatcherUtil.ENTITY_ARMOR_STAND_a, 4, false)
         DataWatcherUtil.setTypeFlag(armorStandDataWatcher, ObjectBasedDataWatcherUtil.ENTITY_ARMOR_STAND_a, 8, true)
-        DataWatcherUtil.setTypeFlag(armorStandDataWatcher, ObjectBasedDataWatcherUtil.ENTITY_ARMOR_STAND_a, 10, true)
+        DataWatcherUtil.setTypeFlag(armorStandDataWatcher, ObjectBasedDataWatcherUtil.ENTITY_ARMOR_STAND_a, 10, false)
 
         val location = location.clone()
         location.x = floor(location.x) + 0.5

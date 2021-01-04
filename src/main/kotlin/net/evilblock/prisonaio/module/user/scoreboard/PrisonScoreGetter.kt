@@ -67,22 +67,22 @@ object PrisonScoreGetter : ScoreGetter {
 
         val region = RegionHandler.findRegion(player.location)
         if (region is BitmaskRegion && region.hasBitmask(RegionBitmask.DANGER_ZONE)) {
-            scores.add("${padding}$primaryColor${ChatColor.BOLD}Kills: ${ChatColor.RED}${user.statistics.getKills()}")
-            scores.add("${padding}$primaryColor${ChatColor.BOLD}Deaths: ${ChatColor.RED}${user.statistics.getDeaths()}")
+            scores.add("${padding}$primaryColor⚔ ${ChatColor.GRAY}Kills: ${ChatColor.RED}${user.statistics.getKills()}")
+            scores.add("${padding}$primaryColor${ChatColor.BOLD}✝ ${ChatColor.GRAY}Deaths: ${ChatColor.RED}${user.statistics.getDeaths()}")
 
             val combatTimer = CombatTimerHandler.getTimer(player.uniqueId)
             if (combatTimer != null && !combatTimer.hasExpired()) {
-                scores.add("$padding  $primaryColor${ChatColor.BOLD}Combat: ${ChatColor.RED}${TimeUtil.formatIntoMMSS(combatTimer.getRemainingSeconds().toInt())}")
+                scores.add("${padding}${ChatColor.DARK_RED}${ChatColor.BOLD}⧗ ${ChatColor.GRAY}Combat: ${ChatColor.RED}${TimeUtil.formatIntoMMSS(combatTimer.getRemainingSeconds().toInt())}")
             }
 
             val enderpearlCooldown = EnderpearlCooldownHandler.getCooldown(player.uniqueId)
             if (enderpearlCooldown != null && !enderpearlCooldown.hasExpired()) {
-                scores.add("${padding}${ChatColor.YELLOW}${ChatColor.BOLD}Enderpearl: ${ChatColor.RED}${enderpearlCooldown.getRemainingSeconds()}s")
+                scores.add("${padding}${ChatColor.YELLOW}${ChatColor.BOLD}⧗ ${ChatColor.GRAY}Enderpearl: ${ChatColor.RED}${enderpearlCooldown.getRemainingSeconds()}s")
             }
 
             val godAppleCooldown = GodAppleCooldownHandler.getCooldown(player.uniqueId)
             if (godAppleCooldown != null && !godAppleCooldown.hasExpired()) {
-                scores.add("${padding}${ChatColor.GOLD}${ChatColor.BOLD}Gopple: ${ChatColor.RED}${TimeUtil.formatIntoMMSS(godAppleCooldown.getRemainingSeconds().toInt())}")
+                scores.add("${padding}${ChatColor.GOLD}${ChatColor.BOLD}⧗ ${ChatColor.GRAY}Gopple: ${ChatColor.RED}${TimeUtil.formatIntoMMSS(godAppleCooldown.getRemainingSeconds().toInt())}")
             }
 
             renderBorders(user, scores)

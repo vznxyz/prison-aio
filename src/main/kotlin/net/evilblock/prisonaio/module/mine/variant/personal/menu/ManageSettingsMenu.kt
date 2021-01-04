@@ -11,7 +11,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
+import net.evilblock.cubed.util.bukkit.prompt.NumberPrompt
 import net.evilblock.prisonaio.module.mine.variant.personal.PrivateMine
 import net.evilblock.prisonaio.module.mine.variant.personal.PrivateMineHandler
 import net.evilblock.prisonaio.module.mine.variant.personal.PrivateMineConfig
@@ -132,8 +132,8 @@ class ManageSettingsMenu(private val previous: Menu, private val mine: PrivateMi
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            EzPrompt.Builder()
-                .promptText("${ChatColor.GREEN}Please input the new sales tax.\n${ChatColor.GRAY}Accepted range is ${ChatColor.GREEN}$0.0-${PrivateMineConfig.salesTaxRange.maximumDouble}%${ChatColor.GRAY}.")
+            NumberPrompt()
+                .withText("${ChatColor.GREEN}Please input a new sales tax percentage. ${ChatColor.GRAY}(Accepted range is 0.0-${PrivateMineConfig.salesTaxRange.maximumDouble}%)")
                 .acceptInput { input ->
                     try {
                         val inputNumber = input.toDouble()
@@ -153,7 +153,6 @@ class ManageSettingsMenu(private val previous: Menu, private val mine: PrivateMi
                         player.sendMessage("${ChatColor.RED}The input \"$input\" isn't a valid number.")
                     }
                 }
-                .build()
                 .start(player)
         }
     }

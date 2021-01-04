@@ -272,7 +272,7 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
                         return
                     }
 
-                    ConfirmMenu("Are you sure?") { confirmed ->
+                    ConfirmMenu { confirmed ->
                         if (confirmed) {
                             gang.kickMember(member.uuid)
 
@@ -285,11 +285,12 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
                 } else {
                     if (member.role == GangMember.Role.MEMBER) {
                         player.sendMessage("${ChatColor.RED}That member can't be demoted any lower.")
+                        return
                     }
 
                     val demotedBy = gang.getMemberInfo(player.uniqueId)!!
-                    val previousRole = GangMember.Role.values()[member.role.ordinal - 1]
 
+                    val previousRole = GangMember.Role.values()[member.role.ordinal - 1]
                     if (previousRole.isAtLeast(demotedBy.role)) {
                         player.sendMessage("${ChatColor.RED}You can't demote that player!")
                         return

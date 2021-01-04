@@ -54,7 +54,7 @@ enum class GeneratorModifierType(
         ChatColor.GOLD,
         ItemStack(Material.HOPPER),
         arrayListOf<String>().also { lore ->
-            lore.addAll(TextSplitter.split(text = "Automatically collects items that a Generator produces to a nearby chest. No more wasting time by having full storage!"))
+            lore.addAll(TextSplitter.split(text = "Automatically collects items that a Generator produces to your inventory. No more wasting time by having full storage!"))
             lore.add("")
             lore.add("${ChatColor.GRAY}Duration: ${ChatColor.RED}${ChatColor.BOLD}{duration}")
         },
@@ -82,7 +82,7 @@ enum class GeneratorModifierType(
     class ModifierParameterType : ParameterType<GeneratorModifierType> {
         override fun transform(sender: CommandSender, source: String): GeneratorModifierType? {
             try {
-                return valueOf(source)
+                return valueOf(source.toUpperCase())
             } catch (e: Exception) {
                 sender.sendMessage("${ChatColor.RED}Couldn't find a modifier type by that name!")
             }

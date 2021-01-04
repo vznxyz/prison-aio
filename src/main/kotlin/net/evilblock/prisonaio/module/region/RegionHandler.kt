@@ -16,8 +16,10 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.practice.region.util.CoordSet2D
 import net.evilblock.practice.region.util.CoordSet3D
+import net.evilblock.prisonaio.module.region.bitmask.RegionBitmaskTickService
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.global.GlobalRegion
+import net.evilblock.prisonaio.service.ServiceRegistry
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
@@ -57,6 +59,8 @@ object RegionHandler : PluginHandler() {
                 }
             }
         }
+
+        ServiceRegistry.register(RegionBitmaskTickService, 10L)
     }
 
     override fun saveData() {

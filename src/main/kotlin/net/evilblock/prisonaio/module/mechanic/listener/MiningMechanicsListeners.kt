@@ -41,7 +41,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ThreadLocalRandom
-import kotlin.math.floor
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 /**
@@ -127,7 +127,7 @@ object MiningMechanicsListeners : Listener {
         val ignoredBlocks = MechanicsModule.getDropsToInvIgnoredBlocks()
         val validBlocks = event.blockList.filter { isValidBlock(it) && !ignoredBlocks.contains(it.type) && (event.yield == 100F || ThreadLocalRandom.current().nextInt(100) < event.yield) }
 
-        val fortuneLevel = if (region.supportsAbilityEnchants() && pickaxe.enchants.containsKey(Fortune)) {
+        val fortuneLevel = if (!pickaxe.isEnchantDisabled(Fortune) && region.supportsAbilityEnchants() && pickaxe.enchants.containsKey(Fortune)) {
             pickaxe.enchants[Fortune]!!
         } else {
             -1
@@ -301,46 +301,18 @@ object MiningMechanicsListeners : Listener {
     }
 
     private fun getFortuneAmount(level: Int): Int {
-        val isRandomAmount = MechanicsModule.isFortuneRandom()
         val multiplier = MechanicsModule.getFortuneMultiplier()
-        var modifier = MechanicsModule.getFortuneModifier()
+        val modifier = MechanicsModule.getFortuneModifier()
         val minDrops = MechanicsModule.getFortuneMinDrops()
         val maxDrops = MechanicsModule.getFortuneMaxDrops()
-        var amountToDrop = (floor(level * multiplier) + 1.0).toInt()
 
-        when {
-            amountToDrop > maxDrops -> {
-                amountToDrop = if (isRandomAmount) {
-                    ThreadLocalRandom.current().nextInt(maxDrops) + minDrops
-                } else {
-                    maxDrops + minDrops
-                }
-            }
-            isRandomAmount -> {
-                amountToDrop = ThreadLocalRandom.current().nextInt(amountToDrop) + minDrops
-            }
-            else -> {
-                amountToDrop += minDrops
-            }
-        }
+        var drops = min((1.0 + (level * multiplier)).toInt(), maxDrops)
 
         if (modifier > 0) {
-            modifier = ThreadLocalRandom.current().nextInt(modifier)
+            drops -= ThreadLocalRandom.current().nextDouble(level * modifier).toInt()
         }
 
-        if (modifier <= 0) {
-            return amountToDrop
-        }
-
-        if (ThreadLocalRandom.current().nextBoolean()) {
-            return amountToDrop + modifier
-        }
-
-        return if (amountToDrop - modifier > 1) {
-            amountToDrop - modifier
-        } else {
-            1
-        }
+        return drops.coerceAtLeast(minDrops)
     }
 
     private fun toIndex(x: Int, y: Int, z: Int): Short {

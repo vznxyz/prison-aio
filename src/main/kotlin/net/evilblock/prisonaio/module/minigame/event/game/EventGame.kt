@@ -281,10 +281,6 @@ abstract class EventGame(val host: UUID, val gameType: EventGameType, arenaOptio
         EventUtils.resetPlayer(player)
 
         player.teleport(votedArena!!.spectatorLocation)
-
-        for (player in players) {
-
-        }
     }
 
     fun removeSpectator(player: Player) {

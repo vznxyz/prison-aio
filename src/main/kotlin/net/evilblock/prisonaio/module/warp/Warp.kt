@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.warp
 
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
+import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
@@ -29,7 +30,7 @@ class Warp(val id: String, var location: Location) {
     }
 
     fun hasPermission(player: Player): Boolean {
-        return player.hasPermission(getPermission())
+        return player.hasPermission(Permissions.WARPS_ACCESS_ALL) || player.hasPermission(getPermission())
     }
 
     fun getFormattedName(): String {

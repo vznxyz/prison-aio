@@ -89,6 +89,7 @@ object MinigamesModule : PluginModule() {
             LeaveCommand.javaClass,
             SetLobbyCommand.javaClass,
             SetMaxPlayersCommand.javaClass,
+            SpectateCommand.javaClass,
             ToggleCommand.javaClass,
             LoadKitCommand.javaClass,
             SaveKitCommand.javaClass

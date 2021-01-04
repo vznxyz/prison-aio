@@ -30,7 +30,6 @@ import net.evilblock.prisonaio.module.generator.Generator
 import net.evilblock.prisonaio.module.generator.GeneratorsModule
 import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.admin.AdminModule
-import net.evilblock.prisonaio.module.kit.KitsModule
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mine.Mine
@@ -51,6 +50,7 @@ import net.evilblock.prisonaio.module.user.UsersModule
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import net.evilblock.prisonaio.service.ServicesThread
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
+import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.warp.WarpsModule
 import org.bukkit.Bukkit
 import org.bukkit.generator.ChunkGenerator
@@ -91,6 +91,7 @@ class PrisonAIO : PluginFramework() {
             builder.registerTypeAdapter(PriceFormulaType.PriceFormula::class.java, AbstractTypeSerializer<PriceFormulaType.PriceFormula>())
             builder.registerTypeAdapter(Generator::class.java, AbstractTypeSerializer<Generator>())
             builder.registerTypeAdapter(Robot::class.java, AbstractTypeSerializer<Robot>())
+            builder.registerTypeAdapter(Region::class.java, AbstractTypeSerializer<Region>())
         }
 
         CommandHandler.registerParameterType(Currency.Type::class.java, Currency.Type.CurrencyParameterType())
@@ -107,7 +108,7 @@ class PrisonAIO : PluginFramework() {
 //            AchievementsModule,
             QuestsModule,
             WarpsModule,
-            KitsModule,
+//            KitsModule,
             ShopsModule,
             MinesModule,
             GangsModule,

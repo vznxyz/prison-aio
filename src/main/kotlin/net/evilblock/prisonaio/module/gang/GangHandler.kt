@@ -38,7 +38,6 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.collections.set
 
@@ -51,14 +50,13 @@ object GangHandler : PluginHandler() {
     val INVITE_EXPIRE_TIME = TimeUnit.HOURS.toMillis(2L)
 
     private var gridIndex = 0
-    private val grid: HashMap<Int, Gang> = hashMapOf()
+    private val grid: ConcurrentHashMap<Int, Gang> = ConcurrentHashMap()
 
-    private val gangByName: MutableMap<String, Gang> = ConcurrentHashMap()
-    private val gangByPlayer: MutableMap<UUID, Gang> = ConcurrentHashMap()
+    private val gangByName: ConcurrentHashMap<String, Gang> = ConcurrentHashMap()
+    private val gangByPlayer: ConcurrentHashMap<UUID, Gang> = ConcurrentHashMap()
 
-    private val invitesByPlayer: MutableMap<UUID, MutableSet<Gang>> = ConcurrentHashMap()
-
-    private val currentlyVisiting: MutableMap<UUID, Gang> = ConcurrentHashMap()
+    private val invitesByPlayer: ConcurrentHashMap<UUID, MutableSet<Gang>> = ConcurrentHashMap()
+    private val currentlyVisiting: ConcurrentHashMap<UUID, Gang> = ConcurrentHashMap()
 
     var asyncWorld: AsyncWorld? = null
 
@@ -135,6 +133,23 @@ object GangHandler : PluginHandler() {
     }
 
     fun saveGrid() {
+        // remove any duplicate gang members before saving to disk
+        // keep this until we fix the server restart issue (gson map duplicate entries)
+        try {
+//            var fixedGangs = 0
+//            var fixedMembers = 0
+//
+//            for (gang in getAllGangs()) {
+//                val duplicates = arrayListOf<UUID>()
+//            }
+//
+//            if (fixed != 0) {
+//                PrisonAIO.instance.systemLog("${ChatColor.GREEN}Safe save of backpack data complete! (${NumberUtils.format(successful)} successful, ${NumberUtils.format(failed)} failed)")
+//            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         Files.write(Cubed.gson.toJson(grid.values), getInternalDataFile(), Charsets.UTF_8)
     }
 

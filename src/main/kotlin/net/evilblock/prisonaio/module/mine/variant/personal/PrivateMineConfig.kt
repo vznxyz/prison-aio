@@ -14,7 +14,7 @@ import org.apache.commons.lang.math.DoubleRange
 object PrivateMineConfig {
 
     var resetInterval: Long = 100000L
-    var salesTaxRange: DoubleRange = DoubleRange(10)
+    var salesTaxRange: DoubleRange = DoubleRange(0.0, 10.0)
     var playerLimit: Int = 15
     var blocks: List<BlockType> = arrayListOf()
 

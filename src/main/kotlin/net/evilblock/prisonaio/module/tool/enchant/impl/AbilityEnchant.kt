@@ -26,33 +26,35 @@ abstract class AbilityEnchant(id: String, enchant: String, maxLevel: Int) : Ench
 
     override fun onInteract(event: PlayerInteractEvent, enchantedItem: ItemStack, level: Int) {
         if (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) {
-            if (event.player.gameMode != GameMode.CREATIVE) {
-                val cooldown: Long = if (isCooldownBasedOnLevel()) {
-                    val cooldownMap = readLevelToCooldownMap()
+            if (event.player.gameMode == GameMode.CREATIVE) {
+                return
+            }
 
-                    cooldownMap.getOrElse(level) {
-                        cooldownMap.entries.maxBy { it.key }!!.value
-                    }
-                } else {
-                    readCooldown()
+            val cooldown: Long = if (isCooldownBasedOnLevel()) {
+                val cooldownMap = readLevelToCooldownMap()
+
+                cooldownMap.getOrElse(level) {
+                    cooldownMap.entries.maxBy { it.key }!!.value
                 }
+            } else {
+                readCooldown()
+            }
 
-                if (useCooldown.containsKey(event.player.uniqueId)) {
-                    val expiry = useCooldown[event.player.uniqueId]!!
-                    if (System.currentTimeMillis() < expiry) {
-                        val remainingSeconds = ((expiry - System.currentTimeMillis()) / 1000.0).toInt()
-                        sendMessage(event.player, "${ChatColor.RED}You can't use this ability for another " + TimeUtil.formatIntoDetailedString(remainingSeconds) + ".")
-                        return
-                    }
-                }
-
-                if (isOnGlobalCooldown(event.player)) {
+            if (useCooldown.containsKey(event.player.uniqueId)) {
+                val expiresAt = useCooldown[event.player.uniqueId]!!
+                if (System.currentTimeMillis() < expiresAt) {
+                    val remainingSeconds = ((expiresAt - System.currentTimeMillis()) / 1000.0).toInt()
+                    sendMessage(event.player, "${ChatColor.RED}You can't use this ability for another " + TimeUtil.formatIntoDetailedString(remainingSeconds) + ".")
                     return
                 }
-
-                useCooldown[event.player.uniqueId] = System.currentTimeMillis() + cooldown
-                resetGlobalCooldown(event.player)
             }
+
+            if (isOnGlobalCooldown(event.player)) {
+                return
+            }
+
+            useCooldown[event.player.uniqueId] = System.currentTimeMillis() + cooldown
+            resetGlobalCooldown(event.player)
         }
     }
 

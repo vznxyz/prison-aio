@@ -193,16 +193,12 @@ object MechanicsModule : PluginModule() {
         return dropsToInvIgnoredBlocks
     }
 
-    fun isFortuneRandom(): Boolean {
-        return config.getBoolean("fortune.random-drop-amount")
-    }
-
     fun getFortuneMultiplier(): Double {
         return config.getDouble("fortune.multiplier")
     }
 
-    fun getFortuneModifier(): Int {
-        return config.getInt("fortune.modifier")
+    fun getFortuneModifier(): Double {
+        return config.getDouble("fortune.modifier")
     }
 
     fun getFortuneMinDrops(): Int {

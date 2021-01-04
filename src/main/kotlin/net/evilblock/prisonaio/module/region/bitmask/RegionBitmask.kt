@@ -15,6 +15,9 @@ enum class RegionBitmask(
 
     SAFE_ZONE(1, "SafeZone", "A region where players take no damage at all"),
     DANGER_ZONE(2, "Dangerous", "A region where natural damage and PvP is enabled"),
-    ALLOW_BUILD(4, "Allow Build", "A region where players can place/destroy blocks")
+    ALLOW_BUILD(4, "Allow Build", "A region where players can place/destroy blocks"),
+    DENY_FLY(8, "Deny Fly", "A region where players cannot use fly"),
+    DENY_SPEED(16, "Deny Speed", "A region where players cannot use modded speed"),
+    SPEED(32, "Speed Effect", "A region where players have permanent speed 2 effect")
 
 }

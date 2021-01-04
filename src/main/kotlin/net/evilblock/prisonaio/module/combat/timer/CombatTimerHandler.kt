@@ -27,6 +27,11 @@ object CombatTimerHandler : PluginHandler() {
     }
 
     @JvmStatic
+    fun getTimer(player: Player): CombatTimer? {
+        return getTimer(player.uniqueId)
+    }
+
+    @JvmStatic
     fun isOnTimer(player: Player): Boolean {
         val timer = getTimer(player.uniqueId)
         return timer != null && !timer.hasExpired()

@@ -1,6 +1,7 @@
 package net.evilblock.prisonaio.module.minigame.event.game.listener
 
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.combat.CombatModule
 import net.evilblock.prisonaio.module.combat.timer.listener.CombatTimerListeners
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.minigame.event.EventItems
@@ -48,7 +49,7 @@ object EventGameListeners : Listener {
         if (EventGameHandler.isOngoingGame()) {
             val game = EventGameHandler.getOngoingGame()!!
             if (game.isPlayingOrSpectating(event.player.uniqueId)) {
-                for (blockedCommand in CombatTimerListeners.BLOCKED_COMMANDS) {
+                for (blockedCommand in CombatModule.getDisabledCommands()) {
                     if (event.message.startsWith(blockedCommand, ignoreCase = true)) {
                         event.isCancelled = true
                         event.player.sendMessage("${ChatColor.RED}You can't execute that command while in an event!")

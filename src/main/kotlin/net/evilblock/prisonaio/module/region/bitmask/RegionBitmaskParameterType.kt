@@ -17,14 +17,17 @@ import java.util.*
 class RegionBitmaskParameterType : ParameterType<RegionBitmask> {
 
     override fun transform(sender: CommandSender, source: String): RegionBitmask? {
-        for (bitmaskType in RegionBitmask.values()) {
-            if (source.equals(bitmaskType.displayName, ignoreCase = true)) {
-                return bitmaskType
-            }
+        val bitmask =  try {
+            RegionBitmask.valueOf(source.toUpperCase())
+        } catch (e: Exception) {
+            null
         }
 
-        sender.sendMessage("${ChatColor.RED}No bitmask type with the name $source found.")
-        return null
+        if (bitmask == null) {
+            sender.sendMessage("${ChatColor.RED}No bitmask type with the name $source found.")
+        }
+
+        return bitmask
     }
 
     override fun tabComplete(sender: Player, flags: Set<String>, source: String): List<String> {

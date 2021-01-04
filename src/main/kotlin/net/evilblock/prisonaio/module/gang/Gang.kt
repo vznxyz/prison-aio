@@ -322,6 +322,10 @@ class Gang(
         return forceInvites
     }
 
+    fun setForceInvites(amount: Int) {
+        forceInvites = amount
+    }
+
     fun useForceInvite() {
         forceInvites--
     }

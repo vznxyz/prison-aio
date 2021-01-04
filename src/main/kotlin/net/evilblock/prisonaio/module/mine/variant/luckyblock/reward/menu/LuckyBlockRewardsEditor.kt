@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.mine.variant.luckyblock.reward.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.buttons.AddButton
 import net.evilblock.cubed.menu.buttons.GlassButton
+import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextSplitter
@@ -68,7 +69,7 @@ class LuckyBlockRewardsEditor(private val luckyBlock: LuckyBlock) : PaginatedMen
     }
 
     override fun size(buttons: Map<Int, Button>): Int {
-        return 45
+        return 54
     }
 
     override fun onClose(player: Player, manualClose: Boolean) {
@@ -117,13 +118,21 @@ class LuckyBlockRewardsEditor(private val luckyBlock: LuckyBlock) : PaginatedMen
                 desc.add("")
 
                 desc.add("${ChatColor.YELLOW}${ChatColor.BOLD}Commands")
-                for (command in reward.commands) {
-                    desc.add("${ChatColor.WHITE} $command")
+
+                if (reward.commands.isNotEmpty()) {
+                    for (command in reward.commands) {
+                        desc.add(" ${ChatColor.WHITE}$command")
+                    }
+                } else {
+                    desc.add(" ${ChatColor.GRAY}None")
                 }
 
                 desc.add("")
                 desc.add("${ChatColor.GRAY}Give Item: ${if (reward.giveItem) "${ChatColor.GREEN}${ChatColor.BOLD}yes" else "${ChatColor.RED}${ChatColor.BOLD}no" }")
                 desc.add("${ChatColor.GRAY}Chance: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(reward.chance)}")
+                desc.add("")
+                desc.add(styleAction(ChatColor.GREEN, "LEFT-CLICK", "to edit reward"))
+                desc.add(styleAction(ChatColor.RED, "RIGHT-CLICK", "to delete reward"))
             }
         }
 
@@ -132,6 +141,24 @@ class LuckyBlockRewardsEditor(private val luckyBlock: LuckyBlock) : PaginatedMen
                 .name(getName(player))
                 .setLore(getDescription(player))
                 .build()
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                EditRewardMenu(reward).openMenu(player)
+            } else if (clickType.isRightClick) {
+                ConfirmMenu { confirmed ->
+                    if (confirmed) {
+                        luckyBlock.rewards.remove(reward)
+
+                        Tasks.async {
+                            LuckyBlockHandler.saveData()
+                        }
+                    }
+
+                    this@LuckyBlockRewardsEditor.openMenu(player)
+                }.openMenu(player)
+            }
         }
     }
 

@@ -10,10 +10,13 @@ package net.evilblock.prisonaio.module.region.bitmask
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
+import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.combat.timer.CombatTimer
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import org.bukkit.ChatColor
+import org.bukkit.GameMode
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -21,6 +24,7 @@ import org.bukkit.entity.Projectile
 import org.bukkit.event.Cancellable
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.projectiles.ProjectileSource
 import java.lang.reflect.Type
 
@@ -180,16 +184,50 @@ open class BitmaskRegion(id: String, cuboid: Cuboid? = null) : Region(id, cuboid
     }
 
     override fun onLeaveRegion(player: Player) {
+        if (hasBitmask(RegionBitmask.DANGER_ZONE)) {
+            if (CombatTimerHandler.isOnTimer(player)) {
+                CombatTimerHandler.forgetTimer(CombatTimerHandler.getTimer(player)!!)
+            }
+        }
 
+        if (hasBitmask(RegionBitmask.SPEED)) {
+            player.removePotionEffect(PotionEffectType.SPEED)
+        }
     }
 
     override fun onEnterRegion(player: Player) {
-//        if (player.gameMode != GameMode.CREATIVE) {
-//            player.allowFlight = false
-//            player.isFlying = false
-//            player.flySpeed = 0.2F
-//            player.walkSpeed = 0.2F
-//        }
+        if (hasBitmask(RegionBitmask.DENY_FLY)) {
+            if (player.gameMode != GameMode.CREATIVE) {
+                if (player.isFlying) {
+                    player.isFlying = false
+                }
+
+                if (player.allowFlight) {
+                    player.allowFlight = false
+                }
+            }
+        }
+
+        if (hasBitmask(RegionBitmask.DENY_SPEED)) {
+            if (player.gameMode != GameMode.CREATIVE) {
+                if (player.walkSpeed != 0.2F) {
+                    player.walkSpeed = 0.2F
+                }
+            }
+
+            for (enchant in EnchantHandler.getRegisteredEnchants()) {
+                if (!EnchantHandler.config.isEnchantEnabled(enchant)) {
+                    continue
+                }
+
+                val metadataKey = "JE-" + enchant.id
+
+                if (player.hasMetadata(metadataKey)) {
+                    enchant.onUnhold(player)
+                    player.removeMetadata(metadataKey, PrisonAIO.instance)
+                }
+            }
+        }
     }
 
     /*

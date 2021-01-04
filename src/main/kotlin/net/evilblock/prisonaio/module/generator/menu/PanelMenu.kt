@@ -94,8 +94,15 @@ class PanelMenu(private val plot: Plot) : Menu() {
 
         override fun getDescription(player: Player): List<String> {
             return arrayListOf<String>().also { desc ->
-                val hasGeneratorType = GeneratorHandler.getGeneratorsByPlot(plot).any { it.getGeneratorType() == type }
-                if (hasGeneratorType) {
+                val core = GeneratorHandler.getCoreByPlot(plot)
+
+                val limited = if (core != null) {
+                    GeneratorHandler.getGeneratorsByPlot(plot).size - 1 >= core.getLevel().maxBuilds
+                } else {
+                    false
+                }
+
+                if (limited) {
                     desc.addAll(TextSplitter.split(text = "You have reached the limit of ${type.getProperName(true)} you can have on a plot!"))
                 } else {
                     val firstLevel = type.getLevels().first()
@@ -143,11 +150,6 @@ class PanelMenu(private val plot: Plot) : Menu() {
                     val maxBuilds = generatorsOnPlot.size - 1 >= core.getLevel().maxBuilds
                     if (maxBuilds) {
                         player.sendMessage("${ChatColor.RED}You need to upgrade your Core to place more generators!")
-                        return
-                    }
-
-                    if (generatorsOnPlot.any { it.getGeneratorType() == type }) {
-                        player.sendMessage("${ChatColor.RED}You've reached the limit")
                         return
                     }
                 } else {

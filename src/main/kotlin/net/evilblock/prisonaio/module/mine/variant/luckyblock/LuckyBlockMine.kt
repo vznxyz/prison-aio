@@ -61,6 +61,20 @@ class LuckyBlockMine(id: String) : Mine(id) {
         }
     }
 
+    override fun onDelete() {
+        Tasks.sync {
+            for (entity in spawnedEntities) {
+                val block = entity.location.block
+                block.type = Material.STONE
+                block.state.update()
+                block.removeMetadata("LuckyBlock", PrisonAIO.instance)
+
+                entity.destroyForCurrentWatchers()
+                EntityManager.forgetEntity(entity)
+            }
+        }
+    }
+
     override fun getAbstractType(): Type {
         return LuckyBlockMine::class.java
     }
@@ -72,6 +86,10 @@ class LuckyBlockMine(id: String) : Mine(id) {
     }
 
     override fun supportsAutomaticReset(): Boolean {
+        return false
+    }
+
+    override fun supportsFullInventoryTeleport(): Boolean {
         return false
     }
 
@@ -158,17 +176,29 @@ class LuckyBlockMine(id: String) : Mine(id) {
         }
 
         if (!block.hasMetadata("LuckyBlock")) {
+            player.sendMessage("${ChatColor.RED}You can only mine the LuckyBlocks in this mine!")
             cancellable.isCancelled = true
             return
         }
 
         val entity = block.getMetadata("LuckyBlock").first().value() as LuckyBlockEntity
         entity.destroyForCurrentWatchers()
+
+        try {
+            entity.luckyBlock.giveRewards(player)
+        } catch (e: Exception) {
+            LuckyBlockHandler.getModule().getPluginFramework().logger.warning("Failed to give lucky block rewards to ${player.name}")
+            e.printStackTrace()
+        }
+
         EntityManager.forgetEntity(entity)
 
         block.removeMetadata("LuckyBlock", PrisonAIO.instance)
-        block.type = Material.STONE
-        block.state.update()
+
+        Tasks.delayed(1L) {
+            block.type = Material.STONE
+            block.state.update()
+        }
 
         spawnQueue.add(System.currentTimeMillis())
         spawnedEntities.remove(entity)
@@ -194,6 +224,8 @@ class LuckyBlockMine(id: String) : Mine(id) {
     }
 
     override fun onEnterRegion(player: Player) {
+        super.onEnterRegion(player)
+
         player.sendMessage("")
         player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}LuckyBlock Mine")
         player.sendMessage(" ${ChatColor.GRAY}Mine the rare block types to receive rare rewards.")

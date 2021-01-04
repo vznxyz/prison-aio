@@ -22,13 +22,13 @@ import java.util.*
 object LeaderboardsModule : PluginModule() {
 
 	private val leaderboards: List<Leaderboard> = listOf(
-		GangTrophiesLeaderboard,
-		GangValueLeaderboard,
-		BlocksMinedLeaderboard,
 		MoneyBalanceLeaderboard,
+		TopTokensLeaderboard,
 		PrestigeLeaderboard,
+		BlocksMinedLeaderboard,
 		TopTimePlayedLeaderboard,
-		TopTokensLeaderboard
+		GangTrophiesLeaderboard,
+		GangValueLeaderboard
 	)
 
 	val exemptions: MutableSet<UUID> = hashSetOf()
