@@ -106,20 +106,20 @@ object TokenShopListeners : Listener {
             try {
                 if (event.lines[1].startsWith("-")) {
                     event.isCancelled = true
-                    event.player.sendMessage("${ChatColor.RED}Quantity cannot be negative.")
+                    event.player.sendMessage("${ChatColor.RED}Quantity can't be negative!")
                     return
                 }
 
                 val quantity = NumberUtils.parseInput(event.lines[1])
                 if (quantity.toInt() < 1) {
                     event.isCancelled = true
-                    event.player.sendMessage("${ChatColor.RED}Quantity must be at least 1.")
+                    event.player.sendMessage("${ChatColor.RED}Quantity must be at least 1!")
                     return
                 }
 
                 val priceLineSplit = event.lines[2].split(" ")
                 if (priceLineSplit[1].startsWith("-")) {
-                    throw IllegalStateException("Price cannot be negative.")
+                    throw IllegalStateException("Price can't be negative!")
                 }
 
                 val price = NumberUtils.parseInput(priceLineSplit[1])

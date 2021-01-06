@@ -20,6 +20,7 @@ import net.evilblock.cubed.store.bukkit.UUIDCache
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.user.economy.EconomyProvider
+import net.evilblock.prisonaio.module.user.event.UserUnloadEvent
 import net.milkbowl.vault.economy.Economy
 import org.bson.Document
 import org.bson.json.JsonMode
@@ -68,14 +69,24 @@ object UserHandler : PluginHandler() {
         }
 
         Tasks.asyncTimer(20L, 20L) {
-            val toRemove = arrayListOf<User>()
+            val expired = arrayListOf<User>()
+
+            // find expired users
             for (user in usersMap.values) {
                 if (user.getPlayer() == null && user.cacheExpiry != null && System.currentTimeMillis() >= user.cacheExpiry!!) {
-                    toRemove.add(user)
+                    expired.add(user)
                 }
             }
 
-            for (user in toRemove) {
+            // save (if needed) and unload expired users
+            for (user in expired) {
+                val unloadEvent = UserUnloadEvent(user)
+                unloadEvent.call()
+
+                if (unloadEvent.isCancelled) {
+                    continue
+                }
+
                 usersMap.remove(user.uuid)
 
                 if (user.requiresSave) {
@@ -83,7 +94,7 @@ object UserHandler : PluginHandler() {
                         saveUser(user)
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        PrisonAIO.instance.logger.severe("Failed to save user ${user.getUsername()}!")
+                        PrisonAIO.instance.logger.severe("Failed to save and unload user ${user.getUsername()}!")
                     }
                 }
             }

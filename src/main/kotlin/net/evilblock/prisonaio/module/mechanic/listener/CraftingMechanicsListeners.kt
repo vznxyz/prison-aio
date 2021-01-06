@@ -27,7 +27,9 @@ object CraftingMechanicsListeners : Listener {
         Material.BEACON,
         Material.NETHER_STAR,
         Material.ENCHANTMENT_TABLE,
-        Material.BOOK_AND_QUILL
+        Material.BOOK_AND_QUILL,
+        Material.SHIELD,
+        Material.ELYTRA
     )
 
     /**

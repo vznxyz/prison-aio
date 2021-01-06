@@ -10,7 +10,7 @@ package net.evilblock.prisonaio.module.tool.enchant.impl
 import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import net.evilblock.prisonaio.module.tool.ToolsModule
-import net.evilblock.prisonaio.module.admin.analytic.Analytic
+import net.evilblock.prisonaio.module.system.analytic.Analytic
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.tool.enchant.EnchantCategory
 import org.bukkit.Bukkit

@@ -26,29 +26,29 @@ object GangSetLeaderCommand {
     fun execute(player: Player, @Param(name = "player") newLeader: UUID) {
         val gang = GangHandler.getGangByPlayer(player.uniqueId)
         if (gang == null) {
-            player.sendMessage("${ChatColor.RED}You must be inside a gang to set relinquish leadership of it.")
+            player.sendMessage("${ChatColor.RED}You must be inside a gang to set relinquish leadership of it!")
             return
         }
 
         if (!gang.isLeader(player.uniqueId)) {
-            player.sendMessage("${ChatColor.RED}Only the leader can relinquish leadership of the gang.")
+            player.sendMessage("${ChatColor.RED}Only the leader can relinquish leadership of the gang!")
             return
         }
 
         if (player.uniqueId == newLeader) {
-            player.sendMessage("${ChatColor.RED}You are already the leader of your gang.")
+            player.sendMessage("${ChatColor.RED}You are already the leader of your gang!")
             return
         }
 
         val newLeaderUsername = Cubed.instance.uuidCache.name(newLeader)
 
         if (!gang.isMember(newLeader)) {
-            player.sendMessage("${ChatColor.RED}$newLeaderUsername is not a member of your gang.")
+            player.sendMessage("${ChatColor.RED}$newLeaderUsername is not a member of your gang!")
             return
         }
 
         gang.updateLeader(newLeader)
-        player.sendMessage("${ChatColor.GREEN}You have given leadership of your gang to $newLeaderUsername.")
+        player.sendMessage("${ChatColor.GREEN}You have given leadership of your gang to $newLeaderUsername!")
     }
 
 }

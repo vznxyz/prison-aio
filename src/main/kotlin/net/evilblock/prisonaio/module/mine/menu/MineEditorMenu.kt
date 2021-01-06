@@ -14,7 +14,7 @@ import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.menu.pagination.PageButton
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.admin.menu.PrisonManagementMenu
+import net.evilblock.prisonaio.module.system.menu.PrisonManagementMenu
 import net.evilblock.prisonaio.module.mine.Mine
 import net.evilblock.prisonaio.module.mine.MineHandler
 import org.bukkit.ChatColor

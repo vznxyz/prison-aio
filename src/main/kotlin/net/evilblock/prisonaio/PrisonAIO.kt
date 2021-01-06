@@ -29,7 +29,7 @@ import net.evilblock.prisonaio.module.auction.AuctionHouseModule
 import net.evilblock.prisonaio.module.generator.Generator
 import net.evilblock.prisonaio.module.generator.GeneratorsModule
 import net.evilblock.prisonaio.module.tool.ToolsModule
-import net.evilblock.prisonaio.module.admin.AdminModule
+import net.evilblock.prisonaio.module.system.SystemModule
 import net.evilblock.prisonaio.module.leaderboard.LeaderboardsModule
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.mine.Mine
@@ -52,7 +52,9 @@ import net.evilblock.prisonaio.service.ServicesThread
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.warp.WarpsModule
+import net.evilblock.source.Source
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.generator.ChunkGenerator
 
 class PrisonAIO : PluginFramework() {
@@ -99,7 +101,7 @@ class PrisonAIO : PluginFramework() {
         database = Cubed.instance.mongo.client.getDatabase(config.getString("mongo-database"))
 
         enabledModules.addAll(arrayListOf(
-            AdminModule,
+            SystemModule,
             RegionsModule,
             MechanicsModule,
             CombatModule,
@@ -148,6 +150,14 @@ class PrisonAIO : PluginFramework() {
 
     override fun getDefaultWorldGenerator(worldName: String?, id: String?): ChunkGenerator {
         return EmptyChunkGenerator()
+    }
+
+    override fun getSpawnLocation(): Location {
+        return if (Source.instance.serverConfig.spawnLocation != null) {
+            Source.instance.serverConfig.spawnLocation!!
+        } else {
+            Bukkit.getServer().worlds[0].spawnLocation
+        }
     }
 
 }

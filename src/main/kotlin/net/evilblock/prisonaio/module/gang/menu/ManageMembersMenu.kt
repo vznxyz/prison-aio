@@ -231,7 +231,7 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 if (member.role.isAtLeast(GangMember.Role.CO_LEADER)) {
-                    player.sendMessage("${ChatColor.RED}That member can't be promoted any higher.")
+                    player.sendMessage("${ChatColor.RED}That member can't be promoted any higher!")
                     return
                 }
 
@@ -253,17 +253,17 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
             } else if (clickType.isRightClick) {
                 if (clickType.isShiftClick) {
                     if (gang.getMemberInfo(player.uniqueId)?.role?.isAtLeast(GangMember.Role.CO_LEADER) == false) {
-                        player.sendMessage("${ChatColor.RED}You must be at least a co-leader to kick members from the gang.")
+                        player.sendMessage("${ChatColor.RED}You must be at least a co-leader to kick members from the gang!")
                         return
                     }
 
                     if (player.uniqueId == member.uuid) {
-                        player.sendMessage("${ChatColor.RED}You can't kick yourself from your gang.")
+                        player.sendMessage("${ChatColor.RED}You can't kick yourself from your gang!")
                         return
                     }
 
                     if (member.role.isAtLeast(gang.getMemberInfo(player.uniqueId)!!.role)) {
-                        player.sendMessage("${ChatColor.RED}You can't kick a member that is the same role as you.")
+                        player.sendMessage("${ChatColor.RED}You can't kick a member that is the same role as you!")
                         return
                     }
 
@@ -277,14 +277,14 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
                             gang.kickMember(member.uuid)
 
                             val memberName = Cubed.instance.uuidCache.name(member.uuid)
-                            player.sendMessage("${ChatColor.GREEN}Successfully kicked $memberName from the cell.")
+                            player.sendMessage("${ChatColor.GREEN}Successfully kicked $memberName from the cell!")
                         } else {
                             player.sendMessage("${ChatColor.YELLOW}No changes made to members.")
                         }
                     }.openMenu(player)
                 } else {
                     if (member.role == GangMember.Role.MEMBER) {
-                        player.sendMessage("${ChatColor.RED}That member can't be demoted any lower.")
+                        player.sendMessage("${ChatColor.RED}That member can't be demoted any lower!")
                         return
                     }
 
@@ -302,7 +302,7 @@ class ManageMembersMenu(private val gang: Gang) : PaginatedMenu() {
                     }
 
                     if (member.role == GangMember.Role.MEMBER) {
-                        player.sendMessage("${ChatColor.RED}That member can't be demoted any lower.")
+                        player.sendMessage("${ChatColor.RED}That member can't be demoted any lower!")
                         return
                     }
 

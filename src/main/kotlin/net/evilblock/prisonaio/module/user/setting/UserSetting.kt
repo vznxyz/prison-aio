@@ -347,6 +347,18 @@ enum class UserSetting(
                 CosmeticEffectsOption(false)
             )
         }
+    ),
+    DEATH_MESSAGES(
+        displayName = "PvP Death Notifications",
+        description = "This setting controls if you will receive notifications when players die in PvP.",
+        icon = { ItemStack(Material.SKULL_ITEM, 1, 0) },
+        defaultOption = { DeathMessagesOption(true) },
+        options = {
+            arrayListOf(
+                DeathMessagesOption(true),
+                DeathMessagesOption(false)
+            )
+        }
     );
 
     private var cached: UserSettingOption = this.defaultOption()

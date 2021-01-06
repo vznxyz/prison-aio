@@ -16,6 +16,7 @@ import net.evilblock.prisonaio.module.mine.MinesModule
 import net.evilblock.prisonaio.module.mine.event.MineBlockBreakEvent
 import net.evilblock.prisonaio.module.mine.menu.button.ToggleSpawnSelectionButton
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.entity.LuckyBlockEntity
+import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
@@ -175,6 +176,12 @@ class LuckyBlockMine(id: String) : Mine(id) {
             return
         }
 
+        if (PickaxeHandler.getPickaxeData(player.inventory.itemInMainHand) == null) {
+            player.sendMessage("${ChatColor.RED}You must use a pickaxe to break a LuckyBlock!")
+            cancellable.isCancelled = true
+            return
+        }
+
         if (!block.hasMetadata("LuckyBlock")) {
             player.sendMessage("${ChatColor.RED}You can only mine the LuckyBlocks in this mine!")
             cancellable.isCancelled = true
@@ -210,11 +217,11 @@ class LuckyBlockMine(id: String) : Mine(id) {
         event.keepInventory = false
         event.drops.clear()
 
-        for (item in player.inventory.armorContents) {
+        for (item in player.inventory.armorContents.filterNotNull()) {
             player.location.world.dropItemNaturally(player.location, item)
         }
 
-        for (item in player.inventory.storageContents) {
+        for (item in player.inventory.storageContents.filterNotNull()) {
             player.location.world.dropItemNaturally(player.location, item)
         }
 

@@ -68,6 +68,7 @@ object MinesModule : PluginModule() {
         return listOf(
             MineCreateCommand::class.java,
             MineDeleteCommand::class.java,
+            MineEditCommand::class.java,
             MineManageCommand::class.java,
             MineResetCommand::class.java,
             MineSetRegionCommand::class.java,

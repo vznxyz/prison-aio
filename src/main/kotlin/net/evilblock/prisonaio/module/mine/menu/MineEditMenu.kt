@@ -19,7 +19,7 @@ class MineEditMenu(private val mine: Mine) : Menu() {
     }
 
     override fun getTitle(player: Player): String {
-        return "Mine Editor - ${mine.id}"
+        return "Edit Mine - ${mine.id}"
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {

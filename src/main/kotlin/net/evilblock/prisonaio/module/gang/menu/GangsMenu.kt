@@ -25,6 +25,7 @@ import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.gang.GangsModule
 import net.evilblock.prisonaio.module.gang.advertisement.menu.ViewAdvertisementsMenu
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
+import net.evilblock.prisonaio.module.gang.rules.menu.RulesMenu
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.menu.MainMenu
 import org.bukkit.ChatColor
@@ -51,6 +52,7 @@ class GangsMenu : Menu() {
 
             buttons[0] = BackButton { MainMenu(UserHandler.getUser(player)).openMenu(player) }
             buttons[4] = InfoButton()
+            buttons[6] = GangRulesButton()
             buttons[8] = GangInvitesButton()
 
             val gang = GangHandler.getGangByPlayer(player)
@@ -81,6 +83,22 @@ class GangsMenu : Menu() {
 
         override fun getMaterial(player: Player): Material {
             return Material.BEACON
+        }
+    }
+
+    private inner class GangRulesButton : Button() {
+        override fun getName(player: Player): String {
+            return "${ChatColor.GOLD}${ChatColor.BOLD}Gang Rules"
+        }
+
+        override fun getMaterial(player: Player): Material {
+            return Material.BOOK
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (clickType.isLeftClick) {
+                RulesMenu().openMenu(player)
+            }
         }
     }
 

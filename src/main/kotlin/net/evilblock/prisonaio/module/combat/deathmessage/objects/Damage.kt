@@ -16,7 +16,13 @@ abstract class Damage(
 
     fun wrapName(player: UUID): String {
         val name = Cubed.instance.uuidCache.name(player)
-        val kills = UserHandler.getUser(player).statistics.getKills()
+
+        val kills = if (UserHandler.isUserLoaded(player)) {
+            UserHandler.getUser(player).statistics.getKills()
+        } else {
+            0
+        }
+
         return "${ChatColor.RED}$name${ChatColor.DARK_RED}[$kills]${ChatColor.YELLOW}"
     }
 

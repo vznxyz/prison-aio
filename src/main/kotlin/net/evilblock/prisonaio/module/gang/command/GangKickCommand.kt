@@ -27,27 +27,27 @@ object GangKickCommand {
     fun execute(player: Player, @Param(name = "player") kickTarget: UUID) {
         val gang = GangHandler.getGangByPlayer(player.uniqueId)
         if (gang == null) {
-            player.sendMessage("${ChatColor.RED}You must be in a gang to kick a player from it.")
+            player.sendMessage("${ChatColor.RED}You must be in a gang to kick a player from it!")
             return
         }
 
         if (gang.getMemberInfo(player.uniqueId)?.role?.isAtLeast(GangMember.Role.CO_LEADER) == false) {
-            player.sendMessage("${ChatColor.RED}You must be at least a co-leader to kick members from the gang.")
+            player.sendMessage("${ChatColor.RED}You must be at least a co-leader to kick members from the gang!")
             return
         }
 
         if (player.uniqueId == kickTarget) {
-            player.sendMessage("${ChatColor.RED}You can't kick yourself from your gang.")
+            player.sendMessage("${ChatColor.RED}You can't kick yourself from your gang!")
             return
         }
 
         if (!gang.isMember(kickTarget)) {
-            player.sendMessage("${ChatColor.RED}That player is not a member of your gang.")
+            player.sendMessage("${ChatColor.RED}That player is not a member of your gang!")
             return
         }
 
         if (gang.getMemberInfo(kickTarget)!!.role.isAtLeast(gang.getMemberInfo(player.uniqueId)!!.role)) {
-            player.sendMessage("${ChatColor.RED}You can't kick a member that is the same role as you.")
+            player.sendMessage("${ChatColor.RED}You can't kick a member that is the same role as you!")
             return
         }
 
@@ -59,7 +59,7 @@ object GangKickCommand {
         gang.kickMember(kickTarget)
 
         val playerName = Cubed.instance.uuidCache.name(kickTarget)
-        player.sendMessage("${ChatColor.GREEN}Successfully kicked $playerName from the gang.")
+        player.sendMessage("${ChatColor.GREEN}Successfully kicked $playerName from the gang!")
     }
 
 }

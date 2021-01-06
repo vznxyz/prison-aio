@@ -11,6 +11,8 @@ import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.module.combat.CombatModule
+import net.evilblock.prisonaio.module.combat.logger.service.CombatLoggerExpiryService
+import net.evilblock.prisonaio.service.ServiceRegistry
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -23,6 +25,14 @@ object CombatLoggerHandler : PluginHandler() {
         return CombatModule
     }
 
+    override fun initialLoad() {
+        ServiceRegistry.register(CombatLoggerExpiryService, 20L, 20L)
+    }
+
+    fun getLoggers(): Collection<CombatLogger> {
+        return loggers.values
+    }
+
     fun getLoggerById(uuid: UUID): CombatLogger? {
         return loggers[uuid]
     }
@@ -33,14 +43,14 @@ object CombatLoggerHandler : PluginHandler() {
 
     fun trackLogger(logger: CombatLogger) {
         loggers[logger.uuid] = logger
-        loggersByOwner[logger.uuid] = logger
+        loggersByOwner[logger.owner.uniqueId] = logger
 
         EntityManager.trackEntity(logger)
     }
 
     fun forgetLogger(logger: CombatLogger) {
         loggers.remove(logger.uuid)
-        loggersByOwner.remove(logger.uuid)
+        loggersByOwner.remove(logger.owner.uniqueId)
 
         EntityManager.forgetEntity(logger)
     }
