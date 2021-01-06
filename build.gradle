@@ -95,6 +95,6 @@ processResources {
 
 tasks.withType(Jar) {
     def home = System.properties['user.home']
-    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/shared")
-//    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/Prison/plugins")
+//    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/shared")
+    destinationDirectory = file("$home/Desktop/@MineJunkie DEV/Prison/plugins")
 }

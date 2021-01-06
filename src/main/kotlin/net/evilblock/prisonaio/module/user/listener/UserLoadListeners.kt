@@ -12,6 +12,7 @@ import net.evilblock.cubed.logging.ErrorHandler
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.event.UserUnloadEvent
 import net.evilblock.rift.bukkit.spoof.SpoofHandler
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
@@ -87,11 +88,19 @@ object UserLoadListeners : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerQuitEvent(event: PlayerQuitEvent) {
-        val user = UserHandler.forgetUser(event.player.uniqueId)
+        if (UserHandler.isUserLoaded(event.player.uniqueId)) {
+            val user = UserHandler.getUser(event.player.uniqueId)
+            if (user.requiresSave()) {
+                Tasks.async {
+                    UserHandler.saveUser(user)
+                }
+            }
 
-        if (user?.requiresSave() == true) {
-            Tasks.async {
-                UserHandler.saveUser(user)
+            val unloadEvent = UserUnloadEvent(user)
+            unloadEvent.call()
+
+            if (!unloadEvent.isCancelled) {
+                UserHandler.forgetUser(user.uuid)
             }
         }
     }

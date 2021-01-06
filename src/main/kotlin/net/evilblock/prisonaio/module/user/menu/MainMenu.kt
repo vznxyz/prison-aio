@@ -292,7 +292,7 @@ class MainMenu(private val user: User) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 FancyMessage("${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}!${ChatColor.GRAY}] ")
-                    .then("${ChatColor.RED}Click to visit ${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}https://www.discord.gg/minejunkie")
+                    .then("${ChatColor.GREEN}${ChatColor.BOLD}Click to visit ${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}https://www.discord.gg/minejunkie")
                     .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to join our Discord!"))
                     .link("https://www.discord.gg/minejunkie")
                     .send(player)
@@ -312,7 +312,7 @@ class MainMenu(private val user: User) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 FancyMessage("${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}!${ChatColor.GRAY}] ")
-                    .then("${ChatColor.RED}Click to visit ${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}https://store.minejunkie.com")
+                    .then("${ChatColor.GREEN}${ChatColor.BOLD}Click to visit ${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}https://store.minejunkie.com")
                     .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to visit our store!"))
                     .link("https://store.minejunkie.com")
                     .send(player)
@@ -332,7 +332,7 @@ class MainMenu(private val user: User) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 FancyMessage("${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}!${ChatColor.GRAY}] ")
-                    .then("${ChatColor.RED}Click to visit ${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}https://www.minejunkie.com")
+                    .then("${ChatColor.GREEN}${ChatColor.BOLD}Click to visit ${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}https://www.minejunkie.com")
                     .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to visit our website!"))
                     .link("https://www.minejunkie.com")
                     .send(player)

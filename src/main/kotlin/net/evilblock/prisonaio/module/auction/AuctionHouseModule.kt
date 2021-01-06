@@ -13,6 +13,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.auction.command.BrowseCommand
 import net.evilblock.prisonaio.module.auction.command.ListingsCommand
+import net.evilblock.prisonaio.module.auction.command.SimulateCommand
 import net.evilblock.prisonaio.module.auction.command.WipeCommand
 import net.evilblock.prisonaio.module.auction.listing.Listing
 import net.evilblock.prisonaio.module.auction.menu.display.BidHistoryDisplay
@@ -44,6 +45,7 @@ object AuctionHouseModule : PluginModule() {
         return listOf(
             BrowseCommand::class.java,
             ListingsCommand::class.java,
+            SimulateCommand::class.java,
             WipeCommand::class.java
         )
     }

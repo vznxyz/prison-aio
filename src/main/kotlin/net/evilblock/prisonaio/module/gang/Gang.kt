@@ -573,7 +573,7 @@ class Gang(
         }
 
         if (!getCuboid().contains(block.location)) {
-            player.sendMessage("${ChatColor.RED}You can't build or break outside of the gang's headquarters.")
+            player.sendMessage("${ChatColor.RED}You can't build or break outside of the gang's headquarters!")
             return
         }
 

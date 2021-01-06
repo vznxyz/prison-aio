@@ -8,8 +8,7 @@
 package net.evilblock.prisonaio.module.user.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.source.Source
-import org.bukkit.Bukkit
+import net.evilblock.prisonaio.PrisonAIO
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -21,12 +20,7 @@ object SpawnCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        if (Source.instance.serverConfig.spawnLocation != null) {
-            player.teleport(Source.instance.serverConfig.spawnLocation)
-        } else {
-            player.teleport(Bukkit.getServer().worlds[0].spawnLocation)
-        }
-
+        player.teleport(PrisonAIO.instance.getSpawnLocation())
         player.sendMessage("${ChatColor.YELLOW}You've been teleported to spawn!")
     }
 

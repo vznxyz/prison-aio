@@ -23,7 +23,7 @@ object GiveRobotCommand {
             @Param(name = "tier", defaultValue = "0") tier: Int
     ) {
         if (tier > RobotsModule.getMaxTiers()) {
-            sender.sendMessage("${ChatColor.RED}You can't give a Tier $tier Robot as it's higher than the max tier.")
+            sender.sendMessage("${ChatColor.RED}You can't give a Tier $tier Robot as it's higher than the max tier!")
             return
         }
 

@@ -22,6 +22,8 @@ import net.evilblock.prisonaio.module.gang.command.parameter.GangBoosterParamete
 import net.evilblock.prisonaio.module.gang.command.parameter.GangParameterType
 import net.evilblock.prisonaio.module.gang.listener.*
 import net.evilblock.prisonaio.module.gang.advertisement.GangAdvertisementHandler
+import net.evilblock.prisonaio.module.gang.rules.GangRulesHandler
+import net.evilblock.prisonaio.module.gang.command.GangRulesCommand
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -45,6 +47,7 @@ object GangsModule : PluginModule() {
         GangChallengeHandler.initialLoad()
         GangHandler.initialLoad()
         GangAdvertisementHandler.initialLoad()
+        GangRulesHandler.initialLoad()
     }
 
     override fun onDisable() {
@@ -52,6 +55,7 @@ object GangsModule : PluginModule() {
 
         GangHandler.saveGrid()
         GangAdvertisementHandler.saveData()
+        GangRulesHandler.saveData()
     }
 
     override fun onAutoSave() {
@@ -59,6 +63,7 @@ object GangsModule : PluginModule() {
 
         GangHandler.saveGrid()
         GangAdvertisementHandler.saveData()
+        GangRulesHandler.saveData()
     }
 
     override fun getListeners(): List<Listener> {
@@ -102,11 +107,13 @@ object GangsModule : PluginModule() {
             GangForceLeaderCommand.javaClass,
             GangForceResetCommand.javaClass,
             GangRefreshValueCommand.javaClass,
+            GangRulesEditorCommand.javaClass,
             GangTrophiesGiveCommand.javaClass,
             GangTrophiesSetCommand.javaClass,
             GangTrophiesTakeCommand.javaClass,
             GangTrophiesResetAllCommand.javaClass,
-            GangBoostersGrantCommand.javaClass
+            GangBoostersGrantCommand.javaClass,
+            GangRulesCommand.javaClass
         )
     }
 

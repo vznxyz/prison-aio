@@ -23,6 +23,8 @@ import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.rank.serialize.RankReferenceSerializer
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
+import net.evilblock.prisonaio.module.theme.ThemesModule
+import net.evilblock.prisonaio.module.theme.user.ThemeUserData
 import net.evilblock.prisonaio.module.user.activity.type.CompletedAchievementActivity
 import net.evilblock.prisonaio.module.user.auction.UserActionHouseData
 import net.evilblock.prisonaio.module.user.news.News
@@ -81,12 +83,20 @@ class User(val uuid: UUID) {
     @JsonAdapter(UserReadNewsPostsSerializer::class)
     internal var readNews: MutableSet<News> = hashSetOf()
 
+    var themeUserData: ThemeUserData? = null
+
     fun init() {
         perks.user = this
         statistics.user = this
         settings.user = this
         auctionHouseData.user = this
         battlePassProgress.user = this
+
+        if (themeUserData == null) {
+            if (ThemesModule.isEnabled() && ThemesModule.isThemeEnabled() && ThemesModule.getTheme().hasUserDataImplementation()) {
+                themeUserData = ThemesModule.getTheme().createUserData(this)
+            }
+        }
     }
 
     /**

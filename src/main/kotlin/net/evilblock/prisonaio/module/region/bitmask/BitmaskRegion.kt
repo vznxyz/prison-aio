@@ -161,7 +161,7 @@ open class BitmaskRegion(id: String, cuboid: Cuboid? = null) : Region(id, cuboid
         if (hasBitmask(RegionBitmask.SAFE_ZONE)) {
             if (source is Player) {
                 cancellable.isCancelled = true
-                source.sendMessage("${ChatColor.RED}You can't launch projectiles in a safe-zone.")
+                source.sendMessage("${ChatColor.RED}You can't launch projectiles in a safe-zone!")
             }
         }
     }
@@ -171,15 +171,38 @@ open class BitmaskRegion(id: String, cuboid: Cuboid? = null) : Region(id, cuboid
     }
 
     override fun onPlayerDeath(player: Player, event: PlayerDeathEvent) {
-        // force the respawn
-        player.spigot().respawn()
+        val armorContents = player.inventory.armorContents
+        val storageContents = player.inventory.storageContents
 
-        // remove fire and add kept items back to inventory
-        Tasks.delayed(1L) {
-            player.fireTicks = 0
+        if (hasBitmask(RegionBitmask.DANGER_ZONE)) {
+            event.keepInventory = false
+            event.drops.clear()
+
+            // only drop items if the player is not in CREATIVE mode
+            if (player.gameMode != GameMode.CREATIVE) {
+                for (item in armorContents.filterNotNull()) {
+                    player.location.world.dropItemNaturally(player.location, item)
+                }
+
+                for (item in storageContents.filterNotNull()) {
+                    player.location.world.dropItemNaturally(player.location, item)
+                }
+            }
+
             player.inventory.clear()
+            player.spigot().respawn()
+        } else {
+            player.spigot().respawn()
 
-            player.updateInventory()
+            Tasks.delayed(1L) {
+                player.fireTicks = 0
+
+                player.inventory.clear()
+                player.inventory.armorContents = armorContents
+                player.inventory.storageContents = storageContents
+
+                player.updateInventory()
+            }
         }
     }
 

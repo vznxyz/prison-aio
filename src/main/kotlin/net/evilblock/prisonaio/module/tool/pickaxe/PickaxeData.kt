@@ -22,7 +22,7 @@ import org.bukkit.inventory.ItemStack
 import java.text.NumberFormat
 import java.util.*
 
-class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
+open class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
 
     var customName: String? = null
 

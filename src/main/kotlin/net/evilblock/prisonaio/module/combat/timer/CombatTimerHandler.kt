@@ -9,16 +9,36 @@ package net.evilblock.prisonaio.module.combat.timer
 
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.combat.CombatModule
 import org.bukkit.entity.Player
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object CombatTimerHandler : PluginHandler() {
 
-    private val timers: MutableMap<UUID, CombatTimer> = hashMapOf()
+    private val timers: MutableMap<UUID, CombatTimer> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return CombatModule
+    }
+
+    override fun initialLoad() {
+        super.initialLoad()
+
+        Tasks.async {
+            val toRemove = arrayListOf<UUID>()
+
+            for (timer in timers.values) {
+                if (timer.hasExpired()) {
+                    toRemove.add(timer.uuid)
+                }
+            }
+
+            for (uuid in toRemove) {
+                timers.remove(uuid)
+            }
+        }
     }
 
     @JvmStatic

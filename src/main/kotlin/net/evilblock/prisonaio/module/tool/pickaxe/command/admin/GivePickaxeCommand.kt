@@ -10,11 +10,8 @@ package net.evilblock.prisonaio.module.tool.pickaxe.command.admin
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.cubed.util.bukkit.ItemBuilder
-import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeData
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
-import net.evilblock.prisonaio.module.tool.enchant.impl.Efficiency
-import net.evilblock.prisonaio.module.tool.enchant.impl.Fortune
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
@@ -31,8 +28,6 @@ object GivePickaxeCommand {
     fun execute(
         sender: CommandSender,
         @Param(name = "player", defaultValue = "self") target: Player,
-        @Param(name = "efficiencyLevel", defaultValue = "0") efficiencyLevel: Int,
-        @Param(name = "fortuneLevel", defaultValue = "0") fortuneLevel: Int,
         @Param(name = "name", wildcard = true) name: String
     ) {
         var pickaxe = ItemBuilder.of(Material.DIAMOND_PICKAXE).also {
@@ -45,14 +40,6 @@ object GivePickaxeCommand {
         PickaxeHandler.trackPickaxeData(pickaxeData)
 
         pickaxe = pickaxeData.toItemStack(pickaxe)
-
-        if (efficiencyLevel > 0) {
-            EnchantHandler.upgradeEnchant(target, pickaxeData, pickaxe, Efficiency, efficiencyLevel, true)
-        }
-
-        if (fortuneLevel > 0) {
-            EnchantHandler.upgradeEnchant(target, pickaxeData, pickaxe, Fortune, fortuneLevel, true)
-        }
 
         if (target.inventory.firstEmpty() == -1) {
             target.sendMessage("${ChatColor.RED}${ChatColor.BOLD}NOTICE: ${ChatColor.GRAY}You received a pickaxe but your inventory was full, so it has been added to your ender-chest.")

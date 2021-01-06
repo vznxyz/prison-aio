@@ -6,67 +6,64 @@
  */
 
 package net.evilblock.prisonaio.module.combat.logger
-
+import net.evilblock.cubed.entity.hologram.updating.UpdatingHologramEntity
 import net.evilblock.cubed.entity.villager.VillagerEntity
-import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
-import org.bukkit.ChatColor
-import org.bukkit.Location
+import net.evilblock.prisonaio.module.combat.logger.event.CombatLoggerDeathEvent
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-class CombatLogger(
-    private val owner: Player,
-    location: Location
-) : VillagerEntity(lines = listOf(), location = location) {
+class CombatLogger(@Transient val owner: Player) : VillagerEntity(lines = listOf(), location = owner.location) {
 
-    var health: Double = 20.0
-    var dead: Boolean = false
+    companion object {
+        const val LOGGER_DURATION = 10_000L
+    }
+
+    var expiration = System.currentTimeMillis() + LOGGER_DURATION
 
     override fun initializeData() {
         super.initializeData()
 
         persistent = false
+        root = true
+
+        attackable = true
+        health = owner.health
+
+        getAttachedHologram().forceUpdate()
     }
 
-    override fun onLeftClick(player: Player) {
-        if (dead) {
-            return
+    override fun createHologram() {
+        hologram = CombatLoggerHologram(this)
+    }
+
+    override fun getAttachedHologram(): UpdatingHologramEntity {
+        return hologram as UpdatingHologramEntity
+    }
+
+    override fun attack(attacker: Entity, damage: Double, ignoreCooldown: Boolean): Boolean {
+        if (isExpired()) {
+            return false
         }
 
-
-
-        if (health <= 0.0) {
-            kill()
-        } else {
-            updateLines()
+        val attacked = super.attack(attacker, damage, ignoreCooldown)
+        if (attacked) {
+            resetExpiration()
+            getAttachedHologram().forceUpdate()
         }
+
+        return attacked
     }
 
-    fun updateLines() {
-        updateLines(listOf(
-            "${ChatColor.RED}${owner.name}${getHealthDisplay()}",
-            "${ChatColor.GRAY}(Combat Logger)"
-        ))
-    }
-
-    fun getHealthDisplay(): String {
-        return buildString {
-            if (!dead && health > 0) {
-                append(" ${ChatColor.WHITE}${(health / 2.0).toInt()}${ChatColor.DARK_RED}${Constants.HEART_SYMBOL}")
-            }
-        }
-    }
-
-    fun kill() {
-        dead = true
-
-        CombatLoggerHandler.forgetLogger(this)
+    override fun kill(killer: Entity) {
+        super.kill(killer)
 
         val items = arrayListOf<ItemStack>()
-        items.addAll(owner.inventory.armorContents)
-        items.addAll(owner.inventory.storageContents)
+        items.addAll(owner.inventory.armorContents.filterNotNull())
+        items.addAll(owner.inventory.storageContents.filterNotNull())
 
         Tasks.sync {
             for (item in items) {
@@ -77,6 +74,7 @@ class CombatLogger(
         owner.inventory.heldItemSlot = 0
         owner.inventory.clear()
         owner.inventory.armorContents = null
+        owner.updateInventory()
         owner.allowFlight = false
         owner.isFlying = false
         owner.fireTicks = 0
@@ -88,8 +86,43 @@ class CombatLogger(
             owner.removePotionEffect(effect.type)
         }
 
-        owner.teleport(PrisonAIO.instance.getSpawnLocation())
+        // can't use Entity#teleport
+        val spawn = PrisonAIO.instance.getSpawnLocation()
+        (owner as CraftPlayer).handle.setLocation(spawn.x, spawn.y, spawn.z, spawn.yaw, spawn.pitch)
         owner.saveData()
+
+        CombatLoggerDeathEvent(killer, this).call()
+
+        Tasks.delayed(40L) {
+            CombatLoggerHandler.forgetLogger(this)
+        }
+    }
+
+    fun isExpired(): Boolean {
+        return System.currentTimeMillis() >= expiration
+    }
+
+    fun resetExpiration() {
+        expiration = System.currentTimeMillis() + LOGGER_DURATION
+    }
+
+    fun expire() {
+        val location = location.clone()
+        (owner as CraftPlayer).handle.setLocation(location.x, location.y, location.z, location.yaw, location.pitch)
+
+        owner.health = health
+        owner.saveData()
+
+        CombatLoggerHandler.forgetLogger(this)
+        destroyForCurrentWatchers()
+    }
+
+    fun getRemainingDuration(): Long {
+        return expiration - System.currentTimeMillis()
+    }
+
+    fun getRemainingSeconds(): Int {
+        return (getRemainingDuration() / 1000.0).toInt()
     }
 
 }

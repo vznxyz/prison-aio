@@ -22,24 +22,24 @@ object GangSetHomeCommand {
     fun execute(player: Player) {
         val visitingGang = GangHandler.getVisitingGang(player)
         if (visitingGang == null) {
-            player.sendMessage("${ChatColor.RED}You must be inside a gang to set its HQ location.")
+            player.sendMessage("${ChatColor.RED}You must be inside a gang to set its HQ location!")
             return
         }
 
         if (visitingGang.leader != player.uniqueId) {
-            player.sendMessage("${ChatColor.RED}Only the leader of the gang can set the HQ location.")
+            player.sendMessage("${ChatColor.RED}Only the leader of the gang can set the HQ location!")
             return
         }
 
         if (!visitingGang.getCuboid().contains(player.location)) {
-            player.sendMessage("${ChatColor.RED}You can only set the HQ location to somewhere within the gang headquarters.")
+            player.sendMessage("${ChatColor.RED}You can only set the HQ location to somewhere within the gang headquarters!")
             return
         }
 
         visitingGang.homeLocation = player.location
-        visitingGang.sendMessagesToMembers("${ChatColor.YELLOW}${player.name} updated the gang's HQ.")
+        visitingGang.sendMessagesToMembers("${ChatColor.YELLOW}${player.name} updated the gang's HQ!")
 
-        player.sendMessage("${ChatColor.GREEN}Successfully updated the gang's HQ location.")
+        player.sendMessage("${ChatColor.GREEN}Successfully updated the gang's HQ location!")
     }
 
 }

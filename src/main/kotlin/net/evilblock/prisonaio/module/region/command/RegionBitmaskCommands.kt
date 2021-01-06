@@ -13,8 +13,10 @@ import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
 import net.evilblock.prisonaio.module.region.bitmask.RegionBitmask
+import net.evilblock.prisonaio.module.region.bitmask.menu.EditRegionBitmaskMenu
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 object RegionBitmaskCommands {
 
@@ -26,7 +28,7 @@ object RegionBitmaskCommands {
     @JvmStatic
     fun list(sender: CommandSender) {
         for (bitmaskType in RegionBitmask.values()) {
-            sender.sendMessage("${ChatColor.GOLD}${bitmaskType.displayName} (${bitmaskType.bitmaskValue}): ${ChatColor.YELLOW}${bitmaskType.description}")
+            sender.sendMessage("${ChatColor.GOLD}${bitmaskType.name} (${bitmaskType.bitmaskValue}): ${ChatColor.YELLOW}${bitmaskType.description}")
         }
     }
 
@@ -36,23 +38,13 @@ object RegionBitmaskCommands {
         permission = "region.bitmask"
     )
     @JvmStatic
-    fun info(sender: CommandSender, @Param(name = "region") region: Region) {
+    fun info(player: Player, @Param(name = "region") region: Region) {
         if (region !is BitmaskRegion) {
-            sender.sendMessage("${ChatColor.RED}Bitmask flags cannot be applied to regions that don't support bitmasks.")
+            player.sendMessage("${ChatColor.RED}Bitmask flags cannot be applied to regions that don't support bitmasks.")
             return
         }
 
-        sender.sendMessage("${ChatColor.YELLOW}Bitmask flags of ${ChatColor.GOLD}${region.getRegionName()}${ChatColor.YELLOW}:")
-
-        for (bitmaskType in RegionBitmask.values()) {
-            if (!region.hasBitmask(bitmaskType)) {
-                continue
-            }
-
-            sender.sendMessage("${ChatColor.GOLD}${bitmaskType.displayName} (${bitmaskType.bitmaskValue}): ${ChatColor.YELLOW}${bitmaskType.description}")
-        }
-
-        sender.sendMessage("${ChatColor.GOLD}Raw Bitmask: ${ChatColor.YELLOW}${region.getRawBitmask()}")
+        EditRegionBitmaskMenu(region).openMenu(player)
     }
 
     @Command(

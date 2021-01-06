@@ -12,6 +12,7 @@ import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
@@ -19,8 +20,8 @@ import org.bukkit.event.player.PlayerRespawnEvent
 object CombatTimerListeners : Listener {
 
     @EventHandler
-    fun onPlayerQuitEvent(event: PlayerQuitEvent) {
-        val timer = CombatTimerHandler.getTimer(event.player.uniqueId)
+    fun onPlayerDeathEvent(event: PlayerDeathEvent) {
+        val timer = CombatTimerHandler.getTimer(event.entity.uniqueId)
         if (timer != null) {
             CombatTimerHandler.forgetTimer(timer)
         }

@@ -66,6 +66,13 @@ object MinigamesModule : PluginModule() {
         EventGameArenaHandler.saveData()
     }
 
+    override fun onAutoSave() {
+        CoinFlipHandler.saveData()
+        EventConfigHandler.saveData()
+        EventGameHandler.saveData()
+        EventGameArenaHandler.saveData()
+    }
+
     override fun getListeners(): List<Listener> {
         return listOf(
             EventGameListeners,

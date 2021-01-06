@@ -3,12 +3,12 @@ package net.evilblock.prisonaio.module.combat.deathmessage.listeners
 import com.google.common.collect.Maps
 import net.evilblock.prisonaio.module.combat.deathmessage.DeathMessageHandler
 import net.evilblock.prisonaio.module.combat.deathmessage.event.CustomPlayerDamageEvent
-import net.evilblock.prisonaio.module.combat.deathmessage.event.PlayerKilledEvent
 import net.evilblock.prisonaio.module.combat.deathmessage.objects.Damage
 import net.evilblock.prisonaio.module.combat.deathmessage.objects.PlayerDamage
 import net.evilblock.prisonaio.module.combat.deathmessage.objects.UnknownDamage
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
-import net.evilblock.prisonaio.module.user.UserHandler.getUser
+import net.evilblock.prisonaio.module.user.UserHandler
+import net.evilblock.prisonaio.module.user.setting.UserSetting
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
@@ -17,6 +17,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -37,7 +38,12 @@ object DamageListener : Listener {
     }
 
     @EventHandler
-    fun onQuit(event: PlayerQuitEvent) {
+    fun onPlayerJoinEvent(event: PlayerJoinEvent) {
+        DeathMessageHandler.clearDamage(event.player)
+    }
+
+    @EventHandler
+    fun onPlayerQuitEvent(event: PlayerQuitEvent) {
         DeathMessageHandler.clearDamage(event.player)
     }
 
@@ -64,9 +70,6 @@ object DamageListener : Listener {
                     (event.entity as CraftPlayer).handle.killer = (killer as CraftPlayer).handle
                     val victim = event.entity
 
-                    val killedEvent = PlayerKilledEvent(killer, victim)
-                    killedEvent.call()
-
                     // prevent kill boosting
                     if (lastKilled.containsKey(killer.uniqueId) && lastKilled[killer.uniqueId]!!.first === victim.uniqueId) {
                         val kills = if (boosting.containsKey(killer.uniqueId)) {
@@ -81,10 +84,10 @@ object DamageListener : Listener {
                     val sameAddress = killer.getAddress().address.hostAddress.equals(victim.address.address.hostAddress, ignoreCase = true)
                     val sameVictim = boosting.containsKey(killer.uniqueId) && boosting[killer.uniqueId]!!.first > 1
 
-                    getUser(victim.uniqueId).statistics.addDeath()
+                    UserHandler.getUser(victim.uniqueId).statistics.addDeath()
 
                     if (!sameAddress && !sameVictim) {
-                        getUser(killerUuid).statistics.addKill()
+                        UserHandler.getUser(killerUuid).statistics.addKill()
                         lastKilled[killer.uniqueId] = Pair(victim.uniqueId, System.currentTimeMillis())
                     }
                 }
@@ -94,7 +97,13 @@ object DamageListener : Listener {
         }
 
         for (player in Bukkit.getOnlinePlayers()) {
-            player.sendMessage(deathMessage)
+            try {
+                if (UserHandler.getUser(player.uniqueId).settings.getSettingOption(UserSetting.DEATH_MESSAGES).getValue()) {
+                    player.sendMessage(deathMessage)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
         DeathMessageHandler.clearDamage(event.entity)

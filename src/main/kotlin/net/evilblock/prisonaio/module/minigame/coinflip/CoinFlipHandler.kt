@@ -7,6 +7,9 @@
 
 package net.evilblock.prisonaio.module.minigame.coinflip
 
+import com.google.common.io.Files
+import com.google.gson.reflect.TypeToken
+import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.logging.LogFile
 import net.evilblock.cubed.logging.LogHandler
 import net.evilblock.cubed.plugin.PluginHandler
@@ -31,19 +34,34 @@ object CoinFlipHandler : PluginHandler() {
     const val SECONDARY_COLOR_ID = 14.toByte()
 
     var disabled: Boolean = false
+    val logFile: LogFile = LogFile(File(File(UserHandler.getModule().getPluginFramework().dataFolder, "logs"), "coinflip.txt"))
 
     private val games: MutableMap<UUID, CoinFlipGame> = hashMapOf()
-
-    val logFile: LogFile = LogFile(File(File(UserHandler.getModule().getPluginFramework().dataFolder, "logs"), "coinflip.txt"))
 
     override fun getModule(): PluginModule {
         return MinigamesModule
     }
 
     override fun initialLoad() {
+        val dataFile = getInternalDataFile()
+        if (dataFile.exists()) {
+            Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
+                val games = Cubed.gson.fromJson(reader.readLine(), object : TypeToken<List<CoinFlipGame>>() {}.type) as List<CoinFlipGame>
+                for (game in games) {
+                    trackGame(game)
+                }
+            }
+        }
+
         LogHandler.trackLogFile(logFile)
 
         Tasks.asyncTimer(CoinFlipGameTicker, 4L, 4L)
+    }
+
+    override fun saveData() {
+        super.saveData()
+
+        Files.write(Cubed.gson.toJson(games.values, object : TypeToken<List<CoinFlipGame>>() {}.type), getInternalDataFile(), Charsets.UTF_8)
     }
 
     fun cancelGames() {
