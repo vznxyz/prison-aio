@@ -92,9 +92,13 @@ class User(val uuid: UUID) {
         auctionHouseData.user = this
         battlePassProgress.user = this
 
-        if (themeUserData == null) {
-            if (ThemesModule.isEnabled() && ThemesModule.isThemeEnabled() && ThemesModule.getTheme().hasUserDataImplementation()) {
+        if (ThemesModule.isEnabled() && ThemesModule.isThemeEnabled() && ThemesModule.getTheme().hasUserDataImplementation()) {
+            if (themeUserData == null) {
                 themeUserData = ThemesModule.getTheme().createUserData(this)
+            }
+
+            if (themeUserData != null) {
+                themeUserData!!.user = this
             }
         }
     }

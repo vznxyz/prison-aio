@@ -42,6 +42,10 @@ object CoinFlipHandler : PluginHandler() {
         return MinigamesModule
     }
 
+    override fun getInternalDataFile(): File {
+        return File(File(getModule().getPluginFramework().dataFolder, "internal"), "coin-flip-games.json")
+    }
+
     override fun initialLoad() {
         val dataFile = getInternalDataFile()
         if (dataFile.exists()) {
@@ -127,48 +131,46 @@ object CoinFlipHandler : PluginHandler() {
     }
 
     fun renderStatisticsDisplay(user: User): List<String> {
-        val list = arrayListOf<String>()
+        return arrayListOf<String>().also { desc ->
+            desc.add("${ChatColor.GRAY}Wins: ${ChatColor.GREEN}${NumberUtils.format(user.statistics.getCoinflipWins())}")
+            desc.add("${ChatColor.GRAY}Losses: ${ChatColor.RED}${NumberUtils.format(user.statistics.getCoinflipLosses())}")
+            desc.add("")
 
-        list.add("${ChatColor.GRAY}Wins: ${ChatColor.GREEN}${NumberUtils.format(user.statistics.getCoinflipWins())}")
-        list.add("${ChatColor.GRAY}Losses: ${ChatColor.RED}${NumberUtils.format(user.statistics.getCoinflipLosses())}")
-        list.add("")
+            val moneyProfit = user.statistics.getCoinflipProfit(Currency.Type.MONEY)
 
-        val moneyProfit = user.statistics.getCoinflipProfit(Currency.Type.MONEY)
+            val moneyProfitStyle = when {
+                moneyProfit.toDouble() == 0.0 -> {
+                    ""
+                }
+                moneyProfit.toDouble() > 0 -> {
+                    "${ChatColor.GREEN}+"
+                }
+                else -> {
+                    "${ChatColor.RED}-"
+                }
+            }
 
-        val moneyProfitStyle = when {
-            moneyProfit.toDouble() == 0.0 -> {
-                ""
+            desc.add("${ChatColor.GRAY}Net Profit (Money): $moneyProfitStyle${Currency.Type.MONEY.format(moneyProfit)}")
+
+            val tokensProfit = user.statistics.getCoinflipProfit(Currency.Type.TOKENS)
+
+            val tokensProfitStyle = when {
+                tokensProfit.toLong() == 0L -> {
+                    ""
+                }
+                tokensProfit.toLong() > 0 -> {
+                    "${ChatColor.GREEN}+"
+                }
+                else -> {
+                    "${ChatColor.RED}-"
+                }
             }
-            moneyProfit.toDouble() > 0 -> {
-                "${ChatColor.GREEN}+"
-            }
-            else -> {
-                "${ChatColor.RED}-"
-            }
+
+            desc.add("${ChatColor.GRAY}Net Profit (Tokens): $tokensProfitStyle${Currency.Type.TOKENS.format(tokensProfit)}")
+            desc.add("")
+            desc.add("${ChatColor.GRAY}Last 24 Hrs: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")
+            desc.add("${ChatColor.GRAY}Last 7 Days: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")
         }
-
-        list.add("${ChatColor.GRAY}Net Profit (Money): $moneyProfitStyle${Currency.Type.MONEY.format(moneyProfit)}")
-
-        val tokensProfit = user.statistics.getCoinflipProfit(Currency.Type.TOKENS)
-
-        val tokensProfitStyle = when {
-            tokensProfit.toLong() == 0L -> {
-                ""
-            }
-            tokensProfit.toLong() > 0 -> {
-                "${ChatColor.GREEN}+"
-            }
-            else -> {
-                "${ChatColor.RED}-"
-            }
-        }
-
-        list.add("${ChatColor.GRAY}Net Profit (Tokens): $tokensProfitStyle${Currency.Type.TOKENS.format(tokensProfit)}")
-        list.add("")
-        list.add("${ChatColor.GRAY}Last 24 Hrs: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")
-        list.add("${ChatColor.GRAY}Last 7 Days: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")
-
-        return list
     }
 
 }

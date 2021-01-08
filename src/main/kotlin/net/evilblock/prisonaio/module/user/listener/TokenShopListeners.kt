@@ -18,6 +18,7 @@ import net.evilblock.prisonaio.module.user.setting.UserSetting
 import net.evilblock.prisonaio.util.Formats
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.block.Sign
 import org.bukkit.entity.Player
@@ -86,7 +87,7 @@ object TokenShopListeners : Listener {
                         event.isCancelled = true
 
                         try {
-                            handleTransaction(event.player, tokenShop)
+                            handleTransaction(event.player, tokenShop, sign.location)
                         } catch (e: Exception) {
                             event.player.sendMessage("${ChatColor.RED}Failed to transact with that token shop!")
 
@@ -243,7 +244,7 @@ object TokenShopListeners : Listener {
         return TokenShop(owner, quantity, buying, BigDecimal(price.toString()))
     }
 
-    private fun handleTransaction(player: Player, tokenShop: TokenShop) {
+    private fun handleTransaction(player: Player, tokenShop: TokenShop, location: Location) {
         Tasks.async {
             if (player.uniqueId == tokenShop.owner) {
                 player.sendMessage("${ChatColor.RED}You can't buy or sell to your own token shop!")
@@ -289,6 +290,13 @@ object TokenShopListeners : Listener {
                     if (owningUser.settings.getSettingOption(UserSetting.TOKEN_SHOP_NOTIFICATIONS).getValue() as Boolean) {
                         owningPlayer?.sendMessage("$TOKEN_SHOP_TAG You sold ${Formats.formatTokens(quantity)} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(price)}${ChatColor.GRAY}!")
                     }
+
+                    UserHandler.tokenShopsLogFile.commit(buildString {
+                        append("${player.name} (${player.uniqueId})")
+                        append(" purchased ${NumberUtils.format(quantity)} tokens from ${owningUser.getUsername()} for $${NumberUtils.format(price)}")
+                        append(Formats.formatPlayer(tokenShop.owner))
+                        append(" (${location.blockX}, ${location.blockY}, ${location.blockZ})")
+                    })
                 } else {
                     if (!owningUser.hasMoneyBalance(price)) {
                         player.sendMessage("${ChatColor.RED}${owningUser.getUsername()} doesn't have enough money to buy your tokens.")
@@ -321,6 +329,13 @@ object TokenShopListeners : Listener {
                     if (owningUser.settings.getSettingOption(UserSetting.TOKEN_SHOP_NOTIFICATIONS).getValue() as Boolean) {
                         owningPlayer?.sendMessage("$TOKEN_SHOP_TAG You bought ${Formats.formatTokens(quantity)} ${ChatColor.GRAY}to ${Formats.formatPlayer(player)} ${ChatColor.GRAY}for ${Formats.formatMoney(price)}${ChatColor.GRAY}!")
                     }
+
+                    UserHandler.tokenShopsLogFile.commit(buildString {
+                        append("${player.name} (${player.uniqueId})")
+                        append(" sold ${NumberUtils.format(quantity)} tokens to ${owningUser.getUsername()} for $${NumberUtils.format(price)}")
+                        append(Formats.formatPlayer(tokenShop.owner))
+                        append(" (${location.blockX}, ${location.blockY}, ${location.blockZ})")
+                    })
                 }
             }
         }

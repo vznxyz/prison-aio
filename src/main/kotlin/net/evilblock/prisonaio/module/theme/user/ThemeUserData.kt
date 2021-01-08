@@ -7,9 +7,10 @@
 
 package net.evilblock.prisonaio.module.theme.user
 
+import net.evilblock.cubed.serialize.AbstractTypeSerializable
 import net.evilblock.prisonaio.module.user.User
 
-abstract class ThemeUserData(@Transient internal val user: User) {
+abstract class ThemeUserData(@Transient internal var user: User) : AbstractTypeSerializable {
 
 
 

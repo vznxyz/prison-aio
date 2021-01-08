@@ -28,7 +28,7 @@ object GangTrophiesLeaderboard : Leaderboard("gang-trophies", "${ChatColor.DARK_
     }
 
     override fun formatEntry(entry: LeaderboardEntry<*>): String {
-        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.GOLD}${ChatColor.BOLD}${NumberUtils.format(entry.value as Int)} Trophies"
+        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.GOLD}${ChatColor.BOLD}${NumberUtils.format(entry.value as Int)}"
     }
 
 }

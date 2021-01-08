@@ -77,7 +77,7 @@ class ProfileCommentsMenu(user: User) : PaginatedProfileLayoutMenu(layout = Prof
                     description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to remove your comment")
                 } else {
                     description.add("")
-                    description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to remove ${Cubed.instance.uuidCache.name(comment.creator)}'s comment")
+                    description.add("${ChatColor.RED}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.RED}to remove this comment")
                 }
             }
 
@@ -105,9 +105,9 @@ class ProfileCommentsMenu(user: User) : PaginatedProfileLayoutMenu(layout = Prof
 
     companion object {
         private val LIST_SLOTS = arrayListOf(
-            20, 21, 22, 23, 24, 25,
-            29, 30, 31, 32, 33, 34,
-            38, 39, 40, 41, 42, 43
+            19, 20, 21, 22, 23, 24, 25, 26,
+            28, 29, 30, 31, 32, 33, 34, 35,
+            37, 38, 39, 40, 41, 42, 43, 44
         )
     }
 

@@ -40,7 +40,7 @@ class ManageUpgradesMenu(private val robot: MinerRobot) : Menu() {
     override fun onClose(player: Player, manualClose: Boolean) {
         if (manualClose) {
             Tasks.delayed(1L) {
-                ManageRobotMenu(robot).openMenu(player)
+                RobotMenu(robot).openMenu(player)
             }
         }
     }

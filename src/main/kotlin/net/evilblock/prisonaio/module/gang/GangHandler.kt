@@ -173,8 +173,8 @@ object GangHandler : PluginHandler() {
     /**
      * Gets all of the [Gang]s in the grid.
      */
-    fun getAllGangs(): Set<Gang> {
-        return HashSet(grid.values)
+    fun getAllGangs(): Collection<Gang> {
+        return grid.values
     }
 
     /**

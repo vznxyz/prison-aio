@@ -36,7 +36,7 @@ object ShopMultiplierCommand {
         val user = UserHandler.getUser(player.uniqueId)
         var hasMultiplier = false
 
-        for ((permission, multiplier) in UsersModule.getPermissionSalesMultipliers()) {
+        for ((permission, multiplier) in UsersModule.permissionSalesMultipliers) {
             if (player.hasPermission(permission)) {
                 player.sendMessage("${ChatColor.GRAY}You have a permission-based shop multiplier of ${ChatColor.RED}${ChatColor.BOLD}${DECIMAL_FORMAT.format(multiplier)}x${ChatColor.GRAY}.")
                 hasMultiplier = true

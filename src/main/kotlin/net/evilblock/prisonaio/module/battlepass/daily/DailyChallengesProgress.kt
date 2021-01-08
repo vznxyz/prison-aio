@@ -18,6 +18,7 @@ class DailyChallengesProgress(val uuid: UUID) {
     @JsonAdapter(ChallengeListReferenceSerializer::class)
     private var completedChallenges: MutableList<Challenge> = arrayListOf()
 
+    private var kills: Int = 0
     private var playTime: Long = 0L
     private var blocksMined: Int = 0
     private var blocksMinedAtMine: MutableMap<String, Int> = hashMapOf()
@@ -30,6 +31,18 @@ class DailyChallengesProgress(val uuid: UUID) {
 
     fun completeChallenge(challenge: Challenge) {
         completedChallenges.add(challenge)
+    }
+
+    fun getKills(): Int {
+        return kills
+    }
+
+    fun setKills(amount: Int) {
+        kills = amount
+    }
+
+    fun addKills(amount: Int) {
+        kills += amount
     }
 
     fun addBlocksMined(amount: Int) {

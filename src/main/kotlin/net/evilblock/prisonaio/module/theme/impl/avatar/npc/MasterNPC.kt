@@ -9,7 +9,7 @@ package net.evilblock.prisonaio.module.theme.impl.avatar.npc
 
 import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.prisonaio.module.theme.impl.avatar.AvatarTheme
-import net.evilblock.prisonaio.module.theme.impl.avatar.path.menu.SelectPathMenu
+import net.evilblock.prisonaio.module.theme.impl.avatar.path.menu.SelectBaseElementMenu
 import net.evilblock.prisonaio.module.theme.impl.avatar.user.AvatarThemeUserData
 import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.Location
@@ -28,7 +28,7 @@ class MasterNPC(location: Location) : NpcEntity(lines = listOf("master npc"), lo
 
         val data = UserHandler.getUser(player.uniqueId).themeUserData as AvatarThemeUserData
         if (!data.hasBaseElement()) {
-            SelectPathMenu(data).openMenu(player)
+            SelectBaseElementMenu(data).openMenu(player)
             return
         }
     }

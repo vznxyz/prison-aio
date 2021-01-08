@@ -114,7 +114,6 @@ object RobotItemListeners : Listener {
                     robot.tier = tier
                     robot.initializeData()
                     robot.spawn(player)
-                    robot.setupFakeBlock(true)
 
                     RobotHandler.trackRobot(robot)
                 }

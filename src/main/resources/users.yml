@@ -1,4 +1,16 @@
+command-aliases:
+  pshop: "openshop prestigeshop"
+  tshop: "openshop tokenshop"
+
+bank-notes:
+  redeem-alert-threshold:
+    MONEY: 10000000000000000
+    TOKENS: 25000000
+
 perks:
+  auto-sell:
+    # If true, all players will have access to the auto-sell perk
+    default-enabled: true
   auto-smelt:
     # If true, all players will have access to the auto-smelt perk
     default-enabled: true
@@ -16,3 +28,31 @@ perks:
       sales-multi-thug: 1.3
       sales-multi-thief: 1.2
       sales-multi-civilian: 1.1
+
+scoreboard:
+  title:
+    static: ""
+    animated: true
+    animation:
+      - text: "&c&lMINE&7&lJUNKIE"
+        delay: 200
+      - text: "&4&lM&c&lINE&7&lJUNKIE"
+        delay: 200
+      - text: "&c&lM&4&lI&c&lNE&7&lJUNKIE"
+        delay: 200
+      - text: "&c&lMI&4&lN&c&lE&7&lJUNKIE"
+        delay: 200
+      - text: "&c&lMIN&4&lE&7&lJUNKIE"
+        delay: 200
+      - text: "&c&lMINE&f&lJ&7&lUNKIE"
+        delay: 200
+      - text: "&c&lMINE&7&lJ&f&lU&7&lNKIE"
+        delay: 200
+      - text: "&c&lMINE&7&lJU&f&lN&7&lKIE"
+        delay: 200
+      - text: "&c&lMINE&7&lJUN&f&lK&7&lIE"
+        delay: 200
+      - text: "&c&lMINE&7&lJUNK&f&lI&7&lE"
+        delay: 200
+      - text: "&c&lMINE&7&lJUNKI&f&lE"
+        delay: 200

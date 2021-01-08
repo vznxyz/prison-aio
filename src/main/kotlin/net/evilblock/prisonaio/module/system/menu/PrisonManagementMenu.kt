@@ -15,8 +15,13 @@ import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TextUtil
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.nms.MinecraftReflection
+import net.evilblock.prisonaio.module.auction.AuctionHouseHandler
+import net.evilblock.prisonaio.module.gang.GangHandler
+import net.evilblock.prisonaio.module.generator.GeneratorHandler
 import net.evilblock.prisonaio.module.system.SystemModule
 import net.evilblock.prisonaio.module.mine.menu.MineEditorMenu
+import net.evilblock.prisonaio.module.robot.RobotHandler
+import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -98,6 +103,12 @@ class PrisonManagementMenu : Menu() {
                 desc.add("${ChatColor.GRAY}Entities: ${ChatColor.YELLOW}${ChatColor.BOLD}${SystemModule.countEntities()}")
                 desc.add("${ChatColor.GRAY}Worlds: ${ChatColor.YELLOW}${ChatColor.BOLD}${Bukkit.getWorlds().size}")
                 desc.add("${ChatColor.GRAY}View Distance: ${ChatColor.YELLOW}${ChatColor.BOLD}${formattedViewDist}")
+                desc.add("${ChatColor.DARK_GRAY}${ChatColor.BOLD}-")
+                desc.add("${ChatColor.GRAY}User Cache: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(UserHandler.getUsers().size)}")
+                desc.add("${ChatColor.GRAY}Gangs: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(GangHandler.getAllGangs().size)}")
+                desc.add("${ChatColor.GRAY}Robots: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(RobotHandler.getRobots().size)}")
+                desc.add("${ChatColor.GRAY}Generators: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(GeneratorHandler.getGenerators().size)}")
+                desc.add("${ChatColor.GRAY}AH Listings: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(AuctionHouseHandler.getAllListings().size)}")
             }
         }
 

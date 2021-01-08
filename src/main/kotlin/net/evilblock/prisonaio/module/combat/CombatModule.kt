@@ -12,6 +12,7 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldownHandler
 import net.evilblock.prisonaio.module.combat.apple.listener.GodAppleListeners
+import net.evilblock.prisonaio.module.combat.bounty.BountyHandler
 import net.evilblock.prisonaio.module.combat.command.ClearDamageCacheCommand
 import net.evilblock.prisonaio.module.combat.deathmessage.DeathMessageHandler
 import net.evilblock.prisonaio.module.combat.enderpearl.EnderpearlCooldownHandler
@@ -42,6 +43,7 @@ object CombatModule : PluginModule() {
     override fun onEnable() {
         super.onEnable()
 
+        BountyHandler.initialLoad()
         CombatLoggerHandler.initialLoad()
         CombatTimerHandler.initialLoad()
         DeathMessageHandler.initialLoad()
@@ -53,6 +55,18 @@ object CombatModule : PluginModule() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    override fun onDisable() {
+        super.onDisable()
+
+        BountyHandler.saveData()
+    }
+
+    override fun onAutoSave() {
+        super.onAutoSave()
+
+        BountyHandler.saveData()
     }
 
     override fun onReload() {

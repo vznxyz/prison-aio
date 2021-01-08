@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.warp.menu
 
 import net.evilblock.cubed.menu.Button
+import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.pagination.PaginatedMenu
 import net.evilblock.prisonaio.module.warp.Warp
 import net.evilblock.prisonaio.module.warp.WarpHandler
@@ -21,6 +22,14 @@ class WarpEditorMenu : PaginatedMenu() {
 
     override fun getPrePaginatedTitle(player: Player): String {
         return "Warp Editor"
+    }
+
+    override fun getGlobalButtons(player: Player): Map<Int, Button>? {
+        return hashMapOf<Int, Button>().also { buttons ->
+            for (i in 9 until 17) {
+                buttons[i] = GlassButton(0)
+            }
+        }
     }
 
     override fun getAllPagesButtons(player: Player): Map<Int, Button> {

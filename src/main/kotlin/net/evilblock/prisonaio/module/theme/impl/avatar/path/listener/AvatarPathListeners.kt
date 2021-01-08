@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.theme.impl.avatar.path.listener
 
 import net.evilblock.prisonaio.module.theme.impl.avatar.user.AvatarThemeUserData
 import net.evilblock.prisonaio.module.user.UserHandler
+import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -20,7 +21,10 @@ object AvatarPathListeners : Listener {
         if (!event.player.hasPlayedBefore()) {
             val data = UserHandler.getUser(event.player.uniqueId).themeUserData as AvatarThemeUserData
             if (!data.hasBaseElement()) {
-
+                event.player.sendMessage("")
+                event.player.sendMessage(" ${ChatColor.GOLD}${ChatColor.BOLD}Visit the Element Master!")
+                event.player.sendMessage(" ${ChatColor.GRAY}You need to select a base element!")
+                event.player.sendMessage("")
             }
         }
     }

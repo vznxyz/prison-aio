@@ -50,6 +50,7 @@ object UserHandler : PluginHandler() {
     private val usersMap: MutableMap<UUID, User> = ConcurrentHashMap()
 
     val economyLogFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "economy.txt"))
+    val tokenShopsLogFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "token-shops.txt"))
 
     init {
         usersCollection.createIndex(BasicDBObject("id", 1))
@@ -61,6 +62,7 @@ object UserHandler : PluginHandler() {
 
     override fun initialLoad() {
         LogHandler.trackLogFile(economyLogFile)
+        LogHandler.trackLogFile(tokenShopsLogFile)
 
         getModule().getPluginFramework().server.servicesManager.register(Economy::class.java, EconomyProvider(), getModule().getPluginFramework(), ServicePriority.Highest)
 
@@ -179,7 +181,7 @@ object UserHandler : PluginHandler() {
             throw IllegalStateException("User does not exist in database")
         }
 
-        return User(uuid)
+        return User(uuid).also { it.init() }
     }
 
     fun saveUser(user: User) {

@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.prisonaio.module.robot.command
+package net.evilblock.prisonaio.module.robot.command.admin
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.prisonaio.module.robot.menu.PlotRobotsMenu

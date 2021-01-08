@@ -55,7 +55,7 @@ object MineCrateListeners : Listener {
             spawnedCrate.destroy()
             MineCrateHandler.forgetSpawnedCrate(spawnedCrate)
 
-            val sendMessages = UserHandler.getUser(event.player.uniqueId).settings.getSettingOption(UserSetting.REWARD_MESSAGES).getValue<Boolean>()
+            val sendMessages = UserHandler.getUser(event.player.uniqueId).settings.getSettingOption(UserSetting.MINE_CRATES_NOTIFICATIONS).getValue<Boolean>()
 
             for (reward in spawnedCrate.rewardSet.pickRewards()) {
                 if (sendMessages) {
@@ -107,7 +107,7 @@ object MineCrateListeners : Listener {
                     }
 
                     val user = UserHandler.getUser(event.player.uniqueId)
-                    if (user.settings.getSettingOption(UserSetting.REWARD_MESSAGES).getValue()) {
+                    if (user.settings.getSettingOption(UserSetting.MINE_CRATES_NOTIFICATIONS).getValue()) {
                         event.player.sendMessage("${RewardsModule.getChatPrefix()}You just found a MineCrate!")
                     }
 

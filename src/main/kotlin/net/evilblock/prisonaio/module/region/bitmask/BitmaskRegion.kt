@@ -14,13 +14,12 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.combat.timer.CombatTimer
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.block.Block
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
+import org.bukkit.entity.*
 import org.bukkit.event.Cancellable
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
@@ -118,6 +117,15 @@ open class BitmaskRegion(id: String, cuboid: Cuboid? = null) : Region(id, cuboid
     }
 
     override fun onEntityDamageEntity(attacker: Entity, victim: Entity, cause: EntityDamageEvent.DamageCause, damage: Double, cancellable: Cancellable) {
+        if (victim is ItemFrame || victim is Painting) {
+            if (attacker is Player) {
+                if (!RegionHandler.bypassCheck(attacker, cancellable)) {
+                    cancellable.isCancelled = true
+                    return
+                }
+            }
+        }
+
         if (hasBitmask(RegionBitmask.SAFE_ZONE)) {
             cancellable.isCancelled = true
             victim.fireTicks = 0

@@ -21,7 +21,7 @@ import net.evilblock.prisonaio.module.gang.challenge.GangChallengesData
 import net.evilblock.prisonaio.module.gang.entity.JerryNpcEntity
 import net.evilblock.prisonaio.module.gang.invite.GangInvite
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
-import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder
 import org.bukkit.Bukkit
@@ -45,7 +45,7 @@ class Gang(
     var homeLocation: Location,
     guideLocation: Location,
     cuboid: Cuboid
-) : Region("gang-grid-$gridIndex", cuboid) {
+) : BitmaskRegion("gang-grid-$gridIndex", cuboid) {
 
     val uuid: UUID = UUID.randomUUID()
     var announcement: String = "This is the default announcement."

@@ -17,8 +17,6 @@ import java.math.BigInteger
 
 object GangValueLeaderboard : Leaderboard("gang-value", "${ChatColor.DARK_RED}${ChatColor.BOLD}Top Gang Value") {
 
-    private val LONG_MAX_BIG_INT = BigInteger.valueOf(Long.MAX_VALUE)
-
     override fun fetchEntries(): List<LeaderboardEntry<*>> {
         val entries = arrayListOf<LeaderboardEntry<BigInteger>>()
 
@@ -31,12 +29,7 @@ object GangValueLeaderboard : Leaderboard("gang-value", "${ChatColor.DARK_RED}${
     }
 
     override fun formatEntry(entry: LeaderboardEntry<*>): String {
-        val value = entry.value as BigInteger
-        return if (value > LONG_MAX_BIG_INT) {
-            "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${ChatColor.AQUA}$${ChatColor.GREEN}${ChatColor.BOLD}$value"
-        } else {
-            "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${Formats.formatMoney((entry.value.longValueExact()).toDouble())}"
-        }
+        return "${ChatColor.GRAY}${entry.position}. ${ChatColor.YELLOW}${entry.displayName} ${ChatColor.GRAY}- ${Formats.formatMoney((entry.value as BigInteger).toBigDecimal())}"
     }
 
 }

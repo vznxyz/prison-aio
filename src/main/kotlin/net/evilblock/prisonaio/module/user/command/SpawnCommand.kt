@@ -9,6 +9,9 @@ package net.evilblock.prisonaio.module.user.command
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.region.RegionHandler
+import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
+import net.evilblock.prisonaio.module.region.bitmask.RegionBitmask
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
@@ -20,6 +23,13 @@ object SpawnCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
+        val region = RegionHandler.findRegion(player)
+        if (region is BitmaskRegion) {
+            if (region.hasBitmask(RegionBitmask.DANGER_ZONE)) {
+
+            }
+        }
+
         player.teleport(PrisonAIO.instance.getSpawnLocation())
         player.sendMessage("${ChatColor.YELLOW}You've been teleported to spawn!")
     }

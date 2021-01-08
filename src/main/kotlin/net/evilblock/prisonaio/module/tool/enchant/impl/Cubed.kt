@@ -45,7 +45,7 @@ object Cubed : Enchant("cubed", "Cubed", 3) {
                             mineCrate.destroy(true)
                             MineCrateHandler.forgetSpawnedCrate(mineCrate)
 
-                            val sendMessages = UserHandler.getUser(event.player.uniqueId).settings.getSettingOption(UserSetting.REWARD_MESSAGES).getValue<Boolean>()
+                            val sendMessages = UserHandler.getUser(event.player.uniqueId).settings.getSettingOption(UserSetting.MINE_CRATES_NOTIFICATIONS).getValue<Boolean>()
 
                             for (reward in mineCrate.rewardSet.pickRewards()) {
                                 if (sendMessages) {

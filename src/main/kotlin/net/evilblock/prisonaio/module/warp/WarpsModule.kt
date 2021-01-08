@@ -51,6 +51,7 @@ object WarpsModule : PluginModule() {
         return listOf(
             WarpCommand.javaClass,
             WarpCreateCommand.javaClass,
+            WarpDebugCommand.javaClass,
             WarpDeleteCommand.javaClass,
             WarpEditorCommand.javaClass,
             WarpsCommand.javaClass

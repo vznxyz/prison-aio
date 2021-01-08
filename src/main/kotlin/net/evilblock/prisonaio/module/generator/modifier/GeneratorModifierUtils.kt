@@ -22,7 +22,7 @@ object GeneratorModifierUtils {
     fun makeModifierItemStack(type: GeneratorModifierType, amount: Int, value: Double, duration: Duration?): ItemStack {
         val item = ItemBuilder.copyOf(type.icon)
             .amount(amount)
-            .name("${type.color}${ChatColor.BOLD}${type.displayName.toUpperCase()}")
+            .name("${type.color}${ChatColor.BOLD}Generator ${type.displayName.toUpperCase()}")
             .setLore(type.renderLore(value, duration))
             .addFlags(
                 ItemFlag.HIDE_ENCHANTS,
@@ -37,16 +37,16 @@ object GeneratorModifierUtils {
         val nmsCopy = ItemUtils.getNmsCopy(item)
         val tag = NBTUtil.getOrCreateTag(nmsCopy)
 
-        NBTUtil.setString(tag, "ModifierType", type.name)
-        NBTUtil.setDouble(tag, "ModifierValue", value)
+        NBTUtil.setString(tag, "GeneratorModifierType", type.name)
+        NBTUtil.setDouble(tag, "GeneratorModifierValue", value)
 
-        ItemUtils.preserveItemNBT(nmsCopy, tag, "ModifierType")
-        ItemUtils.preserveItemNBT(nmsCopy, tag, "ModifierValue")
+        ItemUtils.preserveItemNBT(nmsCopy, tag, "GeneratorModifierType")
+        ItemUtils.preserveItemNBT(nmsCopy, tag, "GeneratorModifierValue")
 
         if (type.durationBased) {
             if (duration != null) {
-                NBTUtil.setLong(tag, "ModifierDuration", duration.get())
-                ItemUtils.preserveItemNBT(nmsCopy, tag, "ModifierDuration")
+                NBTUtil.setLong(tag, "GeneratorModifierDuration", duration.get())
+                ItemUtils.preserveItemNBT(nmsCopy, tag, "GeneratorModifierDuration")
             } else {
                 throw IllegalStateException("Modifier $type.name requires a duration")
             }
@@ -63,12 +63,12 @@ object GeneratorModifierUtils {
             val nmsCopy = ItemUtils.getNmsCopy(itemStack)
             val tag = NBTUtil.getOrCreateTag(nmsCopy)
 
-            if (NBTUtil.hasKey(tag, "ModifierType") && NBTUtil.hasKey(tag, "ModifierValue")) {
-                val type = GeneratorModifierType.valueOf(NBTUtil.getString(tag, "ModifierType"))
-                val value = NBTUtil.getDouble(tag, "ModifierValue")
+            if (NBTUtil.hasKey(tag, "GeneratorModifierType") && NBTUtil.hasKey(tag, "GeneratorModifierValue")) {
+                val type = GeneratorModifierType.valueOf(NBTUtil.getString(tag, "GeneratorModifierType"))
+                val value = NBTUtil.getDouble(tag, "GeneratorModifierValue")
 
-                val duration = if (NBTUtil.hasKey(tag, "ModifierDuration")) {
-                    Duration(NBTUtil.getLong(tag, "ModifierDuration"))
+                val duration = if (NBTUtil.hasKey(tag, "GeneratorModifierDuration")) {
+                    Duration(NBTUtil.getLong(tag, "GeneratorModifierDuration"))
                 } else {
                     null
                 }

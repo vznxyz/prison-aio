@@ -106,12 +106,14 @@ abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : Abs
     open fun onEntityDamageEntity(attacker: Entity, victim: Entity, cause: EntityDamageEvent.DamageCause, damage: Double, cancellable: Cancellable) {
         if (victim is Player) {
             cancellable.isCancelled = true
+            return
         }
 
         if (victim is ItemFrame || victim is Painting) {
             if (attacker is Player) {
                 if (!RegionHandler.bypassCheck(attacker, cancellable)) {
                     cancellable.isCancelled = true
+                    return
                 }
             }
         }

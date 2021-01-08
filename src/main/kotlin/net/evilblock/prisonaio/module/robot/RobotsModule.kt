@@ -22,6 +22,8 @@ import net.evilblock.prisonaio.module.robot.listener.RobotInventoryListeners
 import net.evilblock.prisonaio.module.robot.listener.RobotItemListeners
 import net.evilblock.prisonaio.module.robot.listener.RobotPlotListeners
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
+import net.evilblock.prisonaio.module.robot.command.admin.*
+import net.evilblock.prisonaio.module.robot.impl.modifier.RobotModifierType
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -66,6 +68,7 @@ object RobotsModule : PluginModule() {
             AlignNearCommand::class.java,
             DeleteNearCommand::class.java,
             GiveRobotCommand::class.java,
+            GiveModifierCommand::class.java,
             SpawnExampleRobotCommand::class.java,
             ToggleAnimationsCommand::class.java,
             ToggleMergeCommand::class.java,
@@ -76,7 +79,8 @@ object RobotsModule : PluginModule() {
 
     override fun getCommandParameterTypes(): Map<Class<*>, ParameterType<*>> {
         return mapOf(
-            Cosmetic::class.java to CosmeticParameterType()
+            Cosmetic::class.java to CosmeticParameterType(),
+            RobotModifierType::class.java to RobotModifierType.ModifierParameterType()
         )
     }
 

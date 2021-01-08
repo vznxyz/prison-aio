@@ -8,7 +8,7 @@ import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.robot.Robot
 import net.evilblock.prisonaio.module.robot.RobotHandler
 import net.evilblock.prisonaio.module.robot.RobotsModule
-import net.evilblock.prisonaio.module.robot.tick.Tickable
+import net.evilblock.prisonaio.module.robot.thread.Tickable
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack

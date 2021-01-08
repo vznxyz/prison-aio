@@ -26,6 +26,7 @@ object LeaderboardsModule : PluginModule() {
 		TopTokensLeaderboard,
 		PrestigeLeaderboard,
 		BlocksMinedLeaderboard,
+		KillsLeaderboard,
 		TopTimePlayedLeaderboard,
 		GangTrophiesLeaderboard,
 		GangValueLeaderboard

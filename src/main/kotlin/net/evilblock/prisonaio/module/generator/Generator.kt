@@ -23,7 +23,7 @@ import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifier
 import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifierType
 import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifierUtils
 import net.evilblock.prisonaio.module.generator.schematic.rotate.Rotation
-import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
 import org.bukkit.ChatColor
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -43,7 +43,7 @@ abstract class Generator(
     val owner: UUID,
     val bounds: Cuboid,
     val rotation: Rotation
-) : Region(id = "GEN-$instanceId"), AbstractTypeSerializable {
+) : BitmaskRegion(id = "GEN-$instanceId"), AbstractTypeSerializable {
 
     var level: Int = 0
     var lastTick: Long = System.currentTimeMillis()

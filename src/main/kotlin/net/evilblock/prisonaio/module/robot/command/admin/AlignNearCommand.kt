@@ -1,4 +1,4 @@
-package net.evilblock.prisonaio.module.robot.command
+package net.evilblock.prisonaio.module.robot.command.admin
 
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param

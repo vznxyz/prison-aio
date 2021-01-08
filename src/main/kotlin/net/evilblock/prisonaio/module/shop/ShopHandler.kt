@@ -117,7 +117,7 @@ object ShopHandler: PluginHandler() {
         Tasks.async {
             val backpacks = BackpackHandler.findBackpacksInInventory(player)
             val accessibleShops = getAccessibleShops(player)
-            val sendMessages = UserHandler.getUser(player.uniqueId).settings.getSettingOption(UserSetting.SHOP_RECEIPTS).getValue() as Boolean
+            val sendMessages = UserHandler.getUser(player.uniqueId).settings.getSettingOption(UserSetting.SHOP_NOTIFICATIONS).getValue() as Boolean
             var soldAnything = false
             var firstOfChain = true
 

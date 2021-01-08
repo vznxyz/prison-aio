@@ -51,7 +51,9 @@ import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import net.evilblock.prisonaio.service.ServicesThread
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.theme.ThemeConfiguration
 import net.evilblock.prisonaio.module.theme.ThemesModule
+import net.evilblock.prisonaio.module.theme.user.ThemeUserData
 import net.evilblock.prisonaio.module.warp.WarpsModule
 import net.evilblock.source.Source
 import org.bukkit.Bukkit
@@ -95,6 +97,8 @@ class PrisonAIO : PluginFramework() {
             builder.registerTypeAdapter(Generator::class.java, AbstractTypeSerializer<Generator>())
             builder.registerTypeAdapter(Robot::class.java, AbstractTypeSerializer<Robot>())
             builder.registerTypeAdapter(Region::class.java, AbstractTypeSerializer<Region>())
+            builder.registerTypeAdapter(ThemeConfiguration::class.java, AbstractTypeSerializer<ThemeConfiguration>())
+            builder.registerTypeAdapter(ThemeUserData::class.java, AbstractTypeSerializer<ThemeUserData>())
         }
 
         CommandHandler.registerParameterType(Currency.Type::class.java, Currency.Type.CurrencyParameterType())

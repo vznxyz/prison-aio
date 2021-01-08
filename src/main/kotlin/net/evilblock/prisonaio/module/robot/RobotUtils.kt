@@ -39,7 +39,7 @@ object RobotUtils {
             val moneyPerHour = (RobotsModule.getTierBaseMoney(tier) * 10.0) * TimeUnit.HOURS.toSeconds(1L)
             val tokensPerHour = ((RobotsModule.getTierBaseTokens(tier) * 10.0) * TimeUnit.HOURS.toSeconds(1L)).toLong()
 
-            desc.addAll(TextSplitter.split(text = "Place this robot on your plot to start generating money and tokens!"))
+            desc.addAll(TextSplitter.split(text = "Place this robot on your plot to start generating money and tokens! Robots only work when you're online."))
             desc.add("")
             desc.add("${ChatColor.RED}${ChatColor.BOLD}Statistics")
             desc.add("${ChatColor.GRAY}Money/HR: ${Formats.formatMoney(moneyPerHour)}")

@@ -191,7 +191,7 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
                 }
             }
 
-            description.add("${ChatColor.GRAY}Net Profit (Money): $moneyProfitStyle${Currency.Type.MONEY.format(moneyProfit)}")
+            description.add("${ChatColor.GRAY}Net Profit (Money): $moneyProfitStyle${Currency.Type.MONEY.format(moneyProfit.abs())}")
 
             val tokensProfit = user.statistics.getCoinflipProfit(Currency.Type.TOKENS)
 
@@ -207,7 +207,7 @@ class CoinFlipGameMenu(val game: CoinFlipGame) : Menu() {
                 }
             }
 
-            description.add("${ChatColor.GRAY}Net Profit (Tokens): $tokensProfitStyle${Currency.Type.TOKENS.format(moneyProfit)}")
+            description.add("${ChatColor.GRAY}Net Profit (Tokens): $tokensProfitStyle${Currency.Type.TOKENS.format(moneyProfit.abs())}")
             description.add("")
             description.add("${ChatColor.GRAY}Last 24 Hrs: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")
             description.add("${ChatColor.GRAY}Last 7 Days: ${Currency.Type.MONEY.format(0)} ${ChatColor.GRAY}/ ${Currency.Type.TOKENS.format(0)}")

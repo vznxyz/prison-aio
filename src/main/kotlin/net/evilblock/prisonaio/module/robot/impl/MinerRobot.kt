@@ -2,21 +2,21 @@ package net.evilblock.prisonaio.module.robot.impl
 
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.Cubed
-import net.evilblock.cubed.util.Reflection
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.enchantment.GlowEnchantment
-import net.evilblock.cubed.util.nms.MinecraftProtocol
 import net.evilblock.prisonaio.util.Formats
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
-import net.evilblock.prisonaio.module.robot.menu.ManageRobotMenu
+import net.evilblock.prisonaio.module.robot.menu.RobotMenu
 import net.evilblock.prisonaio.module.robot.Robot
 import net.evilblock.prisonaio.module.robot.RobotHandler
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.robot.cosmetic.Cosmetic
 import net.evilblock.prisonaio.module.robot.cosmetic.impl.SkinCosmetic
+import net.evilblock.prisonaio.module.robot.impl.modifier.RobotModifier
+import net.evilblock.prisonaio.module.robot.impl.modifier.RobotModifierType
+import net.evilblock.prisonaio.module.robot.impl.modifier.RobotModifierUtils
 import net.evilblock.prisonaio.util.statistic.EarningsHistoryV2
 import net.evilblock.prisonaio.module.robot.impl.upgrade.Upgrade
 import net.evilblock.prisonaio.module.robot.impl.upgrade.UpgradeManager
@@ -24,21 +24,18 @@ import net.evilblock.prisonaio.module.robot.impl.upgrade.impl.EfficiencyUpgrade
 import net.evilblock.prisonaio.module.robot.impl.upgrade.impl.FortuneUpgrade
 import net.evilblock.prisonaio.module.robot.serialize.AppliedCosmeticsSerializer
 import net.evilblock.prisonaio.module.robot.serialize.AppliedUpgradesSerializer
-import net.evilblock.prisonaio.module.robot.tick.Tickable
-import net.minecraft.server.v1_12_R1.BlockPosition
-import net.minecraft.server.v1_12_R1.PacketPlayOutBlockBreakAnimation
-import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange
+import net.evilblock.prisonaio.module.robot.thread.Tickable
+import net.evilblock.prisonaio.module.user.UserHandler
 import org.bukkit.*
-import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.metadata.FixedMetadataValue
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, location = location), Tickable {
 
@@ -67,9 +64,6 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
     private var lastTick: Long = System.currentTimeMillis()
     var uptime: Long = 0L
 
-    // block animation values
-    @Transient private var blockPhase: Int = 0
-
     // head animation values
     @Transient private var headMod: Byte = 1
     @Transient private var minHeadRotationRange = -25
@@ -82,13 +76,14 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
     @Transient private var maxArmRotationRange = 0
     @Transient private var armModPerTick = (150) / 10.0
 
+    var modifierStorage: Array<ItemStack?> = arrayOfNulls(3)
+    var modifiers: ConcurrentHashMap<RobotModifierType, RobotModifier> = ConcurrentHashMap()
+
     override fun initializeData() {
         super.initializeData()
 
         persistent = false
         lastTick = System.currentTimeMillis()
-
-        blockPhase = 0
 
         headMod = 1.toByte()
         minHeadRotationRange = -25
@@ -144,7 +139,7 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         }
 
         try {
-            ManageRobotMenu(this).openMenu(player)
+            RobotMenu(this).openMenu(player)
         } catch (e: Exception) {
             player.sendMessage("${ChatColor.RED}Technical difficulties! (Server Error)")
             e.printStackTrace()
@@ -153,25 +148,6 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
 
     override fun sendDestroyPackets(player: Player) {
         super.sendDestroyPackets(player)
-
-        val fakeBlock = getFakeBlockLocation()
-        val blockPos = BlockPosition(fakeBlock.blockX, fakeBlock.blockY, fakeBlock.blockZ)
-
-        Tasks.sync {
-            val blockChangePacket = PacketPlayOutBlockChange()
-            Reflection.setDeclaredFieldValue(blockChangePacket, "a", blockPos)
-            Reflection.setDeclaredFieldValue(blockChangePacket, "block", (fakeBlock.world as CraftWorld).handle.getType(blockPos))
-
-            MinecraftProtocol.send(player, blockChangePacket)
-        }
-
-        val blockBreakEntityId = (fakeBlock.x.toInt() and 0xFFF) shl 20 or (fakeBlock.z.toInt() and 0xFFF) shl 8 or fakeBlock.y.toInt() and 0xFF
-        val blockBreakAnimationPacket = PacketPlayOutBlockBreakAnimation()
-        Reflection.setDeclaredFieldValue(blockBreakAnimationPacket, "a", blockBreakEntityId)
-        Reflection.setDeclaredFieldValue(blockBreakAnimationPacket, "b", BlockPosition(fakeBlock.blockX, fakeBlock.blockY, fakeBlock.blockZ))
-        Reflection.setDeclaredFieldValue(blockBreakAnimationPacket, "c", 0)
-
-        MinecraftProtocol.send(player, blockBreakAnimationPacket)
     }
 
     override fun getHologramLines(): List<String> {
@@ -226,6 +202,8 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
             throw IllegalStateException("Cannot tick robot on main thread")
         }
 
+        tickModifiers()
+
         val owner = Bukkit.getPlayer(owner)
         if (owner != null && owner.isOnline) {
             val timePassed = System.currentTimeMillis() - lastTick
@@ -273,6 +251,124 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
 
         moneyOwed += BigDecimal(money)
         tokensOwed += BigDecimal(tokens)
+
+        if (hasActiveModifier(RobotModifierType.AUTO_COLLECT)) {
+            val modifier = getActiveModifier(RobotModifierType.AUTO_COLLECT) ?: return
+
+            val user = UserHandler.getOrLoadAndCacheUser(owner)
+            if (user.cacheExpiry != null && modifier.duration != null) {
+                if (modifier.duration.isPermanent()) {
+                    user.cacheExpiry = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30L)
+                } else {
+                    user.cacheExpiry = System.currentTimeMillis() + modifier.getRemainingTime()
+                }
+            }
+
+            val moneyCollected = moneyOwed
+            val tokensCollected = tokensOwed
+
+            moneyOwed = BigDecimal(0.0)
+            tokensOwed = BigDecimal(0.0)
+
+            if (moneyCollected > BigDecimal.ZERO) {
+                Currency.Type.MONEY.give(owner, moneyCollected)
+            }
+
+            if (tokensCollected > BigDecimal.ZERO) {
+                Currency.Type.TOKENS.give(owner, tokensCollected)
+            }
+        }
+    }
+
+    fun getActiveModifiers(): Array<RobotModifier?> {
+        return modifiers.values.toTypedArray()
+    }
+
+    fun hasActiveModifier(type: RobotModifierType): Boolean {
+        return modifiers.containsKey(type)
+    }
+
+    fun getActiveModifier(type: RobotModifierType): RobotModifier? {
+        return modifiers[type]
+    }
+
+    fun getMaxModifiers(): Int {
+        return 1
+    }
+
+    /**
+     * Tries to remove the given [amount] of [itemStack] from the [modifierStorage].
+     * Returns the amount of the [itemStack] that was removed.
+     */
+    fun removeModifierItem(itemStack: ItemStack, amount: Int): Int {
+        val originalAmount = amount
+        var remainingAmount = amount
+
+        for (slot in modifierStorage.indices) {
+            val itemInSlot = modifierStorage[slot] ?: continue
+
+            if (!ItemUtils.isSimilar(itemInSlot, itemStack) || !ItemUtils.hasSameLore(itemInSlot, itemStack) || !ItemUtils.hasSameEnchantments(itemInSlot, itemStack)) {
+                continue
+            }
+
+            if (remainingAmount >= itemInSlot.amount) {
+                remainingAmount -= itemInSlot.amount
+                modifierStorage[slot] = null
+            } else {
+                itemInSlot.amount = itemInSlot.amount - remainingAmount
+                break
+            }
+        }
+
+        return originalAmount - remainingAmount
+    }
+
+    fun onApplyModifier(modifier: RobotModifier) {
+
+    }
+
+    fun onRemoveModifier(modifier: RobotModifier) {
+
+    }
+
+    private fun tickModifiers() {
+        if (getMaxModifiers() > 0) {
+            val expired = arrayListOf<RobotModifier>()
+            for (modifier in modifiers.values) {
+                if (modifier.isExpired()) {
+                    expired.add(modifier)
+                }
+            }
+
+            for (modifier in expired) {
+                onRemoveModifier(modifier)
+                modifiers.remove(modifier.type)
+            }
+
+            val activeModifiers = getActiveModifiers()
+            if (activeModifiers.size < getMaxModifiers()) {
+                for (item in modifierStorage) {
+                    if (item != null) {
+                        val modifier = RobotModifierUtils.extractModifierFromItemStack(item)
+                        if (modifier != null) {
+                            if (!hasActiveModifier(modifier.type)) {
+                                modifiers[modifier.type] = modifier
+
+                                if (modifier.type.durationBased) {
+                                    removeModifierItem(item, 1)
+                                }
+
+                                onApplyModifier(modifier)
+
+                                if (getActiveModifiers().size >= getMaxModifiers()) {
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun tickArmorStandAnimation() {
@@ -419,61 +515,6 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
 
         enabledCosmetics.remove(cosmetic)
         cosmetic.onDisable(this)
-    }
-
-    fun getFakeBlockLocation(): Location {
-        val direction = getDirection()
-        return location.clone().add(direction.modX.toDouble(), direction.modY.toDouble(), direction.modZ.toDouble())
-    }
-
-    fun getFakeBlock(): Block {
-        return getFakeBlockLocation().block
-    }
-
-    fun setupFakeBlock(ensureSync: Boolean) {
-        if (ensureSync) {
-            if (!Bukkit.isPrimaryThread()) {
-                Tasks.sync {
-                    setupFakeBlock(false)
-                }
-            } else {
-                setupFakeBlock(false)
-            }
-        } else {
-            if (getFakeBlockLocation().world == null) {
-                return
-            }
-
-            val fakeBlock = getFakeBlock()
-            if (fakeBlock.type != Material.OBSIDIAN) {
-                fakeBlock.type = Material.OBSIDIAN
-                fakeBlock.state.update()
-            }
-
-            if (!fakeBlock.hasMetadata("RobotBlock")) {
-                fakeBlock.setMetadata("RobotBlock", FixedMetadataValue(RobotsModule.getPluginFramework(), true))
-            }
-        }
-    }
-
-    fun clearFakeBlock() {
-        if (getFakeBlockLocation().world == null) {
-            return
-        }
-
-        Tasks.sync {
-            val chunk = location.chunk
-            if (!chunk.isLoaded) {
-                if (!chunk.load(true)) {
-                    throw IllegalStateException("Couldn't load chunk where robot is located")
-                }
-            }
-
-            val fakeBlock = getFakeBlock()
-            fakeBlock.type = Material.AIR
-            fakeBlock.state.update()
-            fakeBlock.removeMetadata("RobotBlock", RobotsModule.getPluginFramework())
-        }
     }
 
     private fun getDirection(): BlockFace {

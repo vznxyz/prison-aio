@@ -8,7 +8,6 @@
 package net.evilblock.prisonaio.module.region
 
 import com.google.common.base.Charsets
-import com.google.common.collect.Maps
 import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
@@ -22,19 +21,19 @@ import net.evilblock.prisonaio.module.region.global.GlobalRegion
 import net.evilblock.prisonaio.service.ServiceRegistry
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
-import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object RegionHandler : PluginHandler() {
 
     private val DATA_TYPE = object : TypeToken<List<Region>>() {}.type
 
-    private val regions: MutableMap<String, Region> = Maps.newConcurrentMap()
-    private val regions2D: MutableMap<CoordSet2D, Region> = Maps.newConcurrentMap()
-    private val regions3D: MutableMap<CoordSet3D, Region> = Maps.newConcurrentMap()
+    private val regions: MutableMap<String, Region> = ConcurrentHashMap()
+    private val regions2D: MutableMap<CoordSet2D, Region> = ConcurrentHashMap()
+    private val regions3D: MutableMap<CoordSet3D, Region> = ConcurrentHashMap()
     private val defaultRegion: Region = GlobalRegion()
 
     override fun getModule(): PluginModule {
@@ -174,7 +173,7 @@ object RegionHandler : PluginHandler() {
     }
 
     fun bypassCheck(player: Player, cancellable: Cancellable): Boolean {
-        if (player.gameMode == GameMode.CREATIVE && (player.hasPermission(Permissions.REGION_BYPASS) || player.isOp)) {
+        if (player.hasPermission(Permissions.REGION_BYPASS) || player.isOp) {
             return if (RegionBypass.hasBypass(player)) {
                 RegionBypass.attemptNotify(player)
                 cancellable.isCancelled = false

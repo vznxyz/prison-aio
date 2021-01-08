@@ -186,9 +186,9 @@ class GangsMenu : Menu() {
     private inner class ManageGangButton(private val gang: Gang) : Button() {
         override fun getName(player: Player): String {
             return if (gang.isLeader(player.uniqueId)) {
-                "${ChatColor.RED}${ChatColor.BOLD}Your Gang"
+                "${ChatColor.GOLD}${ChatColor.BOLD}Your Gang"
             } else {
-                "${ChatColor.RED}${ChatColor.BOLD}${gang.getLeaderUsername()}'s Gang"
+                "${ChatColor.GOLD}${ChatColor.BOLD}${gang.getLeaderUsername()}'s Gang"
             }
         }
 

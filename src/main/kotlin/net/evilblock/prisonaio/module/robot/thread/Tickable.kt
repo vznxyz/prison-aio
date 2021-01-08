@@ -1,4 +1,4 @@
-package net.evilblock.prisonaio.module.robot.tick
+package net.evilblock.prisonaio.module.robot.thread
 
 interface Tickable {
 

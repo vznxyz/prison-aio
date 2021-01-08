@@ -118,9 +118,9 @@ enum class UserSetting(
         description = "This setting controls if sounds will play when you receive private messages.",
         icon = { option ->
             if (option.getValue()) {
-                ItemUtils.makeTexturedSkull(Constants.IB_ALARM_ON_TEXTURE)
+                ItemUtils.makeTexturedSkull(Constants.IB_MUSIC_NOTE_TEXTURE)
             } else {
-                ItemUtils.makeTexturedSkull(Constants.IB_ALARM_OFF_TEXTURE)
+                ItemUtils.makeTexturedSkull(Constants.IB_MUSIC_NOTE_GRAY_TEXTURE)
             }
         },
         defaultOption = { PrivateMessageSoundsOption(true) },
@@ -195,30 +195,18 @@ enum class UserSetting(
     ENCHANT_MESSAGES(
         displayName = "Enchantment Messages",
         description = "This setting controls if you will receive messages in chat related to enchantment abilities.",
-        icon = { ItemStack(Material.ENCHANTMENT_TABLE) },
+        icon = { option ->
+            if (option.getValue()) {
+                net.evilblock.cubed.util.bukkit.ItemUtils.makeTexturedSkull(net.evilblock.cubed.util.bukkit.Constants.IB_ALARM_ON_TEXTURE)
+            } else {
+                net.evilblock.cubed.util.bukkit.ItemUtils.makeTexturedSkull(net.evilblock.cubed.util.bukkit.Constants.IB_ALARM_OFF_TEXTURE)
+            }
+        },
         defaultOption = { EnchantmentMessagesOption(true) },
         options = {
             arrayListOf(
                 EnchantmentMessagesOption(true),
                 EnchantmentMessagesOption(false)
-            )
-        }
-    ),
-    REWARD_MESSAGES(
-        displayName = "Reward Messages",
-        description = "This setting controls if you will receive messages in chat related to rewards, such as: MineCrates, Gang Trophies, etc;",
-        icon = { option ->
-            if (option.getValue()) {
-                ItemUtils.makeTexturedSkull(Constants.IB_CHEST_OPEN_TEXTURE)
-            } else {
-                ItemUtils.makeTexturedSkull(Constants.IB_CHEST_LOOTED_TEXTURE)
-            }
-        },
-        defaultOption = { RewardMessagesOption(true) },
-        options = {
-            arrayListOf(
-                RewardMessagesOption(true),
-                RewardMessagesOption(false)
             )
         }
     ),
@@ -246,14 +234,14 @@ enum class UserSetting(
             )
         }
     ),
-    SHOP_RECEIPTS(
-        displayName = "Shop Receipts",
-        description = "This setting controls if you will be displayed a shop receipt whenever you sell items to a shop.",
+    SHOP_NOTIFICATIONS(
+        displayName = "Shop Notifications",
+        description = "This setting controls if you will receive a notification whenever you sell items to a shop.",
         icon = { option ->
             if (option.getValue()) {
-                ItemUtils.makeTexturedSkull(Constants.IB_MUSIC_NOTE_TEXTURE)
+                ItemUtils.makeTexturedSkull(Constants.IB_ALARM_ON_TEXTURE)
             } else {
-                ItemUtils.makeTexturedSkull(Constants.IB_MUSIC_NOTE_GRAY_TEXTURE)
+                ItemUtils.makeTexturedSkull(Constants.IB_ALARM_OFF_TEXTURE)
             }
         },
         defaultOption = { ShopReceiptsOption(true) },
@@ -261,6 +249,42 @@ enum class UserSetting(
             arrayListOf(
                 ShopReceiptsOption(true),
                 ShopReceiptsOption(false)
+            )
+        }
+    ),
+    MINE_CRATES_NOTIFICATIONS(
+        displayName = "Reward Notifications",
+        description = "This setting controls if you will be notified when you find a MineCrate.",
+        icon = { option ->
+            if (option.getValue()) {
+                ItemUtils.makeTexturedSkull(Constants.IB_ALARM_ON_TEXTURE)
+            } else {
+                ItemUtils.makeTexturedSkull(Constants.IB_ALARM_OFF_TEXTURE)
+            }
+        },
+        defaultOption = { MineCrateNotifications(true) },
+        options = {
+            arrayListOf(
+                MineCrateNotifications(true),
+                MineCrateNotifications(false)
+            )
+        }
+    ),
+    GANG_TROPHY_NOTIFICATIONS(
+        displayName = "Gang Trophy Notifications",
+        description = "This setting controls if you will be notified when you receive trophies for your gang.",
+        icon = { option ->
+            if (option.getValue()) {
+                ItemUtils.makeTexturedSkull(Constants.IB_ALARM_ON_TEXTURE)
+            } else {
+                ItemUtils.makeTexturedSkull(Constants.IB_ALARM_OFF_TEXTURE)
+            }
+        },
+        defaultOption = { GangTrophiesNotifications(true) },
+        options = {
+            arrayListOf(
+                GangTrophiesNotifications(true),
+                GangTrophiesNotifications(false)
             )
         }
     ),

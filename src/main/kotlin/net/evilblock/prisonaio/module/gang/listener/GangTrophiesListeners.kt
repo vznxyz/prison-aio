@@ -45,7 +45,7 @@ object GangTrophiesListeners : Listener {
                 }
 
                 val user = UserHandler.getUser(event.player.uniqueId)
-                if (user.settings.getSettingOption(UserSetting.REWARD_MESSAGES).getValue()) {
+                if (user.settings.getSettingOption(UserSetting.GANG_TROPHY_NOTIFICATIONS).getValue()) {
                     event.player.sendMessage("${RewardsModule.getChatPrefix()}You found ${ChatColor.GOLD}${ChatColor.BOLD}$amount ${ChatColor.GOLD}Trophies ${ChatColor.GRAY}for your gang while mining!")
                 }
 

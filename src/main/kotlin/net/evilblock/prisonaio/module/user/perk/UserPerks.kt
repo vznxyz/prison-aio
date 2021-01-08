@@ -108,7 +108,7 @@ class UserPerks(@Transient internal var user: User) {
     fun getSalesMultiplier(player: Player): Double {
         var stackedMultiplier = 0.0
 
-        for ((permission, multiplier) in UsersModule.getPermissionSalesMultipliers()) {
+        for ((permission, multiplier) in UsersModule.permissionSalesMultipliers) {
             if (player.hasPermission(permission)) {
                 stackedMultiplier += multiplier
                 break
@@ -138,7 +138,7 @@ class UserPerks(@Transient internal var user: User) {
     }
 
     fun isAutoSellEnabled(player: Player): Boolean {
-        return isPerkEnabled(Perk.AUTO_SELL) && hasPerk(player, Perk.AUTO_SELL)
+        return UsersModule.isAutoSellPerkEnabledByDefault() || (isPerkEnabled(Perk.AUTO_SELL) && hasPerk(player, Perk.AUTO_SELL))
     }
 
 }

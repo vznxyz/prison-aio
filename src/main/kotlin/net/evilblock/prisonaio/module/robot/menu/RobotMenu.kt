@@ -6,8 +6,11 @@ import net.evilblock.cubed.menu.buttons.GlassButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.TimeUtil
+import net.evilblock.cubed.util.bukkit.InventoryUtils
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.render.GraphicalTable
+import net.evilblock.prisonaio.module.generator.menu.GeneratorMenu
+import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifierUtils
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.Formats
 import net.evilblock.prisonaio.module.robot.RobotHandler
@@ -27,7 +30,7 @@ import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.concurrent.TimeUnit
 
-class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
+class RobotMenu(private val robot: MinerRobot) : Menu() {
 
     init {
         autoUpdate = true
@@ -35,25 +38,37 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
     }
 
     override fun getTitle(player: Player): String {
-        return "Manage ${ChatColor.stripColor(robot.getTierName())}"
+        return ChatColor.stripColor(robot.getTierName())
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {
-        val buttons = hashMapOf<Int, Button>()
-
-        buttons[4] = YourRobotButton()
-        buttons[20] = UpgradesButton()
-        buttons[22] = CosmeticsButton()
-        buttons[24] = PickupRobotButton()
-        buttons[40] = CollectButton()
-
-        for (i in 0..44) {
-            if (!buttons.containsKey(i)) {
+        return hashMapOf<Int, Button>().also { buttons ->
+            for (i in 0 until 54) {
                 buttons[i] = GlassButton(7)
             }
+
+            buttons[4] = YourRobotButton()
+            buttons[19] = UpgradesButton()
+            buttons[21] = CosmeticsButton()
+            buttons[23] = PickupRobotButton()
+            buttons[25] = CollectButton()
+        }
+    }
+
+    override fun acceptsInsertedItem(player: Player, itemStack: ItemStack, slot: Int): Boolean {
+        if (!GeneratorMenu.MODIFIER_SLOTS.contains(slot)) {
+            return false
         }
 
-        return buttons
+        val modifier = GeneratorModifierUtils.extractModifierFromItemStack(itemStack) ?: return false
+
+        val notInserted = InventoryUtils.addAmountToInventory(robot.modifierStorage, itemStack, itemStack.amount)
+        if (notInserted != null) {
+            player.inventory.addItem(notInserted)
+            player.updateInventory()
+        }
+
+        return true
     }
 
     private inner class YourRobotButton : Button() {
@@ -245,8 +260,6 @@ class ManageRobotMenu(private val robot: MinerRobot) : Menu() {
 
                     RobotsModule.getPluginFramework().logger.info("${player.name} is picking up a Tier ${robot.tier} Robot from ${robot.location.world.name}, ${robot.location.x}, ${robot.location.y}, ${robot.location.z}")
                     RobotHandler.forgetRobot(robot)
-
-                    robot.clearFakeBlock()
                     robot.destroyForCurrentWatchers()
 
                     player.inventory.addItem(robotItemStack)

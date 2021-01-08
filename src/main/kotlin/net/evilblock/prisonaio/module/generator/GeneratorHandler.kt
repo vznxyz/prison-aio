@@ -72,7 +72,7 @@ object GeneratorHandler : PluginHandler() {
             }
         }
 
-        ServiceRegistry.register(GeneratorTickService)
+        ServiceRegistry.register(GeneratorTickService, 20L, 20L)
     }
 
     override fun saveData() {

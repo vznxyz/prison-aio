@@ -34,7 +34,7 @@ object AutoSaveListingsService : Service {
         }
 
         if (saved != 0 || failed != 0) {
-            PrisonAIO.instance.systemLog("${ChatColor.GRAY}Auto-saved ${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(saved)} ${ChatColor.GRAY}GE listings (${ChatColor.RED}${NumberUtils.format(failed)} failed${ChatColor.GRAY})")
+            PrisonAIO.instance.systemLog("${ChatColor.GRAY}Auto-saved ${ChatColor.GREEN}${ChatColor.BOLD}${NumberUtils.format(saved)} ${ChatColor.GRAY}AH listings (${ChatColor.RED}${NumberUtils.format(failed)} failed${ChatColor.GRAY})")
         }
     }
 

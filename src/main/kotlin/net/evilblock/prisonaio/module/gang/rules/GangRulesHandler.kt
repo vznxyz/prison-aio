@@ -19,10 +19,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 object GangRulesHandler : PluginHandler() {
 
-    val rulesFile = File(File(getModule().getPluginFramework().dataFolder, "internal"), "rules.json")
+    val rulesFile = File(File(getModule().getPluginFramework().dataFolder, "internal"), "gang-rules.json")
     val rules: MutableSet<GangRule> = ConcurrentHashMap.newKeySet()
 
-    val menuTemplateFile = File(File(getModule().getPluginFramework().dataFolder, "internal"), "rules-menu-template.json")
+    val menuTemplateFile = File(File(getModule().getPluginFramework().dataFolder, "internal"), "gang-rules-menu-template.json")
     var menuTemplate: MenuTemplate<GangRule>? = null
 
     override fun getModule(): PluginModule {
@@ -36,7 +36,7 @@ object GangRulesHandler : PluginHandler() {
     override fun initialLoad() {
         super.initialLoad()
 
-        rulesFile.mkdirs()
+        rulesFile.parentFile.mkdirs()
         if (rulesFile.exists()) {
             try {
                 Files.newReader(rulesFile, Charsets.UTF_8).use { reader ->
@@ -50,7 +50,7 @@ object GangRulesHandler : PluginHandler() {
             }
         }
 
-        menuTemplateFile.mkdirs()
+        menuTemplateFile.parentFile.mkdirs()
         if (menuTemplateFile.exists()) {
             try {
                 Files.newReader(rulesFile, Charsets.UTF_8).use { reader ->

@@ -27,7 +27,6 @@ enum class Perk(
     FLY("Fly", ItemStack(Material.FEATHER), Permissions.PERK_FLY);
 
     object PerkParameterType : ParameterType<Perk> {
-
         override fun transform(sender: CommandSender, source: String): Perk? {
             return try {
                 valueOf(source)
@@ -39,17 +38,14 @@ enum class Perk(
         }
 
         override fun tabComplete(player: Player, flags: Set<String>, source: String): List<String> {
-            val completed = arrayListOf<String>()
-
-            for (perk in values()) {
-                if (perk.name.startsWith(source, ignoreCase = true)) {
-                    completed.add(perk.name.toLowerCase())
+            return arrayListOf<String>().also { completed ->
+                for (perk in values()) {
+                    if (perk.name.startsWith(source, ignoreCase = true)) {
+                        completed.add(perk.name.toLowerCase())
+                    }
                 }
             }
-
-            return completed
         }
-
     }
 
 }

@@ -10,7 +10,7 @@ package net.evilblock.prisonaio.module.user.setting.option
 import net.evilblock.prisonaio.module.user.setting.UserSettingOption
 import java.lang.reflect.Type
 
-class RewardMessagesOption(private val receive: Boolean) : UserSettingOption {
+class MineCrateNotifications(private val receive: Boolean) : UserSettingOption {
 
     override fun getName(): String {
         return if (receive) {
@@ -25,11 +25,11 @@ class RewardMessagesOption(private val receive: Boolean) : UserSettingOption {
     }
 
     override fun getAbstractType(): Type {
-        return RewardMessagesOption::class.java
+        return MineCrateNotifications::class.java
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is RewardMessagesOption && other.receive == receive
+        return other is MineCrateNotifications && other.receive == receive
     }
 
     override fun hashCode(): Int {

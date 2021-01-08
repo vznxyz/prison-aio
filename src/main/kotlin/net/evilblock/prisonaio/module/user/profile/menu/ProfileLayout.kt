@@ -129,9 +129,9 @@ class ProfileLayout(
     private inner class HeadButton : SkullButton(owner = user.uuid) {
         override fun getName(player: Player): String {
             val status = if (Bukkit.getPlayer(user.uuid) != null) {
-                "${ChatColor.GREEN}${ChatColor.BOLD}${Constants.DOT_SYMBOL}ONLINE"
+                "${ChatColor.GREEN}${ChatColor.BOLD}${Constants.DOT_SYMBOL} ONLINE"
             } else {
-                "${ChatColor.RED}${ChatColor.BOLD}${Constants.DOT_SYMBOL}OFFLINE"
+                "${ChatColor.RED}${ChatColor.BOLD}${Constants.DOT_SYMBOL} OFFLINE"
             }
 
             val text = if (user.uuid == player.uniqueId) {

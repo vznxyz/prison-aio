@@ -9,8 +9,7 @@ import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
-import net.evilblock.prisonaio.module.robot.impl.MinerRobot
-import net.evilblock.prisonaio.module.robot.tick.RobotThread
+import net.evilblock.prisonaio.module.robot.thread.RobotThread
 import net.evilblock.prisonaio.util.plot.PlotUtil
 import org.bukkit.ChatColor
 import org.bukkit.Location
@@ -51,12 +50,6 @@ object RobotHandler : PluginHandler() {
                     for (robot in robots) {
                         robot.initializeData()
                         trackRobot(robot)
-                    }
-
-                    for (robot in robots) {
-                        if (robot is MinerRobot) {
-                            robot.setupFakeBlock(false)
-                        }
                     }
 
                     getModule().getPluginFramework().logger.info("Loaded ${robots.size} robots from robots.json!")

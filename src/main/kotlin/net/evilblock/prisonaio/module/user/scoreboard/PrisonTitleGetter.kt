@@ -8,14 +8,17 @@
 package net.evilblock.prisonaio.module.user.scoreboard
 
 import net.evilblock.cubed.scoreboard.TitleGetter
-import org.bukkit.ChatColor
+import net.evilblock.prisonaio.module.user.scoreboard.animation.TitleAnimation
 import org.bukkit.entity.Player
 
 object PrisonTitleGetter : TitleGetter {
 
     override fun getTitle(player: Player): String {
-        return "${ChatColor.GRAY}${ChatColor.BOLD}${ChatColor.UNDERLINE}MINE${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}JUNKIE"
-//        return TitleAnimation.getCurrentDisplay()
+        return if (ScoreboardConfigHandler.isTitleAnimated()) {
+            TitleAnimation.getCurrentTitle()
+        } else {
+            ScoreboardConfigHandler.getStaticTitle()
+        }
     }
 
 }

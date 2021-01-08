@@ -7,6 +7,8 @@
 
 package net.evilblock.prisonaio.module.theme
 
-interface ThemeConfiguration {
+import net.evilblock.cubed.serialize.AbstractTypeSerializable
+
+interface ThemeConfiguration : AbstractTypeSerializable {
 
 }

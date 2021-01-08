@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.generator.modifier
 
 import net.evilblock.cubed.util.Duration
 
-
 class GeneratorModifier(
     val type: GeneratorModifierType,
     val value: Double,

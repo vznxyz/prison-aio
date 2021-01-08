@@ -55,7 +55,7 @@ class PlotRobotsMenu(private val plot: Plot) : Menu() {
     }
 
     override fun getTitle(player: Player): String {
-        return "Robot Mechanic"
+        return "Your Robots"
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {
@@ -171,11 +171,7 @@ class PlotRobotsMenu(private val plot: Plot) : Menu() {
                             }
 
                             player.updateInventory()
-
-                            player.sendMessage("")
-                            player.sendMessage(" ${ChatColor.YELLOW}${ChatColor.BOLD}Robot Mechanic")
-                            player.sendMessage(" ${ChatColor.GRAY}I've combined the robots in your inventory!")
-                            player.sendMessage("")
+                            player.sendMessage("${ChatColor.GRAY}The robots in your inventory have been combined!")
 
                             for ((tier, amount) in owed) {
                                 if (amount > 0) {
@@ -388,8 +384,6 @@ class PlotRobotsMenu(private val plot: Plot) : Menu() {
 
                                 RobotsModule.getPluginFramework().logger.info("${player.name} is picking up a Tier ${robot.tier} Robot from ${robot.location.world.name}, ${robot.location.x}, ${robot.location.y}, ${robot.location.z}")
                                 RobotHandler.forgetRobot(robot)
-
-                                robot.clearFakeBlock()
                                 robot.destroyForCurrentWatchers()
 
                                 pickupItems.add(RobotUtils.makeRobotItem(1, robot.tier))
@@ -466,7 +460,7 @@ class PlotRobotsMenu(private val plot: Plot) : Menu() {
 
             override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
                 if (clickType.isLeftClick) {
-                    ManageRobotMenu(robot).openMenu(player)
+                    RobotMenu(robot).openMenu(player)
                 } else if (clickType.isRightClick) {
                     robot.collectEarnings(player)
                 }

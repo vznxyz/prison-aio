@@ -29,6 +29,7 @@ object ChallengeHandler : PluginHandler() {
         BlocksMinedAtMineChallenge.BlocksMinedAtMineChallengeType,
         PlayTimeChallenge.PlayTimeChallengeChallengeType,
         PrestigeChallenge.PrestigeRequirementType,
+        KillsChallenge.KillsChallengeType,
         ExecuteCommandChallenge.ExecuteCommandChallengeType
     )
 

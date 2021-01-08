@@ -14,7 +14,7 @@ import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.module.mine.variant.personal.data.BlockType
-import net.evilblock.prisonaio.module.region.Region
+import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
 import net.minecraft.server.v1_12_R1.IBlockData
@@ -33,7 +33,7 @@ class PrivateMine(
     val spawnPoint: Location,
     cuboid: Cuboid,
     val innerCuboid: Cuboid
-) : Region("Private-Mine-$gridIndex", cuboid) {
+) : BitmaskRegion("Private-Mine-$gridIndex", cuboid) {
 
     /**
      * The sales tax of this mine, which is applied when visiting players sell to a shop.

@@ -61,6 +61,12 @@ object ThemesModule : PluginModule() {
                 e.printStackTrace()
             }
         }
+
+        if (isThemeEnabled()) {
+            getPluginFramework().logger.info("Loaded and enabled theme ${theme!!.getName()}")
+        } else {
+            getPluginFramework().logger.info("No theme loaded!")
+        }
     }
 
     override fun onReload() {

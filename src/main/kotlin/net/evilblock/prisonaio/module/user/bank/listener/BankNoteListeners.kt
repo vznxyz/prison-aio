@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.prisonaio.module.user.bank.BankNoteHandler
 import net.evilblock.prisonaio.util.Permissions
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
+import net.evilblock.prisonaio.module.user.UsersModule
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -50,12 +51,7 @@ object BankNoteListeners : Listener {
                 return
             }
 
-            val announce = if (bankNote.currency == Currency.Type.TOKENS) {
-                bankNote.value >= BigDecimal(25_000_000L)
-            } else {
-                bankNote.value >= BigDecimal(10_000_000_000_000_000)
-            }
-
+            val announce = bankNote.value >= BigDecimal(UsersModule.getBankNoteRedeemAlertThreshold(bankNote.currency))
             if (announce) {
                 for (player in Bukkit.getOnlinePlayers()) {
                     if (player.hasPermission(Permissions.BANK_NOTES_ADMIN)) {

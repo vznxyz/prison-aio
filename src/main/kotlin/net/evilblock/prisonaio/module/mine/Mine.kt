@@ -83,6 +83,10 @@ abstract class Mine(id: String) : BitmaskRegion(id, null), AbstractTypeSerializa
         return true
     }
 
+    override fun supportsCosmetics(): Boolean {
+        return false
+    }
+
     override fun onBlockPlace(player: Player, block: Block, cancellable: Cancellable) {
         cancellable.isCancelled = true
     }
