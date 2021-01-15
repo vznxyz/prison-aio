@@ -22,10 +22,11 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object BankNoteHandler : PluginHandler() {
 
-    private val bankNotes = hashMapOf<UUID, BankNote>()
+    private val bankNotes: ConcurrentHashMap<UUID, BankNote> = ConcurrentHashMap()
 
     val logFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "bank-notes.txt"))
 
@@ -47,12 +48,14 @@ object BankNoteHandler : PluginHandler() {
                 val list = Cubed.gson.fromJson(reader, listType) as List<BankNote>
 
                 for (bankNote in list) {
-                    bankNotes[bankNote.uuid] = bankNote
+                    trackBankNote(bankNote)
                 }
             }
         }
 
         LogHandler.trackLogFile(logFile)
+
+        loaded = true
     }
 
     override fun saveData() {

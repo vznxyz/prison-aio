@@ -16,12 +16,13 @@ class MultiBlockBreakEvent(
     val player: Player,
     val block: Block,
     val blockList: MutableList<Block>,
-    yield: Float,
+    yield: Double,
     val skipBlockUpdates: Boolean = false,
-    var useRewardsModifiers: Boolean = false
+    var useRewardsModifiers: Boolean = false,
+    var breakAllBlocks: Boolean = false
 ) : PluginEvent(), Cancellable {
 
-    var yield: Float = 100F.coerceAtMost(0F.coerceAtLeast(`yield`))
+    var yield: Double = 100.0.coerceAtMost(0.0.coerceAtLeast(`yield`))
     private var cancelled: Boolean = false
 
     override fun isCancelled(): Boolean {

@@ -8,6 +8,9 @@
 package net.evilblock.prisonaio.module.tool.enchant.impl
 
 import net.evilblock.cubed.util.TimeUtil
+import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorHandler
+import net.evilblock.prisonaio.module.mechanic.armor.impl.InmateArmorSet
+import net.evilblock.prisonaio.module.mechanic.armor.impl.WardenArmorSet
 import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
@@ -30,7 +33,7 @@ abstract class AbilityEnchant(id: String, enchant: String, maxLevel: Int) : Ench
                 return
             }
 
-            val cooldown: Long = if (isCooldownBasedOnLevel()) {
+            var cooldown: Long = if (isCooldownBasedOnLevel()) {
                 val cooldownMap = readLevelToCooldownMap()
 
                 cooldownMap.getOrElse(level) {
@@ -38,6 +41,11 @@ abstract class AbilityEnchant(id: String, enchant: String, maxLevel: Int) : Ench
                 }
             } else {
                 readCooldown()
+            }
+
+            val equippedSet = AbilityArmorHandler.getEquippedSet(event.player)
+            if (equippedSet != null && equippedSet.hasAbility(InmateArmorSet)) {
+                cooldown = (cooldown * 0.75).toLong()
             }
 
             if (useCooldown.containsKey(event.player.uniqueId)) {

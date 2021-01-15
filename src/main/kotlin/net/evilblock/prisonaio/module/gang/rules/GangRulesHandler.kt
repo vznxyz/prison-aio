@@ -60,6 +60,8 @@ object GangRulesHandler : PluginHandler() {
                 e.printStackTrace()
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

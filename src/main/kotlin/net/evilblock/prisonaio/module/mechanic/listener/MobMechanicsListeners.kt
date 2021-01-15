@@ -29,6 +29,7 @@ object MobMechanicsListeners : Listener {
             CreatureSpawnEvent.SpawnReason.DEFAULT,
             CreatureSpawnEvent.SpawnReason.NATURAL,
             CreatureSpawnEvent.SpawnReason.CHUNK_GEN,
+            CreatureSpawnEvent.SpawnReason.JOCKEY,
             CreatureSpawnEvent.SpawnReason.ENDER_PEARL,
             CreatureSpawnEvent.SpawnReason.NETHER_PORTAL,
             CreatureSpawnEvent.SpawnReason.SILVERFISH_BLOCK,
@@ -39,6 +40,7 @@ object MobMechanicsListeners : Listener {
                 event.isCancelled = true
             }
             else -> {
+                println(event.spawnReason.name)
             }
         }
     }

@@ -30,7 +30,7 @@ object LotteryHandler : PluginHandler() {
     override fun initialLoad() {
         super.initialLoad()
 
-
+        loaded = true
     }
 
     override fun saveData() {

@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.region.listener
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.region.RegionHandler
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.event.RegionBlockBreakEvent
 import net.evilblock.prisonaio.module.region.global.GlobalRegion
 import net.evilblock.prisonaio.util.plot.PlotUtil
@@ -52,7 +53,8 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
-        if (RegionHandler.bypassCheck(event.player, event)) {
+        if (RegionBypass.hasBypass(event.player)) {
+            RegionBypass.attemptNotify(event.player)
             return
         }
 
@@ -68,7 +70,8 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBlockBreakEvent(event: BlockBreakEvent) {
-        if (RegionHandler.bypassCheck(event.player, event)) {
+        if (RegionBypass.hasBypass(event.player)) {
+            RegionBypass.attemptNotify(event.player)
             return
         }
 
@@ -89,7 +92,8 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBucketEmptyEvent(event: PlayerBucketEmptyEvent) {
-        if (RegionHandler.bypassCheck(event.player, event)) {
+        if (RegionBypass.hasBypass(event.player)) {
+            RegionBypass.attemptNotify(event.player)
             return
         }
 
@@ -108,7 +112,8 @@ object RegionListeners : Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
     fun onBucketFillEvent(event: PlayerBucketFillEvent) {
-        if (RegionHandler.bypassCheck(event.player, event)) {
+        if (RegionBypass.hasBypass(event.player)) {
+            RegionBypass.attemptNotify(event.player)
             return
         }
 
@@ -137,7 +142,8 @@ object RegionListeners : Listener {
     @EventHandler(priority = EventPriority.LOW)
     fun onPlayerInteractEvent(event: PlayerInteractEvent) {
         if (event.action == Action.RIGHT_CLICK_BLOCK) {
-            if (RegionHandler.bypassCheck(event.player, event)) {
+            if (RegionBypass.hasBypass(event.player)) {
+                RegionBypass.attemptNotify(event.player)
                 return
             }
         }

@@ -8,13 +8,14 @@
 package net.evilblock.prisonaio.module.region.bitmask
 
 import net.evilblock.cubed.util.bukkit.Constants
+import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.PrisonAIO
-import net.evilblock.prisonaio.module.combat.timer.CombatTimer
 import net.evilblock.prisonaio.module.combat.timer.CombatTimerHandler
+import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.region.Region
-import net.evilblock.prisonaio.module.region.RegionHandler
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
@@ -119,7 +120,7 @@ open class BitmaskRegion(id: String, cuboid: Cuboid? = null) : Region(id, cuboid
     override fun onEntityDamageEntity(attacker: Entity, victim: Entity, cause: EntityDamageEvent.DamageCause, damage: Double, cancellable: Cancellable) {
         if (victim is ItemFrame || victim is Painting) {
             if (attacker is Player) {
-                if (!RegionHandler.bypassCheck(attacker, cancellable)) {
+                if (!RegionBypass.hasBypass(attacker)) {
                     cancellable.isCancelled = true
                     return
                 }
@@ -133,35 +134,39 @@ open class BitmaskRegion(id: String, cuboid: Cuboid? = null) : Region(id, cuboid
         }
 
         if (hasBitmask(RegionBitmask.DANGER_ZONE)) {
-            if (attacker is Player && victim is Player) {
-                if (attacker == victim) {
-                    cancellable.isCancelled = false
-                    return
-                }
+            if (victim !is Player) {
+                return
+            }
 
-                if (getCuboid()?.contains(victim.location) == false) {
+            val attackingPlayer = EventUtils.getAttacker(attacker) ?: return
+
+            // allow self damage
+            if (attackingPlayer == victim) {
+                cancellable.isCancelled = false
+                return
+            }
+
+            if (getCuboid()?.contains(victim.location) == false) {
+                cancellable.isCancelled = true
+                return
+            }
+
+            // respect NO_FF bitmask
+            if (hasBitmask(RegionBitmask.NO_FF)) {
+                val victimGang = GangHandler.getGangByPlayer(victim)
+                val attackerGang = GangHandler.getGangByPlayer(attackingPlayer)
+
+                if (victimGang != null && attackerGang != null && victimGang == attackerGang) {
+                    attackingPlayer.sendMessage("${ChatColor.YELLOW}You can't hurt ${ChatColor.DARK_GREEN}${victim.name}${ChatColor.YELLOW}!")
                     cancellable.isCancelled = true
                     return
                 }
-
-                cancellable.isCancelled = false
-
-                val attackerTimer = CombatTimerHandler.getTimer(attacker.uniqueId)
-                if (attackerTimer == null) {
-                    CombatTimerHandler.trackTimer(CombatTimer(attacker.uniqueId))
-                } else {
-                    attackerTimer.reset()
-                }
-
-                val victimTimer = CombatTimerHandler.getTimer(victim.uniqueId)
-                if (victimTimer == null) {
-                    CombatTimerHandler.trackTimer(CombatTimer(victim.uniqueId))
-                } else {
-                    victimTimer.reset()
-                }
             }
 
-            return
+            cancellable.isCancelled = false
+
+            CombatTimerHandler.resetTimer(attackingPlayer)
+            CombatTimerHandler.resetTimer(victim)
         }
     }
 

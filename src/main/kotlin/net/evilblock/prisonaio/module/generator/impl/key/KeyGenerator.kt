@@ -140,6 +140,8 @@ class KeyGenerator(plot: Plot, owner: UUID, bounds: Cuboid, rotation: Rotation) 
             if (build.finished) {
                 renderGeneratingInfo(info)
             }
+
+            renderModifiersInfo(info)
         }
     }
 

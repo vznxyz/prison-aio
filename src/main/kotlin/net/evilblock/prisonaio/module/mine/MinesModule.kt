@@ -21,6 +21,7 @@ import net.evilblock.prisonaio.module.mine.variant.luckyblock.LuckyBlockHandler
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.command.LuckyBlockEditorCommand
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.command.LuckyBlockToggleCommand
 import net.evilblock.prisonaio.module.mine.variant.mineparty.command.*
+import net.evilblock.prisonaio.module.mine.variant.personal.PrivateMineConfig
 import net.evilblock.prisonaio.module.mine.variant.personal.PrivateMineHandler
 import net.evilblock.prisonaio.module.mine.variant.personal.command.*
 import net.evilblock.prisonaio.module.mine.variant.personal.listener.PrivateMineInternalDataListeners
@@ -47,8 +48,11 @@ object MinesModule : PluginModule() {
     }
 
     override fun onEnable() {
+        super.onEnable()
+
         LuckyBlockHandler.initialLoad()
         MineHandler.initialLoad()
+        PrivateMineConfig.load()
         PrivateMineHandler.initialLoad()
 
         ServiceRegistry.register(ResetMineService, 20L)
@@ -56,12 +60,22 @@ object MinesModule : PluginModule() {
     }
 
     override fun onDisable() {
+        super.onDisable()
+
         MineHandler.saveData()
     }
 
     override fun onAutoSave() {
+        super.onAutoSave()
+
         LuckyBlockHandler.saveData()
         MineHandler.saveData()
+    }
+
+    override fun onReload() {
+        super.onReload()
+
+        PrivateMineConfig.load()
     }
 
     override fun getCommands(): List<Class<*>> {

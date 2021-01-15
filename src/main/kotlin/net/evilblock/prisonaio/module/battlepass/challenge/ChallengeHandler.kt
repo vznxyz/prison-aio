@@ -17,9 +17,8 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import net.evilblock.prisonaio.module.battlepass.challenge.impl.*
 import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
-import net.evilblock.prisonaio.module.user.UserHandler
-import org.bukkit.entity.Player
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object ChallengeHandler : PluginHandler() {
 
@@ -35,7 +34,7 @@ object ChallengeHandler : PluginHandler() {
 
     private val DATA_TYPE = object : TypeToken<List<Challenge>>() {}.type
 
-    private val challenges: MutableMap<String, Challenge> = hashMapOf()
+    private val challenges: MutableMap<String, Challenge> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return BattlePassModule
@@ -64,6 +63,8 @@ object ChallengeHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {
@@ -73,10 +74,10 @@ object ChallengeHandler : PluginHandler() {
     }
 
     fun getAllChallenges(): Collection<Challenge> {
-        val list = arrayListOf<Challenge>()
-        list.addAll(challenges.values)
-        list.addAll(DailyChallengeHandler.getSession().getChallenges())
-        return list
+        return arrayListOf<Challenge>().also { challenges ->
+            challenges.addAll(getChallenges())
+            challenges.addAll(DailyChallengeHandler.getSession().getChallenges())
+        }
     }
 
     fun getChallenges(): Collection<Challenge> {
@@ -93,39 +94,6 @@ object ChallengeHandler : PluginHandler() {
 
     fun forgetChallenge(challenge: Challenge) {
         challenges.remove(challenge.id.toLowerCase())
-    }
-
-    fun checkCompletionsAsync(player: Player) {
-        val user = UserHandler.getUser(player.uniqueId)
-        if (user.battlePassProgress.isPremium()) {
-            for (challenge in challenges.values) {
-                if (challenge.daily) {
-                    continue
-                }
-
-                if (user.battlePassProgress.hasCompletedChallenge(challenge)) {
-                    continue
-                }
-
-                if (challenge.meetsCompletionRequirements(player, user)) {
-                    challenge.onComplete(player, user)
-                }
-            }
-        }
-
-        for (challenge in DailyChallengeHandler.getSession().getChallenges()) {
-            if (!challenge.daily) {
-                continue
-            }
-
-            if (user.battlePassProgress.hasCompletedChallenge(challenge)) {
-                continue
-            }
-
-            if (challenge.meetsCompletionRequirements(player, user)) {
-                challenge.onComplete(player, user)
-            }
-        }
     }
 
 }

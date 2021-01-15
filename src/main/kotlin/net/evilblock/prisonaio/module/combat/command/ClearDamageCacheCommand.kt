@@ -8,7 +8,7 @@
 package net.evilblock.prisonaio.module.combat.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.prisonaio.module.combat.deathmessage.DeathMessageHandler
+import net.evilblock.prisonaio.module.combat.damage.DamageTracker
 import net.evilblock.prisonaio.util.Permissions
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -23,7 +23,7 @@ object ClearDamageCacheCommand {
     )
     @JvmStatic
     fun execute(sender: CommandSender) {
-        DeathMessageHandler.clearDamageCache()
+        DamageTracker.clearDamageCache()
         sender.sendMessage("${ChatColor.GREEN}Cleared damage cache!")
     }
 

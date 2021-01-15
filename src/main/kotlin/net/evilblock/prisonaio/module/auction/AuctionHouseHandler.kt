@@ -59,6 +59,8 @@ object AuctionHouseHandler : PluginHandler() {
         ServiceRegistry.register(AutoSaveListingsService, 20L * 60L)
         ServiceRegistry.register(GarbageCollectionService, 20L)
         ServiceRegistry.register(TickListingsService, 20L)
+
+        loaded = true
     }
 
     fun getAllListings(): Collection<Listing> {

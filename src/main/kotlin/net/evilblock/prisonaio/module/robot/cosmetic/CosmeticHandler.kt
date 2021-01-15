@@ -11,13 +11,14 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object CosmeticHandler : Listener {
 
     private const val REDIS_KEY = "Robots:CosmeticGrants"
 
-    private val registeredCosmetics: MutableSet<Cosmetic> = hashSetOf()
-    private val grantedCosmetics: MutableMap<UUID, MutableSet<Cosmetic>> = hashMapOf()
+    private val registeredCosmetics: MutableSet<Cosmetic> = ConcurrentHashMap.newKeySet()
+    private val grantedCosmetics: MutableMap<UUID, MutableSet<Cosmetic>> = ConcurrentHashMap()
 
     fun load() {
         registeredCosmetics.clear()

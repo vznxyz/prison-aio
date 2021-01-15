@@ -17,12 +17,13 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.AngleUtils
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.cubed.util.bukkit.prompt.EzPrompt
 import net.evilblock.cubed.util.hook.WorldEditUtils
 import net.evilblock.prisonaio.module.gang.booster.task.GangBoosterLogic
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
+import net.evilblock.prisonaio.module.gang.schematic.GangSchematicData
+import net.evilblock.prisonaio.module.gang.schematic.GangSchematicScanResults
 import net.evilblock.prisonaio.module.gang.service.GangInvitesExpiryService
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
@@ -30,7 +31,6 @@ import net.evilblock.prisonaio.service.ServiceRegistry
 import net.evilblock.prisonaio.util.Permissions
 import net.evilblock.source.chat.filter.ChatFilterHandler
 import org.bukkit.*
-import org.bukkit.block.Block
 import org.bukkit.block.Skull
 import org.bukkit.entity.Player
 import java.io.File
@@ -38,7 +38,6 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 import kotlin.collections.set
 
 /**
@@ -68,13 +67,6 @@ object GangHandler : PluginHandler() {
         return File(File(getModule().getPluginFramework().dataFolder, "internal"), "gangs.json")
     }
 
-    override fun saveData() {
-        super.saveData()
-
-        saveGrid()
-        getGridWorld().save()
-    }
-
     override fun initialLoad() {
         super.initialLoad()
 
@@ -90,6 +82,14 @@ object GangHandler : PluginHandler() {
         }
 
         ServiceRegistry.register(GangInvitesExpiryService, 20L, 20L * 15L)
+
+        loaded = true
+    }
+
+    override fun saveData() {
+        super.saveData()
+
+        Files.write(Cubed.gson.toJson(grid.values), getInternalDataFile(), Charsets.UTF_8)
     }
 
     private fun loadWorld() {
@@ -130,27 +130,6 @@ object GangHandler : PluginHandler() {
                 }
             }
         }
-    }
-
-    fun saveGrid() {
-        // remove any duplicate gang members before saving to disk
-        // keep this until we fix the server restart issue (gson map duplicate entries)
-        try {
-//            var fixedGangs = 0
-//            var fixedMembers = 0
-//
-//            for (gang in getAllGangs()) {
-//                val duplicates = arrayListOf<UUID>()
-//            }
-//
-//            if (fixed != 0) {
-//                PrisonAIO.instance.systemLog("${ChatColor.GREEN}Safe save of backpack data complete! (${NumberUtils.format(successful)} successful, ${NumberUtils.format(failed)} failed)")
-//            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        Files.write(Cubed.gson.toJson(grid.values), getInternalDataFile(), Charsets.UTF_8)
     }
 
     /**
@@ -415,7 +394,7 @@ object GangHandler : PluginHandler() {
         }
 
         val gridIndex = ++gridIndex
-        val schematicData = GridSchematicData.of(gridIndex, schematicFile)
+        val schematicData = GangSchematicData.of(gridIndex, schematicFile)
 
         pasteSchematic(schematicData) { success ->
             if (!success) {
@@ -429,7 +408,7 @@ object GangHandler : PluginHandler() {
             }
 
             if (scanResults.guideLocation == null) {
-                throw IllegalStateException("Missing jerry spawn location")
+                throw IllegalStateException("Missing guide spawn location")
             }
 
             Tasks.sync {
@@ -482,7 +461,7 @@ object GangHandler : PluginHandler() {
             throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
         }
 
-        val schematicData = GridSchematicData.of(gang.gridIndex, schematicFile)
+        val schematicData = GangSchematicData.of(gang.gridIndex, schematicFile)
 
         pasteSchematic(schematicData) { success ->
             if (!success) {
@@ -496,7 +475,7 @@ object GangHandler : PluginHandler() {
             }
 
             if (scanResults.guideLocation == null) {
-                throw IllegalStateException("Missing jerry spawn location")
+                throw IllegalStateException("Missing guide spawn location")
             }
 
             Tasks.sync {
@@ -519,7 +498,7 @@ object GangHandler : PluginHandler() {
     }
 
     @Throws(IllegalStateException::class)
-    fun pasteSchematic(schematicData: GridSchematicData, onFinish: (Boolean) -> Unit) {
+    fun pasteSchematic(schematicData: GangSchematicData, onFinish: (Boolean) -> Unit) {
         val schematicFile = GangsModule.getIslandSchematicFile()
         if (!schematicFile.exists()) {
             throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
@@ -552,83 +531,46 @@ object GangHandler : PluginHandler() {
     }
 
     /**
-     * Container for storing the data needed to paste a schematic at a given location.
-     */
-    data class GridSchematicData(
-        val blockCoords: Pair<Int, Int>,
-        val pasteLocation: Location,
-        val schematicSize: Vector,
-        val cuboid: Cuboid
-    ) {
-
-        companion object {
-            @JvmStatic
-            fun of(gridIndex: Int, schematicFile: File): GridSchematicData {
-                val blockCoords = gridCoordsToBlockCoords(indexToGrid(gridIndex))
-                val pasteLocation = Location(getGridWorld(), blockCoords.first.toDouble(), 68.0, blockCoords.second.toDouble())
-                val schematicSize = WorldEditUtils.readSchematicSize(schematicFile)
-
-                return GridSchematicData(
-                    blockCoords = blockCoords,
-                    pasteLocation = pasteLocation,
-                    schematicSize = schematicSize,
-                    cuboid = Cuboid(pasteLocation, pasteLocation.clone().add(schematicSize.x, schematicSize.y, schematicSize.z))
-                )
-            }
-        }
-
-    }
-
-    /**
-     * Container for storing the result of a pasted schematic scan.
-     */
-    data class SchematicScanResults(
-        var spawnLocation: Location? = null,
-        var guideLocation: Location? = null,
-        var blocks: HashSet<Block> = hashSetOf()
-    )
-
-    /**
      * Finds the spawn points for a given location.
      */
-    private fun startSchematicScan(start: Location): SchematicScanResults {
+    private fun startSchematicScan(start: Location): GangSchematicScanResults {
         val schematicSize = WorldEditUtils.readSchematicSize(GangsModule.getIslandSchematicFile())
 
         val minPoint = start.clone()
         val maxPoint = start.clone().add(schematicSize.x, schematicSize.y, schematicSize.z)
 
-        val gridWorld = getGridWorld()
-        val spawnPointScan = SchematicScanResults()
+        val world = getGridWorld()
+        val results = GangSchematicScanResults()
 
         for (x in minPoint.x.toInt()..maxPoint.x.toInt()) {
             for (y in minPoint.y.toInt()..maxPoint.y.toInt()) {
                 zLoop@ for (z in minPoint.z.toInt()..maxPoint.z.toInt()) {
-                    val block = gridWorld.getBlockAt(x, y, z)
+                    val block = world.getBlockAt(x, y, z)
 
                     if (block.state is Skull) {
                         val skull = block.state as Skull
                         when (skull.skullType) {
                             SkullType.PLAYER -> {
-                                spawnPointScan.spawnLocation = block.location.add(0.5, 2.0, 0.5)
-                                spawnPointScan.spawnLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
+                                results.spawnLocation = block.location.add(0.5, 2.0, 0.5)
+                                results.spawnLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
                             }
                             SkullType.CREEPER -> {
-                                spawnPointScan.guideLocation = block.location.add(0.5, 0.0, 0.5)
-                                spawnPointScan.guideLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
+                                results.guideLocation = block.location.add(0.5, 0.0, 0.5)
+                                results.guideLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
                             }
                             else -> continue@zLoop
                         }
 
-                        spawnPointScan.blocks.add(block)
+                        results.blocks.add(block)
                     }
                 }
             }
         }
 
-        return spawnPointScan
+        return results
     }
 
-    private fun indexToGrid(index: Int): Pair<Int, Int> {
+    fun indexToGrid(index: Int): Pair<Int, Int> {
         if (index == 0) {
             return Pair(0, 0)
         }
@@ -639,11 +581,11 @@ object GangHandler : PluginHandler() {
         return Pair(x, y)
     }
 
-    private fun gridToIndex(x: Int, y: Int): Int {
+    fun gridToIndex(x: Int, y: Int): Int {
         return x + (GangsModule.getGridColumns() * y)
     }
 
-    private fun gridCoordsToBlockCoords(pos: Pair<Int, Int>): Pair<Int, Int> {
+    fun gridCoordsToBlockCoords(pos: Pair<Int, Int>): Pair<Int, Int> {
         return Pair(pos.first * GangsModule.getGridGutterWidth(), pos.second * GangsModule.getGridGutterWidth())
     }
 

@@ -24,6 +24,12 @@ object JoinEventCommand {
             return
         }
 
+        val event = MinePartyHandler.getEvent()!!
+        if (event.spawnPoint == null) {
+            player.sendMessage("${ChatColor.RED}The mine's spawn location hasn't been set!")
+            return
+        }
+
         player.teleport(MinePartyHandler.getEvent()!!.spawnPoint)
         player.sendMessage("${ChatColor.GREEN}You've been teleported to the event!")
     }

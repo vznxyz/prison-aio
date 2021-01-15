@@ -12,10 +12,11 @@ import net.evilblock.prisonaio.module.gang.challenge.impl.AcquirePrestigesGangCh
 import net.evilblock.prisonaio.module.gang.challenge.impl.AcquireTrophiesGangChallenge
 import net.evilblock.prisonaio.module.gang.challenge.impl.BlocksMinedGangChallenge
 import net.evilblock.prisonaio.module.gang.challenge.impl.LeaderboardsPlacementGangChallenge
+import java.util.concurrent.ConcurrentHashMap
 
 object GangChallengeHandler {
 
-    private val challenges: MutableMap<String, GangChallenge> = hashMapOf()
+    private val challenges: MutableMap<String, GangChallenge> = ConcurrentHashMap()
 
     fun initialLoad() {
         trackChallenge(BlocksMinedGangChallenge("blocks-progress-500k", 5_000, 500_000))

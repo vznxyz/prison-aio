@@ -12,6 +12,7 @@ import com.google.gson.reflect.TypeToken
 import com.intellectualcrafters.plot.`object`.Plot
 import com.intellectualcrafters.plot.`object`.PlotId
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.backup.BackupHandler
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
@@ -63,6 +64,8 @@ object GeneratorHandler : PluginHandler() {
 
         val dataFile = getInternalDataFile()
         if (dataFile.exists()) {
+            Files.copy(getInternalDataFile(), BackupHandler.findNextBackupFile("generators"))
+
             Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
                 val list = Cubed.gson.fromJson(reader.readLine(), object : TypeToken<List<Generator>>() {}.type) as List<Generator>
                 for (generator in list) {
@@ -73,6 +76,8 @@ object GeneratorHandler : PluginHandler() {
         }
 
         ServiceRegistry.register(GeneratorTickService, 20L, 20L)
+
+        loaded = true
     }
 
     override fun saveData() {

@@ -22,7 +22,7 @@ import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.profile.menu.tab.ProfileStatisticsMenu
 import net.evilblock.prisonaio.module.user.setting.menu.UserSettingsMenu
-import net.evilblock.prisonaio.module.warp.menu.WarpsMenu
+import net.evilblock.prisonaio.module.warp.category.WarpCategoryHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -190,7 +190,7 @@ class MainMenu(private val user: User) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                WarpsMenu().openMenu(player)
+                WarpCategoryHandler.openMenu(player)
             }
         }
     }

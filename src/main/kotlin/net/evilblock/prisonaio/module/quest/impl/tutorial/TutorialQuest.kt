@@ -48,6 +48,8 @@ object TutorialQuest : Quest {
     }
 
     override fun saveData() {
+        super.saveData()
+
         Files.write(Cubed.gson.toJson(config, object : TypeToken<TutorialQuestConfig>() {}.type), configFile, Charsets.UTF_8)
     }
 

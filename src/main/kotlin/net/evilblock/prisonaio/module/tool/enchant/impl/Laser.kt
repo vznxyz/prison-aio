@@ -108,7 +108,7 @@ object Laser : AbilityEnchant(id = "laser", enchant = "Laser", maxLevel = 1) {
 
             if (destroyedBlocks.isNotEmpty()) {
                 Tasks.sync {
-                    val multiBlockBreakEvent = MultiBlockBreakEvent(player, destroyedBlocks.iterator().next(), destroyedBlocks, 100F, useRewardsModifiers = true)
+                    val multiBlockBreakEvent = MultiBlockBreakEvent(player, destroyedBlocks.iterator().next(), destroyedBlocks, getYield(), useRewardsModifiers = true)
                     Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
                 }
             }

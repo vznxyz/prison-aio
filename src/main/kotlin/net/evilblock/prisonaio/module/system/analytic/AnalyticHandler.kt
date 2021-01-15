@@ -48,6 +48,8 @@ object AnalyticHandler : PluginHandler() {
                 analytics[analytic] = analytic.defaultValue
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

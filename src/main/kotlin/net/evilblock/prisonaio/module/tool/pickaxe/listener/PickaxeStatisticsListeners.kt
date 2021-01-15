@@ -7,6 +7,8 @@
 
 package net.evilblock.prisonaio.module.tool.pickaxe.listener
 
+import net.evilblock.prisonaio.module.reward.multiplier.GlobalMultiplierHandler
+import net.evilblock.prisonaio.module.reward.multiplier.GlobalMultiplierType
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -42,7 +44,13 @@ object PickaxeStatisticsListeners : Listener {
     fun onBlockBreakEvent(event: BlockBreakEvent) {
         val itemInHand = event.player.inventory.itemInMainHand
         PickaxeHandler.getPickaxeData(itemInHand)?.let {
-            it.blocksMined++
+            val multiEvent = GlobalMultiplierHandler.getEvent(GlobalMultiplierType.BLOCKS_MINED)
+            if (multiEvent != null) {
+                it.blocksMined += multiEvent.multiplier.toInt()
+            } else {
+                it.blocksMined++
+            }
+
             it.applyMeta(itemInHand)
             event.player.updateInventory()
         }

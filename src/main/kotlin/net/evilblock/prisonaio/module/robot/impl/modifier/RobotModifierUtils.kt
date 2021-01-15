@@ -22,7 +22,7 @@ object RobotModifierUtils {
     fun makeModifierItemStack(type: RobotModifierType, amount: Int, value: Double, duration: Duration?): ItemStack {
         val item = ItemBuilder.copyOf(type.icon)
             .amount(amount)
-            .name("${type.color}${ChatColor.BOLD}Robot ${type.displayName.toUpperCase()}")
+            .name("${type.color}${ChatColor.BOLD}Robot ${type.displayName}")
             .setLore(type.renderLore(value, duration))
             .addFlags(
                 ItemFlag.HIDE_ENCHANTS,

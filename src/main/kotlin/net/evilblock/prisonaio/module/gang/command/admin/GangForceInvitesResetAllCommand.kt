@@ -35,7 +35,7 @@ object GangForceInvitesResetAllCommand {
             reset++
         }
 
-        GangHandler.saveGrid()
+        GangHandler.saveData()
 
         sender.sendMessage("${ChatColor.GREEN}Reset $reset gangs force-invites!")
     }

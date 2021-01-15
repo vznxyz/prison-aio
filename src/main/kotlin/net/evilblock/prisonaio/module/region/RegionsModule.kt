@@ -41,6 +41,12 @@ object RegionsModule : PluginModule() {
         RegionHandler.saveData()
     }
 
+    override fun onAutoSave() {
+        super.onAutoSave()
+
+        RegionHandler.saveData()
+    }
+
     override fun getCommands(): List<Class<*>> {
         return listOf(
             RegionCreateCommand.javaClass,

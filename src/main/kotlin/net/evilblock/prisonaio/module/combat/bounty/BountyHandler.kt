@@ -43,12 +43,18 @@ object BountyHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {
         super.saveData()
 
         Files.write(Cubed.gson.toJson(bounties, object : TypeToken<Set<Bounty>>() {}.type), getInternalDataFile(), Charsets.UTF_8)
+    }
+
+    fun getBounties(): Set<Bounty> {
+        return bounties
     }
 
     fun trackBounty(bounty: Bounty) {

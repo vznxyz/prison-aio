@@ -11,6 +11,7 @@ import net.evilblock.prisonaio.module.combat.CombatModule
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
 import net.evilblock.prisonaio.module.region.bitmask.RegionBitmask
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -25,8 +26,12 @@ object CombatListeners : Listener {
         if (region is BitmaskRegion && region.hasBitmask(RegionBitmask.DANGER_ZONE)) {
             for (blockedCommand in CombatModule.getDisabledCommands()) {
                 if (event.message.startsWith(blockedCommand, ignoreCase = true)) {
-                    event.isCancelled = true
-                    event.player.sendMessage("${ChatColor.RED}You can't execute that command in the PvP arena!")
+                    if (RegionBypass.hasBypass(event.player)) {
+                        RegionBypass.attemptNotify(event.player)
+                    } else {
+                        event.isCancelled = true
+                        event.player.sendMessage("${ChatColor.RED}You can't execute that command in the PvP arena!")
+                    }
                 }
             }
         }

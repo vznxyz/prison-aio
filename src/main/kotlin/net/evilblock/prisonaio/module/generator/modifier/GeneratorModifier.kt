@@ -21,4 +21,8 @@ class GeneratorModifier(
         return System.currentTimeMillis() >= startedAt + (duration?.get() ?: 0L)
     }
 
+    fun getRemainingTime(): Long {
+        return (startedAt + duration!!.get()) - System.currentTimeMillis()
+    }
+
 }

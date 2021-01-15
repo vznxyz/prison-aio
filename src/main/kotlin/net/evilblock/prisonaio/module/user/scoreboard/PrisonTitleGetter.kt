@@ -14,10 +14,10 @@ import org.bukkit.entity.Player
 object PrisonTitleGetter : TitleGetter {
 
     override fun getTitle(player: Player): String {
-        return if (ScoreboardConfigHandler.isTitleAnimated()) {
+        return if (ScoreboardHandler.isTitleAnimated()) {
             TitleAnimation.getCurrentTitle()
         } else {
-            ScoreboardConfigHandler.getStaticTitle()
+            ScoreboardHandler.getStaticTitle()
         }
     }
 

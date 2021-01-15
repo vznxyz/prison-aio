@@ -22,7 +22,7 @@ object GeneratorModifierUtils {
     fun makeModifierItemStack(type: GeneratorModifierType, amount: Int, value: Double, duration: Duration?): ItemStack {
         val item = ItemBuilder.copyOf(type.icon)
             .amount(amount)
-            .name("${type.color}${ChatColor.BOLD}Generator ${type.displayName.toUpperCase()}")
+            .name("${type.color}${ChatColor.BOLD}Generator ${type.displayName}")
             .setLore(type.renderLore(value, duration))
             .addFlags(
                 ItemFlag.HIDE_ENCHANTS,

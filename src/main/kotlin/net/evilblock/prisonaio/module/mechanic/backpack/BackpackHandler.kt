@@ -34,7 +34,7 @@ object BackpackHandler : PluginHandler() {
     val CHAT_PREFIX = "${ChatColor.GRAY}[${ChatColor.GREEN}${ChatColor.BOLD}Backpack${ChatColor.GRAY}] "
 
     private val backpacks: ConcurrentHashMap<String, Backpack> = ConcurrentHashMap()
-    private val upgrades: MutableMap<String, BackpackUpgrade> = hashMapOf()
+    private val upgrades: MutableMap<String, BackpackUpgrade> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return MechanicsModule
@@ -64,6 +64,8 @@ object BackpackHandler : PluginHandler() {
         }
 
         upgrades[CapacityUpgrade.getId().toLowerCase()] = CapacityUpgrade
+
+        loaded = true
     }
 
     override fun saveData() {

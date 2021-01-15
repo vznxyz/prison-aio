@@ -6,6 +6,7 @@ cubed:
     - 24
 explosive:
   description: "Explodes a radius of blocks randomly as you mine."
+  yield: 100.0
 haste:
   description: "Increases the swing rate of your pickaxe."
 jump:
@@ -20,10 +21,12 @@ unbreaking:
   description: "Decreases the rate at which your pickaxe durability deteriorates."
 mine-bomb:
   description: "Right-click to shoot a bomb that destroys a radius of blocks. Cooldown of 20 seconds."
+  yield: 100.0
 nuke:
   description: "Very rare chance of nuking the mine that you are in. All blocks will be destroyed and the mine will be reset instantly."
   cost: 75000 # formula = {cost} + ((level - 1) * 25000)
   chance: 0.002 # 1 in 50,000 chance
+  yield: 100.0
 luck:
   description: "Boosted chance of finding Mine Crates as you mine."
   increased-chances:
@@ -59,6 +62,7 @@ jack-hammer:
   description: "Random chance of breaking the entire layer at which your mining."
   cost: 15000 # formula = {cost} + (level - 1) * 50
   chance: 0.0004 # formula = level * {chance}
+  yield: 100.0
 exporter:
   description: "Right-click to sell your inventory as you mine. 30/45/60 second cooldown based on level."
   cost: 10000 # formula = {cost} + (level - 1) * 2500
@@ -70,6 +74,7 @@ lucky-money:
   description: "Random chance of finding money as you mine. Sums of 100k, 250k, 500k based on level."
 laser:
   description: "Right-click to shoot a laser in the direction you're looking, which destroys all of the blocks in its path. Cooldown based on level."
+  yield: 100.0
 zeus:
   description: "Right-click to lightning strike an area, causing a crater to form. Cooldown based on level."
   cost: 2500000 # formula = {cost} * level
@@ -77,3 +82,4 @@ zeus:
     1: 60
     2: 45
     3: 30
+  yield: 25.0

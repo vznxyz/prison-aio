@@ -44,6 +44,8 @@ object EventGameArenaHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

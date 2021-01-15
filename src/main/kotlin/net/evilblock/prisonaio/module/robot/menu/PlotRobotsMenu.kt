@@ -448,6 +448,24 @@ class PlotRobotsMenu(private val plot: Plot) : Menu() {
                 }
 
                 description.add("")
+                description.add("${ChatColor.YELLOW}${ChatColor.BOLD}Earnings")
+
+                val owedMoney = robot.moneyOwed > BigDecimal.ZERO
+                val owedTokens = robot.tokensOwed > BigDecimal.ZERO
+
+                if (owedMoney || owedTokens) {
+                    if (owedMoney) {
+                        description.add(Formats.formatMoney(robot.moneyOwed))
+                    }
+
+                    if (owedTokens) {
+                        description.add(Formats.formatTokens(robot.tokensOwed.toBigInteger()))
+                    }
+                } else {
+                    description.add("${ChatColor.GRAY}All caught up!")
+                }
+
+                description.add("")
                 description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}for more options")
                 description.add("${ChatColor.YELLOW}${ChatColor.BOLD}RIGHT-CLICK ${ChatColor.YELLOW}to collect earnings")
 

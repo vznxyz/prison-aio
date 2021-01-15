@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.tool.pickaxe.command.admin
 import net.evilblock.cubed.command.Command
 import net.evilblock.cubed.command.data.parameter.Param
 import net.evilblock.prisonaio.module.tool.enchant.Enchant
+import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
 import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -48,7 +49,7 @@ object PickaxeSetLevelCommand {
             pickaxeData.enchants[enchant] = level
         }
 
-        pickaxeData.applyMeta(itemInHand)
+        EnchantHandler.setLevel(pickaxeData, itemInHand, enchant, level, true)
 
         player.updateInventory()
         player.sendMessage("${ChatColor.GREEN}Updated pickaxe's ${enchant.enchant} level to $level!")

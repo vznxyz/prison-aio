@@ -11,10 +11,11 @@ import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.module.combat.CombatModule
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object GodAppleCooldownHandler : PluginHandler() {
 
-    private val cooldowns: MutableMap<UUID, GodAppleCooldown> = hashMapOf()
+    private val cooldowns: MutableMap<UUID, GodAppleCooldown> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return CombatModule
@@ -22,6 +23,8 @@ object GodAppleCooldownHandler : PluginHandler() {
 
     override fun initialLoad() {
         super.initialLoad()
+
+        loaded = true
     }
 
     fun getCooldown(uuid: UUID): GodAppleCooldown? {

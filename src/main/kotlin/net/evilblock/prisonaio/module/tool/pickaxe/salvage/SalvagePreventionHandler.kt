@@ -50,6 +50,8 @@ object SalvagePreventionHandler : PluginHandler() {
                 pickaxes.addAll(list)
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

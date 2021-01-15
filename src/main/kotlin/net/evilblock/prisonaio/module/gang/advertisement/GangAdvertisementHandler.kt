@@ -52,6 +52,8 @@ object GangAdvertisementHandler : PluginHandler() {
         }
 
         ServiceRegistry.register(GangAdvertisementExpiryService, 20L, 20L * 15L)
+
+        loaded = true
     }
 
     override fun saveData() {

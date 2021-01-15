@@ -19,6 +19,7 @@ import net.evilblock.prisonaio.module.mine.MinesModule
 import net.evilblock.prisonaio.module.mine.variant.luckyblock.service.ProcessSpawnQueueService
 import net.evilblock.prisonaio.service.ServiceRegistry
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object LuckyBlockHandler : PluginHandler() {
 
@@ -26,7 +27,7 @@ object LuckyBlockHandler : PluginHandler() {
 
     val spawnSelectionHandler: InteractionHandler = InteractionHandler("LB_SPAWN_EDITOR")
 
-    private val types: MutableMap<String, LuckyBlock> = hashMapOf()
+    private val types: MutableMap<String, LuckyBlock> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return MinesModule
@@ -52,6 +53,8 @@ object LuckyBlockHandler : PluginHandler() {
         }
 
         ServiceRegistry.register(ProcessSpawnQueueService, 20L)
+
+        loaded = true
     }
 
     override fun saveData() {

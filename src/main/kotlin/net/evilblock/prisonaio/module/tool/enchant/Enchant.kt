@@ -37,23 +37,27 @@ abstract class Enchant(
     }
 
     fun readDescription(): String {
-        return ToolsModule.config.getString("$id.description")
+        return ToolsModule.config.getString("$id.description", "")
     }
 
     fun readCost(): Long {
-        return ToolsModule.config.getLong("$id.cost")
+        return ToolsModule.config.getLong("$id.cost", Long.MAX_VALUE)
     }
 
     fun readChance(): Double {
-        return ToolsModule.config.getDouble("$id.chance")
+        return ToolsModule.config.getDouble("$id.chance", 0.0)
+    }
+
+    fun getYield(): Double {
+        return ToolsModule.config.getDouble("$id.yield", 0.0)
     }
 
     fun readCooldown(): Long {
-        return ToolsModule.config.getLong("$id.cooldown")
+        return ToolsModule.config.getLong("$id.cooldown", Long.MAX_VALUE)
     }
 
     fun isCooldownBasedOnLevel(): Boolean {
-        return ToolsModule.config.contains("$id.level-to-cooldown")
+        return ToolsModule.config.contains("$id.level-to-cooldown", false)
     }
 
     fun readLevelToCooldownMap(): Map<Int, Long> {

@@ -35,7 +35,9 @@ abstract class Mine(id: String) : BitmaskRegion(id, null), AbstractTypeSerializa
         persistent = false
     }
 
-    open fun initializeData() {
+    override fun initializeData() {
+        super.initializeData()
+
         cacheChunks()
     }
 

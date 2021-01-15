@@ -55,12 +55,12 @@ object KitHandler : PluginHandler() {
         } else {
             template = PublicKitsTemplate()
         }
+
+        loaded = true
     }
 
     override fun saveData() {
-        if (!loaded) {
-            return
-        }
+        super.saveData()
 
         try {
             Files.write(Cubed.gson.toJson(kits.values), kitsDataFile, Charsets.UTF_8)

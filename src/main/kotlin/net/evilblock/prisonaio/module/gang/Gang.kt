@@ -18,7 +18,7 @@ import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.nms.MinecraftProtocol
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.gang.challenge.GangChallengesData
-import net.evilblock.prisonaio.module.gang.entity.JerryNpcEntity
+import net.evilblock.prisonaio.module.gang.entity.GangGuideNPC
 import net.evilblock.prisonaio.module.gang.invite.GangInvite
 import net.evilblock.prisonaio.module.gang.permission.GangPermission
 import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
@@ -59,7 +59,7 @@ class Gang(
     private var permissions = hashMapOf<GangPermission, GangPermission.PermissionValue>()
     private var boosters: MutableSet<GangBooster> = hashSetOf()
 
-    internal var guideNpc: JerryNpcEntity = JerryNpcEntity(guideLocation)
+    internal var guideNpc: GangGuideNPC = GangGuideNPC(guideLocation)
     var challengesData: GangChallengesData = GangChallengesData(this)
 
     private var trophies: Int = 0
@@ -100,22 +100,24 @@ class Gang(
         return false
     }
 
-    fun initializeData() {
+    override fun initializeData() {
+        super.initializeData()
+
+        invitations = hashMapOf()
+        visitors = hashSetOf()
+        cachedValue = BigInteger("0")
+
         challengesData.gang = this
 
         guideNpc.initializeData()
         guideNpc.persistent = false
         guideNpc.gang = this
-        guideNpc.updateTexture(GangsModule.getJerryTextureValue(), GangsModule.getJerryTextureSignature())
-        guideNpc.updateLines(GangsModule.getJerryHologramLines())
+        guideNpc.updateTexture(GangsModule.getGuideNPCTextureValue(), GangsModule.getGuideNPCTextureSignature())
+        guideNpc.updateLines(GangsModule.getGuideNPCHologramLines())
 
         if (!EntityManager.isEntityTracked(guideNpc)) {
             EntityManager.trackEntity(guideNpc)
         }
-
-        invitations = hashMapOf()
-        visitors = hashSetOf()
-        cachedValue = BigInteger("0")
     }
 
     fun getLeaderUsername(): String {

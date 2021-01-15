@@ -11,7 +11,9 @@ import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.gang.GangsModule
 import net.evilblock.prisonaio.module.gang.booster.GangBooster
 import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorHandler
+import net.evilblock.prisonaio.module.mechanic.armor.impl.MinerArmorSet
 import net.evilblock.prisonaio.module.reward.multiplier.GlobalMultiplierHandler
+import net.evilblock.prisonaio.module.reward.multiplier.GlobalMultiplierType
 import net.evilblock.prisonaio.module.user.User
 import net.evilblock.prisonaio.module.user.UsersModule
 import org.bukkit.entity.Player
@@ -117,13 +119,13 @@ class UserPerks(@Transient internal var user: User) {
 
         stackedMultiplier += getActivePerkGrant(Perk.SALES_BOOST)?.metadata?.get("multiplier")?.asDouble ?: 0.0
 
-        val globalMultiplier = GlobalMultiplierHandler.getActiveMultiplier()
+        val globalMultiplier = GlobalMultiplierHandler.getEvent(GlobalMultiplierType.SHOP)
         if (globalMultiplier != null) {
             stackedMultiplier += globalMultiplier.multiplier
         }
 
-        val equippedAbilityArmor = AbilityArmorHandler.getEquippedSet(player)
-        if (equippedAbilityArmor != null) {
+        val equippedSet = AbilityArmorHandler.getEquippedSet(player)
+        if (equippedSet != null && equippedSet.hasAbility(MinerArmorSet)) {
             stackedMultiplier += 4.0
         }
 

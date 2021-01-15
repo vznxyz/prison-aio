@@ -145,7 +145,7 @@ class ManageSettingsMenu(private val previous: Menu, private val mine: PrivateMi
                         mine.salesTax = inputNumber
 
                         Tasks.async {
-                            PrivateMineHandler.saveGrid()
+                            PrivateMineHandler.saveData()
                         }
 
                         player.sendMessage("${ChatColor.GREEN}You updated your Private Mine's sales tax to ${mine.salesTax}%.")

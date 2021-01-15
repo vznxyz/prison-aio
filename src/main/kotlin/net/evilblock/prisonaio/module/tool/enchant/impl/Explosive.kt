@@ -59,7 +59,7 @@ object Explosive : Enchant("explosive", "Explosive", 50) {
             return
         }
 
-        val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100f)
+        val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, getYield())
         Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
     }
 

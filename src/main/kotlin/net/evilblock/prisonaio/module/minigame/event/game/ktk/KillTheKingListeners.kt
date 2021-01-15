@@ -2,9 +2,9 @@ package net.evilblock.prisonaio.module.minigame.event.game.ktk
 
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Tasks
-import net.evilblock.prisonaio.module.combat.deathmessage.DeathMessageHandler
-import net.evilblock.prisonaio.module.combat.deathmessage.objects.Damage
-import net.evilblock.prisonaio.module.combat.deathmessage.objects.PlayerDamage
+import net.evilblock.prisonaio.module.combat.damage.DamageTracker
+import net.evilblock.prisonaio.module.combat.damage.objects.Damage
+import net.evilblock.prisonaio.module.combat.damage.objects.PlayerDamage
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameHandler
 import net.evilblock.prisonaio.module.minigame.event.game.EventGameState
 import org.bukkit.Bukkit
@@ -81,7 +81,7 @@ object KillTheKingListeners : Listener {
                     if (event.entity.killer != null) {
                         ongoingGame.eliminatePlayer(event.entity, event.entity.killer)
                     } else {
-                        val record: List<Damage> = DeathMessageHandler.getDamageList(event.entity)
+                        val record: List<Damage> = DamageTracker.getDamageList(event.entity)
                         if (record.isNotEmpty()) {
                             val deathCause = record[record.size - 1]
                             if (deathCause is PlayerDamage && deathCause.getTimeDifference() < TimeUnit.MINUTES.toMillis(1)) {

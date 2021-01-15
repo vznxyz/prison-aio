@@ -13,7 +13,10 @@ import org.bukkit.entity.Player
 
 object QuestGuideCommand {
 
-    @Command(names = ["quest guide", "quests guide", "quest help", "quests help"], description = "Information that can guide you through your quests")
+    @Command(
+        names = ["quest guide", "quests guide", "quest help", "quests help"],
+        description = "Information that can guide you through your quests"
+    )
     @JvmStatic
     fun execute(player: Player) {
         QuestGuideMenu().openMenu(player)

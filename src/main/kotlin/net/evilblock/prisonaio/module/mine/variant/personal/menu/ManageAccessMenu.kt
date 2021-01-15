@@ -112,7 +112,7 @@ class ManageAccessMenu(private val mine: PrivateMine) : PaginatedMenu() {
                 PrivateMineHandler.removeAccessToMine(this.player, mine)
 
                 Tasks.async {
-                    PrivateMineHandler.saveGrid()
+                    PrivateMineHandler.saveData()
                 }
 
                 player.sendMessage("${ChatColor.GREEN}You removed ${ChatColor.GRAY}${Cubed.instance.uuidCache.name(this.player)} ${ChatColor.GREEN}from your Private Mine.")
@@ -161,7 +161,7 @@ class ManageAccessMenu(private val mine: PrivateMine) : PaginatedMenu() {
 
                         if (mine.addToWhitelistedPlayers(uuid)) {
                             PrivateMineHandler.addAccessToMine(uuid, mine)
-                            PrivateMineHandler.saveGrid()
+                            PrivateMineHandler.saveData()
 
                             player.sendMessage("${ChatColor.GREEN}You added ${ChatColor.GRAY}$input${ChatColor.GREEN} to your private mine.")
                         }

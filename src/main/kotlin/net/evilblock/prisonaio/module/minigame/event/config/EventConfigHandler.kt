@@ -46,9 +46,13 @@ object EventConfigHandler : PluginHandler() {
         } else {
             config = EventConfig()
         }
+
+        loaded = true
     }
 
     override fun saveData() {
+        super.saveData()
+
         try {
             Files.write(Cubed.gson.toJson(config, dataType), dataFile, Charsets.UTF_8)
         } catch (e: IOException) {

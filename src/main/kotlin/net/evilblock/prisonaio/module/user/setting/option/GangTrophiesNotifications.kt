@@ -28,4 +28,12 @@ class GangTrophiesNotifications(private var receive: Boolean) : UserSettingOptio
         return GangTrophiesNotifications::class.java
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is GangTrophiesNotifications && other.receive == receive
+    }
+
+    override fun hashCode(): Int {
+        return receive.hashCode()
+    }
+
 }

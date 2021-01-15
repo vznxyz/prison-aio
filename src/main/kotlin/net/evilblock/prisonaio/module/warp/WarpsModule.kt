@@ -11,8 +11,11 @@ import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
+import net.evilblock.prisonaio.module.warp.category.WarpCategoryHandler
+import net.evilblock.prisonaio.module.warp.category.template.CategoriesTemplateHandler
 import net.evilblock.prisonaio.module.warp.command.*
 import net.evilblock.prisonaio.module.warp.command.parameter.WarpParameterType
+import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
 object WarpsModule : PluginModule() {
@@ -33,18 +36,24 @@ object WarpsModule : PluginModule() {
         super.onEnable()
 
         WarpHandler.initialLoad()
+        WarpCategoryHandler.initialLoad()
+        CategoriesTemplateHandler.initialLoad()
     }
 
     override fun onDisable() {
         super.onDisable()
 
         WarpHandler.saveData()
+        WarpCategoryHandler.saveData()
+        CategoriesTemplateHandler.saveData()
     }
 
     override fun onAutoSave() {
         super.onAutoSave()
 
         WarpHandler.saveData()
+        WarpCategoryHandler.saveData()
+        CategoriesTemplateHandler.saveData()
     }
 
     override fun getCommands(): List<Class<*>> {
@@ -68,6 +77,10 @@ object WarpsModule : PluginModule() {
 
     override fun requiresLateLoad(): Boolean {
         return true
+    }
+
+    fun getMenuTitle(): String {
+        return ChatColor.translateAlternateColorCodes('&', config.getString("menu-title", "&c&lWarps"))
     }
 
 }

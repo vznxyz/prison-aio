@@ -13,17 +13,13 @@ import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
-import net.evilblock.practice.region.util.CoordSet2D
-import net.evilblock.practice.region.util.CoordSet3D
+import net.evilblock.prisonaio.module.region.util.CoordSet2D
+import net.evilblock.prisonaio.module.region.util.CoordSet3D
 import net.evilblock.prisonaio.module.region.bitmask.RegionBitmaskTickService
-import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.module.region.global.GlobalRegion
 import net.evilblock.prisonaio.service.ServiceRegistry
-import net.evilblock.prisonaio.util.Permissions
-import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.entity.Player
-import org.bukkit.event.Cancellable
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -53,13 +49,16 @@ object RegionHandler : PluginHandler() {
                 val data = Cubed.gson.fromJson(reader, DATA_TYPE) as List<Region>
 
                 for (region in data) {
-                    regions[region.id.toLowerCase()] = region
+                    region.initializeData()
+                    trackRegion(region)
                     updateBlockCache(region)
                 }
             }
         }
 
         ServiceRegistry.register(RegionBitmaskTickService, 10L)
+
+        loaded = true
     }
 
     override fun saveData() {
@@ -170,22 +169,6 @@ object RegionHandler : PluginHandler() {
 
     fun getDefaultRegion(): Region {
         return defaultRegion
-    }
-
-    fun bypassCheck(player: Player, cancellable: Cancellable): Boolean {
-        if (player.hasPermission(Permissions.REGION_BYPASS) || player.isOp) {
-            return if (RegionBypass.hasBypass(player)) {
-                RegionBypass.attemptNotify(player)
-                cancellable.isCancelled = false
-                true
-            } else {
-                player.sendMessage("${ChatColor.RED}${ChatColor.BOLD}WARNING: ${ChatColor.GRAY}You can't use creative mode unless you have region bypass enabled.")
-                cancellable.isCancelled = true
-                true
-            }
-        }
-
-        return false
     }
 
 }

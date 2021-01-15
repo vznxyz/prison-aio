@@ -24,6 +24,7 @@ import net.evilblock.prisonaio.module.mechanic.economy.Currency
 import org.bukkit.ChatColor
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object CoinFlipHandler : PluginHandler() {
 
@@ -36,7 +37,7 @@ object CoinFlipHandler : PluginHandler() {
     var disabled: Boolean = false
     val logFile: LogFile = LogFile(File(File(UserHandler.getModule().getPluginFramework().dataFolder, "logs"), "coinflip.txt"))
 
-    private val games: MutableMap<UUID, CoinFlipGame> = hashMapOf()
+    private val games: MutableMap<UUID, CoinFlipGame> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return MinigamesModule
@@ -60,6 +61,8 @@ object CoinFlipHandler : PluginHandler() {
         LogHandler.trackLogFile(logFile)
 
         Tasks.asyncTimer(CoinFlipGameTicker, 4L, 4L)
+
+        loaded = true
     }
 
     override fun saveData() {

@@ -16,11 +16,12 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 
 object RankHandler : PluginHandler() {
 
-    private val ranksMap: MutableMap<String, Rank> = hashMapOf()
+    private val ranksMap: MutableMap<String, Rank> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return RanksModule
@@ -48,6 +49,8 @@ object RankHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

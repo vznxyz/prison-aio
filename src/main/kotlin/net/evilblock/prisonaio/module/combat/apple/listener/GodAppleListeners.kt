@@ -16,8 +16,8 @@ import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerQuitEvent
 
 object GodAppleListeners : Listener {
 
@@ -61,8 +61,8 @@ object GodAppleListeners : Listener {
     }
 
     @EventHandler
-    fun onPlayerQuitEvent(event: PlayerQuitEvent) {
-        val cooldown = GodAppleCooldownHandler.getCooldown(event.player.uniqueId)
+    fun onPlayerDeathEvent(event: PlayerDeathEvent) {
+        val cooldown = GodAppleCooldownHandler.getCooldown(event.entity.uniqueId)
         if (cooldown != null) {
             GodAppleCooldownHandler.forgetCooldown(cooldown)
         }

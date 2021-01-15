@@ -5,7 +5,7 @@
  * explicit permission from original author: Joel Evans
  */
 
-package net.evilblock.practice.region.util
+package net.evilblock.prisonaio.module.region.util
 
 import org.bukkit.World
 

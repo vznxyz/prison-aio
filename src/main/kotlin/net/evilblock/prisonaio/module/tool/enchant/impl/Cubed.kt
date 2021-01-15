@@ -78,10 +78,10 @@ object Cubed : Enchant("cubed", "Cubed", 3) {
         val yield = if (level <= cubedNerf.size && level > 0) {
             cubedNerf.sorted()[level - 1]
         } else {
-            100f
+            0F
         }
 
-        MultiBlockBreakEvent(event.player, event.block, blocks, `yield`).call()
+        MultiBlockBreakEvent(event.player, event.block, blocks, `yield`.toDouble()).call()
     }
 
 //    override fun getCost(level: Int): Long {

@@ -46,7 +46,7 @@ object ToolsModule : PluginModule() {
         PickaxeHandler.initialLoad()
         PickaxePrestigeHandler.initialLoad()
         SalvagePreventionHandler.initialLoad()
-        EnchantHandler.loadConfig()
+        EnchantHandler.initialLoad()
     }
 
     override fun onReload() {
@@ -63,6 +63,7 @@ object ToolsModule : PluginModule() {
         PickaxeHandler.saveData()
         PickaxePrestigeHandler.saveData()
         SalvagePreventionHandler.saveData()
+        EnchantHandler.saveData()
     }
 
     override fun getListeners(): List<Listener> {

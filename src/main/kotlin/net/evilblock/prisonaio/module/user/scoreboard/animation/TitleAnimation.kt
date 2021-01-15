@@ -7,7 +7,7 @@
 
 package net.evilblock.prisonaio.module.user.scoreboard.animation
 
-import net.evilblock.prisonaio.module.user.scoreboard.ScoreboardConfigHandler
+import net.evilblock.prisonaio.module.user.scoreboard.ScoreboardHandler
 
 object TitleAnimation : Runnable {
 
@@ -15,16 +15,16 @@ object TitleAnimation : Runnable {
     private var lastStage: Long = System.currentTimeMillis()
 
     override fun run() {
-        if (!ScoreboardConfigHandler.isTitleAnimated()) {
+        if (!ScoreboardHandler.isTitleAnimated()) {
             return
         }
 
-        val stageAt = ScoreboardConfigHandler.getTitleAnimationFrames()[stage]
+        val stageAt = ScoreboardHandler.getTitleAnimationFrames()[stage]
 
         if (System.currentTimeMillis() - lastStage >= stageAt.delay) {
             lastStage = System.currentTimeMillis()
 
-            if (stage + 1 >= ScoreboardConfigHandler.getTitleAnimationFrames().size) {
+            if (stage + 1 >= ScoreboardHandler.getTitleAnimationFrames().size) {
                 stage = 0
             } else {
                 stage++
@@ -34,7 +34,7 @@ object TitleAnimation : Runnable {
 
     @JvmStatic
     fun getCurrentTitle(): String {
-        return ScoreboardConfigHandler.getTitleAnimationFrames()[stage].text
+        return ScoreboardHandler.getTitleAnimationFrames()[stage].text
     }
 
 }

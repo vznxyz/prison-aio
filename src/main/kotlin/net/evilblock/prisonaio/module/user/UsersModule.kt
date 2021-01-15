@@ -10,7 +10,6 @@ package net.evilblock.prisonaio.module.user
 import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.plugin.PluginFramework
 import net.evilblock.cubed.plugin.PluginModule
-import net.evilblock.cubed.scoreboard.ScoreboardHandler
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.mechanic.economy.Currency
@@ -33,12 +32,16 @@ import net.evilblock.prisonaio.module.user.perk.Perk
 import net.evilblock.prisonaio.module.user.perk.autosell.AutoSellNotification
 import net.evilblock.prisonaio.module.user.scoreboard.PrisonScoreGetter
 import net.evilblock.prisonaio.module.user.scoreboard.PrisonTitleGetter
-import net.evilblock.prisonaio.module.user.scoreboard.ScoreboardConfigHandler
-import net.evilblock.prisonaio.module.user.scoreboard.animation.RainbowAnimation
+import net.evilblock.prisonaio.module.user.scoreboard.ScoreboardHandler
+import net.evilblock.prisonaio.module.user.scoreboard.animation.LinkAnimation
 import net.evilblock.prisonaio.module.user.scoreboard.animation.TitleAnimation
+import net.evilblock.prisonaio.module.user.service.PlayTimeSyncService
+import net.evilblock.prisonaio.module.user.service.SlotExpirationService
+import net.evilblock.prisonaio.module.user.service.SettingsTickService
+import net.evilblock.prisonaio.module.user.service.TeleportTickService
 import net.evilblock.prisonaio.module.user.setting.listener.UserSettingsListeners
-import net.evilblock.prisonaio.module.user.setting.task.UserSettingsTickTask
-import net.evilblock.prisonaio.module.user.task.PlayTimeSyncTask
+import net.evilblock.prisonaio.module.user.teleport.listener.UserTeleportListeners
+import net.evilblock.prisonaio.service.ServiceRegistry
 import org.bukkit.event.Listener
 import java.util.concurrent.ConcurrentHashMap
 
@@ -63,18 +66,20 @@ object UsersModule : PluginModule() {
         permissionSalesMultipliers = readPermissionSalesMultipliers()
         commandAliases = readCommandAliases()
 
-        ScoreboardConfigHandler.initialLoad()
+        ScoreboardHandler.initialLoad()
         NewsHandler.initialLoad()
         UserHandler.initialLoad()
         BankNoteHandler.initialLoad()
 
-        Tasks.asyncTimer(PlayTimeSyncTask, 20L * 30, 2L * 30)
-        Tasks.asyncTimer(UserSettingsTickTask, 20L, 20L)
+        ServiceRegistry.register(PlayTimeSyncService, 20L * 30L, 20L * 30L)
+        ServiceRegistry.register(SlotExpirationService, 10L)
+        ServiceRegistry.register(SettingsTickService, 20L)
+        ServiceRegistry.register(TeleportTickService, 10L)
 
-        ScoreboardHandler.configure(PrisonTitleGetter, PrisonScoreGetter)
+        net.evilblock.cubed.scoreboard.ScoreboardHandler.configure(PrisonTitleGetter, PrisonScoreGetter)
 
         Tasks.asyncTimer(TitleAnimation, 1L, 1L)
-        Tasks.asyncTimer(RainbowAnimation, 1L, 1L)
+        Tasks.asyncTimer(LinkAnimation, 20L, 20L)
     }
 
     override fun onDisable() {
@@ -82,7 +87,7 @@ object UsersModule : PluginModule() {
             user.statistics.syncPlayTime()
         }
 
-        ScoreboardConfigHandler.saveData()
+        ScoreboardHandler.saveData()
         NewsHandler.saveData()
         UserHandler.saveData()
         BankNoteHandler.saveData()
@@ -94,11 +99,12 @@ object UsersModule : PluginModule() {
         permissionSalesMultipliers = readPermissionSalesMultipliers()
         commandAliases = readCommandAliases()
 
-        ScoreboardConfigHandler.loadConfig()
+        ScoreboardHandler.loadConfig()
     }
 
     override fun onAutoSave() {
-        ScoreboardConfigHandler.saveData()
+        NewsHandler.saveData()
+        ScoreboardHandler.saveData()
         UserHandler.saveData()
         BankNoteHandler.saveData()
     }
@@ -114,6 +120,7 @@ object UsersModule : PluginModule() {
             UserPrestigeListeners,
             UserStatisticsListeners,
             UserSettingsListeners,
+            UserTeleportListeners,
             BankNoteAdminListeners,
             BankNoteDupeListeners,
             BankNoteListeners,
@@ -134,13 +141,14 @@ object UsersModule : PluginModule() {
             NicknameCommand.javaClass,
             PingCommand.javaClass,
             PlayTimeCommand.javaClass,
+            PlotsCommand.javaClass,
             PrestigeCommand.javaClass,
             PrestigeTokensCommand.javaClass,
             ProfileCommand.javaClass,
             RankupAllCommand.javaClass,
             RankupCommand.javaClass,
             RankupsCommand.javaClass,
-            ShopMultiplierCommand.javaClass,
+            MultipliersCommand.javaClass,
             SettingsCommand.javaClass,
             SpawnCommand.javaClass,
             ToggleEnchantMessagesCommand.javaClass,
@@ -190,7 +198,7 @@ object UsersModule : PluginModule() {
     }
 
     fun getBankNoteRedeemAlertThreshold(currency: Currency): Long {
-        return config.getLong("bank-note.redeem-alert-threshold.${currency.toType().name}")
+        return config.getLong("bank-notes.redeem-alert-threshold.${currency.toType().name}")
     }
 
     private fun readPermissionSalesMultipliers(): Map<String, Double> {
