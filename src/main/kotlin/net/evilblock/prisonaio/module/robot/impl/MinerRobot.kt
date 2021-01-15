@@ -2,6 +2,7 @@ package net.evilblock.prisonaio.module.robot.impl
 
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
@@ -185,8 +186,8 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         }
     }
 
-    fun getTicksPerSecond(): Int {
-        return (1000.0 / getTickInterval()).toInt()
+    fun getTicksPerSecond(): Double {
+        return (1000.0 / getTickInterval()).coerceAtLeast(1.0)
     }
 
     override fun getLastTick(): Long {
@@ -205,7 +206,7 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         tickModifiers()
 
         val owner = Bukkit.getPlayer(owner)
-        if (owner != null && owner.isOnline) {
+        if ((owner != null && owner.isOnline) || hasActiveModifier(RobotModifierType.OFFLINE_COLLECT)) {
             val timePassed = System.currentTimeMillis() - lastTick
             if (timePassed < 3_000L) {
                 uptime += timePassed
@@ -252,11 +253,11 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         moneyOwed += BigDecimal(money)
         tokensOwed += BigDecimal(tokens)
 
-        if (hasActiveModifier(RobotModifierType.AUTO_COLLECT)) {
-            val modifier = getActiveModifier(RobotModifierType.AUTO_COLLECT) ?: return
+        if (hasActiveModifier(RobotModifierType.OFFLINE_COLLECT)) {
+            val modifier = getActiveModifier(RobotModifierType.OFFLINE_COLLECT) ?: return
 
             val user = UserHandler.getOrLoadAndCacheUser(owner)
-            if (user.cacheExpiry != null && modifier.duration != null) {
+            if (modifier.duration != null) {
                 if (modifier.duration.isPermanent()) {
                     user.cacheExpiry = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30L)
                 } else {
@@ -280,7 +281,7 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
         }
     }
 
-    fun getActiveModifiers(): Array<RobotModifier?> {
+    fun getActiveModifiers(): Array<RobotModifier> {
         return modifiers.values.toTypedArray()
     }
 
@@ -290,6 +291,16 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
 
     fun getActiveModifier(type: RobotModifierType): RobotModifier? {
         return modifiers[type]
+    }
+
+    fun addActiveModifier(modifier: RobotModifier, itemStack: ItemStack) {
+        modifiers[modifier.type] = modifier
+
+        if (modifier.type.durationBased) {
+            removeModifierItem(itemStack, 1)
+        }
+
+        onApplyModifier(modifier)
     }
 
     fun getMaxModifiers(): Int {
@@ -332,42 +343,46 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
     }
 
     private fun tickModifiers() {
-        if (getMaxModifiers() > 0) {
-            val expired = arrayListOf<RobotModifier>()
-            for (modifier in modifiers.values) {
-                if (modifier.isExpired()) {
-                    expired.add(modifier)
-                }
+        expireModifiers()
+
+        if (getMaxModifiers() <= 0) {
+            return
+        }
+        val activeModifiers = getActiveModifiers()
+        if (activeModifiers.size >= getMaxModifiers()) {
+            return
+        }
+
+        for (item in modifierStorage) {
+            if (item == null) {
+                continue
             }
 
-            for (modifier in expired) {
-                onRemoveModifier(modifier)
-                modifiers.remove(modifier.type)
+            val modifier = RobotModifierUtils.extractModifierFromItemStack(item) ?: continue
+
+            if (hasActiveModifier(modifier.type)) {
+                continue
             }
 
-            val activeModifiers = getActiveModifiers()
-            if (activeModifiers.size < getMaxModifiers()) {
-                for (item in modifierStorage) {
-                    if (item != null) {
-                        val modifier = RobotModifierUtils.extractModifierFromItemStack(item)
-                        if (modifier != null) {
-                            if (!hasActiveModifier(modifier.type)) {
-                                modifiers[modifier.type] = modifier
+            addActiveModifier(modifier, item)
 
-                                if (modifier.type.durationBased) {
-                                    removeModifierItem(item, 1)
-                                }
-
-                                onApplyModifier(modifier)
-
-                                if (getActiveModifiers().size >= getMaxModifiers()) {
-                                    break
-                                }
-                            }
-                        }
-                    }
-                }
+            if (getActiveModifiers().size >= getMaxModifiers()) {
+                break
             }
+        }
+    }
+
+    private fun expireModifiers() {
+        val expired = arrayListOf<RobotModifier>()
+        for (modifier in modifiers.values) {
+            if (modifier.isExpired()) {
+                expired.add(modifier)
+            }
+        }
+
+        for (modifier in expired) {
+            onRemoveModifier(modifier)
+            modifiers.remove(modifier.type)
         }
     }
 
@@ -535,6 +550,31 @@ class MinerRobot(owner: UUID, location: Location) : Robot(owner = owner, locatio
             BlockFace.NORTH
         } else {
             BlockFace.EAST
+        }
+    }
+
+    internal fun renderModifiersInfo(info: MutableList<String>) {
+        info.add("")
+        info.add("${ChatColor.YELLOW}${ChatColor.BOLD}${ChatColor.UNDERLINE}Modifiers")
+        info.add("")
+
+        val modifiers = getActiveModifiers()
+        if (modifiers.isNotEmpty()) {
+            for (modifier in modifiers) {
+                info.add(buildString {
+                    append(modifier.type.getColoredName())
+
+                    if (modifier.value > 1.0) {
+                        append(" ${ChatColor.GRAY}(${NumberUtils.formatDecimal(modifier.value)})")
+                    }
+
+                    if (modifier.type.durationBased && modifier.duration != null) {
+                        append(" ${ChatColor.GRAY}(${TimeUtil.formatIntoAbbreviatedString((modifier.getRemainingTime() / 1000.0).toInt())})")
+                    }
+                })
+            }
+        } else {
+            info.add("${ChatColor.GRAY}None")
         }
     }
 

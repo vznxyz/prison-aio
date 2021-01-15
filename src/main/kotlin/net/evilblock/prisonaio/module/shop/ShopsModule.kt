@@ -51,6 +51,7 @@ object ShopsModule : PluginModule() {
         return listOf(
             OpenShopCommand.javaClass,
             SellAllCommand.javaClass,
+            ShopEditCommand.javaClass,
             ShopEditorCommand.javaClass,
             ShopReceiptCommand.javaClass,
             ShopRenameIdCommand.javaClass,

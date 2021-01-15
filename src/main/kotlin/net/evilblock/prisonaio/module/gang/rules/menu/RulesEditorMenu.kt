@@ -46,7 +46,7 @@ class RulesEditorMenu : PaginatedMenu() {
                 buttons[8] = PageButton(1, this)
             }
 
-            for (i in 9 until 17) {
+            for (i in 9..17) {
                 buttons[i] = GlassButton(0)
             }
         }

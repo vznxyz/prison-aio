@@ -34,10 +34,10 @@ class Warp(val id: String, var location: Location) {
     }
 
     fun getFormattedName(): String {
-        if (displayName == id) {
-            return "${ChatColor.RESET}${ChatColor.BOLD}$displayName"
+        return if (displayName == id) {
+            "${ChatColor.RESET}${ChatColor.BOLD}$displayName"
         } else {
-            return displayName
+            displayName
         }
     }
 

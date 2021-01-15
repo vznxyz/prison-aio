@@ -28,4 +28,12 @@ class DeathMessagesOption(var receive: Boolean) : UserSettingOption {
         return DeathMessagesOption::class.java
     }
 
+    override fun equals(other: Any?): Boolean {
+        return other is DeathMessagesOption && other.receive == receive
+    }
+
+    override fun hashCode(): Int {
+        return receive.hashCode()
+    }
+
 }

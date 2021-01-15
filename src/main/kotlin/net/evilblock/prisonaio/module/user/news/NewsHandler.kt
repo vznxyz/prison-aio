@@ -17,10 +17,11 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.user.UsersModule
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object NewsHandler : PluginHandler() {
 
-    private val news: MutableMap<UUID, News> = hashMapOf()
+    private val news: MutableMap<UUID, News> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return UsersModule
@@ -44,6 +45,8 @@ object NewsHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

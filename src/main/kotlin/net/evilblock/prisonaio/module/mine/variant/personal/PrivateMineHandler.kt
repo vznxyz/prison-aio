@@ -7,13 +7,12 @@
 
 package net.evilblock.prisonaio.module.mine.variant.personal
 
-import com.boydti.fawe.util.TaskManager
 import com.google.common.base.Charsets
 import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
 import com.sk89q.worldedit.Vector
 import net.evilblock.cubed.Cubed
-import net.evilblock.cubed.entity.EntityManager
+import net.evilblock.cubed.backup.BackupHandler
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.util.bukkit.AngleUtils
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -21,15 +20,15 @@ import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.bukkit.generator.EmptyChunkGenerator
 import net.evilblock.cubed.util.hook.WorldEditUtils
 import net.evilblock.prisonaio.module.mine.MinesModule
-import net.evilblock.prisonaio.module.mine.variant.personal.entity.PrivateMineNpcEntity
+import net.evilblock.prisonaio.module.mine.variant.personal.schematic.PrivateMineSchematicData
+import net.evilblock.prisonaio.module.mine.variant.personal.schematic.PrivateMineSchematicScanResults
 import net.evilblock.prisonaio.module.region.RegionHandler
 import org.bukkit.*
-import org.bukkit.block.BlockFace
-import org.bukkit.block.Sign
 import org.bukkit.block.Skull
 import org.bukkit.entity.Player
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.collections.set
@@ -39,28 +38,37 @@ import kotlin.collections.set
  */
 object PrivateMineHandler : PluginHandler() {
 
-    private val schematicFile: File = File(File(Bukkit.getPluginManager().getPlugin("WorldEdit").dataFolder, "schematics"), "PrivateMine.schematic")
+    val schematicFile: File = File(File(Bukkit.getPluginManager().getPlugin("WorldEdit").dataFolder, "schematics"), "PrivateMine.schematic")
 
     private var gridIndex = 0
     private val grid: HashMap<Int, PrivateMine> = HashMap()
-    private val mineAccess: HashMap<UUID, HashSet<PrivateMine>> = HashMap()
-    private val currentlyAt: HashMap<UUID, PrivateMine> = HashMap()
+
+    private val mineByOwner: MutableMap<UUID, PrivateMine> = ConcurrentHashMap()
+
+    private val playerAccess: MutableMap<UUID, HashSet<PrivateMine>> = ConcurrentHashMap()
+    private val playerVisiting: MutableMap<UUID, PrivateMine> = ConcurrentHashMap()
 
     override fun getModule(): MinesModule {
         return MinesModule
     }
 
+    override fun getInternalDataFile(): File {
+        return File(File(getModule().getPluginFramework().dataFolder, "internal"), "private-mines.json")
+    }
+
     override fun initialLoad() {
-        PrivateMineConfig.load()
+        super.initialLoad()
 
         loadWorld()
         loadGrid()
+
+        loaded = true
     }
 
     override fun saveData() {
         super.saveData()
 
-        saveGrid()
+        Files.write(Cubed.gson.toJson(grid.values), getInternalDataFile(), Charsets.UTF_8)
     }
 
     private fun loadWorld() {
@@ -68,6 +76,29 @@ object PrivateMineHandler : PluginHandler() {
                 .generator(EmptyChunkGenerator())
                 .generateStructures(false)
                 .createWorld()
+    }
+
+    private fun loadGrid() {
+        val dataFile = getInternalDataFile()
+        if (dataFile.exists()) {
+            val backupFile = BackupHandler.findNextBackupFile("private-mines")
+            Files.copy(dataFile, backupFile)
+
+            Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
+                val mines = Cubed.gson.fromJson(reader, object : TypeToken<List<PrivateMine>>() {}.type) as List<PrivateMine>
+                for (mine in mines) {
+                    mine.initializeData()
+                    synchronizeCaches(mine)
+
+                    // set highest grid index so we know where to create the next mine
+                    if (mine.gridIndex > gridIndex) {
+                        gridIndex = mine.gridIndex
+                    }
+                }
+            }
+        }
+
+        getModule().getPluginFramework().logger.info("Loaded ${getAllMines().size} robots from mines.json!")
     }
 
     /**
@@ -88,7 +119,7 @@ object PrivateMineHandler : PluginHandler() {
      * Gets the [PrivateMine] a player is currently at, or null.
      */
     fun getCurrentMine(player: Player): PrivateMine? {
-        return currentlyAt[player.uniqueId]
+        return playerVisiting[player.uniqueId]
     }
 
     /**
@@ -98,10 +129,10 @@ object PrivateMineHandler : PluginHandler() {
         getCurrentMine(player)?.removeFromActivePlayers(player)
 
         if (mine == null) {
-            currentlyAt.remove(player.uniqueId)
+            playerVisiting.remove(player.uniqueId)
         } else {
             mine.addToActivePlayers(player)
-            currentlyAt[player.uniqueId] = mine
+            playerVisiting[player.uniqueId] = mine
         }
 
         setPreviousMine(player.uniqueId, mine)
@@ -111,14 +142,14 @@ object PrivateMineHandler : PluginHandler() {
      * Returns a set of [PrivateMine] that the player owns.
      */
     fun getOwnedMines(owner: UUID): Set<PrivateMine> {
-        return mineAccess.getOrDefault(owner, hashSetOf()).filter { it.owner == owner }.toSet()
+        return playerAccess.getOrDefault(owner, hashSetOf()).filter { it.owner == owner }.toSet()
     }
 
     /**
      * Returns a set of [PrivateMine] that the player has access to.
      */
     fun getAccessibleMines(player: UUID): Set<PrivateMine> {
-        return mineAccess.getOrDefault(player, hashSetOf()).sortedBy {
+        return playerAccess.getOrDefault(player, hashSetOf()).sortedBy {
             return@sortedBy if (it.owner == player) {
                 1
             } else {
@@ -128,12 +159,12 @@ object PrivateMineHandler : PluginHandler() {
     }
 
     fun addAccessToMine(uuid: UUID, mine: PrivateMine) {
-        mineAccess.putIfAbsent(uuid, hashSetOf())
-        mineAccess[uuid]!!.add(mine)
+        playerAccess.putIfAbsent(uuid, hashSetOf())
+        playerAccess[uuid]!!.add(mine)
     }
 
     fun removeAccessToMine(uuid: UUID, mine: PrivateMine) {
-        mineAccess.getOrDefault(uuid, HashSet()).remove(mine)
+        playerAccess.getOrDefault(uuid, HashSet()).remove(mine)
     }
 
     /**
@@ -193,207 +224,169 @@ object PrivateMineHandler : PluginHandler() {
         updateCurrentMine(player, mine)
     }
 
-    private fun initialMineSetup(mine: PrivateMine) {
-        mine.activePlayers = hashSetOf()
-        mine.salesTax = mine.salesTax.coerceAtLeast(1.0)
-
+    fun synchronizeCaches(mine: PrivateMine) {
         grid[mine.gridIndex] = mine
+        mineByOwner[mine.owner] = mine
 
         for (player in mine.whitelistedPlayers) {
-            mineAccess.putIfAbsent(player, HashSet())
-            mineAccess[player]!!.add(mine)
+            addAccessToMine(player, mine)
         }
 
         mine.resetRegion()
-
         RegionHandler.updateBlockCache(mine)
     }
 
     /**
-     * Creates and inserts a [PrivateMine] into the [PrivateMineHandler].
+     * Creates and inserts a [PrivateMine] into the grid.
+     *
+     * This method should always be called asynchronously.
      */
     @Throws(IllegalStateException::class)
-    fun createMine(owner: UUID) {
+    fun createMine(owner: UUID, onFinish: (PrivateMine) -> Unit) {
+        assert(!Bukkit.isPrimaryThread()) { "Cannot generate new private mine on primary thread" }
+
         if (!schematicFile.exists()) {
-            throw IllegalStateException("Private Mines schematic file doesn't exist: ${schematicFile.name}")
+            throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
         }
 
-        mineAccess.putIfAbsent(owner, hashSetOf())
-
-        // throw exception if player already owns a private mine
-        for (mine in mineAccess[owner]!!) {
-            if (mine.owner == owner) {
-                throw IllegalStateException("Player already owns a Private Mine")
-            }
+        if (getOwnedMines(owner).isNotEmpty()) {
+            throw IllegalStateException("Player already owns a private mine")
         }
 
         val gridIndex = ++gridIndex
-        val blockCoords = gridCoordsToBlockCoords(indexToGrid(gridIndex))
-        val pasteLocation = Location(getGridWorld(), blockCoords.first.toDouble(), 68.0, blockCoords.second.toDouble())
+        val schematicData = PrivateMineSchematicData.of(gridIndex)
 
-        // paste schematic
-        val pasteVector = Vector(pasteLocation.x, pasteLocation.y, pasteLocation.z)
-        WorldEditUtils.paste(schematicFile, pasteLocation.world, pasteVector, true)
-        println("Pasted schematic at vector ${pasteLocation.x}, ${pasteLocation.y}, ${pasteLocation.z}")
-
-        // find the breakable region of the pasted schematic
-        val cubeStart = Location(getGridWorld(), blockCoords.first.toDouble(), 68.0, blockCoords.second.toDouble())
-
-        Tasks.sync {
-            // find the spawn points for player and npcs
-            val dataScan = scanSchematic(cubeStart)
-            if (!dataScan.isComplete()) {
-                throw IllegalStateException("Schematic is missing a scanned data field")
+        pasteSchematic(schematicData) { success ->
+            if (!success) {
+                throw IllegalStateException("Failed to paste schematic")
             }
 
-            val schematicSize = WorldEditUtils.readSchematicSize(schematicFile)
-            val cuboid = Cuboid(pasteLocation, pasteLocation.clone().add(schematicSize.x, schematicSize.y, schematicSize.z))
+            val scanResults = startSchematicScan(schematicData.pasteLocation)
 
-            Tasks.async {
-                val mine = PrivateMine(gridIndex, owner, dataScan.playerSpawnPoint!!, cuboid, Cuboid(dataScan.cuboidLower!!, dataScan.cuboidUpper!!))
-
-                // execute initial mine setup
-                initialMineSetup(mine)
-
-                // save the world and grid to prevent data loss
-                getGridWorld().save()
-                saveGrid()
-
-                // spawn npc
-                val npc = PrivateMineNpcEntity(dataScan.npcSpawnPoint!!)
-                npc.initializeData()
-
-                EntityManager.trackEntity(npc)
+            if (scanResults.spawnLocation == null) {
+                throw IllegalStateException("Missing player spawn location")
             }
+
+            if (scanResults.npcLocation == null) {
+                throw IllegalStateException("Missing NPC spawn location")
+            }
+
+            if (scanResults.cuboidLower == null) {
+                throw IllegalStateException("Missing cuboid lower location")
+            }
+
+            if (scanResults.cuboidUpper == null) {
+                throw IllegalStateException("Missing cuboid upper location")
+            }
+
+            Tasks.sync {
+                for (block in scanResults.blocks) {
+                    block.type = Material.AIR
+                    block.state.update()
+                }
+            }
+
+            val mine = PrivateMine(
+                gridIndex = gridIndex,
+                owner = owner,
+                spawnPoint = scanResults.spawnLocation!!,
+                npcLocation = scanResults.npcLocation!!,
+                cuboid = schematicData.cuboid,
+                innerCuboid = Cuboid(scanResults.cuboidLower!!, scanResults.cuboidUpper!!)
+            )
+
+            mine.initializeData()
+
+            synchronizeCaches(mine)
+
+            onFinish.invoke(mine)
+        }
+    }
+
+    @Throws(IllegalStateException::class)
+    fun pasteSchematic(schematicData: PrivateMineSchematicData, onFinish: (Boolean) -> Unit) {
+        if (!schematicFile.exists()) {
+            throw IllegalStateException("Schematic file doesn't exist: ${schematicFile.name}")
+        }
+
+        try {
+            Tasks.sync {
+                // preload affected chunks
+                val chunks = schematicData.cuboid.getChunks()
+                for (chunk in chunks) {
+                    if (!chunk.isLoaded) {
+                        if (!chunk.load(true)) {
+                            throw IllegalStateException("Couldn't generate chunks in grid world")
+                        }
+                    }
+                }
+
+                Tasks.async {
+                    val pasteVector = Vector(schematicData.pasteLocation.x, schematicData.pasteLocation.y, schematicData.pasteLocation.z)
+                    WorldEditUtils.paste(schematicFile, schematicData.pasteLocation.world, pasteVector, true)
+                    println("Pasted schematic at vector ${schematicData.pasteLocation.x}, ${schematicData.pasteLocation.y}, ${schematicData.pasteLocation.z}")
+
+                    onFinish.invoke(true)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onFinish.invoke(false)
         }
     }
 
     /**
-     * Container for storing spawn points.
+     * Finds the spawn points for a given location.
      */
-    data class SchematicDataScan(
-        var playerSpawnPoint: Location? = null,
-        var npcSpawnPoint: Location? = null,
-        var cuboidLower: Location? = null,
-        var cuboidUpper: Location? = null
-    ) {
-        fun isComplete(): Boolean {
-            return playerSpawnPoint != null && npcSpawnPoint != null && cuboidLower != null && cuboidLower != null
-        }
-    }
-
-    /**
-     * Finds the spawn point for the NPC by searching for a SIGN tile entity.
-     */
-    private fun scanSchematic(start: Location): SchematicDataScan {
+    private fun startSchematicScan(start: Location): PrivateMineSchematicScanResults {
         val schematicSize = WorldEditUtils.readSchematicSize(schematicFile)
 
         val minPoint = start.clone()
         val maxPoint = start.clone().add(schematicSize.x, schematicSize.y, schematicSize.z)
 
-        val gridWorld = getGridWorld()
-        val dataScan = SchematicDataScan()
+        val world = getGridWorld()
+        val results = PrivateMineSchematicScanResults()
 
         for (x in minPoint.x.toInt()..maxPoint.x.toInt()) {
             for (y in minPoint.y.toInt()..maxPoint.y.toInt()) {
                 zLoop@ for (z in minPoint.z.toInt()..maxPoint.z.toInt()) {
-                    val block = gridWorld.getBlockAt(x, y, z)
-
+                    val block = world.getBlockAt(x, y, z)
                     if (block.state is Skull) {
-                        val below = block.getRelative(BlockFace.DOWN)
                         val skull = block.state as Skull
-
                         when (skull.skullType) {
                             SkullType.PLAYER -> {
-                                dataScan.playerSpawnPoint = block.location.add(0.5, 2.0, 0.5)
-                                dataScan.playerSpawnPoint!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
+                                results.spawnLocation = block.location.add(0.5, 2.0, 0.5)
+                                results.spawnLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
                             }
                             SkullType.CREEPER -> {
-                                dataScan.npcSpawnPoint = block.location.add(0.5, 0.0, 0.5)
-                                dataScan.npcSpawnPoint!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
-
-                                if (below.type == Material.FENCE) {
-                                    dataScan.npcSpawnPoint = dataScan.npcSpawnPoint!!.subtract(0.0, 1.0, 0.0)
+                                results.npcLocation = block.location.add(0.5, 0.0, 0.5)
+                                results.npcLocation!!.yaw = AngleUtils.faceToYaw(skull.rotation) + 90F
+                            }
+                            SkullType.WITHER -> {
+                                if (results.cuboidLower == null) {
+                                    results.cuboidLower = block.location
+                                } else {
+                                    if (block.location.y > results.cuboidLower!!.y) {
+                                        results.cuboidUpper = block.location
+                                    } else {
+                                        results.cuboidUpper = results.cuboidLower
+                                        results.cuboidLower = block.location
+                                    }
                                 }
                             }
-                            else -> {
-                                continue@zLoop
-                            }
+                            else -> continue@zLoop
                         }
 
-                        TaskManager.IMP.sync {
-                            block.type = Material.AIR
-                            block.state.update()
-
-                            if (below.type == Material.FENCE) {
-                                below.type = Material.AIR
-                                below.state.update()
-                            }
-                        }
-                    } else if (block.state is Sign) {
-                        val sign = block.state as Sign
-
-                        if (sign.getLine(0) == "CUBE-FINDER") {
-                            when (sign.getLine(1)) {
-                                "LOWER" -> dataScan.cuboidLower = sign.location
-                                "UPPER" -> dataScan.cuboidUpper = sign.location
-                            }
-
-                            // remove cube-finder blocks
-                            TaskManager.IMP.sync {
-                                block.type = Material.AIR
-                                block.state.update()
-
-                                val below = block.getRelative(BlockFace.DOWN)
-                                if (below.type == Material.FENCE) {
-                                    below.type = Material.AIR
-                                    below.state.update()
-                                }
-                            }
-                        }
+                        results.blocks.add(block)
                     }
                 }
             }
         }
 
-        return dataScan
+        return results
     }
 
-    /**
-     * Loads the grid data from the file system.
-     */
-    private fun loadGrid() {
-        val worldFolder = getGridWorld().worldFolder
-        val memoryFile = File(worldFolder, "privateMines.json")
-
-        if (memoryFile.exists()) {
-            Files.newReader(memoryFile, Charsets.UTF_8).use { reader ->
-                val gridType = object : TypeToken<List<PrivateMine>>() {}.type
-                val gridList = Cubed.gson.fromJson(reader, gridType) as List<PrivateMine>
-
-                for (mine in gridList) {
-                    initialMineSetup(mine)
-
-                    // set highest grid index so we know where to create the next mine
-                    if (mine.gridIndex > gridIndex) {
-                        gridIndex = mine.gridIndex
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Saves the grid data to the file system.
-     */
-    fun saveGrid() {
-        val worldFolder = getGridWorld().worldFolder
-        val memoryFile = File(worldFolder, "privateMines.json")
-
-        Files.write(Cubed.gson.toJson(grid.values), memoryFile, Charsets.UTF_8)
-    }
-
-    private fun indexToGrid(index: Int): Pair<Int, Int> {
+    fun indexToGrid(index: Int): Pair<Int, Int> {
         if (index == 0) {
             return Pair(0, 0)
         }
@@ -404,35 +397,44 @@ object PrivateMineHandler : PluginHandler() {
         return Pair(x, y)
     }
 
-    private fun gridToIndex(x: Int, y: Int): Int {
+    fun gridToIndex(x: Int, y: Int): Int {
         return getGridDimensions() * y + x
     }
 
-    private fun gridCoordsToBlockCoords(pos: Pair<Int, Int>): Pair<Int, Int> {
-        return Pair(
-                pos.first * getGridGutter(),
-                pos.second * getGridGutter()
-        )
+    fun gridCoordsToBlockCoords(pos: Pair<Int, Int>): Pair<Int, Int> {
+        return Pair(pos.first * getGridGutter(), pos.second * getGridGutter())
     }
 
-    @JvmStatic
     fun getGridWorldName(): String {
         return MinesModule.config.getString("personal-mines.grid.world-name")
     }
 
-    @JvmStatic
     fun getGridGutter(): Int {
         return MinesModule.config.getInt("personal-mines.grid.gutter")
     }
 
-    @JvmStatic
     fun getGridDimensions(): Int {
         return MinesModule.config.getInt("personal-mines.grid.dimensions")
     }
 
-    @JvmStatic
     fun getNotificationLines(type: String): List<String> {
-        return MinesModule.config.getStringList("personal-mines.language.notifications.$type").map { ChatColor.translateAlternateColorCodes('&', it) }
+        return MinesModule.config.getStringList("personal-mines.language.notifications.$type").map {
+            ChatColor.translateAlternateColorCodes('&', it)
+        }
+    }
+
+    fun getPrivateMineNPCHologramLines(): List<String> {
+        return MinesModule.config.getStringList("personal-mines.mine.npc.hologram-lines").map {
+            ChatColor.translateAlternateColorCodes('&', it)
+        }
+    }
+
+    fun getPrivateMineNPCTextureValue(): String {
+        return MinesModule.config.getString("personal-mines.mine.npc.texture-value")
+    }
+
+    fun getPrivateMineNPCTextureSignature(): String {
+        return MinesModule.config.getString("personal-mines.mine.npc.texture-signature")
     }
 
 }

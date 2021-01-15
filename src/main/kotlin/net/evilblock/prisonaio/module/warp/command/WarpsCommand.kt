@@ -8,7 +8,7 @@
 package net.evilblock.prisonaio.module.warp.command
 
 import net.evilblock.cubed.command.Command
-import net.evilblock.prisonaio.module.warp.menu.WarpsMenu
+import net.evilblock.prisonaio.module.warp.category.WarpCategoryHandler
 import org.bukkit.entity.Player
 
 object WarpsCommand {
@@ -19,7 +19,7 @@ object WarpsCommand {
     )
     @JvmStatic
     fun execute(player: Player) {
-        WarpsMenu().openMenu(player)
+        WarpCategoryHandler.openMenu(player)
     }
 
 }

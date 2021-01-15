@@ -13,10 +13,11 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.module.combat.CombatModule
 import org.bukkit.Bukkit
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object EnderpearlCooldownHandler : PluginHandler() {
 
-    private val cooldowns: MutableMap<UUID, EnderpearlCooldown> = hashMapOf()
+    private val cooldowns: MutableMap<UUID, EnderpearlCooldown> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return CombatModule

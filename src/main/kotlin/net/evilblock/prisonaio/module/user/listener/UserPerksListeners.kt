@@ -18,7 +18,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 object UserPerksListeners : Listener {
 
     /**
-     * Restores preserved allow-flight and flying states when logging in.
+     * Restores preserved game-mode and flying states when logging in.
      */
     @EventHandler
     fun onPlayerJoinEvent(event: PlayerJoinEvent) {
@@ -30,19 +30,27 @@ object UserPerksListeners : Listener {
     }
 
     /**
-     * Preserves game-mode, allow-flight, and flying states when switching worlds.
+     * Preserves game-mode and flying states when switching worlds.
      */
     @EventHandler
     fun onPlayerChangedWorldEvent(event: PlayerChangedWorldEvent) {
         val gameMode = event.player.gameMode
-        val allowFlight = event.player.allowFlight
-        val isFlying = event.player.isFlying
 
         Tasks.delayed(1L) {
             event.player.gameMode = gameMode
-            event.player.allowFlight = allowFlight
-            event.player.isFlying = isFlying
-            event.player.updateInventory()
+
+            if (UserHandler.isUserLoaded(event.player)) {
+                val user = UserHandler.getUser(event.player)
+                if (user.perks.isPerkEnabled(Perk.FLY)) {
+                    event.player.allowFlight = true
+                    event.player.isFlying = true
+                    event.player.updateInventory()
+                } else {
+                    event.player.allowFlight = false
+                    event.player.isFlying = false
+                    event.player.updateInventory()
+                }
+            }
         }
     }
 

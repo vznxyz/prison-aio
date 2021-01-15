@@ -131,7 +131,7 @@ class CoinFlipBrowserMenu : PaginatedMenu() {
                         val game = CoinFlipGame(
                             creator = UserHandler.getUser(player.uniqueId),
                             currencyAmount = input,
-                            currency = currency
+                            currency = currency.toType()
                         )
 
                         CoinFlipHandler.trackGame(game)

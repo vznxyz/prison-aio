@@ -27,7 +27,11 @@ object MineCrateHandler : PluginHandler() {
     }
 
     override fun initialLoad() {
+        super.initialLoad()
+
         loadConfig()
+
+        loaded = true
     }
 
     fun isAttached(location: Location): Boolean {

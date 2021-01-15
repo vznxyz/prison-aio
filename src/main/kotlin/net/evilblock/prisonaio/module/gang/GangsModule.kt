@@ -53,7 +53,7 @@ object GangsModule : PluginModule() {
     override fun onDisable() {
         super.onDisable()
 
-        GangHandler.saveGrid()
+        GangHandler.saveData()
         GangAdvertisementHandler.saveData()
         GangRulesHandler.saveData()
     }
@@ -61,7 +61,7 @@ object GangsModule : PluginModule() {
     override fun onAutoSave() {
         super.onAutoSave()
 
-        GangHandler.saveGrid()
+        GangHandler.saveData()
         GangAdvertisementHandler.saveData()
         GangRulesHandler.saveData()
     }
@@ -71,7 +71,7 @@ object GangsModule : PluginModule() {
             GangChatListeners,
             GangChallengeListeners,
             GangEntityListeners,
-            GangJerryListeners,
+            GangGuideListeners,
             GangSessionListeners,
             GangTrophiesListeners,
             GangWorldListeners
@@ -149,16 +149,16 @@ object GangsModule : PluginModule() {
         return config.getInt("gang.max-name-length", 16)
     }
 
-    fun getJerryHologramLines(): List<String> {
-        return config.getStringList("gang.jerry.hologram-lines").map { ChatColor.translateAlternateColorCodes('&', it) }
+    fun getGuideNPCHologramLines(): List<String> {
+        return config.getStringList("gang.guide-npc.hologram-lines").map { ChatColor.translateAlternateColorCodes('&', it) }
     }
 
-    fun getJerryTextureValue(): String {
-        return config.getString("gang.jerry.texture-value")
+    fun getGuideNPCTextureValue(): String {
+        return config.getString("gang.guide-npc.texture-value")
     }
 
-    fun getJerryTextureSignature(): String {
-        return config.getString("gang.jerry.texture-signature")
+    fun getGuideNPCTextureSignature(): String {
+        return config.getString("gang.guide-npc.texture-signature")
     }
 
     fun readTrophyBlockBreakChance(): Double {

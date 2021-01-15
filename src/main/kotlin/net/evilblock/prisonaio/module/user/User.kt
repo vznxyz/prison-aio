@@ -23,18 +23,18 @@ import net.evilblock.prisonaio.module.rank.RanksModule
 import net.evilblock.prisonaio.module.rank.event.PlayerRankupEvent
 import net.evilblock.prisonaio.module.rank.serialize.RankReferenceSerializer
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.DeliveryManReward
-import net.evilblock.prisonaio.module.theme.ThemesModule
-import net.evilblock.prisonaio.module.theme.user.ThemeUserData
 import net.evilblock.prisonaio.module.user.activity.type.CompletedAchievementActivity
 import net.evilblock.prisonaio.module.user.auction.UserActionHouseData
 import net.evilblock.prisonaio.module.user.news.News
 import net.evilblock.prisonaio.module.user.perk.UserPerks
 import net.evilblock.prisonaio.module.user.profile.ProfileComment
+import net.evilblock.prisonaio.module.user.scoreboard.slot.DurationBasedSlot
 import net.evilblock.prisonaio.module.user.statistic.UserStatistics
 import net.evilblock.prisonaio.module.user.serialize.UserClaimedRewardsSerializer
 import net.evilblock.prisonaio.module.user.serialize.UserQuestProgressSerializer
 import net.evilblock.prisonaio.module.user.serialize.UserReadNewsPostsSerializer
 import net.evilblock.prisonaio.module.user.setting.UserSettings
+import net.evilblock.prisonaio.module.user.teleport.UserTeleport
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -48,13 +48,11 @@ class User(val uuid: UUID) {
 
     @Transient internal var requiresSave: Boolean = false
     @Transient internal var cacheExpiry: Long? = null
-    @Transient var attachment: PermissionAttachment? = null
+
+    @Transient var permissionAttachment: PermissionAttachment? = null
+    @Transient var scoreboardSlots: MutableList<DurationBasedSlot> = arrayListOf()
 
     internal var firstSeen: Long = System.currentTimeMillis()
-
-    internal var nicknameColors: MutableSet<ChatColor> = hashSetOf()
-    internal var nicknameColor: ChatColor? = null
-    internal var nicknameStyle: ChatColor? = null
 
     @JsonAdapter(value = RankReferenceSerializer::class)
     private var rank: Rank = RankHandler.getStartingRank()
@@ -71,6 +69,10 @@ class User(val uuid: UUID) {
     var auctionHouseData: UserActionHouseData = UserActionHouseData(this)
     var battlePassProgress: BattlePassProgress = BattlePassProgress(this)
 
+    internal var nicknameColors: MutableSet<ChatColor> = hashSetOf()
+    internal var nicknameColor: ChatColor? = null
+    internal var nicknameStyle: ChatColor? = null
+
     private val profileComments: MutableList<ProfileComment> = arrayListOf()
     private val achievements: MutableMap<String, CompletedAchievementActivity> = hashMapOf()
 
@@ -83,24 +85,17 @@ class User(val uuid: UUID) {
     @JsonAdapter(UserReadNewsPostsSerializer::class)
     internal var readNews: MutableSet<News> = hashSetOf()
 
-    var themeUserData: ThemeUserData? = null
+    @Transient
+    var pendingTeleport: UserTeleport? = null
 
     fun init() {
+        scoreboardSlots = arrayListOf()
+
         perks.user = this
         statistics.user = this
         settings.user = this
         auctionHouseData.user = this
         battlePassProgress.user = this
-
-        if (ThemesModule.isEnabled() && ThemesModule.isThemeEnabled() && ThemesModule.getTheme().hasUserDataImplementation()) {
-            if (themeUserData == null) {
-                themeUserData = ThemesModule.getTheme().createUserData(this)
-            }
-
-            if (themeUserData != null) {
-                themeUserData!!.user = this
-            }
-        }
     }
 
     /**
@@ -148,6 +143,28 @@ class User(val uuid: UUID) {
     }
 
     /**
+     * Applies the permissions granted by the user's [rank] and [prestige].
+     */
+    fun applyPermissions(player: Player) {
+        if (permissionAttachment == null) {
+            permissionAttachment = player.addAttachment(PrisonAIO.instance)
+        } else {
+            val permissions = permissionAttachment!!.permissions.keys.toList()
+            for (permission in permissions) {
+                permissionAttachment!!.unsetPermission(permission)
+            }
+        }
+
+        for (permission in rank.getCompoundedPermissions()) {
+            if (permission.startsWith("-")) {
+                permissionAttachment!!.setPermission(permission.substring(1), false)
+            } else {
+                permissionAttachment!!.setPermission(permission, true)
+            }
+        }
+    }
+
+    /**
      * If this user's data has been updated and needs to be saved.
      */
     fun requiresSave(): Boolean {
@@ -162,6 +179,14 @@ class User(val uuid: UUID) {
         }
 
         return false
+    }
+
+    fun hasSlotOfType(slotType: Class<DurationBasedSlot>): Boolean {
+        return scoreboardSlots.isNotEmpty() && scoreboardSlots.any { it::class.java == slotType }
+    }
+
+    fun clearSlotOfType(slotType: Class<DurationBasedSlot>) {
+        scoreboardSlots.removeIf { it::class.java == slotType }
     }
 
     /**
@@ -526,28 +551,6 @@ class User(val uuid: UUID) {
     fun markNewsPostAsRead(news: News) {
         readNews.add(news)
         requiresSave = true
-    }
-
-    /**
-     * Applies the permissions granted by the user's [rank] and [prestige].
-     */
-    fun applyPermissions(player: Player) {
-        if (attachment == null) {
-            attachment = player.addAttachment(PrisonAIO.instance)
-        } else {
-            val permissions = attachment!!.permissions.keys.toList()
-            for (permission in permissions) {
-                attachment!!.unsetPermission(permission)
-            }
-        }
-
-        for (permission in rank.getCompoundedPermissions()) {
-            if (permission.startsWith("-")) {
-                attachment!!.setPermission(permission.substring(1), false)
-            } else {
-                attachment!!.setPermission(permission, true)
-            }
-        }
     }
 
 }

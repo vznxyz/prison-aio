@@ -12,18 +12,26 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import java.text.DecimalFormat
 
-data class GlobalMultiplier(val multiplier: Double, val expires: Long) {
+data class GlobalMultiplier(val type: GlobalMultiplierType, val multiplier: Double, val expires: Long) {
+
+    fun isExpired(): Boolean {
+        return System.currentTimeMillis() >= expires
+    }
+
+    fun getRemainingTime(): String {
+        val remainingSeconds = ((expires - System.currentTimeMillis()) / 1000.0).toInt()
+        return TimeUtil.formatIntoDetailedString(remainingSeconds)
+    }
 
     fun start() {
-        val lines = arrayListOf<String>()
-
-        lines.add("")
-        lines.add(" ${ChatColor.GREEN}${ChatColor.BOLD}Global Multiplier Activated ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}${DECIMAL_FORMAT.format(multiplier)}X${ChatColor.GRAY})")
-        lines.add(" ${ChatColor.GRAY}This global multiplier will stack with any active")
-        lines.add(" ${ChatColor.GRAY}multipliers you already have!")
-        lines.add("")
-        lines.add(" ${ChatColor.GRAY}${ChatColor.ITALIC}Expires in ${ChatColor.GREEN}${ChatColor.ITALIC}${getRemainingTime()}${ChatColor.GRAY}${ChatColor.ITALIC}!")
-        lines.add("")
+        val lines = arrayListOf<String>().also { lines ->
+            lines.add("")
+            lines.add(" ${ChatColor.GREEN}${ChatColor.BOLD}${type.getFormattedName()} Multiplier Activated ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}${DECIMAL_FORMAT.format(multiplier)}X${ChatColor.GRAY})")
+            lines.add(" ${ChatColor.GRAY}A global multiplier has been activated!")
+            lines.add("")
+            lines.add(" ${ChatColor.GRAY}${ChatColor.ITALIC}Expires in ${ChatColor.GREEN}${ChatColor.ITALIC}${getRemainingTime()}${ChatColor.GRAY}${ChatColor.ITALIC}!")
+            lines.add("")
+        }
 
         for (player in Bukkit.getOnlinePlayers()) {
             for (line in lines) {
@@ -33,20 +41,18 @@ data class GlobalMultiplier(val multiplier: Double, val expires: Long) {
     }
 
     fun end(forced: Boolean) {
-        val lines = arrayListOf<String>()
-
-        if (forced) {
-            lines.add("")
-            lines.add(" ${ChatColor.DARK_RED}${ChatColor.BOLD}Global Multiplier Deactivated ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}${DECIMAL_FORMAT.format(multiplier)}X${ChatColor.GRAY})")
-            lines.add(" ${ChatColor.GRAY}An administrator has forcefully deactivated the")
-            lines.add(" ${ChatColor.GRAY}global multiplier!")
-            lines.add("")
-        } else {
-            lines.add("")
-            lines.add(" ${ChatColor.DARK_RED}${ChatColor.BOLD}Global Multiplier Expired ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}${DECIMAL_FORMAT.format(multiplier)}X${ChatColor.GRAY})")
-            lines.add(" ${ChatColor.GRAY}The global multiplier has expired and will no longer")
-            lines.add(" ${ChatColor.GRAY}stack with your multipliers!")
-            lines.add("")
+        val lines = arrayListOf<String>().also { lines ->
+            if (forced) {
+                lines.add("")
+                lines.add(" ${ChatColor.DARK_RED}${ChatColor.BOLD}${type.getFormattedName()} Multiplier Deactivated ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}${DECIMAL_FORMAT.format(multiplier)}X${ChatColor.GRAY})")
+                lines.add(" ${ChatColor.GRAY}The global multiplier has been deactivated!")
+                lines.add("")
+            } else {
+                lines.add("")
+                lines.add(" ${ChatColor.DARK_RED}${ChatColor.BOLD}${type.getFormattedName()} Multiplier Expired ${ChatColor.GRAY}(${ChatColor.GOLD}${ChatColor.BOLD}${DECIMAL_FORMAT.format(multiplier)}X${ChatColor.GRAY})")
+                lines.add(" ${ChatColor.GRAY}The global multiplier has expired!")
+                lines.add("")
+            }
         }
 
         for (player in Bukkit.getOnlinePlayers()) {
@@ -54,11 +60,6 @@ data class GlobalMultiplier(val multiplier: Double, val expires: Long) {
                 player.sendMessage(line)
             }
         }
-    }
-
-    fun getRemainingTime(): String {
-        val remainingSeconds = ((expires - System.currentTimeMillis()) / 1000.0).toInt()
-        return TimeUtil.formatIntoDetailedString(remainingSeconds)
     }
 
     companion object {

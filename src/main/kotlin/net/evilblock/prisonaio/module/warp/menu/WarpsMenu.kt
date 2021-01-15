@@ -17,7 +17,6 @@ import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.module.user.menu.MainMenu
 import net.evilblock.prisonaio.module.warp.Warp
-import net.evilblock.prisonaio.module.warp.WarpHandler
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -25,7 +24,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 
-class WarpsMenu : PaginatedMenu() {
+class WarpsMenu(private val warps: List<Warp>) : PaginatedMenu() {
 
     init {
         updateAfterClick = true
@@ -55,7 +54,7 @@ class WarpsMenu : PaginatedMenu() {
 
     override fun getAllPagesButtons(player: Player): Map<Int, Button> {
         return hashMapOf<Int, Button>().also { buttons ->
-            for (warp in WarpHandler.getWarps()) {
+            for (warp in warps) {
                 buttons[buttons.size] = WarpButton(warp)
             }
         }

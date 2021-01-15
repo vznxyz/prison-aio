@@ -12,6 +12,7 @@ import net.evilblock.cubed.Cubed
 import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.serialize.AbstractTypeSerializable
 import net.evilblock.cubed.util.NumberUtils
+import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
@@ -72,7 +73,13 @@ abstract class Generator(
         return bounds
     }
 
-    open fun initializeData() {
+    override fun is3D(): Boolean {
+        return true
+    }
+
+    override fun initializeData() {
+        super.initializeData()
+
         build.generator = this
 
         val schematic = getLevel().getSchematic(rotation)
@@ -116,42 +123,47 @@ abstract class Generator(
     }
 
     open fun tickModifiers() {
-        if (getMaxModifiers() > 0) {
-            val expired = arrayListOf<GeneratorModifier>()
-            for (modifier in modifiers.values) {
-                if (modifier.isExpired()) {
-                    expired.add(modifier)
-                }
+        expireModifiers()
+
+        if (getMaxModifiers() <= 0) {
+            return
+        }
+
+        val activeModifiers = getActiveModifiers()
+        if (activeModifiers.size >= getMaxModifiers()) {
+            return
+        }
+
+        for (item in modifierStorage) {
+            if (item == null) {
+                continue
             }
 
-            for (modifier in expired) {
-                onRemoveModifier(modifier)
-                modifiers.remove(modifier.type)
+            val modifier = GeneratorModifierUtils.extractModifierFromItemStack(item) ?: continue
+
+            if (hasActiveModifier(modifier.type)) {
+                continue
             }
 
-            val activeModifiers = getActiveModifiers()
-            if (activeModifiers.size < getMaxModifiers()) {
-                for (item in modifierStorage) {
-                    if (item != null) {
-                        val modifier = GeneratorModifierUtils.extractModifierFromItemStack(item)
-                        if (modifier != null) {
-                            if (!hasActiveModifier(modifier.type)) {
-                                modifiers[modifier.type] = modifier
+            addActiveModifier(modifier, item)
 
-                                if (modifier.type.durationBased) {
-                                    removeModifierItem(item, 1)
-                                }
-
-                                onApplyModifier(modifier)
-
-                                if (getActiveModifiers().size >= getMaxModifiers()) {
-                                    break
-                                }
-                            }
-                        }
-                    }
-                }
+            if (getActiveModifiers().size >= getMaxModifiers()) {
+                break
             }
+        }
+    }
+
+    private fun expireModifiers() {
+        val expired = arrayListOf<GeneratorModifier>()
+        for (modifier in modifiers.values) {
+            if (modifier.isExpired()) {
+                expired.add(modifier)
+            }
+        }
+
+        for (modifier in expired) {
+            onRemoveModifier(modifier)
+            modifiers.remove(modifier.type)
         }
     }
 
@@ -217,7 +229,7 @@ abstract class Generator(
 
     abstract fun getMaxModifiers(): Int
 
-    open fun getActiveModifiers(): Array<GeneratorModifier?> {
+    open fun getActiveModifiers(): Array<GeneratorModifier> {
         return modifiers.values.toTypedArray()
     }
 
@@ -227,6 +239,16 @@ abstract class Generator(
 
     fun getActiveModifier(type: GeneratorModifierType): GeneratorModifier? {
         return modifiers[type]
+    }
+
+    fun addActiveModifier(modifier: GeneratorModifier, itemStack: ItemStack?) {
+        modifiers[modifier.type] = modifier
+
+        if (itemStack != null && modifier.type.durationBased) {
+            removeModifierItem(itemStack, 1)
+        }
+
+        onApplyModifier(modifier)
     }
 
     open fun isModifierCompatible(type: GeneratorModifierType): Boolean {
@@ -292,6 +314,31 @@ abstract class Generator(
         info.add("${ChatColor.GRAY}Speed: ${ChatColor.AQUA}${NumberUtils.formatDecimal(build.speed)}")
         info.add("${ChatColor.GRAY}Progress: ${ChatColor.RED}${build.renderRemainingTime()}")
         info.add("${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}${build.renderProgressBar()}${ChatColor.GRAY}${Constants.THICK_VERTICAL_LINE}")
+    }
+
+    internal fun renderModifiersInfo(info: MutableList<String>) {
+        info.add("")
+        info.add("${ChatColor.YELLOW}${ChatColor.BOLD}${ChatColor.UNDERLINE}Modifiers")
+        info.add("")
+
+        val modifiers = getActiveModifiers()
+        if (modifiers.isNotEmpty()) {
+            for (modifier in modifiers) {
+                info.add(buildString {
+                    append(modifier.type.getColoredName())
+
+                    if (modifier.value > 1.0) {
+                        append(" ${ChatColor.GRAY}(${NumberUtils.formatDecimal(modifier.value)})")
+                    }
+
+                    if (modifier.type.durationBased && modifier.duration != null) {
+                        append(" ${ChatColor.GRAY}(${TimeUtil.formatIntoAbbreviatedString((modifier.getRemainingTime() / 1000.0).toInt())})")
+                    }
+                })
+            }
+        } else {
+            info.add("${ChatColor.GRAY}None")
+        }
     }
 
     internal open fun giveItem(player: Player, item: ItemStack): Int {

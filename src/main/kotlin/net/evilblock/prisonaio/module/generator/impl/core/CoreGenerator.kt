@@ -66,11 +66,14 @@ class CoreGenerator(plot: Plot, owner: UUID, bounds: Cuboid, rotation: Rotation)
                 }
 
                 desc.add("")
-                desc.add("${ChatColor.RED}${ChatColor.BOLD}Core Limits")
+                desc.add("${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}Core Limits")
+                desc.add("")
                 desc.add("${ChatColor.GRAY}Money Generator: ${ChatColor.RED}${ChatColor.BOLD}Lvl ${NumberUtils.format(coreLevel.maxMoneyLevel)}")
                 desc.add("${ChatColor.GRAY}Token Generator: ${ChatColor.RED}${ChatColor.BOLD}Lvl ${NumberUtils.format(coreLevel.maxTokenLevel)}")
                 desc.add("${ChatColor.GRAY}Key Generator: ${ChatColor.RED}${ChatColor.BOLD}Lvl ${NumberUtils.format(coreLevel.maxKeyLevel)}")
             }
+
+            renderModifiersInfo(desc)
         }
     }
 

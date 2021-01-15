@@ -75,7 +75,7 @@ object JackHammer : Enchant("jack-hammer", "Jack Hammer", 5000) {
                 }
 
                 Tasks.sync {
-                    val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100F)
+                    val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, getYield())
                     Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
 
                     if (multiBlockBreakEvent.isCancelled) {

@@ -47,7 +47,7 @@ object UserHandler : PluginHandler() {
     private val JSON_WRITER_SETTINGS = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()
 
     private val usersCollection: MongoCollection<Document> = PrisonAIO.instance.database.getCollection("users")
-    private val usersMap: MutableMap<UUID, User> = ConcurrentHashMap()
+    private val usersMap: ConcurrentHashMap<UUID, User> = ConcurrentHashMap()
 
     val economyLogFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "economy.txt"))
     val tokenShopsLogFile: LogFile = LogFile(File(File(getModule().getPluginFramework().dataFolder, "logs"), "token-shops.txt"))
@@ -61,6 +61,8 @@ object UserHandler : PluginHandler() {
     }
 
     override fun initialLoad() {
+        super.initialLoad()
+
         LogHandler.trackLogFile(economyLogFile)
         LogHandler.trackLogFile(tokenShopsLogFile)
 
@@ -101,6 +103,8 @@ object UserHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {
@@ -217,6 +221,10 @@ object UserHandler : PluginHandler() {
 
     fun isUserLoaded(uuid: UUID): Boolean {
         return usersMap.containsKey(uuid)
+    }
+
+    fun isUserLoaded(player: Player): Boolean {
+        return isUserLoaded(player.uniqueId)
     }
 
     /**

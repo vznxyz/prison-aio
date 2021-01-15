@@ -34,6 +34,8 @@ class BattlePassProgress(@Transient var user: User) {
     @JsonAdapter(TierSetReferenceSerializer::class)
     private val claimedRewardsFree: MutableSet<Tier> = hashSetOf()
 
+    var requiresCheck: Boolean = false
+
     fun isPremium(): Boolean {
         return premium
     }
@@ -41,11 +43,13 @@ class BattlePassProgress(@Transient var user: User) {
     fun setPremium(premium: Boolean) {
         this.premium = premium
         user.requiresSave = true
+        requiresCheck = true
     }
 
     fun setExperience(exp: Int) {
         experience = exp
         user.requiresSave = true
+        requiresCheck = true
     }
 
     fun getExperience(): Int {
@@ -112,6 +116,7 @@ class BattlePassProgress(@Transient var user: User) {
 
     fun executedCommand(command: String) {
         commandsExecuted.add(command.trim().toLowerCase())
+        requiresCheck = true
     }
 
 }

@@ -22,6 +22,7 @@ enum class RegionBitmask(
     ALLOW_BUILD(4, "Allow Build", "A region where players can place/destroy blocks", ItemStack(Material.WOOD)),
     DENY_FLY(8, "Deny Fly", "A region where players cannot use fly", ItemStack(Material.ELYTRA)),
     DENY_SPEED(16, "Deny Speed", "A region where players cannot use modded speed", ItemStack(Material.POTION, 1, 8234)),
-    SPEED(32, "Speed Effect", "A region where players have permanent speed 2 effect", ItemStack(Material.POTION, 1, 8226))
+    SPEED(32, "Speed Effect", "A region where players have permanent speed 2 effect", ItemStack(Material.POTION, 1, 8226)),
+    NO_FF(64, "No Friendly-Fire", "A region where gang members cannot attack each other", ItemStack(Material.BEACON)),
 
 }

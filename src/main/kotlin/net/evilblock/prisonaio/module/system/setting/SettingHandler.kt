@@ -48,6 +48,8 @@ object SettingHandler : PluginHandler() {
                 settings[setting] = setting.defaultValue
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

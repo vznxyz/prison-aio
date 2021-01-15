@@ -15,6 +15,8 @@ import net.evilblock.prisonaio.module.battlepass.tier.TierHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.listener.ChallengeListeners
 import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.command.*
+import net.evilblock.prisonaio.module.battlepass.service.CheckProgressService
+import net.evilblock.prisonaio.service.ServiceRegistry
 import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 
@@ -38,6 +40,8 @@ object BattlePassModule : PluginModule() {
         TierHandler.initialLoad()
         ChallengeHandler.initialLoad()
         DailyChallengeHandler.initialLoad()
+
+        ServiceRegistry.register(CheckProgressService, 20L, 20L)
     }
 
     override fun onAutoSave() {

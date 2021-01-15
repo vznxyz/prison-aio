@@ -11,7 +11,6 @@ import net.evilblock.cubed.command.data.parameter.ParameterType
 import net.evilblock.cubed.util.Duration
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.TimeUtil
-import net.evilblock.prisonaio.module.robot.impl.MinerRobot
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
@@ -26,12 +25,12 @@ enum class RobotModifierType(
     val durationBased: Boolean
 ) {
 
-    AUTO_COLLECT(
-        displayName = "Auto-Collect",
+    OFFLINE_COLLECT(
+        displayName = "Offline-Collect",
         color = ChatColor.GOLD,
         icon = ItemStack(Material.HOPPER),
         lore = arrayListOf<String>().also { lore ->
-            lore.addAll(TextSplitter.split(text = "Automatically collects items that a Robot produces to your inventory. No more wasting time by having full storage!"))
+            lore.addAll(TextSplitter.split(text = "Keeps a Robot running and earning money/tokens even when its owner is offline."))
             lore.add("")
             lore.add("${ChatColor.GRAY}Duration: ${ChatColor.RED}${ChatColor.BOLD}{duration}")
         },

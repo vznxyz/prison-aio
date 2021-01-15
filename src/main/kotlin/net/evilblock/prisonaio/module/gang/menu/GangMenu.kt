@@ -32,7 +32,7 @@ class GangMenu(private val gang: Gang) : Menu() {
     }
 
     override fun getTitle(player: Player): String {
-        return "Jerry The Prison Guard"
+        return "Gang Info (${gang.name})"
     }
 
     override fun getButtons(player: Player): Map<Int, Button> {
@@ -136,9 +136,9 @@ class GangMenu(private val gang: Gang) : Menu() {
             val description = arrayListOf<String>()
 
             description.add("")
-            description.addAll(TextSplitter.split(text = "Move Jerry's location by using the Mover Tool.", linePrefix = ChatColor.GRAY.toString()))
+            description.addAll(TextSplitter.split(text = "Move the Guide NPC's location by using the Mover Tool.", linePrefix = ChatColor.GRAY.toString()))
             description.add("")
-            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to move Jerry")
+            description.add("${ChatColor.GREEN}${ChatColor.BOLD}LEFT-CLICK ${ChatColor.GREEN}to move NPC")
 
             return description
         }
@@ -153,23 +153,24 @@ class GangMenu(private val gang: Gang) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (!gang.isLeader(player.uniqueId)) {
-                player.sendMessage("${ChatColor.RED}You must be the leader of the gang to move Jerry!")
+                player.sendMessage("${ChatColor.RED}You must be the leader of the gang to move the Guide NPC!")
                 return
             }
 
             if (player.inventory.firstEmpty() == -1) {
-                player.sendMessage("${ChatColor.RED}You need a free inventory space to pickup Jerry!")
+                player.sendMessage("${ChatColor.RED}You need a free inventory space to move the Guide NPC!")
                 return
             }
 
             gang.guideNpc.updateVisibility(hidden = true)
 
             val builder = ItemBuilder.of(Material.MONSTER_EGG)
-                .name("${ChatColor.YELLOW}${ChatColor.BOLD}Move Jerry")
-                .addToLore(
-                    HiddenLore.encodeString("${gang.guideNpc.uuid}"),
-                    "${ChatColor.GRAY}Place this mob egg wherever",
-                    "${ChatColor.GRAY}you'd like to move Jerry to."
+                .name("${ChatColor.YELLOW}${ChatColor.BOLD}Move Guide NPC")
+                .setLore(
+                    arrayListOf<String>().also { lore ->
+                        lore.add(HiddenLore.encodeString("${gang.guideNpc.uuid}"))
+                        lore.addAll(TextSplitter.split(text = "Place this mob egg wherever you'd like to move the Guide NPC to."))
+                    }
                 )
 
             val itemStack = ItemUtils.setMonsterEggType(builder.build(), EntityType.VILLAGER)
@@ -177,7 +178,7 @@ class GangMenu(private val gang: Gang) : Menu() {
             player.closeInventory()
             player.inventory.addItem(itemStack)
             player.updateInventory()
-            player.sendMessage("${ChatColor.GREEN}I've given you an egg, place this wherever you'd like me to move to.")
+            player.sendMessage("${ChatColor.GREEN}Place the egg wherever you'd like to move the Guide NPC to.")
         }
     }
 

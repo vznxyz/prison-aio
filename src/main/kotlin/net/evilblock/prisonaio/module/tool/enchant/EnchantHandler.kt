@@ -10,6 +10,8 @@ package net.evilblock.prisonaio.module.tool.enchant
 import com.google.common.base.Charsets
 import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
+import net.evilblock.cubed.plugin.PluginHandler
+import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.tool.enchant.impl.*
@@ -18,6 +20,7 @@ import net.evilblock.prisonaio.module.tool.pickaxe.PickaxeHandler
 import net.evilblock.prisonaio.module.mechanic.MechanicsModule
 import net.evilblock.prisonaio.module.region.RegionHandler
 import net.evilblock.prisonaio.module.shop.event.PlayerSellToShopEvent
+import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.tool.enchant.config.EnchantsConfig
 import net.evilblock.prisonaio.module.tool.enchant.config.formula.FixedPriceFormulaType
 import net.evilblock.prisonaio.module.tool.enchant.config.formula.BasePriceWithFixedModifierFormulaType
@@ -42,7 +45,7 @@ import java.lang.StringBuilder
 import java.lang.reflect.Type
 import java.util.*
 
-object EnchantHandler : Listener {
+object EnchantHandler : PluginHandler(), Listener {
 
     val CHAT_PREFIX: String = "${ChatColor.GRAY}[${ChatColor.RED}${ChatColor.BOLD}Enchants${ChatColor.GRAY}] "
 
@@ -84,6 +87,24 @@ object EnchantHandler : Listener {
         registerEnchant(LuckyMoney)
         registerEnchant(Laser)
         registerEnchant(Zeus)
+    }
+
+    override fun getModule(): PluginModule {
+        return ToolsModule
+    }
+
+    override fun initialLoad() {
+        super.initialLoad()
+
+        loadConfig()
+
+        loaded = true
+    }
+
+    override fun saveData() {
+        super.saveData()
+
+        saveConfig()
     }
 
     fun loadConfig() {
@@ -328,6 +349,36 @@ object EnchantHandler : Listener {
         pickaxeData.applyMeta(item)
 
         player.updateInventory()
+
+        return true
+    }
+
+    @JvmStatic
+    fun setLevel(pickaxeData: PickaxeData, item: ItemStack, enchant: Enchant, level: Int, force: Boolean): Boolean {
+        var level = level
+        if (!enchant.canMaterialBeEnchanted(item.type)) {
+            return false
+        }
+
+        if (!force && level > enchant.maxLevel) {
+            level = enchant.maxLevel
+        }
+
+        val enchantLimit = pickaxeData.getEnchantLimit(enchant)
+        if (enchantLimit != -1 && level > enchantLimit) {
+            return false
+        }
+
+        if (level > 32000) {
+            level = 32000
+        }
+
+        if (enchant is VanillaOverride) {
+            item.addUnsafeEnchantment((enchant as VanillaOverride).override, level)
+        }
+
+        pickaxeData.setLevel(enchant, level)
+        pickaxeData.applyMeta(item)
 
         return true
     }

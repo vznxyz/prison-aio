@@ -26,17 +26,18 @@ object PersonalMineCreateCommand {
     )
     @JvmStatic fun execute(sender: CommandSender, @Param("player") uuid: UUID) {
         try {
-            PrivateMineHandler.createMine(uuid)
-
-            val player = Bukkit.getPlayer(uuid) ?: return
-
-            player.sendMessage("")
-            player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Private Mine Ready")
-            player.sendMessage(" ${ChatColor.GRAY}Your private mine is ready to be progress!")
-            player.sendMessage(" ${ChatColor.YELLOW}Type /pmine to get started!")
-            player.sendMessage("")
+            PrivateMineHandler.createMine(uuid) { mine ->
+                val player = Bukkit.getPlayer(uuid)
+                if (player != null) {
+                    player.sendMessage("")
+                    player.sendMessage(" ${ChatColor.GREEN}${ChatColor.BOLD}Private Mine Ready")
+                    player.sendMessage(" ${ChatColor.GRAY}Your private mine is ready to be progress!")
+                    player.sendMessage(" ${ChatColor.YELLOW}Type /pmine to get started!")
+                    player.sendMessage("")
+                }
+            }
         } catch (e: IllegalStateException) {
-            sender.sendMessage("${ChatColor.RED}Failed to generate private mine. Please contact an admin.")
+            sender.sendMessage("${ChatColor.RED}Failed to generate private mine!")
 
             if (sender.isOp) {
                 sender.sendMessage("${ChatColor.RED}${e.message}")

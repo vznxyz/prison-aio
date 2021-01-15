@@ -27,7 +27,7 @@ object GangWorldListeners : Listener {
     fun onWorldSaveEvent(event: WorldSaveEvent) {
         if (event.world == GangHandler.getGridWorld()) {
             Tasks.async {
-                GangHandler.saveGrid()
+                GangHandler.saveData()
             }
         }
     }

@@ -190,7 +190,7 @@ class EditWarpMenu(private val warp: Warp) : Menu() {
         }
     }
 
-    private inner class EditPriceButton : TexturedHeadButton(texture = Constants.IB_WOOD_NUMBER_TEXTURE) {
+    private inner class EditPriceButton : TexturedHeadButton(texture = Constants.WOOD_NUMBER_TEXTURE) {
         override fun getName(player: Player): String {
             return "${ChatColor.AQUA}${ChatColor.BOLD}Edit Price"
         }

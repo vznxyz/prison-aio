@@ -34,6 +34,9 @@ object EventGameHandler : PluginHandler() {
     var disabled = false
 
     override fun initialLoad() {
+        super.initialLoad()
+
+        loaded = true
     }
 
     override fun getModule(): PluginModule {

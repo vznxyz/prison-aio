@@ -36,7 +36,6 @@ object RenameTagListeners : Listener {
             return
         }
 
-        event.cursor = null
         event.isCancelled = true
 
         val renameTagItem = event.cursor

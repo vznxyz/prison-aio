@@ -20,7 +20,6 @@ import kotlin.math.round
 class UserStatistics(@Transient internal var user: User) {
 
     private var playTime: Long = 0L
-
     @Transient
     internal var lastPlayTimeSync: Long = 0L
 

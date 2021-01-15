@@ -11,6 +11,7 @@ import com.google.common.base.Charsets
 import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.backup.BackupHandler
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
@@ -23,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 object PickaxeHandler : PluginHandler() {
 
-    private val pickaxes: MutableMap<UUID, PickaxeData> = ConcurrentHashMap()
+    private val pickaxes: ConcurrentHashMap<UUID, PickaxeData> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return ToolsModule
@@ -42,6 +43,9 @@ object PickaxeHandler : PluginHandler() {
 
         val dataFile = getInternalDataFile()
         if (dataFile.exists()) {
+            val backupFile = BackupHandler.findNextBackupFile("pickaxes")
+            Files.copy(dataFile, backupFile)
+
             Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
                 val dataType = object : TypeToken<List<PickaxeData>>() {}.type
                 val data = Cubed.gson.fromJson(reader, dataType) as List<PickaxeData>
@@ -51,6 +55,8 @@ object PickaxeHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

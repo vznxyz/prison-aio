@@ -59,7 +59,7 @@ object Nuke : Enchant("nuke", "Nuke", 2) {
 				}
 
 				Tasks.sync {
-					val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, 100F, skipBlockUpdates = true)
+					val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, event.block, blocks, getYield(), skipBlockUpdates = true)
 					Bukkit.getPluginManager().callEvent(multiBlockBreakEvent)
 
 					if (multiBlockBreakEvent.isCancelled) {

@@ -170,7 +170,7 @@ class EditLuckyBlockMenu(private val luckyBlock: LuckyBlock) : Menu() {
         }
     }
 
-    private inner class EditMinRewardsButton : TexturedHeadButton(texture = Constants.IB_WOOD_NUMBER_TEXTURE) {
+    private inner class EditMinRewardsButton : TexturedHeadButton(texture = Constants.WOOD_NUMBER_TEXTURE) {
         override fun getName(player: Player): String {
             return "${ChatColor.AQUA}${ChatColor.BOLD}Edit Min Rewards ${ChatColor.GRAY}(${NumberUtils.format(luckyBlock.minRewards)})"
         }
@@ -206,7 +206,7 @@ class EditLuckyBlockMenu(private val luckyBlock: LuckyBlock) : Menu() {
         }
     }
 
-    private inner class EditMaxRewardsButton : TexturedHeadButton(texture = Constants.IB_WOOD_NUMBER_TEXTURE) {
+    private inner class EditMaxRewardsButton : TexturedHeadButton(texture = Constants.WOOD_NUMBER_TEXTURE) {
         override fun getName(player: Player): String {
             return "${ChatColor.AQUA}${ChatColor.BOLD}Edit Max Rewards ${ChatColor.GRAY}(${NumberUtils.format(luckyBlock.maxRewards)})"
         }

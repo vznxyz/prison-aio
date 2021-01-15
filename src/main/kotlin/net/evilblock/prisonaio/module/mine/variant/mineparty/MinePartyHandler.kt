@@ -7,12 +7,16 @@ import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.Constants
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.entity.Player
 
 object MinePartyHandler {
 
-    val EVENT_NAME = "${ChatColor.WHITE}${ChatColor.BOLD}Mine${ChatColor.AQUA}${ChatColor.BOLD}Party"
-    val CHAT_PREFIX = "${ChatColor.GRAY}[${EVENT_NAME}${ChatColor.GRAY}] "
+    val SIMPLE_NAME = "${ChatColor.WHITE}${ChatColor.BOLD}MINE${ChatColor.AQUA}${ChatColor.BOLD}PARTY"
+    val CHAT_NAME = "${ChatColor.WHITE}${ChatColor.BOLD}${ChatColor.UNDERLINE}MINE${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}PARTY${ChatColor.RESET}"
+
+    val MAGIC_NAME = "${ChatColor.DARK_AQUA}${ChatColor.MAGIC}/${ChatColor.RESET} $CHAT_NAME ${ChatColor.DARK_AQUA}${ChatColor.MAGIC}\\"
+    val FINISH_NAME = "${ChatColor.GREEN}${ChatColor.BOLD}${Constants.CHECK_SYMBOL} $CHAT_NAME ${ChatColor.GREEN}${ChatColor.BOLD}${Constants.CHECK_SYMBOL}"
+
+    val CHAT_PREFIX = "${ChatColor.GRAY}[${CHAT_NAME}${ChatColor.GRAY}] "
 
     private var activeMineParty: MinePartyMine? = null
 
@@ -28,27 +32,32 @@ object MinePartyHandler {
         mine.resetRegion()
 
         mine.goal = goal
-        mine.progress = goal
+        mine.progress = 0
         mine.startedAt = System.currentTimeMillis()
+        mine.duration = duration
         mine.active = true
 
         activeMineParty = mine
 
-        val messages = arrayListOf<FancyMessage>().also { msgs ->
+        val messages = arrayListOf<FancyMessage>().also { messages ->
+            val formattedGoal = NumberUtils.format(goal)
             val formattedTime = TimeUtil.formatIntoAbbreviatedString((duration.get() / 1000.0).toInt())
 
-            msgs.add(FancyMessage(""))
-            msgs.add(FancyMessage("      $EVENT_NAME ${ChatColor.GRAY}($formattedTime)"))
-            msgs.add(FancyMessage(""))
-            msgs.add(FancyMessage(" ${ChatColor.GRAY}Time is of the essence! Mine the block"))
+            messages.add(FancyMessage(""))
+            messages.add(FancyMessage(" $MAGIC_NAME"))
+            messages.add(FancyMessage(""))
+            messages.add(FancyMessage(" ${ChatColor.WHITE}You have ${ChatColor.AQUA}$formattedTime ${ChatColor.WHITE}to mine ${ChatColor.AQUA}$formattedGoal ${ChatColor.WHITE}blocks at"))
+            messages.add(FancyMessage(" ${ChatColor.AQUA}/mineparty ${ChatColor.WHITE}to win rewards for everyone!"))
+            messages.add(FancyMessage(""))
 
-            msgs.add(FancyMessage(" ${ChatColor.GRAY}goal of ${NumberUtils.format(goal)}")
-                .then("${ChatColor.AQUA}${ChatColor.BOLD}/mineparty")
-                .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to teleport to the MineParty event!"))
-                .command("/mineparty")
-                .then("${ChatColor.GRAY} to win a reward!"))
+            messages.add(
+                FancyMessage("")
+                    .then(" ${ChatColor.GRAY}[${ChatColor.GREEN}${ChatColor.BOLD}JOIN EVENT${ChatColor.GRAY}]")
+                    .formattedTooltip(FancyMessage("${ChatColor.YELLOW}Click to teleport to the Mine Party event!"))
+                    .command("/mineparty")
+            )
 
-            msgs.add(FancyMessage(""))
+            messages.add(FancyMessage(""))
         }
 
         for (player in Bukkit.getOnlinePlayers()) {
@@ -56,7 +65,7 @@ object MinePartyHandler {
                 msg.send(player)
             }
 
-            player.sendTitle(EVENT_NAME, "${ChatColor.WHITE}The event has started!", 1, 5, 1)
+            player.sendTitle(MAGIC_NAME, "${ChatColor.WHITE}The event has started!", 10, 80, 10)
         }
     }
 
@@ -75,35 +84,32 @@ object MinePartyHandler {
 
         val messages = arrayListOf<String>().also { msgs ->
             msgs.add("")
-            msgs.add("      ${ChatColor.GREEN}${ChatColor.BOLD}${Constants.CHECK_SYMBOL} $EVENT_NAME ${ChatColor.GREEN}${ChatColor.BOLD}${Constants.CHECK_SYMBOL}")
+            msgs.add(" ${ChatColor.GREEN}${ChatColor.BOLD}${Constants.CHECK_SYMBOL} $CHAT_NAME ${ChatColor.GREEN}${ChatColor.BOLD}${Constants.CHECK_SYMBOL}")
             msgs.add("")
             msgs.add(" ${ChatColor.GRAY}The block goal has been reached!")
             msgs.add(" ${ChatColor.GRAY}All players that contributed have been rewarded!")
             msgs.add("")
         }
 
-        for (player in getPlayersInEvent()) {
+        for (player in event.getNearbyPlayers()) {
             for (msg in messages) {
                 player.sendMessage(msg)
             }
 
-            player.sendTitle(EVENT_NAME, "${ChatColor.GREEN}The block goal has been reached!", 1, 5, 1)
+            player.sendTitle(FINISH_NAME, "${ChatColor.GREEN}The block goal has been reached!", 10, 50, 10)
         }
     }
 
     fun cancelEvent() {
         if (activeMineParty != null) {
+            val event = activeMineParty!!
             activeMineParty = null
 
-            for (player in getPlayersInEvent()) {
+            for (player in event.getNearbyPlayers()) {
                 player.sendMessage("${CHAT_PREFIX}The event has been cancelled by an admin!")
-                player.sendTitle(EVENT_NAME, "${ChatColor.RED}The event has been cancelled!", 1, 5, 1)
+                player.sendTitle(MAGIC_NAME, "${ChatColor.RED}The event has been cancelled!", 10, 50, 10)
             }
         }
-    }
-
-    fun getPlayersInEvent(): List<Player> {
-        return Bukkit.getOnlinePlayers().filter { activeMineParty!!.isNearbyMine(it) }
     }
 
 }

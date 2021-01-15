@@ -41,30 +41,35 @@ object CombatTimerHandler : PluginHandler() {
         }
     }
 
-    @JvmStatic
     fun getTimer(uuid: UUID): CombatTimer? {
         return timers[uuid]
     }
 
-    @JvmStatic
     fun getTimer(player: Player): CombatTimer? {
         return getTimer(player.uniqueId)
     }
 
-    @JvmStatic
     fun isOnTimer(player: Player): Boolean {
         val timer = getTimer(player.uniqueId)
         return timer != null && !timer.hasExpired()
     }
 
-    @JvmStatic
     fun trackTimer(timer: CombatTimer) {
         timers[timer.uuid] = timer
     }
 
-    @JvmStatic
     fun forgetTimer(timer: CombatTimer) {
         timers.remove(timer.uuid)
+    }
+
+    @JvmStatic
+    fun resetTimer(player: Player) {
+        val attackerTimer = getTimer(player.uniqueId)
+        if (attackerTimer == null) {
+            trackTimer(CombatTimer(player.uniqueId))
+        } else {
+            attackerTimer.reset()
+        }
     }
 
 }

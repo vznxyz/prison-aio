@@ -50,7 +50,7 @@ class GeneratorMenu(private val generator: Generator) : Menu() {
 
             buttons[4] = GeneratorButton()
 
-            if (generator.modifierStorage.any { it != null }) {
+            if (generator.modifierStorage.isNotEmpty()) {
                 for ((index, itemStack) in generator.modifierStorage.withIndex()) {
                     if (itemStack != null && index < MODIFIER_SLOTS.size) {
                         buttons[MODIFIER_SLOTS[index]] = ModifierItemButton(itemStack)

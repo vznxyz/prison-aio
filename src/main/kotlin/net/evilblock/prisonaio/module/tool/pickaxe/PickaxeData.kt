@@ -9,7 +9,6 @@ package net.evilblock.prisonaio.module.tool.pickaxe
 
 import com.google.gson.annotations.JsonAdapter
 import net.evilblock.cubed.util.NumberUtils
-import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import net.evilblock.prisonaio.module.tool.enchant.EnchantHandler
@@ -88,8 +87,8 @@ open class PickaxeData(val uuid: UUID = UUID.randomUUID()) {
             val lore = arrayListOf<String>().also { lore ->
                 lore.add("")
                 lore.add("${ChatColor.YELLOW}${ChatColor.BOLD}Statistics")
-                lore.add("${ChatColor.GRAY}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Prestige: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(prestige)}")
-                lore.add("${ChatColor.GRAY}${ChatColor.BOLD}${Constants.THICK_VERTICAL_LINE} ${ChatColor.GRAY}Blocks Mined: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberFormat.getInstance().format(blocksMined)}")
+                lore.add("${ChatColor.GRAY}Prestige: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(prestige)}")
+                lore.add("${ChatColor.GRAY}Blocks Mined: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberFormat.getInstance().format(blocksMined)}")
                 lore.add("")
                 lore.add("${ChatColor.RED}${ChatColor.BOLD}Enchants")
 

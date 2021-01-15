@@ -7,6 +7,7 @@
 
 package net.evilblock.prisonaio.module.mechanic.listener
 
+import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.Reflection
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -125,7 +126,7 @@ object MiningMechanicsListeners : Listener {
         val region = RegionHandler.findRegion(event.block.location)
 
         val ignoredBlocks = MechanicsModule.getDropsToInvIgnoredBlocks()
-        val validBlocks = event.blockList.filter { isValidBlock(it) && !ignoredBlocks.contains(it.type) && (event.yield == 100F || ThreadLocalRandom.current().nextInt(100) < event.yield) }
+        val validBlocks = event.blockList.filter { isValidBlock(it) && !ignoredBlocks.contains(it.type) && (event.yield >= 100.0 || Chance.percent(event.yield)) }
 
         val fortuneLevel = if (!pickaxe.isEnchantDisabled(Fortune) && region.supportsAbilityEnchants() && pickaxe.enchants.containsKey(Fortune)) {
             pickaxe.enchants[Fortune]!!
@@ -146,7 +147,7 @@ object MiningMechanicsListeners : Listener {
 
                 if (pickaxe.enchants.containsKey(TokenPouch)) {
                     val tokenPouchLevel = pickaxe.enchants[TokenPouch]!!
-                    TokenPouch.attemptFindPouch(event.player, tokenPouchLevel)
+                    TokenPouch.attemptFindPouch(event.player, tokenPouchLevel, false)
                 }
             }
         }
@@ -159,20 +160,26 @@ object MiningMechanicsListeners : Listener {
                     val world = (event.block.world as CraftWorld).handle
                     val blockData = net.minecraft.server.v1_12_R1.Block.getById(0).blockData
 
-                    for (block in validBlocks) {
+                    val brokenBlocks = if (event.breakAllBlocks) {
+                        event.blockList.filter { isValidBlock(it) && !ignoredBlocks.contains(it.type) }
+                    } else {
+                        validBlocks
+                    }
+
+                    for (block in brokenBlocks) {
                         val chunk = world.getChunkAt(block.x shr 4, block.z shr 4)
                         chunk.sections[block.y shr 4].setType(block.x and 15, block.y and 15, block.z and 15, blockData)
                     }
 
-                    if (validBlocks.size == 1) {
-                        val block = validBlocks.first()
+                    if (brokenBlocks.size == 1) {
+                        val block = brokenBlocks.first()
                         val packet = PacketPlayOutBlockChange((block.world as CraftWorld).handle, BlockPosition(block.x, block.y, block.z))
                         MinecraftProtocol.send(event.player, packet)
                     } else {
                         val modifiedChunks = hashMapOf<ChunkCoordIntPair, Pair<PacketPlayOutMultiBlockChange, MutableList<PacketPlayOutMultiBlockChange.MultiBlockChangeInfo>>>()
                         val chunkViewers = hashMapOf<ChunkCoordIntPair, List<Player>>()
 
-                        for (block in validBlocks) {
+                        for (block in brokenBlocks) {
                             val chunkCoords = ChunkCoordIntPair(block.chunk.x, block.chunk.z)
                             if (!chunkViewers.containsKey(chunkCoords)) {
                                 chunkViewers[chunkCoords] = Bukkit.getOnlinePlayers().filter { it.world == block.world && isChunkInViewDistance(it, chunkCoords) }

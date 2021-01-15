@@ -17,10 +17,11 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object GlobalMultiplierHandler : PluginHandler() {
 
-    private var activeEvent: GlobalMultiplier? = null
+    private val activeEvents: ConcurrentHashMap<GlobalMultiplierType, GlobalMultiplier> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return RewardsModule
@@ -36,38 +37,47 @@ object GlobalMultiplierHandler : PluginHandler() {
         val dataFile = getInternalDataFile()
         if (dataFile.exists()) {
             Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
-                activeEvent = Cubed.gson.fromJson(reader, object : TypeToken<GlobalMultiplier>() {}.type) as GlobalMultiplier?
+                val events = Cubed.gson.fromJson(reader, object : TypeToken<Collection<GlobalMultiplier>>() {}.type) as Collection<GlobalMultiplier>
+                for (event in events) {
+                    startEvent(event)
+                }
             }
         }
 
         Tasks.asyncTimer(10L, 10L) {
-            if (activeEvent != null && System.currentTimeMillis() >= activeEvent!!.expires) {
-                endEvent(activeEvent!!, false)
+            val expired = arrayListOf<GlobalMultiplier>()
+
+            for (event in activeEvents.values) {
+                if (event.isExpired()) {
+                    expired.add(event)
+                }
+            }
+
+            for (event in expired) {
+                endEvent(event, false)
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {
         super.saveData()
 
-        Files.write(Cubed.gson.toJson(activeEvent), getInternalDataFile(), Charsets.UTF_8)
+        Files.write(Cubed.gson.toJson(activeEvents.values, object : TypeToken<Collection<GlobalMultiplier>>() {}.type), getInternalDataFile(), Charsets.UTF_8)
     }
 
-    fun isSet(): Boolean {
-        return activeEvent != null
+    fun getEvent(type: GlobalMultiplierType): GlobalMultiplier? {
+        return activeEvents[type]
     }
 
-    fun getActiveMultiplier(): GlobalMultiplier? {
-        return activeEvent
-    }
-
-    fun setActiveMultiplier(event: GlobalMultiplier) {
-        activeEvent = event
+    fun startEvent(event: GlobalMultiplier) {
+        activeEvents[event.type] = event
         event.start()
     }
 
     fun endEvent(event: GlobalMultiplier, forced: Boolean) {
-        activeEvent = null
+        activeEvents.remove(event.type)
         event.end(forced)
     }
 

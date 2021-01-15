@@ -52,6 +52,8 @@ object DailyChallengeHandler : PluginHandler() {
                 saveData()
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

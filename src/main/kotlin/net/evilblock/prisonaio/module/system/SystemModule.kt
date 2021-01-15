@@ -27,11 +27,11 @@ import org.bukkit.event.Listener
 object SystemModule : PluginModule() {
 
     override fun getName(): String {
-        return "Admin"
+        return "System"
     }
 
     override fun getConfigFileName(): String {
-        return "admin"
+        return "system"
     }
 
     override fun getPluginFramework(): PluginFramework {

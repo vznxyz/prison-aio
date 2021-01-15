@@ -12,10 +12,10 @@ gang:
   max-members: 6
   # The maximum characters a gang's name can contain
   max-name-length: 32
-  # Jerry The Prison Guard settings
-  jerry:
+  # Guide NPC settings
+  guide-npc:
     hologram-lines:
-      - "&e&lJerry The Prison Guard"
+      - "&e&lGang Guide"
       - "&7News, Settings & Achievements"
     change-log:
       - ""

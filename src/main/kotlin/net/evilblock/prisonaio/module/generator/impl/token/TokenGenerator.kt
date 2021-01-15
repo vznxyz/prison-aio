@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.generator.impl.token
 
 import com.intellectualcrafters.plot.`object`.Plot
 import net.evilblock.cubed.util.NumberUtils
+import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.module.generator.Generator
@@ -43,22 +44,6 @@ class TokenGenerator(plot: Plot, owner: UUID, bounds: Cuboid, rotation: Rotation
 
     private var uptime: Long = 0L
     private var earnings: EarningsHistoryV2 = EarningsHistoryV2()
-
-    override fun initializeData() {
-        super.initializeData()
-
-        if (uncollected == null) {
-            uncollected = BigDecimal(0.0)
-        }
-
-        if (multiplier < 0) {
-            multiplier = 1.0
-        }
-
-        if (earnings == null) {
-            earnings = EarningsHistoryV2()
-        }
-    }
 
     override fun getAbstractType(): Type {
         return TokenGenerator::class.java
@@ -215,6 +200,8 @@ class TokenGenerator(plot: Plot, owner: UUID, bounds: Cuboid, rotation: Rotation
             if (build.finished) {
                 renderGeneratingInfo(info)
             }
+
+            renderModifiersInfo(info)
         }
     }
 

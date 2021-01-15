@@ -19,10 +19,10 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerQuitEvent
 
 object EnderpearlListeners : Listener {
 
@@ -124,8 +124,8 @@ object EnderpearlListeners : Listener {
     }
 
     @EventHandler
-    fun onPlayerQuitEvent(event: PlayerQuitEvent) {
-        val cooldown = EnderpearlCooldownHandler.getCooldown(event.player.uniqueId)
+    fun onPlayerDeathEvent(event: PlayerDeathEvent) {
+        val cooldown = EnderpearlCooldownHandler.getCooldown(event.entity.uniqueId)
         if (cooldown != null) {
             EnderpearlCooldownHandler.forgetCooldown(cooldown)
         }

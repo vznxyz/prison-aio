@@ -14,7 +14,7 @@ import net.evilblock.prisonaio.module.combat.apple.GodAppleCooldownHandler
 import net.evilblock.prisonaio.module.combat.apple.listener.GodAppleListeners
 import net.evilblock.prisonaio.module.combat.bounty.BountyHandler
 import net.evilblock.prisonaio.module.combat.command.ClearDamageCacheCommand
-import net.evilblock.prisonaio.module.combat.deathmessage.DeathMessageHandler
+import net.evilblock.prisonaio.module.combat.damage.DamageTracker
 import net.evilblock.prisonaio.module.combat.enderpearl.EnderpearlCooldownHandler
 import net.evilblock.prisonaio.module.combat.enderpearl.listener.EnderpearlListeners
 import net.evilblock.prisonaio.module.combat.logger.CombatLoggerHandler
@@ -46,7 +46,7 @@ object CombatModule : PluginModule() {
         BountyHandler.initialLoad()
         CombatLoggerHandler.initialLoad()
         CombatTimerHandler.initialLoad()
-        DeathMessageHandler.initialLoad()
+        DamageTracker.initialLoad()
         GodAppleCooldownHandler.initialLoad()
         EnderpearlCooldownHandler.initialLoad()
 

@@ -26,7 +26,7 @@ class LeaderboardsMenu(private var redirectOnClose: Boolean = false) : Menu() {
 
     companion object {
         private val BUTTON_SLOTS = arrayListOf<Int>().also {
-            it.addAll(19..26)
+            it.addAll(19..25)
             it.addAll(28..35)
         }
     }

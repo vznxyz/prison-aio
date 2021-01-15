@@ -3,14 +3,15 @@ package net.evilblock.prisonaio.module.robot.menu
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.menu.buttons.GlassButton
+import net.evilblock.cubed.menu.buttons.MenuButton
 import net.evilblock.cubed.menu.menus.ConfirmMenu
 import net.evilblock.cubed.util.TextSplitter
 import net.evilblock.cubed.util.TimeUtil
 import net.evilblock.cubed.util.bukkit.InventoryUtils
+import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.ItemUtils
 import net.evilblock.cubed.util.bukkit.render.GraphicalTable
 import net.evilblock.prisonaio.module.generator.menu.GeneratorMenu
-import net.evilblock.prisonaio.module.generator.modifier.GeneratorModifierUtils
 import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import net.evilblock.prisonaio.util.Formats
 import net.evilblock.prisonaio.module.robot.RobotHandler
@@ -18,6 +19,7 @@ import net.evilblock.prisonaio.module.robot.RobotUtils
 import net.evilblock.prisonaio.module.robot.RobotsModule
 import net.evilblock.prisonaio.module.robot.cosmetic.CosmeticHandler
 import net.evilblock.prisonaio.module.robot.impl.MinerRobot
+import net.evilblock.prisonaio.module.robot.impl.modifier.RobotModifierUtils
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -32,6 +34,10 @@ import java.util.concurrent.TimeUnit
 
 class RobotMenu(private val robot: MinerRobot) : Menu() {
 
+    companion object {
+        val MODIFIER_SLOTS = listOf(40)
+    }
+
     init {
         autoUpdate = true
         updateAfterClick = true
@@ -43,24 +49,58 @@ class RobotMenu(private val robot: MinerRobot) : Menu() {
 
     override fun getButtons(player: Player): Map<Int, Button> {
         return hashMapOf<Int, Button>().also { buttons ->
-            for (i in 0 until 54) {
-                buttons[i] = GlassButton(7)
-            }
-
             buttons[4] = YourRobotButton()
             buttons[19] = UpgradesButton()
             buttons[21] = CosmeticsButton()
             buttons[23] = PickupRobotButton()
             buttons[25] = CollectButton()
+
+            if (robot.modifierStorage.isNotEmpty()) {
+                for ((index, itemStack) in robot.modifierStorage.withIndex()) {
+                    if (itemStack != null && index < GeneratorMenu.MODIFIER_SLOTS.size) {
+                        buttons[MODIFIER_SLOTS[index]] = ModifierItemButton(itemStack)
+                    }
+                }
+            }
+
+            buttons[41] = MenuButton()
+                .icon(Material.BOOK)
+                .name("${ChatColor.GOLD}${ChatColor.BOLD}Modifiers")
+                .lore(arrayListOf<String>().also { desc ->
+                    desc.add("")
+                    desc.addAll(TextSplitter.split(text = "Place any modifier items you have in the empty slot to the left."))
+
+                    val modifiers = robot.modifiers.values.let {
+                        if (it.isEmpty()) {
+                            it
+                        } else {
+                            robot.modifiers.values.filter { it.isPermanent() || !it.isExpired() }
+                        }
+                    }
+
+                    if (modifiers.isNotEmpty()) {
+                        desc.add("")
+
+                        for (modifier in modifiers) {
+                            desc.add("${modifier.type.getColoredName()} ${ChatColor.GRAY}(${TimeUtil.formatIntoAbbreviatedString((modifier.getRemainingTime() / 1000.0).toInt())})")
+                        }
+                    }
+                })
+
+            for (i in 0 until 54) {
+                if (!buttons.containsKey(i) && !MODIFIER_SLOTS.contains(i)) {
+                    buttons[i] = GlassButton(7)
+                }
+            }
         }
     }
 
     override fun acceptsInsertedItem(player: Player, itemStack: ItemStack, slot: Int): Boolean {
-        if (!GeneratorMenu.MODIFIER_SLOTS.contains(slot)) {
+        if (!MODIFIER_SLOTS.contains(slot)) {
             return false
         }
 
-        val modifier = GeneratorModifierUtils.extractModifierFromItemStack(itemStack) ?: return false
+        val modifier = RobotModifierUtils.extractModifierFromItemStack(itemStack) ?: return false
 
         val notInserted = InventoryUtils.addAmountToInventory(robot.modifierStorage, itemStack, itemStack.amount)
         if (notInserted != null) {
@@ -97,6 +137,8 @@ class RobotMenu(private val robot: MinerRobot) : Menu() {
                 desc.add("${ChatColor.GRAY}Money/HR: ${Formats.formatMoney(moneyPerHour)}")
                 desc.add("${ChatColor.GRAY}Tokens/HR: ${Formats.formatTokens(tokensPerHour.toLong())}")
                 desc.add("")
+                desc.add("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}Revenue History")
+                desc.add("")
 
                 val table = GraphicalTable()
                     .addEntry(0, 0, "")
@@ -119,11 +161,12 @@ class RobotMenu(private val robot: MinerRobot) : Menu() {
                     .addEntry(4, 1, Formats.formatMoney(robot.moneyEarnings.allTime))
                     .addEntry(4, 2, Formats.formatTokens(robot.tokenEarnings.allTime.toBigInteger()))
 
-                    .title("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}Revenue History")
                     .borders(true)
                     .render()
 
                 desc.addAll(table)
+
+                robot.renderModifiersInfo(desc)
             }
         }
 
@@ -170,7 +213,7 @@ class RobotMenu(private val robot: MinerRobot) : Menu() {
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
-                ManageUpgradesMenu(robot).openMenu(player)
+                RobotUpgradesMenu(robot).openMenu(player)
             }
         }
     }
@@ -205,7 +248,7 @@ class RobotMenu(private val robot: MinerRobot) : Menu() {
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
-            ManageCosmeticsMenu(robot).openMenu(player)
+            RobotCosmeticsMenu(robot).openMenu(player)
         }
     }
 
@@ -313,6 +356,45 @@ class RobotMenu(private val robot: MinerRobot) : Menu() {
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
             if (clickType.isLeftClick) {
                 robot.collectEarnings(player)
+            }
+        }
+    }
+
+    private inner class ModifierItemButton(private val itemStack: ItemStack) : Button() {
+        override fun getButtonItem(player: Player): ItemStack {
+            return itemStack.clone()
+        }
+
+        override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {
+            if (player.inventory.firstEmpty() == -1) {
+                player.sendMessage("${ChatColor.RED}You need a free inventory space to do that!")
+                return
+            }
+
+            when (clickType) {
+                ClickType.LEFT -> {
+                    val removed = robot.removeModifierItem(itemStack, itemStack.amount)
+                    if (removed > 0) {
+                        player.inventory.addItem(ItemBuilder.copyOf(itemStack).amount(removed).build())
+                        player.updateInventory()
+                    }
+                }
+                ClickType.RIGHT -> {
+                    var removed = 0
+                    if (itemStack.amount > 1) {
+                        removed = robot.removeModifierItem(itemStack, itemStack.amount / 2)
+                    } else if (itemStack.amount == 1) {
+                        removed = robot.removeModifierItem(itemStack, 1)
+                    }
+
+                    if (removed > 0) {
+                        player.inventory.addItem(ItemBuilder.copyOf(itemStack).amount(removed).build())
+                        player.updateInventory()
+                    }
+                }
+                else -> {
+
+                }
             }
         }
     }

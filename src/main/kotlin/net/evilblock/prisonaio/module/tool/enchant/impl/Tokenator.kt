@@ -8,6 +8,7 @@
 package net.evilblock.prisonaio.module.tool.enchant.impl
 
 import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorHandler
+import net.evilblock.prisonaio.module.mechanic.armor.impl.WardenArmorSet
 import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.region.Region
@@ -35,7 +36,7 @@ object Tokenator : Enchant("tokenator", "Tokenator", 100) {
         var tokenAmount = (level * readMultiplier()).coerceAtLeast(1.0).roundToInt().toLong()
 
         val equippedSet = AbilityArmorHandler.getEquippedSet(event.player)
-        if (equippedSet != null) {
+        if (equippedSet != null && equippedSet.hasAbility(WardenArmorSet)) {
             tokenAmount = (tokenAmount * 2.0).toLong()
         }
 

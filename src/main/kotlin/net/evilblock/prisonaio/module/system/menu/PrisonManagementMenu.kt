@@ -18,8 +18,10 @@ import net.evilblock.cubed.util.nms.MinecraftReflection
 import net.evilblock.prisonaio.module.auction.AuctionHouseHandler
 import net.evilblock.prisonaio.module.gang.GangHandler
 import net.evilblock.prisonaio.module.generator.GeneratorHandler
+import net.evilblock.prisonaio.module.mine.MineHandler
 import net.evilblock.prisonaio.module.system.SystemModule
 import net.evilblock.prisonaio.module.mine.menu.MineEditorMenu
+import net.evilblock.prisonaio.module.mine.variant.personal.PrivateMineHandler
 import net.evilblock.prisonaio.module.robot.RobotHandler
 import net.evilblock.prisonaio.module.user.UserHandler
 import net.evilblock.prisonaio.util.Permissions
@@ -105,6 +107,8 @@ class PrisonManagementMenu : Menu() {
                 desc.add("${ChatColor.GRAY}View Distance: ${ChatColor.YELLOW}${ChatColor.BOLD}${formattedViewDist}")
                 desc.add("${ChatColor.DARK_GRAY}${ChatColor.BOLD}-")
                 desc.add("${ChatColor.GRAY}User Cache: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(UserHandler.getUsers().size)}")
+                desc.add("${ChatColor.GRAY}Mines: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(MineHandler.getMines().size)}")
+                desc.add("${ChatColor.GRAY}Private Mines: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(PrivateMineHandler.getAllMines().size)}")
                 desc.add("${ChatColor.GRAY}Gangs: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(GangHandler.getAllGangs().size)}")
                 desc.add("${ChatColor.GRAY}Robots: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(RobotHandler.getRobots().size)}")
                 desc.add("${ChatColor.GRAY}Generators: ${ChatColor.YELLOW}${ChatColor.BOLD}${NumberUtils.format(GeneratorHandler.getGenerators().size)}")

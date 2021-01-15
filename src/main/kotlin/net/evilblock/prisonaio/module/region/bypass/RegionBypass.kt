@@ -17,18 +17,20 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
 
 object RegionBypass : Listener {
 
     private const val METADATA_KEY = "REGION_BYPASS"
-    private val noticeSent = hashSetOf<UUID>()
+
+    private val noticeSent: MutableSet<UUID> = hashSetOf()
 
     @JvmStatic
     fun hasBypass(player: Player, checkGameMode: Boolean = true): Boolean {
-        return player.hasMetadata(METADATA_KEY) && (!checkGameMode || player.gameMode == GameMode.CREATIVE)
+        return (player.isOp || player.hasPermission(Permissions.REGION_BYPASS))
+                && player.hasMetadata(METADATA_KEY)
+                && (!checkGameMode || player.gameMode == GameMode.CREATIVE)
     }
 
     @JvmStatic

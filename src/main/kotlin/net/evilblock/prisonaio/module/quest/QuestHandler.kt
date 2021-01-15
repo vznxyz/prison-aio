@@ -34,6 +34,8 @@ object QuestHandler : PluginHandler() {
     }
 
     override fun initialLoad() {
+        super.initialLoad()
+
         for (quest in quests) {
             quest.initializeData()
 
@@ -43,6 +45,8 @@ object QuestHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     fun getQuests(): List<Quest> {

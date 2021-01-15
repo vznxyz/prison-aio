@@ -38,6 +38,10 @@ abstract class AbilityArmorSet(
         return emptyList()
     }
 
+    fun hasAbility(armorSet: AbilityArmorSet): Boolean {
+        return armorSet == this || getInheritedArmorSets().contains(armorSet)
+    }
+
     fun getHelmet(): ItemStack {
         val item = ItemBuilder.copyOf(helmet)
             .name("$setName Helmet")

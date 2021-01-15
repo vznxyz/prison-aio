@@ -17,10 +17,11 @@ import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.tool.ToolsModule
 import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object PickaxePrestigeHandler : PluginHandler() {
 
-    private val prestigeInfoMap: MutableMap<Int, PickaxePrestigeInfo> = hashMapOf()
+    private val prestigeInfoMap: MutableMap<Int, PickaxePrestigeInfo> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return ToolsModule
@@ -48,6 +49,8 @@ object PickaxePrestigeHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

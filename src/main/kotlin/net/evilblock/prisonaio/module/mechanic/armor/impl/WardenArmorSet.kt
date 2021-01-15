@@ -22,7 +22,11 @@ object WardenArmorSet : AbilityArmorSet(
 ) {
 
     override fun getSetDescription(): String {
-        return "While the full set is equipped, right-click while mining to activate the Rage ability, which has no description yet because I don't like the original idea."
+        return "While the full set is equipped, you will receive 2x more tokens when mining."
+    }
+
+    override fun getShortSetDescription(): String? {
+        return "Receive 2x more tokens when mining"
     }
 
     override fun getInheritedArmorSets(): List<AbilityArmorSet> {

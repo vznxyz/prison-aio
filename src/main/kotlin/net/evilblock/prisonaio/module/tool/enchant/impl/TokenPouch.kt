@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.tool.enchant.impl
 
 import net.evilblock.cubed.util.Chance
 import net.evilblock.prisonaio.module.mechanic.armor.AbilityArmorHandler
+import net.evilblock.prisonaio.module.mechanic.armor.impl.WardenArmorSet
 import net.evilblock.prisonaio.module.tool.enchant.Enchant
 import net.evilblock.prisonaio.module.region.Region
 import net.evilblock.prisonaio.module.tool.enchant.EnchantCategory
@@ -35,23 +36,26 @@ object TokenPouch : Enchant("token-pouch", "Token Pouch", 1000) {
 //    }
 
     override fun onBreak(event: BlockBreakEvent, enchantedItem: ItemStack?, level: Int, region: Region) {
-        attemptFindPouch(event.player, level)
+        attemptFindPouch(event.player, level, true)
     }
 
     @JvmStatic
-    fun attemptFindPouch(player: Player, level: Int) {
+    fun attemptFindPouch(player: Player, level: Int, sendMessages: Boolean) {
         val user = UserHandler.getUser(player.uniqueId)
 
         if (Chance.percent(0.0025 * level)) {
             var tokenAmount = Chance.pick(2200, floor(2200 + level * 1.1).toInt())
 
-            if (AbilityArmorHandler.getEquippedSet(player) != null) {
+            val equippedSet = AbilityArmorHandler.getEquippedSet(player)
+            if (equippedSet != null && equippedSet.hasAbility(WardenArmorSet)) {
                 tokenAmount = (tokenAmount * 2.0).toInt()
             }
 
             user.addTokensBalance(tokenAmount.toLong())
 
-            sendMessage(player, "You found a pouch with ${Formats.formatTokens(tokenAmount.toLong())} ${ChatColor.GRAY}tokens in it!")
+            if (sendMessages) {
+                sendMessage(player, "You found a pouch with ${Formats.formatTokens(tokenAmount.toLong())} ${ChatColor.GRAY}tokens in it!")
+            }
         }
     }
 

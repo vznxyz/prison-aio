@@ -16,10 +16,11 @@ import net.evilblock.cubed.plugin.PluginModule
 import net.evilblock.prisonaio.PrisonAIO
 import net.evilblock.prisonaio.module.battlepass.BattlePassModule
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object TierHandler : PluginHandler() {
 
-    private val tiers: MutableMap<Int, Tier> = hashMapOf()
+    private val tiers: MutableMap<Int, Tier> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return BattlePassModule
@@ -54,6 +55,8 @@ object TierHandler : PluginHandler() {
         for (i in 1..50) {
             tiers.putIfAbsent(i, Tier(i))
         }
+
+        loaded = true
     }
 
     override fun saveData() {

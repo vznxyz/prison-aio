@@ -90,14 +90,10 @@ object Zeus : AbilityEnchant(id = "zeus", enchant = "Zeus", maxLevel = 3) {
                 return
             }
 
-            // broadcast multi block break event (use rewards modifiers)
-            val multiBlockBreakEvent = MultiBlockBreakEvent(event.player, zeusExplodeEvent.origin, blocks, 100F, useRewardsModifiers = true)
-            multiBlockBreakEvent.call()
+            MultiBlockBreakEvent(event.player, zeusExplodeEvent.origin, blocks, getYield(), useRewardsModifiers = true, breakAllBlocks = true).call()
 
-            // send notification
             sendMessage(event.player, "Your mighty powers jolt a lightning strike, which forms a crater!")
 
-            // send lightning
             MinecraftProtocol.send(event.player, createLightningPacket(event.clickedBlock.getRelative(BlockFace.UP).location))
         }
     }

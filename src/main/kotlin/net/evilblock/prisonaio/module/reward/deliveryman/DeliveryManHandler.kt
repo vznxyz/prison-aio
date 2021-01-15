@@ -22,6 +22,7 @@ import net.evilblock.prisonaio.module.reward.deliveryman.reward.requirement.impl
 import net.evilblock.prisonaio.module.reward.deliveryman.reward.requirement.impl.PrestigeRequirement
 import org.bukkit.ChatColor
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 object DeliveryManHandler : PluginHandler() {
 
@@ -32,7 +33,7 @@ object DeliveryManHandler : PluginHandler() {
         PrestigeRequirement.PrestigeRequirementType
     )
 
-    private val rewards: MutableMap<String, DeliveryManReward> = hashMapOf()
+    private val rewards: MutableMap<String, DeliveryManReward> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return RewardsModule
@@ -60,6 +61,8 @@ object DeliveryManHandler : PluginHandler() {
                 }
             }
         }
+
+        loaded = true
     }
 
     override fun saveData() {

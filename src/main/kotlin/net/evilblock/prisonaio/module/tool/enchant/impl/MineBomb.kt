@@ -153,7 +153,7 @@ object MineBomb : AbilityEnchant("mine-bomb", "Mine Bomb", 3), Listener {
         }
 
         // broadcast multi block break event
-        val multiBlockBreakEvent = MultiBlockBreakEvent(player, mineBombEvent.origin, blocks, 100F)
+        val multiBlockBreakEvent = MultiBlockBreakEvent(player, mineBombEvent.origin, blocks, getYield())
         multiBlockBreakEvent.call()
 
         if (!multiBlockBreakEvent.isCancelled) {

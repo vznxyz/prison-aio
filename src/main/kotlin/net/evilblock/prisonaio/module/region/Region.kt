@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.region
 
 import net.evilblock.cubed.serialize.AbstractTypeSerializable
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
+import net.evilblock.prisonaio.module.region.bypass.RegionBypass
 import org.bukkit.block.Block
 import org.bukkit.entity.*
 import org.bukkit.event.Cancellable
@@ -20,6 +21,10 @@ import org.bukkit.projectiles.ProjectileSource
 abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : AbstractTypeSerializable {
 
     var persistent: Boolean = true
+
+    open fun initializeData() {
+
+    }
 
     abstract fun getRegionName(): String
 
@@ -111,7 +116,7 @@ abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : Abs
 
         if (victim is ItemFrame || victim is Painting) {
             if (attacker is Player) {
-                if (!RegionHandler.bypassCheck(attacker, cancellable)) {
+                if (!RegionBypass.hasBypass(attacker)) {
                     cancellable.isCancelled = true
                     return
                 }
@@ -128,7 +133,7 @@ abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : Abs
     }
 
     open fun onPlayerInteractEntity(player: Player, rightClicked: Entity, cancellable: Cancellable) {
-        if (RegionHandler.bypassCheck(player, cancellable)) {
+        if (RegionBypass.hasBypass(player)) {
             return
         }
 
@@ -145,6 +150,38 @@ abstract class Region(val id: String, internal var cuboid: Cuboid? = null) : Abs
 
     open fun onEnterRegion(player: Player) {
 
+    }
+
+    /**
+     * If the given [player] is considered nearby.
+     */
+    fun isNearby(player: Player): Boolean {
+        if (cuboid == null) {
+            throw IllegalStateException("Cannot check if player is nearby if no region has been set for this mine")
+        }
+
+        val nearbyRadius = 5
+
+        // save processing power here by directly checking if the region contains the player's location
+        if (nearbyRadius <= 0) {
+            if (cuboid!!.contains(player.location)) {
+                return true
+            }
+        }
+
+        // clone the region and grow by the radius, including up and down
+        val expandedRegion = cuboid!!.clone()
+            .grow(nearbyRadius)
+            .expand(Cuboid.CuboidDirection.UP, nearbyRadius)
+            .expand(Cuboid.CuboidDirection.DOWN, nearbyRadius)
+
+        // check if expanded region contains the player's location
+        if (expandedRegion.contains(player.location)) {
+            return true
+        }
+
+        // the player is not nearby
+        return false
     }
 
 }

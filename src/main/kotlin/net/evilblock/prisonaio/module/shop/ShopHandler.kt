@@ -29,11 +29,12 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object ShopHandler: PluginHandler() {
 
-    private val shopsMap: MutableMap<String, Shop> = hashMapOf()
-    private val receipts = hashMapOf<UUID, MutableSet<ShopReceipt>>()
+    private val shopsMap: MutableMap<String, Shop> = ConcurrentHashMap()
+    private val receipts: MutableMap<UUID, MutableSet<ShopReceipt>> = ConcurrentHashMap()
 
     override fun getModule(): PluginModule {
         return ShopsModule
@@ -60,6 +61,8 @@ object ShopHandler: PluginHandler() {
         }
 
         ServiceRegistry.register(ShopCooldownsExpiryService, 20L)
+
+        loaded = true
     }
 
     override fun saveData() {

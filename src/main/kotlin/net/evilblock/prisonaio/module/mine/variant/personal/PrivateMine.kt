@@ -8,12 +8,14 @@
 package net.evilblock.prisonaio.module.mine.variant.personal
 
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.lite.LiteEdit
 import net.evilblock.cubed.lite.LiteRegion
 import net.evilblock.cubed.util.Chance
 import net.evilblock.cubed.util.NumberUtils
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.prisonaio.module.mine.variant.personal.data.BlockType
+import net.evilblock.prisonaio.module.mine.variant.personal.npc.PrivateMineNPC
 import net.evilblock.prisonaio.module.region.bitmask.BitmaskRegion
 import net.evilblock.prisonaio.module.reward.RewardsModule
 import net.evilblock.prisonaio.module.reward.minecrate.MineCrateHandler
@@ -31,37 +33,40 @@ class PrivateMine(
     val gridIndex: Int,
     val owner: UUID,
     val spawnPoint: Location,
+    npcLocation: Location,
     cuboid: Cuboid,
     val innerCuboid: Cuboid
 ) : BitmaskRegion("Private-Mine-$gridIndex", cuboid) {
 
-    /**
-     * The sales tax of this mine, which is applied when visiting players sell to a shop.
-     */
+    var public: Boolean = false
     var salesTax: Double = PrivateMineConfig.salesTaxRange.maximumDouble
-
-    /**
-     * Players that have been whitelisted and can visit this mine at any time.
-     */
     val whitelistedPlayers: HashSet<UUID> = hashSetOf(owner)
 
-    /**
-     * If this mine is currently public
-     */
-    var public: Boolean = false
+    var moneyGained: Long = 0L
 
-    /**
-     * The amount of money this mine has generated from sales tax.
-     */
-    @Transient var moneyGained: Long = 0L
+    internal var npc: PrivateMineNPC = PrivateMineNPC(npcLocation)
 
-    /**
-     * The players that are currently active in this mine.
-     */
-    @Transient internal var activePlayers: HashSet<Player> = hashSetOf()
+    @Transient
+    internal var activePlayers: HashSet<Player> = hashSetOf()
 
     @Transient
     var lastResetCheck: Long = System.currentTimeMillis()
+
+    override fun initializeData() {
+        super.initializeData()
+
+        activePlayers = hashSetOf()
+        salesTax = salesTax.coerceAtLeast(1.0)
+
+        npc.initializeData()
+        npc.persistent = false
+        npc.updateTexture(PrivateMineHandler.getPrivateMineNPCTextureValue(), PrivateMineHandler.getPrivateMineNPCTextureSignature())
+        npc.updateLines(PrivateMineHandler.getPrivateMineNPCHologramLines())
+
+        if (!EntityManager.isEntityTracked(npc)) {
+            EntityManager.trackEntity(npc)
+        }
+    }
 
     override fun getRegionName(): String {
         return "${getOwnerName()}'s Private Mine"

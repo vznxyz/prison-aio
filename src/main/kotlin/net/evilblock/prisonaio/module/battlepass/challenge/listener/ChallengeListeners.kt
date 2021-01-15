@@ -10,6 +10,7 @@ package net.evilblock.prisonaio.module.battlepass.challenge.listener
 import net.evilblock.prisonaio.module.battlepass.challenge.ChallengeHandler
 import net.evilblock.prisonaio.module.battlepass.challenge.impl.ExecuteCommandChallenge
 import net.evilblock.prisonaio.module.battlepass.daily.DailyChallengeHandler
+import net.evilblock.prisonaio.module.combat.event.PlayerKilledEvent
 import net.evilblock.prisonaio.module.mine.event.MineBlockBreakEvent
 import net.evilblock.prisonaio.module.rank.event.AsyncPlayerPrestigeEvent
 import net.evilblock.prisonaio.module.user.UserHandler
@@ -28,8 +29,10 @@ object ChallengeListeners : Listener {
             if (challenge is ExecuteCommandChallenge) {
                 if (event.message.startsWith("/${challenge.command}", ignoreCase = true)) {
                     DailyChallengeHandler.getSession().getProgress(event.player.uniqueId).executedCommand(challenge.command)
-                    UserHandler.getUser(event.player.uniqueId).battlePassProgress.executedCommand(challenge.command)
-                    ChallengeHandler.checkCompletionsAsync(event.player)
+
+                    val user = UserHandler.getUser(event.player.uniqueId)
+                    user.battlePassProgress.executedCommand(challenge.command)
+
                     break
                 }
             }
@@ -41,7 +44,7 @@ object ChallengeListeners : Listener {
         val progress = DailyChallengeHandler.getSession().getProgress(event.user.uuid)
         progress.addPlayTime(event.offset)
 
-        ChallengeHandler.checkCompletionsAsync(event.user.getPlayer()!!)
+        event.user.battlePassProgress.requiresCheck = true
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -49,7 +52,7 @@ object ChallengeListeners : Listener {
         val progress = DailyChallengeHandler.getSession().getProgress(event.user.uuid)
         progress.incrementTimePrestiged()
 
-        ChallengeHandler.checkCompletionsAsync(event.player)
+        event.user.battlePassProgress.requiresCheck = true
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -57,7 +60,7 @@ object ChallengeListeners : Listener {
         val progress = DailyChallengeHandler.getSession().getProgress(event.player.uniqueId)
         progress.addBlocksMined(1)
 
-        ChallengeHandler.checkCompletionsAsync(event.player)
+        UserHandler.getUser(event.player).battlePassProgress.requiresCheck = true
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -65,7 +68,16 @@ object ChallengeListeners : Listener {
         val progress = DailyChallengeHandler.getSession().getProgress(event.player.uniqueId)
         progress.addBlocksMinedAtMine(event.mine, 1)
 
-        ChallengeHandler.checkCompletionsAsync(event.player)
+        UserHandler.getUser(event.player).battlePassProgress.requiresCheck = true
     }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onPlayerDeathEvent(event: PlayerKilledEvent) {
+        val progress = DailyChallengeHandler.getSession().getProgress(event.killer.uniqueId)
+        progress.addKills(1)
+
+        UserHandler.getUser(event.killer).battlePassProgress.requiresCheck = true
+    }
+
 
 }

@@ -14,6 +14,8 @@ import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.*
 
 interface Currency {
@@ -30,7 +32,7 @@ interface Currency {
 
     fun take(player: UUID, amount: Number)
 
-    fun format(amount: Number): String
+    fun format(amount: Number, allowShorten: Boolean = true): String
 
     fun toType(): Type {
         return when (this) {
@@ -77,8 +79,16 @@ interface Currency {
             UserHandler.getOrLoadAndCacheUser(player).subtractMoneyBalance(amount.toDouble())
         }
 
-        override fun format(amount: Number): String {
-            return Formats.formatMoney(amount.toDouble())
+        override fun format(amount: Number, allowShorten: Boolean): String {
+            return when {
+                amount is Int -> Formats.formatMoney(BigDecimal(amount.toDouble()))
+                amount is Double -> Formats.formatMoney(BigDecimal(amount))
+                amount is BigInteger -> Formats.formatMoney(BigDecimal(amount.toDouble()))
+                amount is BigDecimal -> Formats.formatMoney(amount)
+                else -> {
+                    Formats.formatMoney(amount.toDouble())
+                }
+            }
         }
     }
 
@@ -107,7 +117,7 @@ interface Currency {
             UserHandler.getOrLoadAndCacheUser(player).subtractTokensBalance(amount.toLong())
         }
 
-        override fun format(amount: Number): String {
+        override fun format(amount: Number, allowShorten: Boolean): String {
             return Formats.formatTokens(amount.toLong())
         }
     }
@@ -137,7 +147,7 @@ interface Currency {
             UserHandler.getOrLoadAndCacheUser(player).subtractPrestigeTokens(amount.toInt())
         }
 
-        override fun format(amount: Number): String {
+        override fun format(amount: Number, allowShorten: Boolean): String {
             return Formats.formatPrestigeTokens(amount.toInt())
         }
     }
@@ -171,7 +181,7 @@ interface Currency {
             currency.take(player, amount)
         }
 
-        override fun format(amount: Number): String {
+        override fun format(amount: Number, allowShorten: Boolean): String {
             return currency.format(amount)
         }
 

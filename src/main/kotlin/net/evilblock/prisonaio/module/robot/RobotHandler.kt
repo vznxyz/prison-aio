@@ -5,6 +5,7 @@ import com.google.common.io.Files
 import com.google.gson.reflect.TypeToken
 import com.intellectualcrafters.plot.`object`.PlotId
 import net.evilblock.cubed.Cubed
+import net.evilblock.cubed.backup.BackupHandler
 import net.evilblock.cubed.entity.EntityManager
 import net.evilblock.cubed.plugin.PluginHandler
 import net.evilblock.cubed.plugin.PluginModule
@@ -22,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap
 object RobotHandler : PluginHandler() {
 
     private val dataType = object : TypeToken<List<Robot>>() {}.type
-    private val backupsFolder = File(getModule().getPluginFramework().dataFolder, "backups")
 
     private val robotsByUuid: MutableMap<UUID, Robot> = ConcurrentHashMap()
     private val robotsByPlot: MutableMap<PlotId, MutableList<Robot>> = ConcurrentHashMap()
@@ -40,8 +40,7 @@ object RobotHandler : PluginHandler() {
 
         val dataFile = getInternalDataFile()
         if (dataFile.exists()) {
-            backupsFolder.mkdir()
-            Files.copy(dataFile, findNextBackupFile())
+            Files.copy(dataFile, BackupHandler.findNextBackupFile("robots"))
 
             try {
                 Files.newReader(dataFile, Charsets.UTF_8).use { reader ->
@@ -61,9 +60,13 @@ object RobotHandler : PluginHandler() {
         }
 
         RobotThread.start()
+
+        loaded = true
     }
 
     override fun saveData() {
+        super.saveData()
+
         try {
             java.nio.file.Files.write(getInternalDataFile().toPath(), Cubed.gson.toJson(robotsByUuid.values, dataType).toByteArray())
         } catch (e: Exception) {
@@ -139,10 +142,6 @@ object RobotHandler : PluginHandler() {
 
         player.sendMessage("${ChatColor.RED}You are not a member of this plot, so you can't do that!")
         return false
-    }
-
-    private fun findNextBackupFile(): File {
-        return File(backupsFolder, "robots-" + SimpleDateFormat("yyyy-dd-MM_hh.mm.ss").format(Date()) + ".json")
     }
 
 }

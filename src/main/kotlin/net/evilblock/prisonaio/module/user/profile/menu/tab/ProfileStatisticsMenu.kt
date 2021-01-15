@@ -106,7 +106,7 @@ class ProfileStatisticsMenu(user: User) : ProfileLayoutMenu(layout = ProfileLayo
         }
     }
 
-    private inner class KillsButton : TexturedHeadButton(Constants.IB_SKULL_GREEN_TEXTURE) {
+    private inner class KillsButton : TexturedHeadButton(Constants.SKULL_GREEN_TEXTURE) {
         override fun getName(player: Player): String {
             return "${ChatColor.GREEN}${ChatColor.BOLD}Kills"
         }
@@ -118,7 +118,7 @@ class ProfileStatisticsMenu(user: User) : ProfileLayoutMenu(layout = ProfileLayo
         }
     }
 
-    private inner class DeathsButton : TexturedHeadButton(Constants.IB_SKULL_RED_TEXTURE) {
+    private inner class DeathsButton : TexturedHeadButton(Constants.SKULL_RED_TEXTURE) {
         override fun getName(player: Player): String {
             return "${ChatColor.RED}${ChatColor.BOLD}Deaths"
         }

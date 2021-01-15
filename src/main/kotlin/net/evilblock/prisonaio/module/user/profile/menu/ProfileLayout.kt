@@ -251,12 +251,11 @@ class ProfileLayout(
         }
 
         override fun getDescription(player: Player): List<String> {
-            return listOf(
-                "${ChatColor.GRAY}Manage your account settings and",
-                "${ChatColor.GRAY}privacy options.",
-                "",
-                "${ChatColor.YELLOW}Click to manage your settings"
-            )
+            return arrayListOf<String>().also { desc ->
+                desc.addAll(TextSplitter.split(text = "Manage your account settings and privacy settings."))
+                desc.add("")
+                desc.add("${ChatColor.YELLOW}Click to manage your settings")
+            }
         }
 
         override fun clicked(player: Player, slot: Int, clickType: ClickType, view: InventoryView) {

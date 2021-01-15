@@ -26,11 +26,11 @@ object InmateArmorSet : AbilityArmorSet(
 ) {
 
     override fun getSetDescription(): String {
-        return "While the full set is equipped, you will receive 2x more tokens when mining."
+        return "While the full set is equipped, your enchant ability cooldowns are 25% less duration."
     }
 
     override fun getShortSetDescription(): String {
-        return "Receive 2x more tokens when mining"
+        return "Enchant ability cooldowns are 25% less duration"
     }
 
 }

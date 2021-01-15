@@ -9,6 +9,7 @@ package net.evilblock.prisonaio.module.mine.variant.mineparty
 
 import net.evilblock.cubed.util.Duration
 import net.evilblock.prisonaio.module.mine.variant.normal.NormalMine
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
@@ -45,7 +46,7 @@ class MinePartyMine(id: String) : NormalMine(id) {
     }
 
     override fun supportsRewards(): Boolean {
-        return false
+        return true
     }
 
     override fun supportsCosmetics(): Boolean {
@@ -53,8 +54,9 @@ class MinePartyMine(id: String) : NormalMine(id) {
     }
 
     override fun onBlockBreak(player: Player, block: Block, cancellable: Cancellable) {
+        cancellable.isCancelled = true
+
         if (!active || isExpired()) {
-            cancellable.isCancelled = true
             return
         }
 
@@ -63,6 +65,9 @@ class MinePartyMine(id: String) : NormalMine(id) {
         if (progress >= goal) {
             MinePartyHandler.finishEvent()
         }
+
+        block.type = Material.AIR
+        block.state.update()
     }
 
     fun isExpired(): Boolean {

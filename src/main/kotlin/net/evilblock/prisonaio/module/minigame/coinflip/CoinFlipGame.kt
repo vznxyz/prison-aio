@@ -22,7 +22,7 @@ class CoinFlipGame(
     val creator: User,
     var opponent: User? = null,
     val currencyAmount: Number,
-    val currency: Currency
+    val currency: Currency.Type
 ) {
 
     val uuid: UUID = UUID.randomUUID()
